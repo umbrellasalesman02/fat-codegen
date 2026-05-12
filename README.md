@@ -86,10 +86,10 @@ Notes:
 vp install
 vp run check
 vp run test
-API_PORT=3100 vp run --filter @template/api dev &
+API_PORT=3737 vp run --filter @template/api dev &
 API_PID=$!
 sleep 3
-API_PORT=3100 vp run --filter @template/api smoke
+API_PORT=3737 vp run --filter @template/api smoke
 kill $API_PID
 vp run test:e2e
 ```
