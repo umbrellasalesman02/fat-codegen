@@ -1,29 +1,32 @@
+import { NodeHttpServer, NodeRuntime } from "@effect/platform-node"
+import { Effect, Layer } from "effect"
+import { HttpRouter } from "effect/unstable/http"
+import { HttpApiBuilder } from "effect/unstable/httpapi"
 import { createServer } from "node:http"
-import { Effect } from "effect"
+import { Api } from "./api.js"
 
 const port = Number(process.env.API_PORT ?? 3000)
 
-const healthResponse = Effect.succeed({
-  status: "ok",
-  service: "api",
-  version: "0.1.0"
-} as const)
+const SystemApiHandlers = HttpApiBuilder.group(
+  Api,
+  "system",
+  Effect.fn(function*(handlers) {
+    return handlers.handle("health", () =>
+      Effect.succeed({
+        status: "ok" as const,
+        service: "api" as const,
+        version: "0.1.0"
+      })
+    )
+  })
+)
 
-const server = createServer((req, res) => {
-  if (req.method === "GET" && req.url === "/health") {
-    const program = Effect.map(healthResponse, (payload) => {
-      res.writeHead(200, { "content-type": "application/json" })
-      res.end(JSON.stringify(payload))
-    })
+const ApiRoutes = HttpApiBuilder.layer(Api).pipe(
+  Layer.provide(SystemApiHandlers)
+)
 
-    Effect.runFork(program)
-    return
-  }
+const HttpServerLayer = HttpRouter.serve(ApiRoutes).pipe(
+  Layer.provide(NodeHttpServer.layer(createServer, { port }))
+)
 
-  res.writeHead(404, { "content-type": "application/json" })
-  res.end(JSON.stringify({ error: "Not Found" }))
-})
-
-server.listen(port, () => {
-  console.log(`[api] listening on http://localhost:${port}`)
-})
+Layer.launch(HttpServerLayer).pipe(NodeRuntime.runMain)
