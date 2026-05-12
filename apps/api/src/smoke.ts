@@ -1,7 +1,7 @@
 import { Effect } from "effect"
 import { ApiClient, makeApiClientLayer } from "@template/shared"
 
-const port = Number(process.env.API_PORT ?? 3000)
+const port = Number(process.env.API_PORT ?? 3737)
 const baseUrl = `http://127.0.0.1:${port}`
 
 const program = Effect.gen(function*() {

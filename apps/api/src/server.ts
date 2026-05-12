@@ -5,7 +5,7 @@ import { HttpApiBuilder } from "effect/unstable/httpapi"
 import { createServer } from "node:http"
 import { Api } from "@template/shared"
 
-const port = Number(process.env.API_PORT ?? 3000)
+const port = Number(process.env.API_PORT ?? 3737)
 
 const SystemApiHandlers = HttpApiBuilder.group(
   Api,
