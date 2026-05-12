@@ -1,5 +1,5 @@
 import { NodeHttpServer, NodeRuntime } from "@effect/platform-node"
-import { Effect, Layer } from "effect"
+import { Effect, Layer, Ref } from "effect"
 import { HttpRouter } from "effect/unstable/http"
 import { HttpApiBuilder } from "effect/unstable/httpapi"
 import { createServer } from "node:http"
@@ -12,12 +12,22 @@ const SystemApiHandlers = HttpApiBuilder.group(
   "system",
   // oxlint-disable-next-line eslint/require-yield
   Effect.fn(function*(handlers) {
+    const counter = yield* Ref.make(0)
+
     return handlers.handle("health", () =>
       Effect.succeed({
         status: "ok" as const,
         service: "api" as const,
         version: "0.1.0"
       })
+    ).handle("counter", () =>
+      Ref.get(counter).pipe(
+        Effect.map((value) => ({ value }))
+      )
+    ).handle("incrementCounter", () =>
+      Ref.updateAndGet(counter, (value) => value + 1).pipe(
+        Effect.map((value) => ({ value }))
+      )
     )
   })
 )
