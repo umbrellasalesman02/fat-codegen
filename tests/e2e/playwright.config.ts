@@ -15,7 +15,7 @@ export default defineConfig({
   webServer: [
     {
       command: "API_PORT=3737 vp run --filter @template/api dev",
-      url: "http://127.0.0.1:3737/rpc",
+      url: "http://127.0.0.1:3737",
       reuseExistingServer: !process.env.CI,
       timeout: 120_000
     },
