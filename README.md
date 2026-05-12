@@ -76,6 +76,10 @@ Run from repository root:
 - `vp run test:e2e`
 - `vp run deps:check`
 
+Notes:
+
+- Use `vp run build` for this monorepo starter. `vp build` is the built-in single-app Vite build command and expects a root `index.html`.
+
 ## Local flow equivalent to CI
 
 ```bash
