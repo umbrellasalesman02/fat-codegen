@@ -108,6 +108,62 @@ _Avoid_: warn-and-stub, silent partial generation
 Generator-owned boundary contract files live under `packages/shared/src/generated/*`, while hand-written shared files only compose or re-export those contracts for Application consumption.
 _Avoid_: app imports of generated internals, mixed manual and generated contract files
 
+**Slice Success Criterion**:
+A Generated Application Slice is successful when a user can retrieve and view the targeted read-only domain output end-to-end through API and web using generated contracts, with fail-fast behavior for unsupported required script semantics.
+_Avoid_: partial backend-only proof, silent fallback behavior
+
+**Title Read Summary**:
+The minimal read-only Title payload includes `titleId`, `titleNameLabel`, and `modifiedAt`.
+_Avoid_: full title document payload, preemptive optional metadata
+
+**Seed Title Fixture**:
+The first Generated Application Slice targets one explicit Title fixture: `9B433A0E-7EBC-435C-8A99-D966BC17BA30`.
+_Avoid_: arbitrary title selection in slice 1, multi-title scope expansion
+
+**Canonical Modified Timestamp**:
+`modifiedAt` is a projection-defined canonical timestamp field whose upstream source field is declared explicitly in slice configuration.
+_Avoid_: implicit timestamp inference, source-field leakage into contracts
+
+**Slice Field Completeness Rule**:
+For a target fixture, all fields in the declared read summary must resolve; generation fails if any required field is missing.
+_Avoid_: partial field emission, best-effort success state
+
+**Slice Scope Error**:
+Requests outside the current slice scope return a typed domain error (`TitleNotInSliceScope`) rather than generic not-found.
+_Avoid_: ambiguous not-found responses during incremental rollout
+
+**Slice Scope Visibility**:
+The first slice exposes one title view route and shows explicit user-facing scope messaging when `TitleNotInSliceScope` is returned.
+_Avoid_: hidden scope failures, transport-only error visibility
+
+**Minimal Script Semantics Scope**:
+Slice-1 supports only script semantics required to derive `Title Read Summary` fields for the Seed Title Fixture; all other encountered required semantics fail fast.
+_Avoid_: broad script-engine ambition in slice 1, silent semantic omission
+
+**Source Domain Diagnostics**:
+Generation diagnostics classify failures by Source Domain (`Data Structure`, `Reference Data`, `Behavior Logic`) to support slice triage.
+_Avoid_: undifferentiated error streams, layer-blind troubleshooting
+
+**Seed Fixture Snapshot**:
+Slice-1 commits expected output snapshots for the Seed Title Fixture (read payload and key diagnostics), and regeneration must match unless an intentional change is made.
+_Avoid_: untracked generator drift, assertion-free regeneration
+
+**Fixture Capture Path**:
+A slice-local acquisition path captures fixture data (for example via OData by table name and id) into committed projection input used by generation.
+_Avoid_: live-runtime dependency for slice proof, ad hoc manual fixture creation
+
+**Slice Runtime Path**:
+The slice runtime path serves generated outputs from committed fixture projections through contracts, API, and web without requiring live source connectivity.
+_Avoid_: implicit runtime fetch from source systems, capture/runtime coupling
+
+**Fixture Capture Command Contract**:
+Fixture capture uses a generic command contract with explicit table name, record id, and output fixture target.
+_Avoid_: table-specific capture scripts, hidden capture parameters
+
+**Dual Fixture Record**:
+Slice fixtures may store both captured source records and projected records, while runtime and generation consume projected records only.
+_Avoid_: projected-only fixtures with no traceability, runtime dependence on raw records
+
 ## Relationships
 
 - A **Template Repository** contains multiple **Application**s
@@ -133,6 +189,20 @@ _Avoid_: app imports of generated internals, mixed manual and generated contract
 - **Source Provenance Path** standardizes naming of immutable structural inputs
 - **Unsupported Script Step Policy** preserves trust in generated outputs by preventing partial behavior emission
 - **Generated Contract Ownership** keeps app dependencies stable while allowing generator internals to evolve
+- **Slice Success Criterion** defines the minimum end-to-end proof for a Generated Application Slice
+- **Title Read Summary** defines the minimum useful payload for the first Title slice
+- **Seed Title Fixture** constrains the first slice to one deterministic title anchor
+- **Canonical Modified Timestamp** keeps boundary contracts stable despite upstream field variance
+- **Slice Field Completeness Rule** enforces binary success for required read payloads
+- **Slice Scope Error** clarifies progressive-implementation boundaries at runtime
+- **Slice Scope Visibility** ensures slice boundaries are observable in the web experience
+- **Minimal Script Semantics Scope** aligns behavior support with the first slice contract
+- **Source Domain Diagnostics** make failure triage align with dependency layering
+- **Seed Fixture Snapshot** provides deterministic regression detection for slice evolution
+- **Fixture Capture Path** enables reproducible fixture acquisition without runtime coupling
+- **Slice Runtime Path** keeps slice behavior deterministic and environment-stable
+- **Fixture Capture Command Contract** standardizes agent-driven fixture acquisition
+- **Dual Fixture Record** preserves mapping traceability without expanding runtime coupling
 
 ## Folder Boundaries
 
@@ -161,3 +231,16 @@ _Avoid_: app imports of generated internals, mixed manual and generated contract
 - "source folder naming" was ambiguous — resolved via **Source Provenance Path** with `source/filemaker/funkis-authoring-tool/fm-xml-export-exploder-output/`.
 - "unsupported script behavior" was ambiguous between stubbing and hard failure — resolved as **Unsupported Script Step Policy** with fail-fast diagnostics.
 - "shared contract ownership" was ambiguous between generated and hand-edited files — resolved via **Generated Contract Ownership**.
+- "first-slice done state" was ambiguous — resolved via **Slice Success Criterion**.
+- "minimum title payload" was ambiguous — resolved as **Title Read Summary**.
+- "initial title scope" was ambiguous between one and many titles — resolved as **Seed Title Fixture**.
+- "modified timestamp source" was ambiguous across legacy fields — resolved as **Canonical Modified Timestamp**.
+- "required field behavior" was ambiguous between strict and best-effort output — resolved as **Slice Field Completeness Rule**.
+- "out-of-scope title request behavior" was ambiguous — resolved as **Slice Scope Error**.
+- "scope boundary UX" was ambiguous — resolved as **Slice Scope Visibility**.
+- "slice-1 script breadth" was ambiguous — resolved as **Minimal Script Semantics Scope**.
+- "diagnostic triage axis" was ambiguous — resolved as **Source Domain Diagnostics**.
+- "regression oracle for slice-1" was ambiguous — resolved as **Seed Fixture Snapshot**.
+- "live data usage in slice-1" was ambiguous — resolved as **Fixture Capture Path** plus **Slice Runtime Path**.
+- "fixture capture interface" was ambiguous — resolved as **Fixture Capture Command Contract**.
+- "fixture storage shape" was ambiguous — resolved as **Dual Fixture Record**.
