@@ -1,0 +1,249 @@
+<Script>
+	<ScriptReference id="479" name="Cleanup Title CL"></ScriptReference>
+	<ObjectList membercount="16">
+		<Step hash="5C9614A62FFE872C8BB91A79D61C75E0" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script is called from LP settings on the language TAB"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BE8C5F7FBDAA9B26A353A13174F23956" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Mode can be &quot;cleanup&quot; - deleting unused blocks or &quot;optimise&quot; also deleting unsed texts and media fields"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="22112A4ACF77307623C16F59F25DDD26" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BF3B6F155147277954111AEFE8152D9E" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(scriptParameter)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$mode"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0CDBFF8777DADD94C43FE25EC7130F86" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Title::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D72EDAB78A426865BBC8C3AB9B63BA25" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$mode="cleanup"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7C694D6A99EC5E24141B9392451E24A0" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Delete unused blocks"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["Clicking OK means that all unused blocks will be removed from this title.  These blocks can be added one by one if needed.¶¶Are you sure you want to delete unused blocks?¶"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Cancel">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5F1DE38CD64747AF2F6CF4603636C444" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$mode = "optimise"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="80E7559A39B82B3D8197D0981F598C59" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Cleanup Title"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["Clicking OK means that all unused blocks will be removed from this title and the database will be optimised. This is a good thing to do when a project is delivered in origial language. ¶¶Are you sure you want to cleanup title?¶"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Cancel">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="273F1C085836D8E74225E256D3E48D67" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="CD81897D8FD316D87B3BD30822D9E7EC" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastMessageChoice)= 1]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C7FDE41DE3A06751FF3D6BE8B348C922" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="480" name="Cleanup Title SRV"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_id"; $title_id ) &SetProperty ( "mode" ; $mode )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="699A56286B3F767D9A2EFFA98A2972B0" id="164" name="Perform Script on Server" enable="False">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="480" name="Cleanup Title SRV"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_id"; $title_id ) &SetProperty ( "mode" ; $mode )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="09D7359344DDF258EFD93617FEF6CE58" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Cleanup completed"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA[Get(ScriptResult)]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AE1CB7D909BC87773470296BF73503F8" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="210438FF1431A02DFB8514D25D84C4CD" id="6" name="Go to Layout" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

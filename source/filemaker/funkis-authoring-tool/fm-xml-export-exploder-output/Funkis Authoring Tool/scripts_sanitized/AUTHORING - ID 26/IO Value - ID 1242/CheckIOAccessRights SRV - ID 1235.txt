@@ -1,0 +1,110 @@
+# Called from script trigger onModify from IO Page Item Settings
+# Designed for PSOS
+
+Set Variable [ $io_id[1] ; Get(scriptParameter) ]
+
+Go to Layout [ Layout: "TABLE FAT IO Alt" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $title_id[1] ; FAT IO Alt::Title id ]
+
+If [ Get(foundCount)= 1 ]
+	
+	# Downgrade the IO permissions. Cannot fix Write Session
+	Set Field [ FAT IO Alt::IO Read Permissions ; "" ]
+	Set Field [ FAT IO Alt::IO Write Permissions ; Case ( PatternCount ( FAT IO Alt::IO Write Permissions; "Session") ; "My Session"; "") ]
+	
+	
+	# Find all IO Values using this IO
+	Go to Layout [ Layout: "TABLE FAT IO Value" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+	If [ Get(foundCount) > 0 ]
+		Loop [ Flush: Always ]
+			Set Variable [ $io_type[1] ; FAT IO Value::IO Type ]
+			Set Variable [ $io_context[1] ; FAT IO Value::IO Context ]
+			Set Variable [ $read_filter[1] ; FAT IO Value::IO Read filter ]
+			Set Variable [ $write_as[1] ; FAT IO Value::IO Write as ]
+			
+			Perform Script [ From list ; "UpdateIOAccessRights" ; Parameter: SetProperty("io_type" ; $io_type) & 
+							SetProperty("io_id" ; $io_id) & 
+							SetProperty("read_filter" ; $read_filter) & 
+							SetProperty("write_as" ; $write_as) ]
+			
+			Go to Layout [ Layout: "TABLE FAT IO Value" ; Animation: None ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+End If
+
+# Find all Text variables using this IO
+Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		# Text variables for Insight have context=Title but no need to check access rights for Insights
+		If [ FAT Text variable::IO Context ≠ "Title" ]
+			Set Variable [ $read_filter[1] ; "My " & FAT Text variable::IO Context ]
+			Set Variable [ $write_as[1] ; "" ]
+			Set Variable [ $io_type[1] ; FAT IO @ Text variable::IO type ]
+			
+			Perform Script [ From list ; "UpdateIOAccessRights" ; Parameter: SetProperty("io_type" ; $io_type) & 
+							SetProperty("io_id" ; $io_id) & 
+							SetProperty("read_filter" ; $read_filter) & 
+							SetProperty("write_as" ; $write_as) ]
+			
+			Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# Find all Dynamic lists using this IO
+Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $io_type[1] ; FAT IO @ List Dynamic::IO type ]
+		Set Variable [ $read_filter[1] ; "My " & FAT List::Dynamic List IO context ]
+		Set Variable [ $write_as[1] ; "" ]
+		
+		Perform Script [ From list ; "UpdateIOAccessRights" ; Parameter: SetProperty("io_type" ; $io_type) & 
+						SetProperty("io_id" ; $io_id) & 
+						SetProperty("read_filter" ; $read_filter) & 
+						SetProperty("write_as" ; $write_as) ]
+		
+		Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# Find all Tag values
+Go to Layout [ Layout: "TABLE FAT Tag Value" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $read_filter[1] ; "My " & FAT Tag Value::IO Context ]
+		Set Variable [ $write_as[1] ; "" ]
+		
+		Perform Script [ From list ; "UpdateIOAccessRights" ; Parameter: SetProperty("io_type" ; $io_type) & 
+						SetProperty("io_id" ; $io_id) & 
+						SetProperty("read_filter" ; $read_filter) & 
+						SetProperty("write_as" ; $write_as) ]
+		
+		Go to Layout [ Layout: "TABLE FAT Tag Value" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+Go to Record/Request/Page [ Next ; Exit after last: ON ]
+
+If [ Not isPSOS ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+
+
+
+

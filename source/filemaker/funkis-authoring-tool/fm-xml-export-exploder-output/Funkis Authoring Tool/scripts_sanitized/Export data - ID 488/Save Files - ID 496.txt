@@ -1,0 +1,205 @@
+Set Variable [ $exportDestination[1] ; GetScriptProperty( "exportDestination" ) ]
+Set Variable [ $fullFilePath[1] ; GetScriptProperty( "fullFilePath" ) ]
+Set Variable [ $fullFilePath_VTTLocalisedMedia[1] ; GetScriptProperty( "fullFilePath_VTTLocalisedMedia" ) ]
+Set Variable [ $destinationRootpath[1] ; GetScriptProperty( "destinationRootpath" ) ]
+Set Variable [ $title_id[1] ; GetScriptProperty( "title_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty( "package_id" ) ]
+Set Variable [ $exportDB[1] ; GetScriptProperty( "exportDB" ) ]
+Set Variable [ $savePosition[1] ; GetAsNumber (GetScriptProperty( "savePosition" )) ]
+
+# ExportDB possible values for Media DB: "Media update", "Media all"
+
+# ---------------- This script saves files on disk ---------------------------------------------
+
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ PatternCount ($exportDB ; "Media") ]
+	
+	# ----------- If media files -----------------------------------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+	If [ $package_id ≠ "" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		# Extend found set with media that does not belong to a specific package
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	Else
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+	Loop [ Flush: Defer ]
+		Set Variable [ $dataFileName[1] ; FAT Media::Container exported filename ]
+		Set Variable [ $filePath[1] ; Case ( 
+						
+						    FAT Media::Localisation code = FAT Title::Original localisation code Or IsEmpty ( FAT Media::Localisation code ); 
+						
+						        GetMediaPath ( $dataFileName);
+						
+						        GetMediaPathLocalisation ( $dataFileName; FAT Media::Localisation code )
+						
+						) ]
+		If [ $exportDestination = "Local" ]
+			Set Variable [ $fullFilePath[1] ; $destinationRootpath & "public/" & $filePath & $dataFileName ]
+			Get File Exists [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Target: $fileExist ]
+			# ------- Local "Media update" checks modification date on file on disk with BaseElements plugin
+			If [ Not $fileExist Or GetAsTimeStamp (<Function Missing> ( GetPathWithoutVolumeName ( $fullFilePath ) )) < FAT Media::Container modified
+							
+							Or
+							
+							$exportDB ≠ "Media update" ]
+				Export Field Contents [ Create folders: ON ; FAT Media::Media container ; ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ]
+			End If
+		Else If [ $exportDestination = "Remote" ]
+			Set Variable [ $fullFilePath[1] ; $destinationRootpath & $filePath & $dataFileName ]
+			# ------- Remote "Media update" checks last exported date in FAT Media table
+			# ------- Export Field Contents is not available on FileMaker Server ---------
+			If [ IsEmpty ( FAT Media::Container exported ) Or 
+							FAT Media::Container exported < FAT Media::Container modified Or 
+							$exportDB  = "Media all" ]
+				Create Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Create folders: ON ]
+				Open Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Target: $fileID ]
+				Write to Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ; Target: FAT Media::Media container ; Append line feed: OFF ]
+				Close Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ]
+				
+				# Only set exported for Package media - Title media needs to export each time
+				If [ Not IsEmpty ( FAT Media::Package id ) ]
+					Set Field [ FAT Media::Container exported ; Get(currentTimeStamp) ]
+				End If
+			End If
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	
+	# Font CSS file
+	Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+	If [ $exportDB = "Media all" And Not IsEmpty ( FAT Theme::Fonts CSS file ) ]
+		
+		Set Variable [ $dataFileName[1] ; GetContainerAttribute ( FAT Theme::Fonts CSS file; "filename") ]
+		Set Variable [ $filePath[1] ; "content/theme/" ]
+		
+		If [ $exportDestination = "Local" ]
+			Set Variable [ $fullFilePath[1] ; $destinationRootpath & "public/" & $filePath & $dataFileName ]
+			Export Field Contents [ Create folders: ON ; FAT Theme::Fonts CSS file ; ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ]
+		Else If [ $exportDestination = "Remote" ]
+			Set Variable [ $fullFilePath[1] ; $destinationRootpath & $filePath & $dataFileName ]
+			# ------- Remote "Media update" checks last exported date in FAT Media table
+			# ------- Export Field Contents is not available on FileMaker Server ---------
+			Create Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Create folders: ON ]
+			Open Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Target: $fileID ]
+			Write to Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ; Target: FAT Theme::Fonts CSS file ; Append line feed: OFF ]
+			Close Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ]
+			Set Field [ FAT Theme::Font CSS Exported ; Get(currentTimeStamp) ]
+		End If
+	End If
+	
+	# Font files - only exported using Media all
+	If [ $exportDB = "Media all" ]
+		Go to Layout [ Layout: "TABLE FAT Theme Font" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get ( foundCount )>0 ]
+			Loop [ Flush: Defer ]
+				If [ Not IsEmpty(FAT Theme Font::Font File Container) ]
+					Set Variable [ $dataFileName[1] ; FAT Theme Font::Font filename ]
+					Set Variable [ $filePath[1] ; "content/theme/" ]
+					If [ $exportDestination = "Local" ]
+						Set Variable [ $fullFilePath[1] ; $destinationRootpath & "public/" & $filePath & $dataFileName ]
+						Export Field Contents [ Create folders: ON ; FAT Theme Font::Font File Container ; ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ]
+					Else If [ $exportDestination = "Remote" ]
+						Set Variable [ $fullFilePath[1] ; $destinationRootpath & $filePath & $dataFileName ]
+						# ------- Export Field Contents is not available on FileMaker Server ---------
+						Create Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Create folders: ON ]
+						Open Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Target: $fileID ]
+						Write to Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ; Target: FAT Theme Font::Font File Container ; Append line feed: OFF ]
+						Close Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ]
+						Set Field [ FAT Theme Font::Font file exported ; Get(currentTimeStamp) ]
+					End If
+				End If
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+	End If
+	# --------------- If Subtitle VTT files - all chunks are in one file - cut up and export file by file -------------------------------
+Else If [ PatternCount ( $exportDB ; "Subtitle VTT" ) ]
+	If [ $package_id ≠ "" ]
+		# For base projests - make package the root
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Variable [ $fileContent[1] ; TextDecode ( FAT Package::Latest Exported file[$savePosition] ; "UTF-8") ]
+	Else
+		Set Variable [ $fileContent[1] ; TextDecode ( FAT Title::Latest Exported file[$savePosition] ; "UTF-8") ]
+	End If
+	Set Variable [ $localisationCode[1] ; Case ( PatternCount ( RightWords ( $exportDB ; 2 ) ; "Text") ; 
+					
+					RightWords ( $exportDB ; 1 );
+					
+					RightWords ( $exportDB ; 2 )
+					
+					) ]
+	
+	Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+	Set Variable [ $numOfVideos[1] ; PatternCount ( $fileContent ; "WEBVTT" ) ]
+	If [ $numOfVideos > 0 ]
+		Set Variable [ $i[1] ; 1 ]
+		Loop [ Flush: Defer ]
+			If [ $i = $numOfVideos ]
+				Set Variable [ $vtt_chunk[1] ; Right ( $fileContent ; Length ( $fileContent ) - Position ( $fileContent ; "WEBVTT" ; 0 ; $i ) + 1) ]
+			Else
+				Set Variable [ $vtt_chunk[1] ; getChar ( $fileContent ; Position ( $fileContent ; "WEBVTT" ; 0 ; $i ) ; Position ( $fileContent ; "WEBVTT" ; 0 ; $i+1 ) - 3) ]
+			End If
+			Set Variable [ $media_id[1] ; getChar ( GetValue ( $vtt_chunk ; 1 ) ; 9 ; 50 ) ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Set Variable [ $video_filename[1] ; FAT Media::Container exported filename no extension ]
+			# Localised media VTTs needs to be exported in language folder
+			If [ FAT Media::Localisation code = FAT Title::Original localisation code ]
+				Set Variable [ $file[1] ; $fullFilePath & $video_filename & "." & $localisationCode & ".vtt" ]
+			Else
+				Set Variable [ $file[1] ; $fullFilePath_VTTLocalisedMedia & $video_filename & "." & $localisationCode & ".vtt" ]
+			End If
+			Create Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Create folders: ON ]
+			Open Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Target: $fileID ]
+			Write to Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ; Target: $vtt_chunk ; Append line feed: OFF ]
+			Close Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ]
+			# save file
+			Set Variable [ $i[1] ; $i + 1 ]
+			Exit Loop If [ $i > $numOfVideos ]
+		End Loop
+	End If
+	# --------------------    THEME ----------------------------------
+	# Styles CSS and Fonts are exported together with Media
+Else If [ $exportDB = "Theme" Or $exportDB = "Package list" Or $exportDB = "Block" ]
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+	# Theme does also include fonts.css and font files
+	
+	# Write theme.json
+	Create Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Create folders: ON ]
+	Open Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Target: $fileID ]
+	Write to Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ; Target: FAT Package::Latest Exported file ; Append line feed: OFF ]
+	Close Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ]
+	
+Else
+	
+	# ----------- If JSON files -----------------------------------------------------------------------
+	
+	# IMPORTANT! Don't commit before exporting files - will override files created by server when doing a local export.
+	
+	Create Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Create folders: ON ]
+	Open Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Target: $fileID ]
+	
+	If [ $package_id ≠ "" ]
+		# For base projects - make package the root
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ IsEmpty ( FAT Package::Latest Exported file[$savePosition]) ]
+			Close Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ]
+			Exit Script [ "Error: Exported JSON file not found.¶¶File path: " & $fullFilePath ]
+		Else
+			Write to Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ; Target: FAT Package::Latest Exported file ; Append line feed: OFF ]
+		End If
+	Else
+		Write to Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ; Target: FAT Title::Latest Exported file ; Append line feed: OFF ]
+	End If
+	Close Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ]
+End If
+
+

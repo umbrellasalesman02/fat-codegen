@@ -1,0 +1,22 @@
+# 2024-02-10
+# Adding new overview items for Package, Chapter, Page, Page item
+Set Error Capture [ ON ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+Set Variable [ $item_type[1] ; GetScriptProperty ( "item_type" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Overview" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Overview::Title id ; $title_id ]
+Set Field [ FAT Overview::Item id ; $item_id ]
+Set Field [ FAT Overview::Item type ; $item_type ]
+
+Commit Records/Requests [ With dialog: OFF ]
+If [ Get(lastError) = 504 //non-unique value error ]
+	Delete Record/Request [ With dialog: OFF ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+

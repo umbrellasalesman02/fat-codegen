@@ -1,0 +1,73 @@
+# Script is called from button in layout Baseproject Global texts
+# The script pushes out text changes to all projects in whole FAT.
+
+Set Variable [ $push_localisation[1] ; Get(scriptParameter) ]
+
+Set Variable [ $base_project_id[1] ; Base Project::PrimaryKey ]
+Set Variable [ $old_globaltext_id[1] ; FAT Text @ Base Project Primary::PrimaryKey ]
+
+If [ $push_localisation = "Primary" ]
+	Set Variable [ $localisation_code[1] ; Base Project::Primary localisation code ]
+	Set Variable [ $new_template_text[1] ; FAT Text @ Base Project Primary::Text ]
+	Set Variable [ $new_template_label_text[1] ; FAT Text @ Base Project Primary::Label ]
+Else If [ $push_localisation = "Secondary" ]
+	Set Variable [ $localisation_code[1] ; Base Project::Secondary localisation code ]
+	Set Variable [ $new_template_text[1] ; FAT Text @ Base Project Secondary::Text ]
+	Set Variable [ $new_template_label_text[1] ; FAT Text @ Base Project Secondary::Label ]
+End If
+
+Set Variable [ $language_code[1] ; getLanguageCode ( $localisation_code ) ]
+Set Variable [ $country_code[1] ; getCountryCode ( $localisation_code ) ]
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Show Custom Dialog [ Title: "Update or create this text in all Titles?" ; Message: "When updating - this global text and usage description in all Titles using the same base project and language code = " & $localisation_code & " will be affected. Modified texts in Titles will not be affected.¶¶Are you sure you want to do this? " ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+
+# Find all Titles using this Base project
+Set Variable [ $num_updated_texts[1] ; 0 ]
+Set Variable [ $num_new_texts[1] ; 0 ]
+
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+		Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+		# Find text in Title using this as a base
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)=1 ]
+			# Don't update texts that are already modified
+			If [ GetAsNumber(FAT Text::ModificationTimeStamp - FAT Text::CreationTimestamp) < 10
+							// Make difference 10 sec, the time stamps could actually be different even if created at the same time. ]
+				Set Field [ FAT Text::Text ; $new_template_text ]
+				Set Field [ FAT Text::Label ; $new_template_label_text ]
+				Set Variable [ $num_updated_texts[1] ; $num_updated_texts + 1 ]
+			End If
+		Else If [ Get(foundCount)=0 ]
+			New Record/Request
+			Set Field [ FAT Text::PrimaryKey Override ; $old_globaltext_id ]
+			Set Field [ FAT Text::Title id ; $title_id ]
+			Set Field [ FAT Text::Parent id ; $title_id ]
+			Set Field [ FAT Text::Source item type ; "global" ]
+			Set Field [ FAT Text::Source reference ; "Global text" ]
+			Set Field [ FAT Text::Language code ; $language_code ]
+			Set Field [ FAT Text::Country code ; $country_code ]
+			Set Field [ FAT Text::Text ; $new_template_text ]
+			Set Field [ FAT Text::Label ; $new_template_label_text ]
+			Set Variable [ $num_new_texts[1] ; $num_new_texts + 1 ]
+		End If
+		Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Go to Layout [ Layout: "Base Project Text" ; Animation: None ]
+	Show Custom Dialog [ Title: "Global texts succesfully updated" ; Message: "You have successfully updated " & $num_updated_texts & " texts and created " & $num_new_texts & " new texts in existing titles with localisation code  " & $localisation_code & "." ; Default Button: "OK" ]
+	
+End If
+

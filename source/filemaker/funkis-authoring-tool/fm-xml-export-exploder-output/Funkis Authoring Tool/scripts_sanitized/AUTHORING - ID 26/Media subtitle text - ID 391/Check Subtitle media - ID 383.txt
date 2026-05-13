@@ -1,0 +1,19 @@
+# Only called from Title settings - package id unknown
+# This function will return BOTH media id and package id
+
+Set Variable [ $learningprogramme_id[1] ; GetScriptProperty ( "learningprogramme_id" ) ]
+Set Variable [ $media_filename[1] ; GetScriptProperty ( "media_filename" ) ]
+
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)=0 ]
+	Exit Script [ "" ]
+Else
+	Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+	Set Variable [ $package_id[1] ; FAT Media::Package id ]
+	Exit Script [ SetProperty ( "media_id" ; $media_id ) &
+					SetProperty ( "package_id" ; $package_id ) ]
+End If
+

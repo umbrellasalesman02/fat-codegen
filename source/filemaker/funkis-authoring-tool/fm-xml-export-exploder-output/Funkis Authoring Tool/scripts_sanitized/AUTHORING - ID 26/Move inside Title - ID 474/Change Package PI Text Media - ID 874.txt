@@ -1,0 +1,84 @@
+# Called from script Change Package Text Media
+# Change package id for all text and media connected to a page item  - subtitles, sprig stories, list items etc
+
+Set Variable [ $old_package_id[1] ; GetScriptProperty ("old_package_id") ]
+Set Variable [ $new_package_id[1] ; GetScriptProperty ("new_package_id") ]
+Set Variable [ $title_id[1] ; GetScriptProperty ("title_id") ]
+Set Variable [ $pageitem_id[1] ; GetScriptProperty ( "pageitem_id" ) ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty ("localisation_code") ]
+
+Set Error Capture [ ON ]
+Freeze Window
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+# Find text with parent = page item id.
+  This will include standard texts, sprig and all localised texts as well
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	If [ Not IsEmpty ( $title_id ) ]
+		Replace Field Contents [ FAT Text::Title id ; Replace with calculation: $title_id ]
+	End If
+	Replace Field Contents [ FAT Text::Package id ; Replace with calculation: $new_package_id ]
+End If
+
+Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+# Find media with parent = page item.
+  This will include all standard media, sprig media and localised media too.
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	If [ Not IsEmpty ( $title_id ) ]
+		Replace Field Contents [ FAT Media::Title id ; Replace with calculation: $title_id ]
+	End If
+	Replace Field Contents [ FAT Media::Package id ; Replace with calculation: $new_package_id ]
+End If
+
+# Reduce found set to media that exclude pageitem as parent (i.e video sprig media)
+Set Variable [ $omit_type[1] ; "page-item" ]
+Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)> 0 ]
+	Loop [ Flush: Always ]
+		If [ FAT Media::hasMedia And SubtitleMedia ( FAT Media::Container file extension ) ]
+			Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+			Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)>0 ]
+				If [ Not IsEmpty ( $title_id ) ]
+					Replace Field Contents [ FAT Text::Title id ; Replace with calculation: $title_id ]
+				End If
+				Replace Field Contents [ FAT Text::Package id ; Replace with calculation: $new_package_id ]
+			End If
+			
+		End If
+		Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# Find the page item
+Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# Check if media 1 have subtitles
+If [ Media PI 1::hasMedia And SubtitleMedia ( Media PI 1::Container file extension ) ]
+	# Check if media have subtitles
+	Set Variable [ $media_id[1] ; FAT Page item::Media 1 id ]
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	# Find text with parent = media
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		If [ Not IsEmpty ( $title_id ) ]
+			Replace Field Contents [ FAT Text::Title id ; Replace with calculation: $title_id ]
+		End If
+		Replace Field Contents [ FAT Text::Package id ; Replace with calculation: $new_package_id ]
+	End If
+End If
+
+# Check if any media modifier includes subtitles
+Perform Script [ From list ; "Set ModifierValue Text Media Package" ; Parameter: SetProperty ( "new_package_id" ; $new_package_id ) &
+				SetProperty ( "fat_item_id" ; $pageitem_id ) ]
+
+
+
+
+
+

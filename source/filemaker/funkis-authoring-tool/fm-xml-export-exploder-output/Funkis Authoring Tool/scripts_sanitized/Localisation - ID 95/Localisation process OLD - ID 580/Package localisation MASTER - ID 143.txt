@@ -1,0 +1,195 @@
+# Called from Script Start Localisation Package and Localise new text
+# Formerly called Prepare-Translate MASTER
+
+Freeze Window
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+# Translation MASTER includes the following operations:
+  1. Prepare new text fields, labelled with the right language and country code
+  2. Export texts to disk (HT) or to the translation API (MT)
+  3. Import texts from the translation API (MT Only)
+  
+  Depending on translation API operation 2 and 3 may be performed at the same time. 
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+Set Variable [ $localisation_id[1] ; FAT Localisation @ Package::PrimaryKey ]
+
+Set Variable [ $original_localisation_code[1] ; FAT Title::Original localisation code ]
+Set Variable [ $target_localisation_code[1] ; FAT Localisation @ Package::Localisation code ]
+
+Set Variable [ $$localisation_code[1] ; $target_localisation_code ]
+Set Field [ FAT Title::gCurrentLocalisationCode ; $target_localisation_code ]
+
+# Set localisation stage = 2 if stage = 1
+Set Field [ FAT Localisation @ Package::Localisation stage ; Case ( FAT Localisation @ Package::Localisation stage = 1; 2; FAT Localisation @ Package::Localisation stage) ]
+
+# Translation method is either "Human translation" HT or "Machine translation" MT
+Set Variable [ $translation_method[1] ; FAT Localisation @ Package::Translation method ]
+
+# Get translation api for MT in step 2
+Set Variable [ $translation_api[1] ; FAT Localisation @ Package::Translation API ]
+Set Variable [ $translation_api_name[1] ; Translation API @ Package::API Name ]
+
+If [ PatternCount ( $translation_api_name; "Funkis Cloud") ]
+	Show Custom Dialog [ Title: "Cannot use this api for Package localisation" ; Message: "Sorry, you cannot use the Funkis Cloud translation APIs for Package localisation." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+
+// # If executed from card window - close window
+// If [ PatternCount ( Get(windowName) ; "Package localisation" ) ]
+// Close Window
+// Select Window [ Name: $$currentWindow ]
+// End If
+Freeze Window
+
+# STEP 1: Create new text fields with original id and with new language and country code
+Perform Script [ From list ; "Create Localised Text fields" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty( "original_localisation_code" ; $original_localisation_code) &
+				SetProperty( "target_localisation_code" ; $target_localisation_code) ]
+// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Set Variable [ $result[1] ; Get(ScriptResult) ]
+If [ PatternCount ( $result ; "Error" ) ]
+	Show Custom Dialog [ Title: "Error!!!!" ; Message: $result ; Default Button: "OK" ]
+	Halt Script
+Else
+	Set Variable [ $num_of_created[1] ; Get(ScriptResult) ]
+End If
+
+
+# Add event to log
+Set Variable [ $event_text[1] ; $num_of_created & " new localised text fields created in database." ]
+Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+				SetProperty ( "event_text" ; $event_text ) ]
+
+# STEP 2: Export untranslated texts to local disk for human translation or to an API for machine translation.
+If [ $translation_method = "Human translation" ]
+	Set Variable [ $exportMode[1] ; "Translation files" ]
+	Perform Script [ From list ; "Export Local CL" ; Parameter: SetProperty ( "exportMode" ; $exportMode ) ]
+	
+	Go to Layout [ Layout: "FAT Package Settings" ; Animation: None ]
+	
+	# Add event to log
+	Set Variable [ $event_text[1] ; "Text files exported to users local export path." ]
+	Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+					SetProperty ( "event_text" ; $event_text ) ]
+	
+Else If [ $translation_method = "Machine translation" ]
+	Perform Script [ From list ; "Send all texts to API" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty( "original_localisation_code" ; $original_localisation_code) &
+					SetProperty( "target_localisation_code" ; $target_localisation_code) &
+					SetProperty( "translation_api"; $translation_api) ]
+	// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+	Set Variable [ $num_of_new_translations[1] ; GetResultProperty ( "num_of_new_translations" ) ]
+	Set Variable [ $num_of_updated_translations[1] ; GetResultProperty ( "num_of_updated_translations" ) ]
+	
+	# Add event to log
+	If [ Translation API @ Package::Asynchronous ]
+		Set Variable [ $event_text[1] ; $translation_api_name & " sent " & $num_of_new_translations & " texts to API and " & $num_of_updated_translations & " updated texts." ]
+	Else
+		Set Variable [ $event_text[1] ; $translation_api_name & " translated " & $num_of_new_translations & " new texts and " & $num_of_updated_translations & " updated texts." ]
+	End If
+	Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+					SetProperty ( "event_text" ; $event_text ) ]
+End If
+
+# STEP 2.1: Get translations from asynchronous MT API
+
+If [ $translation_method = "Machine translation" And Translation API @ Package::Asynchronous ]
+	# If something goes wrong when fetching texts - update localisation stage
+	Perform Script [ From list ; "Change Package localisation stage" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) &
+					SetProperty ( "stage" ; 3 ) ]
+	
+	Go to Layout [ Layout: "FAT Package Settings" ; Animation: None ]
+	Show Custom Dialog [ Title: "Translation in progress" ; Message: ($num_of_updated_translations + $num_of_new_translations) & " texts are sent to the API and translation is now in progress. Press Get when you want to try to fetch the translations.¶¶
+					If translation is not complete yet, wait a few minutes and press button \"Get async text\" in localisation tools." ; Default Button: "Get" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice) = 1 ]
+		Perform Script [ From list ; "Get all texts from API" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "package_id" ; $package_id ) &
+						SetProperty( "original_localisation_code" ; $original_localisation_code) &
+						SetProperty( "target_localisation_code" ; $target_localisation_code) &
+						SetProperty( "translation_api"; $translation_api) ]
+		Set Variable [ $translation_result[1] ; Get(ScriptResult) ]
+		
+		
+		Set Variable [ $event_text[1] ; $translation_api_name & " " & $translation_result & "." ]
+		Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+						SetProperty ( "event_text" ; $event_text ) ]
+	Else
+		Set Variable [ $event_text[1] ; ($num_of_updated_translations + $num_of_new_translations) & " texts sent to asynchronous API but not fetched." ]
+		Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+						SetProperty ( "event_text" ; $event_text ) ]
+		Exit Script []
+	End If
+	// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+	Set Variable [ $async_translation_result[1] ; Get(ScriptResult) ]
+	# Install OnTimer script
+	If [ PatternCount ( $async_get_translation_success ; "error" ) ]
+		# Wait one minute then try again. Only 5 tries allowed. 
+		Set Variable [ $$async_calls[1] ; 0 ]
+		Set Variable [ $$localisation_id[1] ; $localisation_id ]
+		Install OnTimer Script [ "Async Get Texts OnTimer" ; 60 ]
+	Else
+		
+		Perform Script [ From list ; "Get translation progress" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "package_id" ; $package_id ) &
+						SetProperty ( "localisation_code" ; $target_localisation_code ) ]
+		# Change stage to 4
+		Perform Script [ From list ; "Change Package localisation stage" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) &
+						SetProperty ( "stage" ; 4 ) ]
+		# Add event to log
+		Set Variable [ $event_text[1] ; "Localisation set to stage 4." ]
+		Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+						SetProperty ( "event_text" ; $event_text ) ]
+		
+	End If
+	
+	// Go to Layout [ Layout: "FAT Package Settings" ; Animation: None ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	
+Else If [ $translation_method = "Machine translation" And Not Translation API @ Package::Asynchronous ]
+	#  STEP 3: Update translation status
+	# Not asynchronous
+	Perform Script [ From list ; "Get translation progress" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "localisation_code" ; $target_localisation_code ) ]
+	Perform Script [ From list ; "Change Package localisation stage" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) &
+					SetProperty ( "stage" ; 4 ) ]
+	
+	# Add event to log
+	Set Variable [ $event_text[1] ; "Localisation set to stage 4." ]
+	Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+					SetProperty ( "event_text" ; $event_text ) ]
+	
+	// Go to Layout [ Layout: "FAT Package Settings" ; Animation: None ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	
+Else If [ $translation_method = "Human translation" ]
+	Perform Script [ From list ; "Change Package localisation stage" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) &
+					SetProperty ( "stage" ; 2 ) ]
+	
+	# Add event to log
+	Set Variable [ $event_text[1] ; "Localisation set to stage 2 after creating translation files." ]
+	Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+					SetProperty ( "event_text" ; $event_text ) ]
+	
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+
+
+
+
+
+

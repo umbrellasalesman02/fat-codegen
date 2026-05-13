@@ -1,0 +1,18 @@
+# I sthis LEGACY after 2024-05 ? 
+# Script called from button in IO page item settings
+# For Blocks developed AFTER March 2022
+Freeze Window
+Set Error Capture [ ON ]
+Set Variable [ $page_item[1] ; FAT Page item::PrimaryKey ]
+Set Variable [ $io_type[1] ; BlockTemplate @ Page item::IO Type Array ]
+Set Variable [ $io_default_context[1] ; Case(BlockTemplate::Block type = "5F127BA8-1BC7-467B-93EF-7BE401615BAA"; "group"; "member") ]
+Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+New Record/Request
+Set Field [ FAT IO Value @ Page item::Parent id ; $page_item ]
+Set Field [ FAT IO Value @ Page item::IO Context ; $io_default_context ]
+Set Field [ FAT IO Value @ Page item::IO Type ; $io_type ]
+Set Field [ FAT IO Value @ Page item::IO Array ; True ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Go to Object [ "IO Array portal" ; Repetition: 1 ]
+Go to Portal Row [ Select: OFF ; Last ]
+

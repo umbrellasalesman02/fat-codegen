@@ -1,0 +1,36 @@
+
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $new_tt_id[1] ; GetScriptProperty ( "new_tt_id" ) ]
+
+
+
+# Duplicate Global Texts
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		# Check if the text is already is a clone. If so use old primary key.
+		Set Variable [ $old_globaltext_id[1] ; Case ( FAT Text::PrimaryKey Override = "" ; FAT Text::PrimaryKey ; FAT Text::PrimaryKey Override) ]
+		Duplicate Record/Request
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT Text::Title id ; $new_tt_id ]
+		Set Field [ FAT Text::PrimaryKey Override ; $old_globaltext_id ]
+		# A global text can be either "Global text" or "Block text"
+		If [ FAT Text::Source reference = "Block text" ]
+			Set Variable [ $old_block_id[1] ; FAT Text::Parent id ]
+			Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Set Variable [ $new_block_id[1] ; FAT Block::PrimaryKey ]
+			Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+			Set Field [ FAT Text::Parent id ; $new_block_id ]
+		Else If [ FAT Text::Source reference = "Global text" ]
+			Set Field [ FAT Text::Parent id ; $new_tt_id ]
+		End If
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+

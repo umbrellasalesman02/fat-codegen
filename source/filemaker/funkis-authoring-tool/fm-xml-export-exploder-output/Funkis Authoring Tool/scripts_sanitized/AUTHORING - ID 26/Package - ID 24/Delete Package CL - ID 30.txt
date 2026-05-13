@@ -1,0 +1,31 @@
+# Extra warning added after a Package was deleted by mistake in June 2023
+If [ Not IsEmpty ( List(FAT Chapter::PrimaryKey) ) ]
+	Show Custom Dialog [ Title: "Package not empty" ; Message: "This Package includes content and cannot be deleted. If you are serious with deleting the package, delete all chapters first." ; Default Button: "OK" ]
+	Exit Script []
+Else
+	
+	Show Custom Dialog [ Title: "Delete package - " & FAT Package::Reference name ; Message: "If you delete this Package - all linked items will also be deleted and cannot be restored. ¶¶Are you sure you want to delete the item?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice) =1 ]
+		Show Custom Dialog [ Title: "This operation cannot be undone" ; Message: "Are you absolutely sure that you want to delete the item?¶¶
+						This operation can under no circumstance be undone." ; Default Button: "Cancel" ; Button 2: "Delete" ]
+		If [ Get(lastMessageChoice) =2 ]
+			Commit Records/Requests [ With dialog: OFF ]
+			
+			# Log deletion
+			Set Variable [ $event_log_text[1] ; "Deleted package " & FAT Package::Reference name & " - " &  FAT Package::PrimaryKey ]
+			Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+			
+			Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+			// Perform Script [ From list ; "Delete Package SRV" ; Parameter: FAT Package::PrimaryKey ]
+			
+			
+			Perform Script [ From list ; "Init Title" ]
+			
+		End If
+		Go to Layout [ Layout: "FAT Title" ; Animation: None ]
+	End If
+	
+	
+End If
+
+

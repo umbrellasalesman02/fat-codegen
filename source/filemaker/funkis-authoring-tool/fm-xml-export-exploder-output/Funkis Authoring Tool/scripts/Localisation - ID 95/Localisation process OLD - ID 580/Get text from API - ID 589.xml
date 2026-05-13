@@ -1,0 +1,643 @@
+<Script>
+	<ScriptReference id="589" name="Get text from API"></ScriptReference>
+	<ObjectList membercount="58">
+		<Step hash="74CC7882D1CF1C528D3A3EE9FF5A06CC" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script can be called from a loop or from a single translation request.&#13;It is used to get translated text from asynchronous machine translation apis."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2A5A3937642524008DCAB7564CB88DEA" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4F778F9DA1A44268E973F1A1D0D04433" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="The translation id to get"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B5EE10CCA6D635A5D97893C563DE7F35" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "translation_id" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$translation_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A8E331383FFC93FF600861F0153A3EBD" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EEB4B66B159EE3DBA6128DB690CFE54C" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="THe translation API"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BED4BE8D4364E5FF4312AC78696BB70F" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "translation_api" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$translation_api"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B9B4BC93EF107658D687A21E41E6F97D" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "get_api_url" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$get_api_url"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="65165F3ED6992F336B33CB7A2A797B39" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "api_key" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$api_key"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1DB7CAB1AC41127372B6A69F4A98D3DC" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5FDC659A36D5790890255A673A81A485" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$get_api_url = ""]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3A5C801ABA4C13B9D2303CB44F1027F9" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Get all info for the translation API if not in the function call - used for translating one text"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B8B4993197F4C421368945E536E741B7" id="6" name="Go to Layout" enable="True">
+			<Options>10</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="296" name="TABLE Translation API"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0A3A185A66C4260408C95E71B09FEC86" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$translation_api">
+								<FieldReference id="1" name="PrimaryKey">
+									<TableOccurrenceReference id="1065423" name="Translation API @ Title"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E619F36B5CC133963240B878A4FD7519" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Translation API @ Title::Get translation URL]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$get_api_url"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8863152DBD8175A7EB9554002B85C079" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Translation API @ Title::API PrivateKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$api_key"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B043FFA168D839D698EEC5D1B8E19102" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Translation API @ Title::Asynchronous]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$asynchronous"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A4DA21BCE04E356479E7377A677D85A1" id="6" name="Go to Layout" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6E20898AE4D38D20479FACCF7481E68D" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="50EB071BBED65B93BF2360281E70E641" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9DCA38B9C2542083D0E65F8BE258734E" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="968D33D95B471B84D90C8876EA29DA05" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F1A962E0AE4CC266C1FDD0680A1DF23C" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="----------------  Start logic for different translation apis ------------------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2040153A9AAD871A4A97C98BF6CDE6C1" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0616AFD97041AB84F288E7D3A2810040" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="94AC41B3D434CF7D7F89F9283FE20715" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$translation_api = "78E0ADA2-AF9C-4983-887F-555DDF084C0F" // Google Translation API v2]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D4C88F45177031D300FB13DD854E7F05" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5E2581A90739AC4B2888BE6540D8DD0E" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Google Translate API is not asynchronous"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EB36C4FBAD002ACDB177D6C1FF581748" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AC8023BF784EA1AF56C5D70D892116BA" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$translation_api = "EE355B37-B655-48F6-9D4D-B7B3DE745DDF" // Intento IKEA ikea-best-enginesOr $translation_api = "6A20D8F0-DD6F-41A6-A5EA-FC5617233FB3"  // Intento IKEA ikea-it-desk]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="ECFD115F795109C8A05E77AAFD01B62A" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CD5FAA5FAA8187E043082C19998FB9C2" id="141" name="Set Variable" breakpoint="True" enable="True">
+			<Options>1064964</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$get_api_url & $translation_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$operationAPI"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8F4E8DFF04E112085EF89FCE55BDCDDB" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B40F4564325F05D9FC510D8073454AAF" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[_cURL_request ( "GET" ) & _cURL_header ( "Content-Type" ; "application/json" ) & _cURL_header ( "Accept" ; "application/json; charset=utf-8" ) & _cURL_header ( "apikey" ; $api_key )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$cURL_options"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E4F4A247A051E5387CB2BF28B23F56CF" id="160" name="Insert from URL" enable="True">
+			<Options>20613</Options>
+			<ParameterValues membercount="6">
+				<Parameter type="Boolean">
+					<Boolean type="Verify SSL Certificates" id="268435456" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Select" id="4096" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Target">
+					<Variable value="$resultJSON">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+					</Variable>
+				</Parameter>
+				<Parameter type="URL">
+					<URL autoEncode="True">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$operationAPI]]></Text>
+							</Calculation>
+						</Calculation>
+					</URL>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA[$cURL_options]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="759FC6DA9B4F96000B76106FB2376524" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4354AA64C2DA56509DA03EB5D7A2BBE2" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[JSONGetElement($resultJSON ; "done")]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8E838C591AADA0C62DB0AB2859EF26CA" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[IsEmpty(JSONGetElement ( $resultJSON ; "error" ))]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8D7F3CCF11DB2E3EEDA9EB6E543219F3" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[JSONGetElement ( $resultJSON ; "response[0]results[0]" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$translatedText"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E8DFBFB8B68E376A94340D2F870E06E1" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="B40DA9CEA2C7E604DBECB3669A9AF2C4" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$resultJSON]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$translatedText"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AFB170A9B6610E54A1C9EB0430F6E72A" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="F70942B964E2498091220C390F3338F1" id="103" name="Exit Script" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$translatedText]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3B37BB3E3AABF6D0513488A93F10D22C" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="863970624F06557589E01F401082B64E" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Return something that cannot be a translation response"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6D5F904D134C64B6119B28D36224C2D6" id="103" name="Exit Script" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["--- NOT TRANSLATED YET ---"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="24329C03936145542C518716555595CC" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="210A346E22128F12F0B1DF6D7F4576F7" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="005E7F232829E8037377A13B7E4AF80A" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="D2AB7470317E9FB9AD0C2EB29D59A1D6" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C034DEF0EEC20048AB7290F73A00DD99" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="------------------------------- End translation APIs -------------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C5258F14961247D2DF9FCB9121DC6419" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D5D3CB23ED9317FB5279228BF006C7BE" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F790D81233EA71DEA023366FB4B3F622" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B2BEC842A3987A5B53D98E5443D204D0" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D9E7C5698E5558065335FFBE510006CA" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AD674372DA9D18DEC119D46A410E3028" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0828913E6BB23E8B8A3EBCD3B19AE9F4" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

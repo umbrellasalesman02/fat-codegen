@@ -1,0 +1,18 @@
+Freeze Window
+Show Custom Dialog [ Title: "Create new Title" ; Message: "Please check existing Titles and add to your user before creating a completely new." & ¶ & ¶ &  
+				"Are you sure you want to create a completely new Title?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) = 1 ]
+	Set Variable [ $$login_id[1] ; User::User_id ]
+	
+	Set Variable [ $$currentWindow[1] ; Get(windowName) ]
+	New Window [ Style: Card ; Name: "New Title" ; Layout: "FAT New Title" ; Height: 740 * Get(WindowZoomLevel)/100 ; Width: 960 * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+	New Record/Request
+	
+	Set Field [ FAT Title::LastSettingTab ; "tab1" ]
+	Set Field [ FAT Title::gStartPackageType ; "B6397ED6-1BA8-4444-BD51-65076EE684F9" // Title site is the default start package type ]
+	Set Field [ FAT Title::Base project ; "432D61A4-618C-4579-A4E4-427A6B521FDD" // Base project ]
+	Set Field [ FAT Title::Title Backend ; "Funkis Cloud" // Packages can still be with backend = LMS ]
+	Set Variable [ $$lp_id[1] ; FAT Title::PrimaryKey ]
+	Go to Field [ FAT Title::Reference title ]
+End If
+

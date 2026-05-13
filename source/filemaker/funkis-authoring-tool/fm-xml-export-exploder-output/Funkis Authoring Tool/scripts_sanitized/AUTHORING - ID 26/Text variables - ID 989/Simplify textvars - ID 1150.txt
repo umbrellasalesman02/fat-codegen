@@ -1,0 +1,36 @@
+# This script finds and replaces all old style text variables using ${io: CODE to a friendly name.
+# Script is called from a button in Title settings - Manual tools
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Freeze Window
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)= 0 ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Exit Script []
+End If
+
+Loop [ Flush: Always ]
+	Set Variable [ $old_textvar[1] ; FAT Text variable::String source definition ]
+	Set Variable [ $new_textvar[1] ; FAT Text variable::Friendly string ]
+	If [ $old_textvar ≠ $new_textvar And Not IsEmpty ( $old_textvar ) And Not IsEmpty ( $new_textvar ) ]
+		# Find text var in text
+		Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount) > 0 ]
+			
+			Loop [ Flush: Always ]
+				Set Field [ FAT Text::Text ; Substitute ( FAT Text::Text; $old_textvar; $new_textvar) ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+			
+		End If
+	End If
+	Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

@@ -1,0 +1,33 @@
+Freeze Window
+Set Variable [ $localisation_id[1] ; GetScriptProperty ( "localisation_id" ) ]
+Set Variable [ $translation_method[1] ; GetScriptProperty ( "translation_method" ) ]
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+
+Set Field [ FAT Title::gClient ; FAT Title::Client id ]
+Set Field [ FAT Title::gTitle ; FAT Title::PrimaryKey ]
+Set Field [ FAT Localisation::gUseApprovedTranslationsFromId ; "" ]
+
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ $caller = "Title" ]
+	Perform Script [ From list ; "Open card setting" ; Parameter: SetProperty ("card_window_name" ; "Title localisation" ) &
+					SetProperty ("card_window_layout" ; "FAT Title localisation" ) &
+					SetProperty ("card_window_width" ; "1100" ) &
+					SetProperty ("card_window_height" ; "720" ) &
+					SetProperty ("item_id" ; $localisation_id ) &
+					SetProperty ("item_type" ; "Title Localisation" ) ]
+	Set Variable [ $$currentLocalisationStage[1] ; FAT Localisation::Localisation stage ]
+	Perform Script [ From list ; "Refresh Localisation status" ; Parameter: "Title localisation" ]
+	Go to Object [ FAT Localisation::LastActiveTab ; Repetition: 1 ]
+Else
+	Perform Script [ From list ; "Open card setting" ; Parameter: SetProperty ("card_window_name" ; "Package localisation" ) &
+					SetProperty ("card_window_layout" ; "FAT Package localisation" ) &
+					SetProperty ("card_window_width" ; "1100" ) &
+					SetProperty ("card_window_height" ; "720" ) &
+					SetProperty ("item_id" ; $localisation_id ) &
+					SetProperty ("item_type" ; "Package Localisation" ) ]
+	Set Variable [ $$currentLocalisationStage[1] ; FAT Localisation @ Package::Localisation stage ]
+	Perform Script [ From list ; "Refresh Localisation status" ; Parameter: "Localisation" ]
+	Go to Object [ FAT Localisation @ Package::LastActiveTab ; Repetition: 1 ]
+End If
+

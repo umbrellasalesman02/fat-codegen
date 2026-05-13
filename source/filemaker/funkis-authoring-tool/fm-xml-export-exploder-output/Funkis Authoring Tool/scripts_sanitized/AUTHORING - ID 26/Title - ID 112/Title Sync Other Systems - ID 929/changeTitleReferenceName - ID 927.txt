@@ -1,0 +1,23 @@
+# Called fom scriptTrigger onModify field event when changing title reference name
+# Updates titles on other systems to keep them in sync
+Set Error Capture [ ON ]
+Freeze Window
+
+If [ FAT Title::Title Backend = "Funkis Cloud" ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $funkis_cloud_title_id[1] ; FAT Title::Funkis Cloud Title id ]
+	Set Variable [ $reference_title[1] ; FAT Title::Reference title ]
+	
+	# Update title name on Funkis Cloud
+	
+	# Update image on Funkis Insight
+	Go to Layout [ Layout: "TABLE IN Title" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ IN Title::Reference title ; Replace with calculation: $reference_title ]
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	
+End If
+

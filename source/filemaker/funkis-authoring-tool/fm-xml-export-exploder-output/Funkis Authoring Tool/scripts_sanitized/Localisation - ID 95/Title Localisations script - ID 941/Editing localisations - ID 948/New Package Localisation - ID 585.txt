@@ -1,0 +1,72 @@
+# This script is the OLD script - launched from a button in Package Settings - Language tab
+# But works for BOTH Title Localisation and Package localisation.
+# Script MUST be called when standing in FAT Package layout
+
+Set Error Capture [ ON ]
+
+# If called from the add-in-Title loop - script parameter = the title localisation id
+Set Variable [ $title_localisation_id[1] ; GetScriptProperty ( "title_localisation_id" ) ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty ( "localisation_code" ) ]
+Set Variable [ $translation_method[1] ; GetScriptProperty ( "translation_method" ) ]
+
+Freeze Window
+If [ IsEmpty ( $title_localisation_id ) And ValueCount ( FAT Localisation @ Package::PrimaryKey ) = 0 ]
+	# Package localisation - When adding the very first language
+	Show Custom Dialog [ Title: "Important reminder - remove unused block" ; Message: "You are about to add your first localisation to this Package. If this is the only planned package, please remove all unused blocks before sending texts to translation to get rid of all unnecessary texts.¶¶
+					You can do it under Title settinges / Tools" ; Default Button: "OK" ]
+	Show Custom Dialog [ Title: "Protect words from not being translated" ; Message: "If you have expressions or words that you don't want to be translated to each language - for example a brand name or similar - please add <span translate=\"no\"> and </span translate=\"no\"> around those words" ; Default Button: "OK" ]
+End If
+
+Set Variable [ $org_localisation_code[1] ; FAT Title::Original localisation code ]
+Set Variable [ $localisation_code[1] ; Case(IsEmpty($localisation_code); FAT Title::gSelectedLocalisation; $localisation_code) ]
+Set Variable [ $translation_method[1] ; Case(IsEmpty($translation_method); FAT Title::gTranslationMethod; $translation_method) ]
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+Set Variable [ $package_name[1] ; FAT Package::Reference name ]
+Go to Layout [ Layout: "TABLE FAT Localisation @ Package" ; Animation: None ]
+# Find this Package localisation - whether is connected to the Title localisation or not
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ (Get(foundCount)>0 Or $localisation_code = $org_localisation_code) And IsEmpty ( $title_localisation_id ) ]
+	# Add from Package. Check if language already added. FAT cannot handle double localisations using same localisation_code
+	Show Custom Dialog [ Title: "Language already added" ; Message: "This language is already added. You cannot add an existing language to the Package." ; Default Button: "OK" ]
+Else If [ Get(foundCount)>0 And Not IsEmpty ( $title_localisation_id ) ]
+	# Add from title localisation
+	Show Custom Dialog [ Title: "Package localisation exist" ; Message: "It already exist a package localisation for \"" & $package_name  & "\" in \"" & $localisation_code & "\". ¶¶Do you want to connect this Package localisation to the Title localisation?" ; Default Button: "Yes" ; Button 2: "No" ; Button 3: "Cancel" ]
+	If [ Get(lastMessageChoice) = 1 ]
+		# User pressed YES - connect package localisation to Title localisation
+		Set Field [ FAT Localisation @ Package::Title localisation id ; $title_localisation_id ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Exit Script [ 1 ]
+	Else If [ Get(lastMessageChoice) = 2 ]
+		# User pressed NO - do not connect to Title localisation - do nothing
+		Exit Script [ 0 ]
+	Else If [ Get(lastMessageChoice) = 3 ]
+		# User pressed CANCEL - exit
+		Exit Script [ 0 ]
+	End If
+Else
+	New Record/Request
+	Set Variable [ $localisation_stage[1] ; 1 ]
+	Set Field [ FAT Localisation @ Package::Title id ; $title_id ]
+	Set Field [ FAT Localisation @ Package::Package id ; $package_id ]
+	Set Field [ FAT Localisation @ Package::Title localisation id ; $title_localisation_id ]
+	Set Field [ FAT Localisation @ Package::Original Localisation code ; $org_localisation_code ]
+	Set Field [ FAT Localisation @ Package::Localisation code ; $localisation_code ]
+	Set Field [ FAT Localisation @ Package::Translation method ; $translation_method ]
+	Set Field [ FAT Localisation @ Package::Localisation stage ; $localisation_stage ]
+	
+	# Add event to log
+	Set Variable [ $localisation_id[1] ; FAT Localisation @ Package::PrimaryKey ]
+	Set Variable [ $event_text[1] ; "Language " & $localisation_code & " added for " & $translation_method & "." ]
+	Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+					SetProperty ( "event_text" ; $event_text )& 
+					SetProperty ( "localisation_stage" ; $localisation_stage ) ]
+	
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+	Exit Script [ 1 ]
+End If
+
+

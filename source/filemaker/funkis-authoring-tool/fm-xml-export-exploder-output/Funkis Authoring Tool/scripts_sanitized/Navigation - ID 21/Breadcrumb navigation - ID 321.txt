@@ -1,0 +1,28 @@
+
+# Which tab number
+Set Variable [ $BreadCrumbPosition[1] ; GetValue ( Get ( TriggerTargetPanel ) ; 1 ) ]
+
+# Handle situation where a separator is clicked
+If [ Mod ( $BreadCrumbPosition ; 2 ) = 0 ]
+	Exit Script [ False ]
+End If
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $hierarchyPathTypes[1] ; "Title" & ¶ &
+				Case(TF PK Header::Text = "" ; "" ; "Package" & ¶) &
+				Case(TF CH Header::Text = "" ; "" ; "Chapter" & ¶) &
+				Case(TF PG Header::Text = "" ; "" ; "Page" & ¶) ]
+Set Variable [ $level[1] ; GetValue ( $hierarchyPathTypes ; (1+ $BreadCrumbPosition)/2 ) ]
+If [ $level = "Title" ]
+	Go to Layout [ Layout: "FAT Title" ; Animation: None ]
+	// Go to Related Record [ Table: FAT Title ; Layout: "FAT Title" ; Show related ]
+Else If [ $level = "Package" ]
+	Go to Layout [ Layout: "FAT Package" ; Animation: None ]
+	// Go to Related Record [ Table: FAT Package ; Layout: "FAT Package" ; Show related ]
+Else If [ $level = "Chapter" ]
+	Go to Layout [ Layout: "FAT Chapter" ; Animation: None ]
+	// Go to Related Record [ Table: FAT Chapter ; Layout: "FAT Chapter" ; Show related ]
+Else If [ $level = "Page" ]
+	Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+	// Go to Related Record [ Table: FAT Page ; Layout: "FAT Page" ; Show related ]
+End If
+

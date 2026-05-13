@@ -1,0 +1,151 @@
+# This script is called from both translation scripts and from review scripts
+
+Set Error Capture [ ON ]
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+# Use localisation id
+# Caller can be either "Title localisation" or "Package localisation"
+Set Variable [ $localisation_id[1] ; GetScriptProperty ( "localisation_id" ) ]
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+Set Variable [ $status[1] ; GetScriptProperty ( "status" ) ]
+Set Variable [ $exception[1] ; GetScriptProperty ( "exception" ) ]
+
+# Exception can be
+  "" - normal case
+  "Reviewed" - Texts that been reviewed and set to "In progress" or "Approved" will not be changed-
+
+# Text status can be:
+  1. Not translated
+  2. Sent to API (only asynchronous machine translation)
+  3. Not reviewed
+  4. In progress
+  5. Approved
+
+If [ IsEmpty ( $exception ) ]
+	Show Custom Dialog [ Title: "Change translation text status" ; Message: "You are about to set ALL texts in this localisation to status " & $status & ". Are you sure you want to do this?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+Else If [ $exception = "Reviewed" ]
+	Show Custom Dialog [ Title: "Change translation text status" ; Message: "You are about to set texts in this localisation to status " & $status & ".  Texts that been set to \"Approved\" or \"In progress\" will NOT change status. Are you sure you want to do this?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+Else If [ $exception = "Changed" ]
+	Show Custom Dialog [ Title: "Change translation text status" ; Message: "You are about to set texts in this localisation to status " & $status & ".  Only texts where the original text has been modified AFTER the translated text was created will be affected. ¶¶Are you sure you want to do this?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+End If
+
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+Freeze Window
+If [ $caller = "Title localisation" ]
+	Set Variable [ $title_id[1] ; FAT Localisation::Title id ]
+	Set Variable [ $title_localisation_id[1] ; $localisation_id ]
+	Set Variable [ $package_id[1] ; FAT Localisation::Package id ]
+	Set Variable [ $localisation_code[1] ; FAT Localisation::Localisation code ]
+	Set Variable [ $localisation_stage[1] ; FAT Localisation::Localisation stage ]
+Else If [ $caller = "Package localisation" ]
+	Set Variable [ $title_id[1] ; FAT Localisation @ Package::Title id ]
+	Set Variable [ $package_id[1] ; FAT Localisation @ Package::Package id ]
+	Set Variable [ $localisation_code[1] ; FAT Localisation @ Package::Localisation code ]
+	Set Variable [ $localisation_stage[1] ; FAT Localisation @ Package::Localisation stage ]
+End If
+
+Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+
+If [ $caller = "Title localisation" ]
+	# Get all texts with title_id
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $caller = "Package localisation" ]
+	# Get global texts - with title_id but no package_id
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	# Get all texts with package_id
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+End If
+
+If [ $exception = "Reviewed" ]
+	#  Omit "Approved" and "In progress"
+	Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+Else If [ $exception = "Changed" ]
+	Loop [ Flush: Always ]
+		# Omit texts where the original text is unchanged after the localised text was created.
+		If [ FAT Text translated::CreationTimestamp > FAT Text @ Translation::ModificationTimeStamp ]
+			Omit Record
+		Else
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End If
+	End Loop
+	Set Variable [ $number_of_changed_texts[1] ; Get(foundCount) ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	If [ $number_of_changed_texts > 0 ]
+		# Give a warning
+		If [ $status = "Not translated" ]
+			# Creation time stamp will be changed and texts will be replaced by original texts
+			Show Custom Dialog [ Title: "Prepare for re-translation" ; Message: "Found " & $number_of_changed_texts & " texts that been changed since translation was created. ¶
+							Do you want to remove existing translations and prepare for re-translation?¶¶
+							Remember to start a new translation directly after this operation." ; Default Button: "OK" ; Button 2: "Cancel" ]
+		Else If [ $status = "Not reviewed" ]
+			# Only a warning
+			Show Custom Dialog [ Title: "Set changed text to Not reviewed" ; Message: "Found " & $number_of_changed_texts & " texts that been changed since translation was created. ¶
+							Do you want to set these texts to Not reviewed?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+		End If
+		If [ Get(lastMessageChoice) = 2 ]
+			Exit Script []
+		End If
+		Freeze Window
+		Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+		If [ $status = "Not translated" ]
+			Go to Record/Request/Page [ First ]
+			Loop [ Flush: Always ]
+				# Set Creation date to today and set texts to orginial language
+				Set Variable [ $org_text[1] ; FAT Text @ Translation::Text ]
+				Set Field [ FAT Text translated::CreationTimestamp ; Get(currentHostTimeStamp) ]
+				Set Field [ FAT Text translated::Text ; $org_text ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		Else If [ $status = "Not reviewed" ]
+			# Do nothing
+		End If
+	End If
+End If
+
+Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+Set Variable [ $found_texts[1] ; 0 ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $found_texts[1] ; Get(foundCount) ]
+	Replace Field Contents [ FAT Text translated::Status ; Replace with calculation: $status ]
+End If
+
+Set Variable [ $event_text[1] ; "Set " & $found_texts & " texts to status " & $status & "." ]
+Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+				SetProperty ( "localisation_stage" ; $localisation_stage ) & 
+				SetProperty ( "event_text" ; $event_text ) ]
+
+# When going back in progress - change stage to 2.
+If [ $status = "Not translated" ]
+	
+	If [ $caller = "Title localisation" ]
+		Perform Script [ From list ; "Change Title localisation stage" ; Parameter: SetProperty ( "title_localisation_id" ; $title_localisation_id ) &
+						SetProperty ( "localisation_stage" ; $localisation_stage ) &
+						SetProperty ( "force_stage" ; True ) ]
+		// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	Else If [ $caller = "Package localisation" ]
+		Perform Script [ From list ; "Change Package localisation stage" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) &
+						SetProperty ( "stage" ; 2 ) &
+						SetProperty ( "force_stage" ; True ) ]
+	End If
+	
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+
+
+
+
+
+

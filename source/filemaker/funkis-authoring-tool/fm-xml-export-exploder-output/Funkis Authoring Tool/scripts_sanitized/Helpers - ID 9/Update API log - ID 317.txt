@@ -1,0 +1,9 @@
+# This script is logging events that goes wrong when using the API and a custom dialog cannot be shown to the user. 
+Set Variable [ $eventType[1] ; GetScriptProperty ( "eventType" ) ]
+Set Variable [ $eventMessage[1] ; GetScriptProperty ( "eventMessage" ) ]
+Go to Layout [ Layout: "FileMaker API Log" ; Animation: None ]
+New Record/Request
+Set Field [ FileMaker API Log::Event type ; $eventType ]
+Set Field [ FileMaker API Log::Message ; $eventMessage ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

@@ -1,0 +1,60 @@
+# Called from multiple places
+# source-table can be
+  package
+  chapter
+  page
+  page-item
+  attribute
+  list-item
+  score
+  link
+
+Set Variable [ $location_id[1] ; GetScriptProperty ( "location_id" ) ]
+Set Variable [ $source_table[1] ; GetScriptProperty ( "source_table" ) ]
+Set Variable [ $caller_layout[1] ; GetScriptProperty ( "caller_layout" ) ]
+Set Variable [ $source_mediafield[1] ; GetScriptProperty ( "source_mediafield" ) ]
+Set Variable [ $learningprogramme_id[1] ; GetScriptProperty ( "learningprogramme_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $package_id[1] ; Case
+				
+				( $package_id = "" ;
+				
+				   Case ( $source_table = "global" Or 
+				          $source_table = "list-item" Or 
+				          $source_table = "tag" Or 
+				          $source_table = "io" Or 
+				          $source_table = "score" Or 
+				          $source_table = "link"; 
+				
+				          "" ; FAT Package::PrimaryKey) ;
+				
+				   $package_id
+				
+				) ]
+
+Set Variable [ $language_code[1] ; Case( GetScriptProperty ( "language_code" ) = "";
+				
+				    FAT Title::Original language code;
+				
+				    GetScriptProperty ( "language_code" )
+				
+				) ]
+Set Variable [ $country_code[1] ; Case( GetScriptProperty ( "country_code" ) = "";
+				
+				    FAT Title::Original country code;
+				
+				    GetScriptProperty ( "country_code" )
+				
+				) ]
+Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Media::Title id ; $learningprogramme_id ]
+Set Field [ FAT Media::Package id ; $package_id ]
+Set Field [ FAT Media::Parent id ; $location_id ]
+Set Field [ FAT Media::Source item type ; $source_table ]
+Set Field [ FAT Media::Language code ; $language_code ]
+Set Field [ FAT Media::Country code ; $country_code ]
+Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+Go to Layout [ Layoutname: $caller_layout ; Animation: None ]
+Set Field By Name [ Specify target field: ON ; $source_mediafield ; $media_id ]
+

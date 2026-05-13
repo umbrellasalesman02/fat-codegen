@@ -1,0 +1,59 @@
+# This script clones a specific Page items and all of its Attributes, stateToggles, Tags, Texts, Media, Content arrays
+# Client script must manage next sortIndex
+
+Set Variable [ $parent_id[1] ; FAT Page item::Parent id ]
+Set Variable [ $pageitem_id[1] ; FAT Page item::PrimaryKey ]
+Set Variable [ $chapter_id[1] ; FAT Chapter::PrimaryKey ]
+Set Variable [ $proxy_Type[1] ; FAT Page::Proxy type ]
+
+Show Custom Dialog [ Title: "Duplicate page item" ; Message: "Are you sure you want to duplicate this page item?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice)=1 ]
+	
+	Freeze Window
+	Set Variable [ $$pageItemRecordLoadTrigger[1] ; False ]
+	
+	If [ FAT Page::Proxy type = "page_item" ]
+		# We need to create the page as well - for slide projects
+		Set Variable [ $parent_id[1] ; FAT Page::Parent id ]
+		Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+		Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+		Set Variable [ $clone_sortindex[1] ; FAT Page::SortIndex ]
+		Perform Script [ From list ; "Clone Page SRV" ; Parameter: SetProperty ( "isClonedTitle" ; 0 ) &
+						SetProperty ( "clone_level" ; "page_item" ) &
+						SetProperty ( "title_id" ; FAT Title::PrimaryKey ) &
+						SetProperty ( "package_id" ; FAT Package::PrimaryKey ) &
+						SetProperty ( "parent_id" ; $parent_id ) ]
+		Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+	Else
+		Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+		If [ Not isPSOS ]
+			# If this script is called from a button
+			Set Variable [ $sortindex1[1] ; FAT Page item::SortIndex ]
+			If [ Get(recordNumber)<Get(foundCount) ]
+				Go to Record/Request/Page [ Next ; Exit after last: OFF ]
+				Set Variable [ $sortindex2[1] ; FAT Page item::SortIndex ]
+				Go to Record/Request/Page [ Previous ; Exit after last: OFF ]
+				Set Variable [ $newindex[1] ; $sortindex1 + ($sortindex2 - $sortindex1)/2 ]
+			End If
+			# Execute on server and send sortindex and pageitem_id as a parameter
+			Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		Else
+			# If this script is called from a PSOS
+			Perform Script [ From list ; "" ; Parameter: SetProperty ( "isClonedTitle" ; 0 ) &
+							SetProperty ( "clone_level" ; "page_item" ) &
+							SetProperty ( "title_id" ; FAT Title::PrimaryKey ) &
+							SetProperty ( "package_id" ; FAT Package::PrimaryKey ) &
+							SetProperty ( "parent_id" ; FAT Page item::Parent id ) ]
+		End If
+		Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+	End If
+	Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "chapter_id" ; $chapter_id ) &
+					SetProperty ( "page_id" ; $parent_id ) &
+					SetProperty ( "pageitem_id" ; $pageitem_id ) &
+					SetProperty ( "proxy_type" ; $proxy_type ) ]
+	If [ Get(recordNumber)<Get(foundCount) ]
+		Go to Record/Request/Page [ Next ; Exit after last: OFF ]
+	End If
+End If
+
+

@@ -1,0 +1,46 @@
+Show Custom Dialog [ Title: "Update this text in all Titles?" ; Message: "When updating - all global texts in the Titles using this same block template will be updated. ¶¶Are you sure you want to do this? " ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) = 1 ]
+	Freeze Window
+	Set Error Capture [ ON ]
+	Set Variable [ $baseproject_id[1] ; BlockTemplate::Base Project ]
+	Set Variable [ $symboltemplate_id[1] ; BlockTemplate::PrimaryKey ]
+	Set Variable [ $old_globaltext_id[1] ; TF BT Text::PrimaryKey ]
+	Set Variable [ $old_globaloriginaltext_id[1] ; TF BT Text::OriginalKey ]
+	Set Variable [ $templateText[1] ; TF BT Text::Text ]
+	Set Variable [ $language_code[1] ; TF BT Text::Language code ]
+	Set Variable [ $country_code[1] ; TF BT Text::Country code ]
+	
+	Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+	# Find all blocks based on this block template
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Loop [ Flush: Always ]
+		If [ Get(foundCount)>0 ]
+			Set Variable [ $symbol_id[1] ; FAT Block::PrimaryKey ]
+			Set Variable [ $lp_id[1] ; FAT Block::Title id ]
+			Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+			# Find all texts with same localisation code
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)= 1 ]
+				# if text exist - just update text
+				Set Field [ FAT Text::Text ; $templateText ]
+			Else If [ Get(foundCount) = 0 ]
+				# if text don't exist - create new text
+				New Record/Request
+				Set Field [ FAT Text::PrimaryKey Override ; Case ( $old_globaloriginaltext_id = "" ; $old_globaltext_id ; $old_globaloriginaltext_id) ]
+				Set Field [ FAT Text::OriginalKey ; Case ( $old_globaloriginaltext_id ≠ "" ; $old_globaltext_id ; "") ]
+				Set Field [ FAT Text::Title id ; $lp_id ]
+				Set Field [ FAT Text::Parent id ; $symbol_id ]
+				Set Field [ FAT Text::Source item type ; "global" ]
+				Set Field [ FAT Text::Source reference ; "Block text" ]
+				Set Field [ FAT Text::Text ; $templateText ]
+				Set Field [ FAT Text::Language code ; $language_code ]
+				Set Field [ FAT Text::Country code ; $country_code ]
+			End If
+		End If
+		Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Go to Object [ "Global text" ; Repetition: 1 ]
+End If
+

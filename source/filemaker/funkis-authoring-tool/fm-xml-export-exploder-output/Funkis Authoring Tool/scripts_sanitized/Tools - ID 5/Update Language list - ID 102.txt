@@ -1,0 +1,23 @@
+Perform Script [ From list ; "Test for Missing Google API Key" ]
+Go to Layout [ Layout: "TABLE Language" ; Animation: None ]
+Set Field [ Language @ Title::gJSON ; "" ]
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: Language @ Title::gJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+Set Variable [ $NumberofLanguages[1] ; PatternCount ( Language @ Title::gJSON ; "\"language\":" ) ]
+If [ $NumberofLanguages>0 ]
+	Show All Records
+	Delete All Records [ With dialog: OFF ]
+	Set Variable [ $ListRowNumber[1] ; 0 ]
+	Loop [ Flush: Always ]
+		Exit Loop If [ $ListRowNumber≥$NumberofLanguages ]
+		New Record/Request
+		Set Variable [ $JSONRowNumber[1] ; "["&$ListRowNumber&"]" ]
+		Set Field [ Language @ Title::Language Abbreviation code ; 
+						
+						JSONGetElement ( Language @ Title::gJSON ; "data.languages"& $JSONRowNumber& ".language"  ) ]
+		Set Field [ Language @ Title::Language ; 
+						
+						JSONGetElement ( Language @ Title::gJSON ; "data.languages"&$JSONRowNumber&".name") ]
+		Set Variable [ $ListRowNumber[1] ; $ListRowNumber+1 ]
+	End Loop
+End If
+

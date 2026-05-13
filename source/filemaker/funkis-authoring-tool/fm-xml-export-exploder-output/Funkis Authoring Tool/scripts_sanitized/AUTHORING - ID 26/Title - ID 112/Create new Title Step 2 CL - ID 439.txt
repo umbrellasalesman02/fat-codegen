@@ -1,0 +1,57 @@
+If [ IsEmpty ( FAT Title::Reference title ) Or IsEmpty ( FAT Title::gSelectedLocalisation ) Or IsEmpty ( FAT Title::Client id ) Or IsEmpty ( FAT Title::gThemeTemplate ) Or IsEmpty ( FAT Title::Title Backend ) ]
+	Show Custom Dialog [ Title: "More info needed" ; Message: "You need to fill in all fields to create the title" ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+If [ FAT Title::Title Backend = "Funkis Cloud" And IsEmpty (Client::Funkis Cloud Client id) ]
+	Show Custom Dialog [ Title: "Client does not exist on Funkis Cloud yet" ; Message: "The client - " & Client::Name & " does not have a tenant id on Funkis Cloud yet. Please check with Funkis Platform." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $theme_template_id[1] ; FAT Title::gThemeTemplate ]
+Set Variable [ $language_code[1] ; getLanguageCode ( FAT Title::gSelectedLocalisation ) ]
+Set Variable [ $country_code[1] ; getCountryCode ( FAT Title::gSelectedLocalisation ) ]
+Set Variable [ $first_package_type_id[1] ; FAT Title::gStartPackageType ]
+Set Field [ FAT Title::Original language code ; $language_code ]
+Set Field [ FAT Title::Original country code ; $country_code ]
+Set Field [ FAT Title::Codebase id ; "547B3496-8B9F-45C5-90B1-5C712DD063EB" /* Readable name: Funkis Player @ Latest */ ]
+Set Field [ FAT Title::FC Title directory ; FAT Title::JSON friendly id ]
+Set Variable [ $$localisation_code[1] ; $language_code & "-" & $country_code ]
+
+Set Error Capture [ ON ]
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ PatternCount (Get(windowName); "new")
+				// New Title ]
+	Close Window
+End If
+
+Freeze Window
+// If [ notJens ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+// Else
+// Perform Script [ From list ; "Create new Title Step 2 SRV" ; Parameter: SetProperty ( "title_id" ; $title_id ) & 
+				SetProperty ( "theme_template_id" ; $theme_template_id ) & 
+				SetProperty ( "first_package_type_id" ; $first_package_type_id ) ]
+// End If
+
+Set Variable [ $result[1] ; Get(ScriptResult) ]
+Set Variable [ $result[1] ; Case($result = ""; "New title successfully created!"; $result) ]
+
+Go to Layout [ Layout: "TABLE User X Title" ; Animation: None ]
+New Record/Request
+Set Field [ User X Title::User id ; $$login_id ]
+Set Field [ User X Title::Title id ; $title_id ]
+Set Field [ User X Title::Localisation code ; $$localisation_code ]
+
+Go to Layout [ Layout: "FAT Title Settings" ; Animation: None ]
+
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Field [ FAT Title::gViewTranslatedLanguage ; 0 ]
+Go to Object [ FAT Title::LastSettingTab ; Repetition: 1 ]
+Show Custom Dialog [ Title: "New title created" ; Message: $result ; Default Button: "OK" ]
+
+
+
+

@@ -1,0 +1,47 @@
+# This script is called from an onObjectModify script trigger in Title Settings.
+  The script changes codebase for all including packages.
+
+# $modifyField = "codebase" "branch" or "version"
+Set Variable [ $modifyField[1] ; Get(scriptParameter) ]
+If [ $modifyField = "codebase" ]
+	Set Field [ FAT Title::Codebase version id ; "" ]
+End If
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $current_FAT_version[1] ; FAT Title::Current FAT Version ]
+
+Commit Records/Requests [ With dialog: OFF ]
+Freeze Window
+Set Error Capture [ ON ]
+
+If [ Baseproject Codebase @ Title::Codebase type ≠ "branch" And $modifyField = "codebase" ]
+	Set Variable [ $codebase_id[1] ; FAT Title::Codebase id ]
+	Set Variable [ $codebase_version[1] ; "" ]
+Else If [ Baseproject Codebase @ Title::Codebase type = "version" And $modifyField = "version" ]
+	Set Variable [ $codebase_id[1] ; FAT Title::Codebase id ]
+	Set Variable [ $codebase_version[1] ; FAT Title::Codebase version id ]
+Else If [ Baseproject Codebase @ Title::Codebase type = "branch" And $modifyField = "branch" ]
+	Set Variable [ $codebase_id[1] ; FAT Title::Codebase id ]
+	Set Variable [ $codebase_version[1] ; FAT Title::Codebase version id ]
+End If
+
+If [ Not IsEmpty ( $codebase_id ) ]
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Package::Codebase id ; Replace with calculation: $codebase_id ]
+		Replace Field Contents [ FAT Package::Codebase version id ; Replace with calculation: $codebase_version ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Else
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Show Custom Dialog [ Title: "Could not change codebase on packages" ; Message: "Something went wrong. Please check your package codebase settings." ; Default Button: "OK" ]
+		
+	End If
+End If
+
+# Check if codebase moving from FAT version X to FAT version Y
+If [ ($current_FAT_version = "3" Or IsEmpty($current_FAT_version) ) And Baseproject Codebase Version @ Title::FAT Version number = "4" ]
+	Perform Script [ From list ; "Update to FAT v4" ]
+End If
+
+
+

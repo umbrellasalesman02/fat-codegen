@@ -1,0 +1,14 @@
+# Inserts data as bas64
+# get data
+
+Set Variable [ $package_dir[1] ; FAT Package::Export Package Sub Path ]
+Set Variable [ $baseURL[1] ; Variables::taskServerURL ]
+Set Variable [ $remoteFolderPath[1] ; $package_dir ]
+// Perform Script [ From list ; "deliverables_getPackageDeliverablesAsBase64" ; Parameter: $remoteFolderPath ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Set Variable [ $base64_result[1] ; Get(ScriptResult) ]
+Set Variable [ $base64_url[1] ; "data:text/html;base64," & $base64_result ]
+// Show Custom Dialog [ Title: "Data url" ; Message: $base64_url ; Default Button: "OK" ; Button 2: "Cancel" ]
+Set Web Viewer [ "test22" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+Refresh Object [ Name: "test22" ]
+

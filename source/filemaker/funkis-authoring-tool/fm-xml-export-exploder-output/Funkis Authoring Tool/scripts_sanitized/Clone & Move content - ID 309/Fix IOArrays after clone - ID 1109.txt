@@ -1,0 +1,101 @@
+# Called from Start Cloning after all cloning is ready
+# Only called if clone_settings includes "IOs"
+# Replaces comma-separated IO Arrays in both Page items and List items
+# This works to do after all cloning since IO Arrays are read only
+
+
+# SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "clone_level" ; $clone_level ) &
+  SetProperty ( "item_id" ; $item_id ) 
+
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $clone_level[1] ; GetScriptProperty("clone_level") ]
+Set Variable [ $item_id[1] ; GetScriptProperty("item_id") ]
+
+Set Error Capture [ ON ]
+
+Perform Script [ From list ; "New Page item found set" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "clone_level" ; $clone_level ) &
+				SetProperty ( "old_item_id" ; $item_id ) ]
+
+If [ Not PatternCount ( Get(ScriptResult); "Error") ]
+	
+	# Now we stand in TABLE FAT Page item with all page items included in clone level
+	
+	# --------- Page items that connects a Legacy IO Array ----------------
+	Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Loop [ Flush: Always ]
+			Set Variable [ $old_io_array[1] ; FAT Page item::IO id array Legacy ]
+			Perform Script [ From list ; "Reconnect IO Arrays Legacy" ; Parameter: SetProperty ( "old_io_array" ; $old_io_array ) &
+							SetProperty ( "title_id" ; $title_id ) ]
+			Set Variable [ $new_io_array[1] ; Get(ScriptResult) ]
+			Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+			Set Field [ FAT Page item::IO id array Legacy ; $new_io_array ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+	
+	# ----------- List items @ List @ Page item that connects a legacy IO Array ----------------------
+	# Go back to found set - now look for List item
+	Perform Script [ From list ; "New Page item found set" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "old_item_id" ; $item_id ) ]
+	# Now we stand in TABLE FAT Page item with all page items included in clone level
+	  And now we now that the found set > 0
+	
+	# So the correct way to test for no related records is:
+	  - GTRR Match current record only: test for error 101
+	  - GTRR Match found set: test for error 401
+	
+	Go to Related Record [ Table: FAT List item @ List @ Page item ; Layout: "TABLE FAT List item" ; Show related ; Match found set ]
+	If [ Get(lastError) ≠ 401 ]
+		# Find list items IO array
+		Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $old_io_array[1] ; FAT List item::IO id array ]
+				Perform Script [ From list ; "Reconnect IO Arrays Legacy" ; Parameter: SetProperty ( "old_io_array" ; $old_io_array ) &
+								SetProperty ( "title_id" ; $title_id ) ]
+				Set Variable [ $new_io_array[1] ; Get(ScriptResult) ]
+				Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+				Set Field [ FAT List item::IO id array ; $new_io_array ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+	End If
+	
+	
+	# ----------- List items @ Page item that connects a legacy IO Array ---------------------
+	# Go back to found set - now look for List item
+	Perform Script [ From list ; "New Page item found set" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "old_item_id" ; $item_id ) ]
+	# Now we stand in TABLE FAT Page item with all page items included in clone level
+	  And now we now that the found set > 0
+	
+	# So the correct way to test for no related records is:
+	  - GTRR Match current record only: test for error 101
+	  - GTRR Match found set: test for error 401
+	
+	Go to Related Record [ Table: FAT List item @ Page item ; Layout: "TABLE FAT List item" ; Show related ; Match found set ]
+	If [ Get(lastError) ≠ 401 ]
+		# Find list items IO array
+		Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $old_io_array[1] ; FAT List item::IO id array ]
+				Perform Script [ From list ; "Reconnect IO Arrays Legacy" ; Parameter: SetProperty ( "old_io_array" ; $old_io_array ) &
+								SetProperty ( "title_id" ; $title_id ) ]
+				Set Variable [ $new_io_array[1] ; Get(ScriptResult) ]
+				Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+				Set Field [ FAT List item::IO id array ; $new_io_array ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+	End If
+	
+	
+End If
+
+

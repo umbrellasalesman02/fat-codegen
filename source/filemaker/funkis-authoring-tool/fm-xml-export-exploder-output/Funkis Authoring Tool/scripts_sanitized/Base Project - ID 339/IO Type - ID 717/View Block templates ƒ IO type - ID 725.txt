@@ -1,0 +1,13 @@
+# Called from IO Type
+Freeze Window
+Set Error Capture [ ON ]
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $io_type[1] ; IO Type::FATType ]
+Go to Layout [ Layout: "BlockTemplate List" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)=0 ]
+	Show Custom Dialog [ Title: "No Block templates found" ; Message: "It seems there's no Block templates using this IO type. " ; Default Button: "OK" ]
+	Perform Script [ From list ; "Go previous layout" ]
+End If
+

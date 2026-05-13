@@ -1,0 +1,32 @@
+# called from a portal that act as a dropdown menu
+# Called from Page item, Page item 2, Page and Chapter menu
+
+Set Variable [ $caller[1] ; Get(scriptParameter) ]
+# Caller can be "Page", "Chapter", "Page item" or "Page item 2"
+
+
+If [ $caller = "Page item" Or $caller = "Page item 2" ]
+	Set Variable [ $block_id[1] ; FAT Page Block VL::PrimaryKey ]
+	Set Variable [ $block_name[1] ; FAT Page Block VL::Name ]
+	Set Field [ FAT Page item::gBlock ; $block_id ]
+	Close Popover
+	If [ $caller = "Page item" ]
+		Perform Script [ From list ; "Create PageItem in Page CL" ; Parameter: SetProperty ( "page_item2" ; False ) ]
+	Else If [ $caller = "Page item 2" ]
+		Perform Script [ From list ; "Create PageItem in Page CL" ; Parameter: SetProperty ( "page_item2" ; True ) ]
+	End If
+Else If [ $caller = "Page" ]
+	Set Variable [ $block_id[1] ; FAT Page Block VL::PrimaryKey ]
+	Set Variable [ $block_name[1] ; FAT Page Block VL::Name ]
+	Set Field [ FAT Page item::gBlock ; $block_id ]
+	Close Popover
+	Perform Script [ From list ; "Create PageItem CL" ]
+Else If [ $caller = "Chapter" ]
+	Set Variable [ $block_id[1] ; FAT Package Block VL::PrimaryKey ]
+	Set Variable [ $block_name[1] ; FAT Package Block VL::Name ]
+	Set Field [ FAT Page item::gBlock ; $block_id ]
+	Close Popover
+	Perform Script [ From list ; "Create Page CL" ; Parameter: SetProperty ( "proxy_type" ; "page_item" ) & 
+					SetProperty ( "block_id" ; FAT Page item::gBlock ) ]
+End If
+

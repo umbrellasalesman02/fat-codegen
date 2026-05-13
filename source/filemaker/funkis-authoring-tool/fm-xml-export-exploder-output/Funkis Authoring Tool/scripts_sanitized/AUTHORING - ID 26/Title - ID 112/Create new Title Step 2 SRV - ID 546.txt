@@ -1,0 +1,153 @@
+# Called from button Create Title in card window New Title
+# Can be called from FAT Title TABLE during tests
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $theme_template_id[1] ; GetScriptProperty ( "theme_template_id" ) ]
+Set Variable [ $first_package_type_id[1] ; GetScriptProperty ( "first_package_type_id" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $localisation_code[1] ; FAT Title::Original localisation code ]
+Set Variable [ $language_code[1] ; FAT Title::Original language code ]
+Set Variable [ $country_code[1] ; FAT Title::Original country code ]
+Set Variable [ $reference_title[1] ; FAT Title::Reference title ]
+Set Variable [ $backend[1] ; FAT Title::Title Backend ]
+
+# Set BaseProject  - this is set in DB on creation - all Titles will use BaseProj = "432D61A4-618C-4579-A4E4-427A6B521FDD"
+Set Variable [ $base_project[1] ; FAT Title::Base project ]
+
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Title::PrimaryKey ) &
+				SetProperty ( "source_table" ; "title" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Title::Header txt id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Title::PrimaryKey ) &
+				SetProperty ( "source_table" ; "title" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Title::Sub header txt id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+
+
+#  start notJens when debugging - end on line 90 -----------------------
+// If [ notJens ]
+# Import Modifiers from Base project
+If [ isPSOS ]
+	Perform Script [ From list ; "Import BaseProject modifiers" ; Parameter: SetProperty ( "title_id" ; $title_id ) ]
+Else
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+If [ Get(ScriptResult) = "Cancel" ]
+	Exit Script []
+End If
+# Import global codebase texts from Base project
+If [ isPSOS ]
+	Perform Script [ From list ; "Import BaseProject global texts" ; Parameter: SetProperty ( "title_id" ; $title_id ) ]
+Else
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+
+# Import Blocks from Base project
+If [ isPSOS ]
+	Perform Script [ From list ; "Import all block templates" ; Parameter: SetProperty ( "title_id" ; $title_id ) ]
+Else
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+If [ Get(ScriptResult) = "Cancel" ]
+	Exit Script []
+End If
+
+# Import all text variables from Base project
+If [ isPSOS ]
+	Perform Script [ From list ; "Import all text variables" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "title_backend" ; $backend ) &
+					SetProperty ( "base_project" ; $base_project ) ]
+Else
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+
+# Create all default Links from Base project
+// Perform Script [ From list ; "Import DefaultLinks" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "title_backend" ; $backend ) &
+				SetProperty ( "base_project" ; $base_project ) ]
+
+# Setup a new theme based on selected theme
+If [ isPSOS ]
+	Perform Script [ From list ; "Setup new Title Theme" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "theme_template_id" ; $theme_template_id ) & 
+					SetProperty ( "language_code" ; $language_code ) & 
+					SetProperty ( "country_code" ; $country_code ) ]
+Else
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Field [ TF TT Header::Text ; $reference_title ]
+# Done with all blocks, modifiers, theme, text variables
+
+# Fix image before creating title on Funkis Cloud and Insights
+Go to Layout [ Layout: "Variables" ; Animation: None ]
+Go to Record/Request/Page [ First ]
+If [ $backend = "Funkis Cloud" ]
+	Set Variable [ $default_image[1] ; Variables::Title default image Funkis Cloud ]
+Else If [ $backend = "LMS" ]
+	Set Variable [ $default_image[1] ; Variables::Title default image LMS ]
+Else If [ $backend = "Other" ]
+	Set Variable [ $default_image[1] ; Variables::Title default image Other ]
+End If
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Set Field [ FAT Title::Icon image ; $default_image ]
+
+
+// End If
+// # ---------- End notJens when debugging --------------------------
+
+# --------------- Set up backend-specific configuration ----------------------------------------
+# This must be DONE after creating all Modifiers
+
+# Get the default Funkis Cloud environment
+Perform Script [ From list ; "Get default environment" ]
+Set Variable [ $title_environment[1] ; Get(ScriptResult) ]
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Set Field [ FAT Title::Title Environment ; $title_environment ]
+
+Perform Script [ From list ; "Create FC Start packages" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "first_package_type_id" ; $first_package_type_id ) &
+				SetProperty ( "backend" ; $backend ) ]
+Set Variable [ $title_site_directory[1] ; Get(ScriptResult) ]
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+
+# Create title on Funkis Cloud and adding the start package as a launch url
+Set Variable [ $organization_id[1] ; Client::Funkis Cloud Client id ]
+Set Variable [ $title_directory[1] ; FAT Title::FC Title directory ]
+
+If [ $backend = "LMS" ]
+	Set Variable [ $launchURL[1] ; "https://" & Title Server Preview::URL & "/" & FAT Title::Export Title Sub Path & $title_site_directory & "/" ]
+Else
+	Set Variable [ $launchURL[1] ; "https://" & Title Server Publish::URL & "/" & FAT Title::Export Title Sub Path & $title_site_directory & "/" ]
+End If
+
+Perform Script [ From list ; "CreateTitleOnCloud" ; Parameter: SetProperty ( "title_environment" ; $title_environment ) &
+				SetProperty ( "organization_id" ; $organization_id )&
+				SetProperty ( "reference_title" ; $reference_title )&
+				SetProperty ( "title_directory" ; $title_directory ) &
+				SetProperty ( "launchURL" ; $launchURL ) ]
+Set Variable [ $funkis_cloud_title_id[1] ; Get(ScriptResult) ]
+If [ PatternCount ( $funkis_cloud_title_id ; "Error" ) ]
+	Set Variable [ $error_message[1] ; $funkis_cloud_title_id ]
+Else
+	Set Field [ FAT Title::Funkis Cloud Title id ; $funkis_cloud_title_id ]
+End If
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ $backend = "Funkis Cloud" And Not PatternCount ( $funkis_cloud_title_id ; "Error" ) ]
+	# Create the title on Funkis Insight
+	Perform Script [ From list ; "CreateTitleOnInsight" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "title_environment" ; $title_environment ) &
+					SetProperty ( "reference_title" ; $reference_title ) &
+					SetProperty ( "funkis_cloud_title_id" ; $funkis_cloud_title_id ) ]
+	
+End If
+
+

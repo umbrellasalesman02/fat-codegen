@@ -1,0 +1,2088 @@
+<Script>
+	<ScriptReference id="957" name="Title HT Localisation MASTER 1"></ScriptReference>
+	<ObjectList membercount="156">
+		<Step hash="5789476B597C02368688DF48F65A3F41" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This translation flow is designed for Title Translations"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A7C6BA8783FC23393D7F728A8578ED5F" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Script is called from Trasnlate button in Title Localisation Card Window when translation method = &quot;Human&quot;"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B7BCAB63FD27ECA736D8B2388A87966E" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C2B92CD71B082B7051F0B94BB13FDA4C" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Stage  Name                             Text status HT              Text status MT&#13;1.     Language added                   - (text does not exist)     - (text does not exist)&#13;2.     Text prepared for translation    Not translated              Not translated&#13;3.     Original text sent&#09;              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)&#13;4.     Translated text imported&#09;      Not reviewed                 Not reviewed&#13;5.&#09;   Translation in review           In progress                  In progress&#13;6.     Translation approved             Approved                    Approved"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3CBC05D47CE8049DA6561055AB21A8DC" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5738F2B89C82B023A214F00FA77C72BB" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="For Human translation - localisation will be in STAGE 3 after this script if STAGE &lt; 3 when triggered"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F536D0272E0401395208FD38DA19CF75" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D76DD68ECF5B2F8A3DB82A76D2E29BF1" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="D4A49D28DCAD9557514832527A823D4E" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2F79519CC1752B7088656EDAAEDDF167" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3B7EF5DB43F5B8B62F9E1CA0C48210B0" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="----------------- Intitiate all variables from Localisation that will be used in process ----------------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="58ED9732B6508941D239A9FC7ED910BC" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Title::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="14DDDCE79BE5A608093C3A1D22C9BCBC" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Title::JSON friendly id]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_reference_title"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="38F64DB370BBC6A427B2133EF07E04C3" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Localisation::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_localisation_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8E8A0A79C709047B73B91E9EC8B9081D" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Localisation::Localisation stage]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$localisation_stage"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="44D73F592E0E0596143E5C8C7FC308B4" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Title::TextInContextualOrderTimeStamp]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$last_sorted_timestamp"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D8648742F1B5A16501E80E6AA6E370D2" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Case (    IsEmpty ( FAT Localisation::TextfieldsCreationTimestamp );   GetAsTimeStamp ( "2000-01-01" );   FAT Localisation::TextfieldsCreationTimestamp )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$last_localised_textfield_creation_timestamp"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="064B1E1D901FDA37CD82144FEFE5495B" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Localisation::Original Localisation code]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$original_localisation_code"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8F031F68E87EA8AA8521C9ECFAF895D7" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Localisation::Localisation code]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$target_localisation_code"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E440041CACC1A962814216E16B343700" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="58390FA758C2398AE24ED1CF5405F1DF" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="------------------ Check that all export paths are in order for human translation -------------------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="886FFEDCBD951644B4CB1EB159A78D14" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[User X Title @ Title::Title Filepath export="" And FAT Localisation @ Package::Translation method = "Human translation"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DC4EE86E4D72998B7EA6A8B044FB651C" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["No file path found!"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["You haven't defined an export path. Go to Title settings, select an output folder and redo the export."]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="29D6383EAC5ABADFFBA81805DF7D5E9F" id="103" name="Exit Script" enable="True">
+		</Step>
+		<Step hash="9486518DD3428AFB80780840BF25BD1C" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="250F5612A7AFF2D748DB8515579BA300" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[User X Title @ Title::Title Filepath export]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$export_path"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6E30347637B1D43E6553BBAEB571F107" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="ECA00ECD1F94138E38AEB4354934F004" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AE2E11EE17CEB98E84D846D9BEBD0EB0" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="------------- Check if texts needs to be arranged in a new sort order ---------------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B3DDFC7F2F2B5CC7C03D33F44DCC2EA9" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="------------- Returns a boolean AND timestamp when last original text field was created ---------------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2254CDDAA1ECC71D1792BA3CD91D2952" id="1" name="Perform Script" enable="False">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="945" name="Check if arrange texts needed"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_id" ; $title_id ) & SetProperty ( "original_localisation_code" ; $original_localisation_code ) & SetProperty ( "last_sorted_timestamp" ; $last_sorted_timestamp )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F50275F075C3DF069AE877067057CDBF" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="945" name="Check if arrange texts needed"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_id" ; $title_id ) & SetProperty ( "original_localisation_code" ; $original_localisation_code ) & SetProperty ( "last_sorted_timestamp" ; $last_sorted_timestamp )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="499C7C1196C839EE9469D5DB6DA278D5" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetAsBoolean ( GetResultProperty ( "new_arrange_needed" ))]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$new_arrange_needed"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6F5E62AF724815246EDC924DC5D783B9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetAsTimeStamp ( GetResultProperty ( "last_original_textfield_creation_timestamp" ))]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$last_original_textfield_creation_timestamp"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="808F610B41B0B8EFC5456936CD02E3DA" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="02164753A42990CCC66D2602147367DC" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="------------- If texts needs to be arranged in a new sort order - Arrange text ---------------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FDB615BEF2893CFD96318D71CB7277B0" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$new_arrange_needed]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="478059A7C00DEB429985CF7E7FFC02D2" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1C95A5F43D4FD6372F151B582E1D2202" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Text needs to be arranged in order"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["Before starting the translation, texts needs to be arranged in the right contextual order for the reviewers. This might take some time."]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="Arrange">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Skip">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3" value="Stop">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C385C9B581D67F5DFAD42F915E19B958" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastMessageChoice) = 3]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="85F0F3F8CB6004D6DB41FEF298645BEA" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="User pressed Stop - Add event to log"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="036E29D17FBF223EB6EFE6DB2428DD78" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Texts needed new arrangement. User stopped. Last text created " & $last_original_textfield_creation_timestamp & "."]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$event_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5D297C7186D43664F84DAEE054D33F61" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="596" name="Add to localisation log"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_id" ; $title_localisation_id ) & SetProperty ( "localisation_stage" ; $localisation_stage ) & SetProperty ( "event_text" ; $event_text )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="377A0B0E54A6386949A70D28D28AFF62" id="103" name="Exit Script" enable="True">
+		</Step>
+		<Step hash="B44AFC547182BDA27F5CBDAE84837950" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastMessageChoice) = 1]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A316D826A2267A18A5759D191F78D68E" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E4850D5AACE2A6F7899350490A9C1EDC" id="1" name="Perform Script" enable="False">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="938" name="Arrange text in order Title"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_id" ; $title_id ) &SetProperty ( "title_localisation_id" ; $title_localisation_id )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6A0F502B9C22F3247C73C78A06321F72" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="938" name="Arrange text in order Title"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_id" ; $title_id ) &SetProperty ( "title_localisation_id" ; $title_localisation_id )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E4825FF932E570A601C334E5054B43E6" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9C2658D2CF5D636F278433031FD5A47B" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(currentHostTimeStamp)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$last_sorted_timestamp"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="268789379BDA7E5235AE6BD489125C91" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Not PatternCount ( Get(ScriptResult) ; "error" )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="898D83DE80437D11C5B90858718CC68F" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Title and Package texts now are in contextual order"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C4CAE62A7E924FA213E2310CCCA4BA7F" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="If no errors - save the timestamp when finding new texts"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="78EC47E43C6F93359D00203A905E7109" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="161" name="TextInContextualOrderTimeStamp">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065132" name="FAT Title"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$last_sorted_timestamp]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="867851CEBD8391D44D2E146C0BC289BE" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Texts were successfully arranged in contextual order."]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$event_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="53A2778B5BCFA7ED4687AF69C1463EB6" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="596" name="Add to localisation log"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_id" ; $title_localisation_id ) & SetProperty ( "localisation_stage" ; $localisation_stage ) & SetProperty ( "event_text" ; $event_text )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="840B551EF5FC6B90984408C0337F6BCD" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="39BB8510085314FF9D0D6E4D40C4A22D" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Something went wrong when arranging texts. Maybe a record is busy."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FDBD072FAE632D3054D6D04660F3D094" id="6" name="Go to Layout" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="46031D82C0698AE77B393CC31408FEC6" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Error when sorting text"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["Something went wrong when sorting the original texts in contextual order.¶Probably there's someone else working with the title right now.¶¶Do you want to stop the process or continue?"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="Stop">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Continue">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="196C0372BCC3F4832A5F12102B107DA7" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastMessageChoice) = 1]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DD48E654FE72E55ACB09C741E8D19275" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["User stopped because an error occured when arranging texts in contextual order. " & Get(ScriptResult)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$event_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FE19965A5470E922618E6C167967792A" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="596" name="Add to localisation log"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_id" ; $title_localisation_id ) & SetProperty ( "localisation_stage" ; $localisation_stage ) & SetProperty ( "event_text" ; $event_text )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9D3B805B904BAEBC9F699F9817D1E214" id="103" name="Exit Script" enable="True">
+		</Step>
+		<Step hash="4B3C683FD6EA46829A4EDD2E79D95293" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="3818E8051A7C87AF255AC52F6A862747" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="C3C8A338064E36A090C586A4B62E30B5" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastMessageChoice) = 2]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4DD60AF7235BCDCDEA7FE66E7629B0A4" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="User pressed Skip - Add event to log"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5B5CA6C40E0D9A3FC9FC99DFD71A8D39" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Texts needed new arrangement but user skipped. Last text created " & $last_original_textfield_creation_timestamp & "."]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$event_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="07D1F3E7D15AA4990FC7713566901289" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="596" name="Add to localisation log"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_id" ; $title_localisation_id ) & SetProperty ( "localisation_stage" ; $localisation_stage ) & SetProperty ( "event_text" ; $event_text )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A98AB57B8C53F7F776AF6F0D3B8669BE" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="F360D5AE003A4665FF6430F56ABD6052" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="07FA20A52422706B783EF482E3F24481" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5318D0FD78075E9D8BF2BA5A060A67BE" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="--------------------------- Set translation provider ------------------------------------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="272FAF518B369B851CC599AE2E1138FD" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B30E6CB9CE2EE683FF2C96BBA796A37A" id="6" name="Go to Layout" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3D0C592F43BA9FD43CD0ADBA29B949FA" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="6">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Translation provider"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["Please, enter the name of the translation provider that will be used for this translation. ¶¶This will make it easier to backtrack the translation later. "]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Cancel">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Field1">
+					<Parameter type="Target">
+						<Variable value="$translation_provider">
+							<repetition>
+								<Calculation datatype="1" position="10">
+									<Calculation>
+										<Text><![CDATA[1]]></Text>
+									</Calculation>
+								</Calculation>
+							</repetition>
+						</Variable>
+					</Parameter>
+					<Boolean type="Password" value="False"></Boolean>
+					<Parameter type="Label">
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA["Name of provider"]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CDFD7DBC7E318D526F7C71D59FAEA089" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastMessageChoice) = 2]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E9525260298831F6033845ABD8232C55" id="103" name="Exit Script" enable="True">
+		</Step>
+		<Step hash="9B30E79B0B8E8FB90550F4CFB33A717A" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="7CE4E198620540186BF03E93CCDA9F11" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="21" name="Translation provider">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065181" name="FAT Localisation"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$translation_provider]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8117B0A2774DBCD5EEA3193F0A273641" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Count(FAT Localisation @ Title::PrimaryKey) > 0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7C7004DBC12D854A8149037AF20FAA07" id="74" name="Go to Related Record" enable="True">
+			<Options>33554440</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065746" name="FAT Localisation @ Title"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="102" name="TABLE FAT Localisation @ Package"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F169DD0ED16DB8BB078093D9620445B0" id="91" name="Replace Field Contents" enable="True">
+			<Options>16517</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="21" name="Translation provider">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065424" name="FAT Localisation @ Package"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="replace">
+					<List name="Replace with calculation: " value="3">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$translation_provider]]></Text>
+							</Calculation>
+						</Calculation>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4156778F83E66AD2EB49BC1E8D13794B" id="6" name="Go to Layout" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7C87548FE06AD06086E637EDE8E08E1D" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CA06940118DC8F029BF13A3519614A1F" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$translation_provider & " selected as translation provider."]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$event_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B7014323AD1F9A5D9F13C6AA1E3E8CF3" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="596" name="Add to localisation log"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_id" ; $title_localisation_id ) & SetProperty ( "localisation_stage" ; $localisation_stage ) & SetProperty ( "event_text" ; $event_text )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EF39549B9943F6943E46F1412A6EF60E" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="2EDB8AD701BB646421D4A65DF57CCCD1" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="70F904F36A775B308DBD7EFC328001EC" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="---------------------- Stage 1 - Localise text fields - Duplicate new texts ---------------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6A9C25FAFCE676694BBD38AC42BC118E" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="47D867B9F11FF40335A46DD1F612ECFC" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="New strategy opening a separate FAT Text file to increase performance"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BD02591B21B58B96F439CAE8A40C1198" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="For 40 text fields time reduced from 9 sec to 3 sec using FM Server 20.3.1 with Loop Flush: Defer setting"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C8B1AFF054018132CDDB84868F78B26D" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="With previous server version with Loop Flush: Always - time was probably longer. "></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="319151626EB62BD060892170011A4CF6" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D6D0037EA3A2133334A685454DA6DAFF" id="1" name="Perform Script" enable="False">
+			<Options>16464</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<DataSourceReference id="6" name="FAT Text"></DataSourceReference>
+						<ScriptReference id="2" name="Localise Text fields"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_id" ; $title_id ) &SetProperty ( "original_localisation_code" ; $original_localisation_code ) &SetProperty ( "target_localisation_code" ; $target_localisation_code ) &SetProperty ( "last_localised_textfield_creation_timestamp" ; $last_localised_textfield_creation_timestamp )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CC697ADCB85702BAD101EEAB713F14C0" id="164" name="Perform Script on Server" enable="True">
+			<Options>16464</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<DataSourceReference id="6" name="FAT Text"></DataSourceReference>
+						<ScriptReference id="2" name="Localise Text fields"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_id" ; $title_id ) &SetProperty ( "original_localisation_code" ; $original_localisation_code ) &SetProperty ( "target_localisation_code" ; $target_localisation_code ) &SetProperty ( "last_localised_textfield_creation_timestamp" ; $last_localised_textfield_creation_timestamp )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5B6F68F800F186D3B1F454AEF13F2AC9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetResultProperty ( "num_of_created")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$num_of_created"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B3D2E9935E4945D32ED697661771D000" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetResultProperty ( "num_of_errors")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$num_of_errors"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2B94C6186CF649E54184E5EA7BBC83DE" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetAsTimeStamp (GetResultProperty ( "last_localised_textfield_creation_timestamp"))]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$last_localised_textfield_creation_timestamp"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0F5F3A7104CCEA23CE7009C1D34563D1" id="34" name="Close File" enable="False">
+			<Options>16</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="DataSourceReference">
+					<DataSourceReference id="6" name="FAT Text"></DataSourceReference>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0EC617EC78C8270832ADEC12B3971468" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F8986B252C9F2292189759B1129173B8" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$num_of_errors > 0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2BE05D1256085B820A903D1E52BA2CFC" id="6" name="Go to Layout" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="15F0F7B77C611682BF42B4E45E838E48" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Error when creating new text fields for localisation"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["Something went wrong when creating new localised text fields.¶Probably there's someone else working with the title right now.¶¶Do you want to stop the process or continue?"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="Stop">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Continue">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9768EBA4CA565B6FF3550EF00345EBE8" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastMessageChoice) = 1]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="65AAFDECB3EE932602582863AFA9DEB0" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["User stopped because error when creating new localised text fields. "]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$event_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B29851C09523C8C17537BDD5D2DD2B5F" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="596" name="Add to localisation log"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_id" ; $title_localisation_id ) & SetProperty ( "localisation_stage" ; $localisation_stage ) & SetProperty ( "event_text" ; $event_text )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="203CCC9EDF40E483213C960CC23404B2" id="103" name="Exit Script" enable="True">
+		</Step>
+		<Step hash="76E5799F23D77BE9698DE5F3DB21B935" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="87C68DD0E3884947CD4BCE643A312913" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Error when creating new localised text fields but user continued process. "]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$event_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="800D8D7A5514E5766B01E9A0C660EE08" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="DEF58F5E2593FC4FA311AD8190F2F8B2" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Successfully created " & $num_of_created & " new localised text fields."]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$event_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7F7AE100E359EFB58C132DD42BBAC1CE" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Update Localisation with date when localised text fields were created."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="09B6D240B4B30FFCA196091B1A744874" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="37" name="TextfieldsCreationTimestamp">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065181" name="FAT Localisation"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$last_localised_textfield_creation_timestamp]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B27711FF1FE12D3086969B1FBA112FD6" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="The commit below is needed for allowing PSOS to make changes"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C5EF304FBC2E7450946D17B209F3D59C" id="75" name="Commit Records/Requests" enable="True">
+			<Options>128</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="Skip data entry validation" id="256" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Force Commit" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C91D1C0A3A0BE391CC99268E0337447B" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="160115D4AC4DA9AA261924BF38686105" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="596" name="Add to localisation log"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_id" ; $title_localisation_id ) & SetProperty ( "localisation_stage" ; $localisation_stage ) & SetProperty ( "event_text" ; $event_text )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="387788C333822211E641A4836F9F2C0E" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4186B75D745323ECADC6BB4A3420F1AA" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="------------------------ Stage 2 - Text fields prepared for translation --------------------------------------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DB1263B97C88E45A3D338237076C3404" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="943DCDF9030A82981E703E3525FA64CC" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[2]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$localisation_stage"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AC8D7122BB156E210D086369B9EC64C3" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="956" name="Change Title localisation stage"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_localisation_id" ; $title_localisation_id ) &SetProperty ( "localisation_stage" ; $localisation_stage ) &SetProperty ( "force_stage" ; "" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E87AD0ED85059ADF6BC9650F1BD415EE" id="164" name="Perform Script on Server" enable="False">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="956" name="Change Title localisation stage"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_localisation_id" ; $title_localisation_id ) &SetProperty ( "localisation_stage" ; $localisation_stage ) &SetProperty ( "force_stage" ; "" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C63007F418BD4BDF747AC39F6B5A17D2" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3434100563D0C90028BFD2945C5D3C66" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="596" name="Add to localisation log"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_id" ; $localisation_id ) & SetProperty ( "localisation_stage" ; $localisation_stage ) & SetProperty ( "event_text" ; $event_text )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1420A4B3CAA4A74C98310E4717A51B85" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4233EAB6ED2010BA5C58873A8C13DCC0" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="------------------------ Stage 3 - Export Text fields for translators --------------------------------------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D5B7F615A7B0024DE9B60BD5E80830E9" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Send all texts in Title in one bunch"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8E883BFD25AC461A1F0C30BA3F6A85A9" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B6746E26BC0C542A6FB568EF73A5D258" id="1" name="Perform Script" breakpoint="True" enable="False">
+			<Options>1065024</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="958" name="Title Export HT files SRV"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_id" ; $title_id ) &SetProperty ( "title_localisation_id" ; $title_localisation_id ) &SetProperty ( "title_reference_title" ; $title_reference_title )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E4A6A3BF36A49A7FABC672AB61DB4309" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="958" name="Title Export HT files SRV"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_id" ; $title_id ) &SetProperty ( "title_localisation_id" ; $title_localisation_id ) &SetProperty ( "title_reference_title" ; $title_reference_title )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6AA6329C0E81A11B901CA1514760AA5B" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E228CF66E002DC2F1ECA0A27D0D02A18" id="6" name="Go to Layout" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B02F4F241FD92AECE0C8845724B3BBBB" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DDED7A9DD1EC7EBA8743C5659B51FB0D" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Write JSON file"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0D4AE2883A547C6869F0DAC23E190E77" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$export_path & GetContainerAttribute ( FAT Title::Latest Exported file ; "filename" ) & ".json"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$export_path"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4291EBAF029F53CE4C86FD4511B884CC" id="190" name="Create Data File" enable="True">
+			<Options>544</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="UniversalPathList">
+					<UniversalPathList membercount="1">
+						<ObjectList>
+							<Location><![CDATA[$export_path]]></Location>
+						</ObjectList>
+					</UniversalPathList>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Create folders" id="512" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E72D04DA9856A7B3BB5E0B9C27689650" id="191" name="Open Data File" enable="True">
+			<Options>37</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="UniversalPathList">
+					<UniversalPathList membercount="1">
+						<ObjectList>
+							<Location><![CDATA[$export_path]]></Location>
+						</ObjectList>
+					</UniversalPathList>
+				</Parameter>
+				<Parameter type="Target">
+					<Variable value="$fileID">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+					</Variable>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E21EA4FEA0FEFDCBE6EFC9802143E970" id="192" name="Write to Data File" enable="True">
+			<Options>16387</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="id">
+					<Calculation datatype="2" position="0">
+						<Calculation>
+							<Text><![CDATA[$fileID]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Target">
+					<FieldReference id="73" name="Latest Exported file">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065132" name="FAT Title"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Encoding type="2" name="UTF-8"></Encoding>
+				<Parameter type="Boolean">
+					<Boolean type="Append line feed" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7F51118453CBB7D91FD0307F8334031C" id="196" name="Close Data File" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="id">
+					<Calculation datatype="2" position="0">
+						<Calculation>
+							<Text><![CDATA[$fileID]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A3A21E0A569381D503B95882B8062290" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="53B68F70295959A393FF9AE55FBEEEE9" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6FFDDE078DA366381F83F73740A8829D" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[3]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$localisation_stage"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="068FFDF2BA9BA7CE0F20BD9956B21DE8" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Successfully created new localised text file."]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$event_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6DD3CA114551F8A74A2CE1078706E8DF" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="16C7151DBCDDB1A74B82A684575604B2" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="596" name="Add to localisation log"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_id" ; $localisation_id ) & SetProperty ( "localisation_stage" ; $localisation_stage ) & SetProperty ( "event_text" ; $event_text )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="72CC6DD9750F87DA7D5F62B3AC19D969" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="956" name="Change Title localisation stage"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "title_localisation_id" ; $title_localisation_id ) &SetProperty ( "localisation_stage" ; $localisation_stage ) &SetProperty ( "force_stage" ; "" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B808EF558D1378F38171193C103ACF41" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="644" name="Log translation status CL"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "caller" ; "Title localisation" ) &SetProperty ( "localisation_id" ; $title_localisation_id ) &SetProperty ( "localisation_stage" ; $localisation_stage ) &SetProperty ( "status_type" ; "status" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="74AD26EBFACB59A3CAD2696AE8DB5297" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C30D2CD02CE92BED61F1486E36E76234" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Make sure all PSOS changes are viewed in window"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9692E370DAF9E0850A26F116600978B4" id="80" name="Refresh Window" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="Boolean">
+					<Boolean type="Flush cached join results" id="256" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Flush cached external data" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4D27FFA9FA38F907AC8EE83B2CEB9EB1" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C36249850245ABA4F2E2D4F915903244" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

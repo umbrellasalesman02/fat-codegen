@@ -1,0 +1,177 @@
+<Script>
+	<ScriptReference id="744" name="View all blocks using List"></ScriptReference>
+	<ObjectList membercount="13">
+		<Step hash="30D3772938EF814EC0912B300C39416A" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called from a button on layout Title Content Array Setting"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="70D7D1DAA9217F7E1555DF25C9FC8F00" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F28A5BC1CCB831AD4EBED057BDBFC798" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="7FE04180EC0DFDAD7C166DB28EDE6795" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT IO::Title id]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5605B3FBFB49598B13FE1AA275569146" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT List::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$tca_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CB57B12E09E54E134E661F947B6F2918" id="1" name="Perform Script" enable="True">
+			<Options>64</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="411" name="Close card Window"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter></Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1C5586D560743191160F013066298CE2" id="1" name="Perform Script" enable="True">
+			<Options>64</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="13" name="Save Active Layout"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter></Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BD705436375A1A56992AF224658D24B8" id="6" name="Go to Layout" enable="True">
+			<Options>10</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="230" name="FAT Block instances"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5CA7B68F7859195C74F148E8629FBE28" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$tca_id">
+								<FieldReference id="92" name="List id">
+									<TableOccurrenceReference id="1065276" name="FAT Page item @ Block"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FA25E0DE6522B15B4637E7763A63B33A" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount) = 0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F1743A15670A28F584586E7C89755583" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["No page items found"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["There are no page items in this Title that use this List yet."]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="76BAD6B14CACAC4B8B68F9401AC1A2A7" id="1" name="Perform Script" enable="True">
+			<Options>64</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="14" name="Go previous layout"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter></Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F57625ED7B6BAA5BF87837C7A6702BFE" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

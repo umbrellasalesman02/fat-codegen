@@ -1,0 +1,74 @@
+# This script will be called from all buttons where we duplicate Title, Package groups, Package, Chapter, Page, Page item
+# It will open a new window where the user can configure
+
+
+Set Variable [ $clone_level[1] ; GetScriptProperty ( "clone_level" ) ]
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+Set Variable [ $item_parent_id[1] ; GetScriptProperty ( "item_parent_id" ) ]
+Set Variable [ $item_description[1] ; GetScriptProperty ( "item_description" ) ]
+Set Variable [ $item_sortindex[1] ; GetAsNumber(GetScriptProperty ( "item_sortindex" )) ]
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Field [ FAT Title::gCloneSuffix ; "COPY" ]
+Set Field [ FAT Title::gCloneItemInfo ; $item_description ]
+Set Field [ FAT Title::gCloneLevel ; $clone_level ]
+Set Field [ FAT Title::gCloneItemId ; $item_id ]
+Set Field [ FAT Title::gCloneItemParentId ; $item_parent_id ]
+
+Commit Records/Requests [ With dialog: OFF ]
+
+Freeze Window
+# Finding new sortindex relies that we are looking at a found set of items when duplicating
+If [ Get(foundCount)> 1 And Get(recordNumber)<Get(foundCount) ]
+	If [ $clone_level = "Package" ]
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: OFF ]
+		Set Variable [ $item_next_sortindex[1] ; FAT Package::SortIndex ]
+		Go to Record/Request/Page [ Previous ; Exit after last: OFF ]
+	Else If [ $clone_level = "Chapter" ]
+		Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: OFF ]
+		Set Variable [ $item_next_sortindex[1] ; FAT Chapter::SortIndex ]
+		Go to Record/Request/Page [ Previous ; Exit after last: OFF ]
+	Else If [ $clone_level = "Page" ]
+		Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: OFF ]
+		Set Variable [ $item_next_sortindex[1] ; FAT Page::SortIndex ]
+		Go to Record/Request/Page [ Previous ; Exit after last: OFF ]
+	Else If [ $clone_level = "Page item" ]
+		Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: OFF ]
+		Set Variable [ $item_next_sortindex[1] ; FAT Page item::SortIndex ]
+		Go to Record/Request/Page [ Previous ; Exit after last: OFF ]
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Set Field [ FAT Title::gCloneItemNewSortIndex ; $item_sortindex + ($item_next_sortindex - $item_sortindex)/2 ]
+Else
+	Set Field [ FAT Title::gCloneItemNewSortIndex ; $item_sortindex + ,5 ]
+End If
+
+Perform Script [ From list ; "Open card setting" ; Parameter: SetProperty ("card_window_name" ; "Duplicate FAT item" ) &
+				SetProperty ("card_window_layout" ; "FAT Duplicate PKG PK CH PG PI") &
+				SetProperty ("card_window_width" ; "586" ) &
+				SetProperty ("card_window_height" ; "586" ) &
+				SetProperty ("item_id" ; $title_id ) &
+				SetProperty ("item_type" ; "Clone" ) ]
+Set Variable [ $$cloneAvailableSettings[1] ; "IOs¶Links¶Lists¶Tags¶Score categories" ]
+
+If [ FAT Title::gCloneLevel = "Title" ]
+	Set Field [ FAT Title::gCloneDefaultSettings ; "IOs¶Links¶Lists¶Tags¶Score categories" ]
+Else If [ FAT Title::gCloneLevel = "Package group" ]
+	Set Field [ FAT Title::gCloneDefaultSettings ; "IOs¶Links¶Lists¶Tags¶Score categories" ]
+Else If [ FAT Title::gCloneLevel = "Package" ]
+	Set Field [ FAT Title::gCloneDefaultSettings ; "IOs¶Links¶Lists¶Tags¶Score categories" ]
+Else If [ FAT Title::gCloneLevel = "Chapter" ]
+	Set Field [ FAT Title::gCloneDefaultSettings ; "IOs¶Links¶Lists" ]
+Else If [ FAT Title::gCloneLevel = "Page" ]
+	Set Field [ FAT Title::gCloneDefaultSettings ; "IOs¶Links¶Lists" ]
+Else If [ FAT Title::gCloneLevel = "Page item" ]
+	Set Field [ FAT Title::gCloneSuffix ; "" ]
+	Set Field [ FAT Title::gCloneDefaultSettings ; "" ]
+End If
+
+Go to Field [ Select/perform ; FAT Title::gCloneSuffix ]
+

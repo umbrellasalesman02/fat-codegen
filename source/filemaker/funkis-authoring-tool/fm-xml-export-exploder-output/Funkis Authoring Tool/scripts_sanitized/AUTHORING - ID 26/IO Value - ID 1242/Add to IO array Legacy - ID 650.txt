@@ -1,0 +1,12 @@
+# Script called from button in page item settings
+
+# This is used for Blocks developed before March 2022
+Set Variable [ $io_id[1] ; FAT IO @ Page item Legacy::IO InputTargetDataKey ]
+If [ IsEmpty(FAT Page item::IO id array Legacy) ]
+	Set Field [ FAT Page item::IO id array Legacy ; $io_id ]
+Else
+	Set Variable [ $io_array[1] ; FAT Page item::IO id array Legacy ]
+	Set Field [ FAT Page item::IO id array Legacy ; $io_array & "," & $io_id ]
+End If
+// Set Field [ FAT Page item::IO id Legacy ; "" ]
+

@@ -1,0 +1,39 @@
+
+# updates modifiers based on the current template
+# Only properties below are OK to change in ongoing productions!!!
+
+Show Custom Dialog [ Title: "Update modifiers in ongoing productions" ; Message: "You are about to update modifiers in ongoing productions. Does your changes corresponds with the code?. Be very careful and don't remove ANY package types, stateToggle states or similar.¶¶
+				
+				Please not that you cannot change an attribute type to Text or Media." ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) = 1 ]
+	Set Variable [ $modifier_template_type[1] ; GetScriptProperty ( "modifier_template_type" ) ]
+	Set Variable [ $modifier_template_id[1] ; GetScriptProperty ( "modifier_template_id" ) ]
+	Set Error Capture [ ON ]
+	Freeze Window
+	Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $package_types[1] ; ModifierTemplate::Package type id ]
+	Set Variable [ $modifier_values[1] ; ModifierTemplate::Values ]
+	Set Variable [ $default_value[1] ; ModifierTemplate::DefaultValue ]
+	Set Variable [ $name[1] ; ModifierTemplate::Name ]
+	Set Variable [ $description[1] ; ModifierTemplate::Description ]
+	Set Variable [ $template_parent_id[1] ; ModifierTemplate::Template parent id ]
+	Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ ($modifier_template_type = "Text" And FAT Modifier::Type = "Text") Or ($modifier_template_type = "Media" And FAT Modifier::Type = "Media") ]
+		Show Custom Dialog [ Title: "Cannot change modifier type to media or text" ; Message: "It seems like you've changed the modfier type to Text or Media. Unfortunately, you cannot do that. " ; Default Button: "OK" ]
+		Set Variable [ $original_type[1] ; FAT Modifier::Type ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Exit Script []
+	End If
+	Replace Field Contents [ FAT Modifier::Package type id ; Replace with calculation: $package_types ]
+	Replace Field Contents [ FAT Modifier::Type ; Replace with calculation: $modifier_template_type ]
+	Replace Field Contents [ FAT Modifier::Values ; Replace with calculation: $modifier_values ]
+	Replace Field Contents [ FAT Modifier::DefaultValue ; Replace with calculation: $default_value ]
+	Replace Field Contents [ FAT Modifier::Name ; Replace with calculation: $name ]
+	Replace Field Contents [ FAT Modifier::Description ; Replace with calculation: $description ]
+	Replace Field Contents [ FAT Modifier::Parent id ; Replace with calculation: $template_parent_id ]
+	
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+

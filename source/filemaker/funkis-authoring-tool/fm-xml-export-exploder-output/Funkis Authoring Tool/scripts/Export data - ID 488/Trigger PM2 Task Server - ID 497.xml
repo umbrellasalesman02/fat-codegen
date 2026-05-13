@@ -1,0 +1,1088 @@
+<Script>
+	<ScriptReference id="497" name="Trigger PM2 Task Server"></ScriptReference>
+	<ObjectList membercount="73">
+		<Step hash="37359BF5405CFC753DCBCA1B030680D5" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script is the only script communication with the PM2 Task Server running on the same machine as the FileMaker Server"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0BB916BF2912F22F05A5BE17957ED6BB" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="The PM2 Task Server uses data exported from FAT and combines it with data from GitLab.com, syncs, compress or build."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A095A5EF29E1F0ECEB3252197EA2B138" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5978F3C47B72F214A004AA421BE3A366" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D28259A1941DC4364F267BB4096DED5D" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty( "destinationRootPath" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$destinationRootPath"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F788FC0A3645F062A4C1285D9D164776" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Remote type not used MArch 2021"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="487C0C1AF92DAEDAFA915747F36F9BDF" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "remoteType" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$remoteType"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F1889A7EA6DBBD389151A5FC29873A80" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "s3BucketName" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$s3BucketName"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B8F12333FD9C80D05CE4FE4BF66B1A81" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "s3BucketNameDestination" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$s3BucketNameDestination"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1835D41BBA3126508A47CAFBADF7A223" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "urlDestination" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$urlDestination"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B4BEE27ABB6FE31B8C60FB65F679C400" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "awsCdnKey" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$awsCdnKey"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2F21567E93592387A2C20BAC9B851484" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "awsCdnKeyDestination" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$awsCdnKeyDestination"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="80BC88E230CD1A439BD1BA4D5349F6F3" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "awsEnvironment" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$awsEnvironment"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E61D5E41DDC27BC956CA94341BF0E593" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "apiEndpoint" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$apiEndpoint"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5A494D1E832AFF1CA21CB14D3748D014" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty( "package_dir" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$package_dir"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F21A3944479F1351442951A95DC1D651" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9883B811D7637A8A07C31E9A0F80EF16" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="For taskServer - &quot;content-update&quot;, &quot;code-update&quot; or &quot;deliver&quot;"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="81E26B2B0BDFA217E1E6B61563952C3C" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="ACD45417A31294AF6DC4FA76F4D3FE89" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "typeOfTask" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$typeOfTask"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D4DBB0194419BAFB17AF408F1CA8A320" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="†ypeOfTask can be &quot;sync&quot;, &quot;publish&quot; or &quot;publish-funkis-cloud&quot;"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="12BAD8A7CD8F1468A516C98E30752A3C" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FB86BD11A36CB9B194822DBD47361190" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "jobTypes" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$jobTypes"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="614D4F68F3ECB8EE48294C454019B0A3" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="jobTypes can be&#13;CODE_UPDATE&#13;SCORM_12&#13;SCORM_2004&#13;WEB_LINK&#13;XAPI&#13;FC_DELIVERY (only for log)"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6B6D2494AA162BF9A0CACDBBFC34B136" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E3C43CF54E5EC814CEE8438F7B8A2ADE" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "GitLabURL" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$GitLabURL"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="635DB1E051BE65177A8F9E3BB69C7B8B" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "emailToNotifyWhenDone" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$emailToNotifyWhenDone"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="53E1B31052D72CFE25824004ACC65B52" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "title_header" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_header"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="64BC9038DC64850CEB8AFB20AF2F052F" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "resultTransferTarget" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$resultTransferTarget"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="74FD5D7DED652318811A4C95E062660A" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "funkisCodeBase" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$funkisCodeBase"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F489A6822F39D477D964B921F5FD456F" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "funkisCodeBaseVersion" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$funkisCodeBaseVersion"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F049C4213FB7B6BAC787F54AFC4C7FE3" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3323E2DCF5691C651233F1CEF29F9878" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="For Publish:: Set branch settings"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8E46EE52C5172A8B6E0770FA21BB89D8" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "branchSettings" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$branchSettings"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="073017CA7F3B976C3A7FA253E10414BF" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="For Publish:: Pass the name of the delivery milestone"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="90DAE77ED61A406F753482B675D26624" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "delivery_milestone" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$delivery_milestone"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4D8D87887794C00C4D56FD1B5BA24F6E" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="For Publish-Build:: Pass the id of the build log item"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F25AD6C99C2196683963786DA59BADC4" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "build_id" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$build_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="616FB538FE12705A906EB8A05EE03430" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7F74C69083FF0E55A410EC649B89D701" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="68" name="Variables"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2F9CE3E083B4BBBD21349FD6924696C1" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Variables::taskServerURL]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$taskServerURL"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="27D8CF8DD7E6452D69922AF2FC7C7BD2" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A6BCD1746A2C2C0EDF533A1EB9AA4B18" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E0207033966C0C53166BA3BE5F6343D7" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="130B02AB5E053BF98ED8EDE6026DFC16" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Remove volume name from path i.e &quot;Macintosh HD&quot;"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="20B08DB44FF3A017EECCCBB4957A4D03" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetPathWithoutVolumeName ($destinationRootPath)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$destinationRootPath_noVolumeName"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5B5D4377C662257D7CB0C31964A93F41" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8450BBF4358FD75A733A17804404C3AC" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$typeOfTask = "sync"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1406E8AB6A15AB25E7EDBD6020AD34D5" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Call the sync server - running on same machine as FMServer"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CBB7D3E99F5C40A7AB9F887848730BD4" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$taskServerURL & "sync"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$theURL"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F1C4AE16696E2718CBF294D731D6CA00" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[JSONSetElement ( "{}"; ["localAbsolutePath"; $destinationRootPath_noVolumeName; JSONString];["remoteFolderName"; $package_dir; JSONString];["resultTransferTarget"; $resultTransferTarget; JSONString];["testOnly"; False ; JSONBoolean];["s3BucketName"; $s3bucketName ; JSONString];["awsCdnKey"; $awsCdnKey ; JSONString];["awsEnvironment"; $awsEnvironment ; JSONString];["apiEndpoint"; $apiEndpoint ; JSONString])]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$json"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8582931F23F52A637D686F8C78550F7F" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$typeOfTask = "publish"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C5A38502E4EAB3B25C8D8BD2C5D3DB68" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Create a build with resultTransferTarget"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="30CA2DCD6EFBDD2FD8D3851436F8602C" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FMListToJSONArray ( "jobTypeArr" ; $jobTypes )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$jobTypeJSON"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="56C9181CDBF9B997217C43D4CFB8726D" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$taskServerURL & "publish"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$theURL"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="22CE7C099017BF8A7347DDE2866B3C9E" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[JSONSetElement ( "{}"; ["jobTypes"; JSONGetElement ( $jobTypeJSON ; "jobTypeArr" ); JSONArray];["resultTransferTarget"; $resultTransferTarget; JSONString];["originalTitle"; $title_header; JSONString];["localAbsolutePath"; $destinationRootPath_noVolumeName; JSONString];["remoteFolderPath"; $package_dir; JSONString];["gitlabUrl"; $GitLabURL ; JSONString];["funkisCodeBase"; $funkisCodeBase; JSONString];["funkisCodeBaseVersion"; $funkisCodeBaseVersion; JSONString];["branchSettings"; $branchSettings; JSONObject];["delivery_milestone"; $delivery_milestone; JSONString];["version"; $publishType ; JSONString];["emailToNotifyWhenDone"; $emailToNotifyWhenDone ; JSONString];["testOnly"; False ; JSONBoolean];["buildId"; $build_id ; JSONString];["s3BucketName"; $s3bucketName ; JSONString];["awsCdnKey"; $awsCdnKey ; JSONString];["awsEnvironment"; $awsEnvironment ; JSONString];["apiEndpoint"; $apiEndpoint ; JSONString])]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$json"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="44E63C1E63F9F8204D1C1870FD219DDF" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$typeOfTask = "publish-funkis-cloud"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DE178E83BD8F2E7CE9FC26D7EF21AC79" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Deliver a funkis cloud package by copying from draft to web"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="075C3E8430BB9CD0BA330093F89035B2" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$taskServerURL & "publish-funkis-cloud"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$theURL"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="95DCCE79577C97B7399F1E4B1EF08EB5" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[JSONSetElement ( "{}"; ["resultTransferTarget"; $resultTransferTarget; JSONString];["originalTitle"; $title_header; JSONString];["remoteFolderPath"; $package_dir; JSONString];["delivery_milestone"; $delivery_milestone; JSONString];["version"; $publishType ; JSONString];["buildId"; $build_id ; JSONString];["emailToNotifyWhenDone"; $emailToNotifyWhenDone ; JSONString];["s3BucketName"; $s3bucketName ; JSONString];["s3BucketNameDestination"; $s3bucketNameDestination ; JSONString];["awsCdnKey"; $awsCdnKey ; JSONString];["awsCdnKeyDestination"; $awsCdnKeyDestination ; JSONString];["urlDestination"; $urlDestination ; JSONString];["awsEnvironment"; $awsEnvironment ; JSONString];["apiEndpoint"; $apiEndpoint ; JSONString])]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$json"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DEFF57A2C5D7DE5BD55ACC2FFED9ABF4" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="4F9C6551AF5478C56E5CCD4B60EDF80B" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Test only"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="690AF70728A1C905792B3FCF1EBC67B4" id="87" name="Show Custom Dialog" breakpoint="True" enable="True">
+			<Options>1064964</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["JSON"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA[JSONFormatElements ($json)]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E4C0F5F932560D4704991FCB1D4744D3" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="42A611A0A85FC50E02D95E57FBE65A2F" id="200" name="Set Error Logging" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean type="enabled" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6E42A6901544607D0232D9F6D4B066C0" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[_cURL_request ( "POST" ) & _cURL_header ( "Content-Type" ; "application/json" ) & _cURL_header ( "Accept" ; "application/json" ) & _cURL_show_error & _cURL_data___string ( $json )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$cURL_options"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3D9401AD7B4E3A07CAB0CF092A4834C9" id="160" name="Insert from URL" enable="True">
+			<Options>20613</Options>
+			<ParameterValues membercount="6">
+				<Parameter type="Boolean">
+					<Boolean type="Verify SSL Certificates" id="268435456" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Select" id="4096" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Target">
+					<Variable value="$resultJSON">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+					</Variable>
+				</Parameter>
+				<Parameter type="URL">
+					<URL autoEncode="True">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$theURL]]></Text>
+							</Calculation>
+						</Calculation>
+					</URL>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA[$cURL_options]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0C0BDC19901AE4E88CF45F8843366EC5" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(lastError)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$last_error"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="503209F685C3E12CE1BD5F73D80EAF30" id="103" name="Exit Script" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[Case ( $last_error = 0 ; ""; ", Last error: " & $last_error & " Details: " & Get(lastErrorDetail) )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5A819F67970FBF4C0CA58112D7CB67BC" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="632515E749A2F28109192D4463D693F0" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="56B4CCEFBAD2007F34DB98F5BDED5374" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="23FEB2E8CAD6079CA41F5AC3F72BCFD2" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4C408C25CC9263F8B94D96E2C2508816" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

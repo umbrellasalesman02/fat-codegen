@@ -1,0 +1,53 @@
+# Called from Create and Add IO to PI from both standard and Legacy IO
+
+Freeze Window
+
+Set Variable [ $io_type[1] ; GetScriptProperty ( "io_type" ) ]
+Set Variable [ $io_name[1] ; GetScriptProperty ( "io_name" ) ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $list_template_id[1] ; GetScriptProperty ( "list_template_id" ) ]
+Set Variable [ $list_id[1] ; GetScriptProperty ( "list_id" ) ]
+
+If [ $list_id = "" And $list_template_id ≠ "" ]
+	# Create a list if the block template uses a list template and if the page item is not connected to a list yet.
+	If [ $io_type = "Rate" Or $io_type ="Dilemma" Or $io_type ="Select" Or $io_type ="Choice" Or $io_type ="IO group" ]
+		# If IO requires a list and no list is set
+		Show Custom Dialog [ Title: "Missing list" ; Message: "The IO of type " & $io_type & " requires a list to function properly and no list is yet defined for this page item.¶¶Do you want to create a list for this page item, fix it later or stop the IO creation?" ; Default Button: "Create" ; Button 2: "Later" ; Button 3: "Stop" ]
+		If [ Get(lastMessageChoice) = 1 ]
+			# User chosed to Create a list for this page item
+			Set Variable [ $list_name[1] ; "List for " & $io_name ]
+			Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+			New Record/Request
+			Set Variable [ $list_id[1] ; FAT List::PrimaryKey ]
+			Set Field [ FAT List::Title id ; $title_id ]
+			Set Field [ FAT List::List template id ; $list_template_id ]
+			Set Field [ FAT List::Description ; $list_name ]
+			Set Field [ FAT List::List backend ; "FAT" ]
+			
+			# Set a valid object name - no duplicates allowed in same title, not exceeding number of characters
+			Perform Script [ From list ; "Set valid object name" ; Parameter: SetProperty ( "source_textfield" ; GetFieldName ( FAT List::Name ) ) &
+							SetProperty ( "new_name" ; $list_name ) &
+							SetProperty ( "max_characters" ; 32 ) ]
+			
+			
+			Commit Records/Requests [ With dialog: OFF ]
+			If [ List template::List has modifiers ]
+				Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "List" ) & 
+								SetProperty ( "item_id" ; $list_id ) &
+								SetProperty ( "learningprogramme_id" ; $title_id ) &
+								SetProperty ( "symbol_id" ; $list_template_id ) ]
+			End If
+			
+			Exit Script [ $list_id ]
+		Else If [ Get(lastMessageChoice) = 2 ]
+			# User will connect list to IO manually later
+		Else If [ Get(lastMessageChoice) = 3 ]
+			# User wants to stop
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+			Halt Script
+		End If
+	End If
+Else
+	Exit Script [ $list_id ]
+End If
+

@@ -1,0 +1,31 @@
+# Called from Clone Title Objects
+# After creating IOs - go back to List items and swop old IOs to new IOs
+
+
+Show Custom Dialog [ Title: "Legacy script" ; Message: "This dialog box should not appear when duplicating. Please contact Jens with information: \"Connect cloned IOs in List items\"" ; Default Button: "OK" ]
+
+Set Error Capture [ ON ]
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $new_tt_id[1] ; GetScriptProperty ( "new_tt_id" ) ]
+
+Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+# Find all list items in Title with valuetype = "IO"
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $old_io_id[1] ; FAT List item::Value 1 ]
+		
+		If [ $old_io_id ≠ "" ]
+			Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Set Variable [ $new_io_id[1] ; FAT IO::PrimaryKey ]
+			Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+			Set Field [ FAT List item::Value 1 ; $new_io_id ]
+		End If
+		
+		Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+

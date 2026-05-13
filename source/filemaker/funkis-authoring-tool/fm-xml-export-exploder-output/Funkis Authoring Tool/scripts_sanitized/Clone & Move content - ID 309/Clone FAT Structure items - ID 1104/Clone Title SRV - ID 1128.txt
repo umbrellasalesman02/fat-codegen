@@ -1,0 +1,54 @@
+# This script clones a specific Title and all of its Package, Chapters, Pages, Page items, Modifiers, Tags, Texts, Media etc
+# This script is called from:
+  1. Start cloning
+# Script is designed to work PSOS
+
+# SetProperty ( "old_tt_id" ; $old_tt_id) &
+  SetProperty ( "title_id" ; $title_id )
+
+
+Freeze Window
+Set Error Capture [ ON ]
+
+# If the whole Title is cloned we need to point to new Blocks, Modifiers, Lists, Links, Score Categories, IOs, Tags etc
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id") ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+
+# Clone all content
+# Set default variable values
+Set Variable [ $isClonedTitle[1] ; True ]
+Set Variable [ $clone_level[1] ; "Title" ]
+Set Variable [ $clone_settings[1] ; "IOs¶Links¶Lists¶Tags¶Score categories" ]
+
+# Add Title modifiers
+Perform Script [ From list ; "Clone ModifierValue" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+				SetProperty ( "isMovedPackage" ; $isMovedPackage ) & 
+				SetProperty ( "old_item_id" ; $old_tt_id ) & 
+				SetProperty ( "new_item_id" ; $title_id ) & 
+				SetProperty ( "title_id" ; $title_id ) & 
+				SetProperty ( "package_id" ; "" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	
+	Loop [ Flush: Always ]
+		
+		Set Variable [ $package_id[1] ; FAT Package Alt::PrimaryKey ]
+		Perform Script [ From list ; "Clone Package SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+						SetProperty ( "clone_level" ; $clone_level ) &
+						SetProperty ( "clone_settings" ; $clone_settings ) &
+						SetProperty ( "suffix" ; $suffix) &
+						SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "package_id" ; $package_id ) ]
+		
+		Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+Exit Script [ $item_id ]
+

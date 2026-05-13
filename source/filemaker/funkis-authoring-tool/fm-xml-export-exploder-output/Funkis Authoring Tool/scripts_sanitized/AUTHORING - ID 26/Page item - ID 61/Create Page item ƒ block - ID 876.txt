@@ -1,0 +1,23 @@
+# Called from a button in the explore building block card
+Set Variable [ $block_id[1] ; FAT Block::PrimaryKey ]
+Set Variable [ $caller[1] ; FAT Block::gCallerLayout ]
+
+Perform Script [ From list ; "Close card Window" ]
+
+If [ $caller = "Page item" ]
+	Set Field [ FAT Page item::gBlock ; $block_id ]
+	Perform Script [ From list ; "Create PageItem in Page CL" ]
+	Set Field [ FAT Page item::gBlock ; "" ]
+Else If [ $caller = "Page" ]
+	Set Field [ FAT Page::gBlock ; $block_id ]
+	Perform Script [ From list ; "Create PageItem CL" ]
+	Set Field [ FAT Page::gBlock ; "" ]
+Else If [ $caller = "Chapter" ]
+	Set Field [ FAT Chapter::gBlock ; $block_id ]
+	Perform Script [ From list ; "Create Page CL" ; Parameter: SetProperty ( "proxy_type" ; "page_item" ) & 
+					SetProperty ( "block_id" ; FAT Chapter::gBlock ) ]
+	Set Field [ FAT Chapter::gBlock ; "" ]
+End If
+
+
+

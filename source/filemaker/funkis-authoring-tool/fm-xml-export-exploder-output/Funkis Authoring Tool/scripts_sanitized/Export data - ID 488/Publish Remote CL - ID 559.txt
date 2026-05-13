@@ -1,0 +1,221 @@
+# Called from a button in Package Settings - only developers
+# Can also be called from script Publish All Remote CL
+# Called from Clone Publish Packages (which is called from CONTENT CLONE MASTER)
+# This script does not only export content from FAT but also instructs the Task Server to build a new code version. 
+
+Freeze Window
+
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+Set Variable [ $publish_mode[1] ; GetScriptProperty ( "publish_mode" ) ]
+Set Variable [ $show_dialog[1] ; GetScriptProperty ( "show_dialog" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $first_build[1] ; GetScriptProperty ( "first_build" ) ]
+
+# ---------------------------------- How to run --------------------------------------------------------------------------
+Commit Records/Requests [ With dialog: OFF ]
+If [ $show_dialog = "true" ]
+	Show Custom Dialog [ Title: "Build new version" ; Message: "When pressing the OK button, the FAT will begin building a new version of this package with the selected code base. This will take a few minutes and you will receive an email with a link when the new version is ready for preview or download." ; Default Button: "OK" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice) = 2 ]
+		Exit Script []
+	End If
+End If
+If [ Not IsEmpty ($package_id) ]
+	# Call from the Code package overview
+	Freeze Window
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+# ---------------------------------- Set type of task  --------------------------------------------------------------------------
+Set Variable [ $typeOfTask[1] ; "publish" ]
+# typeOfTask /*
+  sync - syncing new content from FAT to Preview server
+  publish - building a new package with both content from FAT and code from GitLab
+  */
+// Set Variable [ $exportMode[1] ; "json" ]
+Set Variable [ $exportMode[1] ; "Media all" ]
+
+# exportMode /*
+  JSON = All JSON files
+  TEXT = JSON + all TEXT files
+  Media update = JSON + TEXT + updated media - This option is for Authors and Editors
+  Media all = JSON + TEXT + all media
+  Translation = TEXT and Subtitles for localised language (only remote export)
+  Translation files = TEXT and Subtitles for localised language (only local export)
+  */
+
+Set Variable [ $exportDestination[1] ; "Remote" ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; Case ( IsEmpty ( FAT Title::Base project ); "" ; FAT Package::PrimaryKey) ]
+Set Variable [ $package_type[1] ; Case ( IsEmpty ( FAT Title::Base project ); "" ; FAT Package::Package type id) ]
+Set Variable [ $package_dir[1] ; FAT Package::Export Package Sub Path ]
+Set Variable [ $titleLocalisationCode[1] ; FAT Title::Original localisation code ]
+
+# Environment
+Set Variable [ $awsEnvironment[1] ; Title Environment::AWS Environment ]
+Set Variable [ $apiEndpoint[1] ; Title Environment::Environment API endpoint ]
+
+# Preview server
+Set Variable [ $remoteType[1] ; Title Server Preview::remoteType identifier ]
+Set Variable [ $s3bucketName[1] ; Title Server Preview::S3 bucket name ]
+Set Variable [ $awsCdnKey[1] ; Title Server Preview::AWS CDN Key ]
+Set Variable [ $resultTransferTarget[1] ; Title Server Preview::URL ]
+
+# URL to the server where we will upload content and code - i.e test.quiddity.se.
+
+Set Variable [ $title_header[1] ; FAT Title::Reference title & "  •  " & FAT Package::Reference name ]
+Set Variable [ $emailToNotifyWhenDone[1] ; User @ Title::email ]
+
+
+If [ Not PatternCount ( $emailToNotifyWhenDone ; "@" ) And $show_dialog = "true" ]
+	Show Custom Dialog [ Title: "No email adress set" ; Message: "Please type an email address where the download link should be sent to." ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $emailToNotifyWhenDone ]
+	If [ Get(lastMessageChoice) = 2 ]
+		Exit Script [ "error" ]
+	Else
+		Set Field [ User @ Title 2::email ; $emailToNotifyWhenDone ]
+	End If
+End If
+
+# jobTypes /*
+  CODE_UPDATE or
+  List with SCORM_12,SCORM_2004,WEB_LINK,XAPI
+  */
+# funkisCodeBase /*
+  A String identifyer for TaskServer to know what to build. Could in the future be completely replaced by branchSettings. 
+  */
+# branchSettings /*
+  A JSON given by Codebase choice. Each Codebase have a set of different code packages and branches and gives the task server detailed information of what to build. Handled in a separate table. 
+  */
+
+Set Variable [ $GitLabURL[1] ; Case ( 
+				
+				     IsEmpty (FAT Package::GitLab Project code URL) ;
+				
+				     Base Project @ Title::GitLabURL;
+				
+				     FAT Package::GitLab Project code URL
+				
+				)
+				
+				/*If not using specific project code on GitLab - use GitLab code defined by BaseProject */ ]
+Set Variable [ $codebase_id[1] ; Baseproject Codebase @ Package::PrimaryKey ]
+Set Variable [ $codebase_version_id[1] ; Baseproject Codebase Version @ Package::PrimaryKey ]
+Set Variable [ $funkisCodeBase[1] ; Baseproject Codebase @ Package::Name ]
+Set Variable [ $funkisCodeBaseShortName[1] ; Baseproject Codebase @ Package::Short name ]
+Set Variable [ $branchSettings[1] ; Baseproject Codebase @ Package::Codebase JSON ]
+
+# Check if codebase supports the package type
+// If [ Not PatternCount ( Baseproject Codebase @ Package::Package type ; $package_type) ]
+// Show Custom Dialog [ Title: "Codebase cannot build this package type" ; Message: "You have selected a codebase that cannot build this kind of package type. Please change the codebase for this package. " ; Default Button: "OK" ]
+// Exit Script []
+// End If
+
+# Get
+
+# Get codebase version string (can be latest, next etc.
+Perform Script [ From list ; "GetCodebaseVersionString" ; Parameter: SetProperty ( "codebase_id" ; $codebase_id ) &
+				SetProperty ( "codebase_version_id" ; $codebase_version_id ) ]
+
+Set Variable [ $funkisCodeBaseBranch[1] ; GetResultProperty ( "branch_string" ) ]
+Set Variable [ $funkisCodeBaseVersion[1] ; GetResultProperty ( "version_string" ) ]
+
+If [ $funkisCodeBaseVersion ≠ "" ]
+	# Before updating code or building - validate that the included building blocks are compatible with codebase version.
+	Perform Script [ From list ; "ValidateBlockCodebase" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "package_type" ; $package_type ) &
+					SetProperty ( "funkisCodeBaseVersion" ; $funkisCodeBaseVersion ) ]
+	Set Variable [ $incompatible_blocks[1] ; Get(ScriptResult) ]
+	
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	
+	If [ Not IsEmpty ( $incompatible_blocks ) And $show_dialog = "true" ]
+		Show Custom Dialog [ Title: "Warning" ; Message: "The following building blocks in this package does not seem to be compatible with the selected codebase version:¶¶" & Get(ScriptResult) & "¶Do you want to proceed anyway?" ; Default Button: "Cancel" ; Button 2: "Proceed" ]
+		If [ Get(lastMessageChoice) = 1 ]
+			Exit Script []
+		End If
+	End If
+	
+	# Check if package reports completed
+	If [ $first_build ≠ "true" ]
+		Perform Script [ From list ; "CheckForCompletion" ; Parameter: $package_id ]
+		If [ Get(ScriptResult) ≠ "" And $show_dialog = "true" ]
+			Show Custom Dialog [ Title: "Warning" ; Message: Get(ScriptResult) ; Default Button: "Cancel" ; Button 2: "Proceed" ]
+			If [ Get(lastMessageChoice) = 1 ]
+				Exit Script []
+			End If
+		End If
+	End If
+	
+Else If [ $funkisCodeBaseBranch ≠ "" ]
+	# If we try to build a Funkis Codebase branch -> 
+	  set the variable funkisCodeBaseVersion to the branchname since Task Server will not make any difference. 
+	Set Variable [ $funkisCodeBaseVersion[1] ; $funkisCodeBaseBranch ]
+End If
+
+# --------------------- GO ON AND BUILD ----------------------------------------------------
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+If [ $publish_mode = "CODE_UPDATE" ]
+	# Update to preview server
+	Set Variable [ $jobTypes[1] ; "CODE_UPDATE" ]
+Else If [ $publish_mode = "DELIVERY" ]
+	# Build a delivery package for download and create a build log entry
+	Set Variable [ $jobTypes[1] ; FAT Package::Delivery format ]
+	Set Variable [ $delivery_milestone[1] ; Funkis WOW Delivery::Milestone name ]
+	Perform Script [ From list ; "Add to build log" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "codebase_id" ; $codebase_id ) &
+					SetProperty ( "codebase_version_id" ; $codebase_version_id ) &
+					SetProperty ( "delivery_milestone" ; $delivery_milestone ) ]
+	Set Variable [ $build_id[1] ; Get(ScriptResult) ]
+End If
+
+# Development export - uncomment for fault trace
+If [ isPSOS ]
+	# First package when creating new titile is PSOS
+	Perform Script [ From list ; "Export Data MASTER" ; Parameter: SetProperty ( "exportDestination" ; $exportDestination ) &
+					SetProperty ( "remoteType" ; $remoteType ) &
+					SetProperty ( "s3bucketName" ; $s3bucketName ) &
+					SetProperty ( "awsEnvironment" ; $awsEnvironment ) &
+					SetProperty ( "awsCdnKey" ; $awsCdnKey ) &
+					SetProperty ( "apiEndpoint" ; $apiEndpoint ) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "package_type" ; $package_type ) &
+					SetProperty ( "titleLocalisationCode" ; $titleLocalisationCode ) &
+					SetProperty ( "emailToNotifyWhenDone" ; $emailToNotifyWhenDone )& 
+					SetProperty ( "title_header" ; $title_header ) &
+					SetProperty ( "GitLabURL" ; $GitLabURL ) &
+					SetProperty ( "package_dir" ; $package_dir )& 
+					SetProperty ( "exportMode" ; $exportMode )& 
+					SetProperty ( "resultTransferTarget" ; $resultTransferTarget )&
+					SetProperty ( "typeOfTask" ; $typeOfTask ) &
+					SetProperty ( "funkisCodeBase" ; $funkisCodeBase ) & 
+					SetProperty ( "jobTypes" ; $jobTypes ) & 
+					SetProperty ( "branchSettings" ; $branchSettings ) & 
+					SetProperty ( "delivery_milestone" ; $delivery_milestone ) & 
+					SetProperty ( "funkisCodeBaseShortName" ; $funkisCodeBaseShortName ) & 
+					SetProperty ( "funkisCodeBaseVersion" ; $funkisCodeBaseVersion ) & 
+					SetProperty ( "build_id" ; $build_id ) ]
+Else
+	# Developer can publish new versions and create packages
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+
+If [ Get(ScriptResult) ≠ "success" And Get(ScriptResult) ≠ "" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "Something went wrong during the export." ; Message: "Error message: " & Get(ScriptResult) ; Default Button: "OK" ]
+	Exit Script [ "error" ]
+End If
+
+# Publishing new Title information in the background
+If [ Not isPSOS And Not isTitleInformation ( $package_type ) // Title information shall not be previewed ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+# Reset backend if changed
+
+
+
+

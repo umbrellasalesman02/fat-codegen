@@ -1,0 +1,96 @@
+# This translation flow is designed for Title Translations
+# Script is called from Title HT Localisation Master 1   AND  from Title Export HT Files CL
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translated
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+# For Human translation only
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $title_localisation_id[1] ; GetScriptProperty("title_localisation_id") ]
+Set Variable [ $title_reference_title[1] ; GetScriptProperty("title_reference_title") ]
+Set Variable [ $exclude_text_status[1] ; GetScriptProperty("exclude_text_status") ]
+
+
+If [ IsEmpty ( $title_localisation_id ) ]
+	# Original language json export
+	Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $original_localisation_code[1] ; FAT Title::Original localisation code ]
+	Set Variable [ $localisation_code[1] ; FAT Title::Original localisation code ]
+Else
+	# Localised language json export
+	Go to Layout [ Layout: "TABLE FAT Localisation" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $original_localisation_code[1] ; FAT Localisation::Original Localisation code ]
+	Set Variable [ $localisation_code[1] ; FAT Localisation::Localisation code ]
+End If
+
+Set Variable [ $filename[1] ; $title_reference_title & "_" & $localisation_code & ".json" ]
+
+# --------------- Create a text JSON to send ------------------------------------------
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+If [ IsEmpty( $exclude_text_status) ]
+	# Export all textfields in Title for this localisation
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	# Export all textfields in Title for this localisation - except those with exclude status
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Go to Record/Request/Page [ First ]
+
+If [ Get(foundCount)>0 ]
+	# In HT we use the localised Texts id for fast pairing when retrieving texts
+	Loop [ Flush: Defer ]
+		Set Variable [ $textJSON_for_translation[1] ; Let ( 
+						
+						  obj = JSONSetElement ( "" ; 
+						
+						
+						  ["value" ; FAT Text::Text; JSONString];
+						  ["id" ; FAT Text::PrimaryKey; JSONString];
+						  ["package_id" ; FAT Text::Package id; JSONString];
+						  ["package_name" ; FAT Package @ Text::JSON Friendly id; JSONString];
+						  // original_id = primaryKey if OriginalKey is missing - if exporting original language file
+						  ["original_id" ; Case(FAT Text::PrimaryKey Override = ""; 
+						                        Case (FAT Text::OriginalKey = ""; FAT Text::PrimaryKey; FAT Text::OriginalKey);
+						                        FAT Text::PrimaryKey Override) ; JSONString];
+						  ["usage_type" ; FAT Package @ Text::Usage type name ; JSONString];
+						  ["parent" ; JSONSetElement ( "{}" ; ["type" ; FAT Text::Source item type ; JSONString];["id" ; FAT Text::Parent id ; JSONString]); JSONObject ];
+						  ["index" ; FAT Text::RecordNumberReference; JSONNumber]
+						   
+						
+						 );
+						
+						 JSONSetElement ( $textJSON_for_translation ; "[" & Get(recordNumber) - 1 & "]" ; obj ; JSONObject)
+						
+						
+						 ) ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# Save in Title Export container and commit
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Field [ FAT Title::Latest Exported file ; TextEncode ( $textJSON_for_translation ; "utf-8" ; 1 ) ]
+Commit Records/Requests [ With dialog: OFF ]
+Set Field [ FAT Title::Latest Exported file ; Base64Decode(Base64Encode(FAT Title::Latest Exported file); $filename) ]
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ Get(lastError) ≠ 0 ]
+	Exit Script [ "Error - cannot create file. Title may be open by another user." ]
+End If
+
+
+

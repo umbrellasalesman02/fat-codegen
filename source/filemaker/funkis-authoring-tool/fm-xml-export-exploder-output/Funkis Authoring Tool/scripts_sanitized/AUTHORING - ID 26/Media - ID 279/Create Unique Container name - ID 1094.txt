@@ -1,0 +1,29 @@
+# Called on ScriptTrigger onSave on all FAT Container fields
+# Create a unique filename when exporting
+# 2024-05-24 THIS APPROACH WITH RENAMING FILENAMES INCLUDED BUGS
+  Need to find another solution where unique filenmae is exported but stays the same in DB.
+
+// Commit Records/Requests [ With dialog: OFF ]
+// Set Variable [ $media_id[1] ; Get(scriptParameter) ]
+// 
+// Freeze Window
+// Set Error Capture [ ON ]
+// 
+// Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+// Perform Find [ ⚠️ RESTORE ⚠️ ]
+// 
+// If [ Get(lastError) = 0 And Not PatternCount ( FAT Media::Container exported filename no extension ; FAT Media::PrimaryKey ) And Not IsEmpty ( FAT Media::Media container ) ]
+// Set Variable [ $filename[1] ; FAT Media::Container exported filename no extension ]
+// Set Variable [ $filename_extension[1] ; Lower ( FAT Media::Container file extension ) ]
+// Set Variable [ $filename[1] ; PrettifyDash ($filename & "-" & FAT Media::PrimaryKey) & "." &  $filename_extension ]
+// Set Field [ FAT Media::Media container ; Base64Decode(Base64Encode(FAT Media::Media container); $filename) ]
+// If [ Get(lastError) = 0 ]
+// Commit Records/Requests [ With dialog: OFF ]
+// End If
+// End If
+// 
+// Go to Layout [ Layout: <original layout> ; Animation: None ]
+// 
+// 
+// 
+

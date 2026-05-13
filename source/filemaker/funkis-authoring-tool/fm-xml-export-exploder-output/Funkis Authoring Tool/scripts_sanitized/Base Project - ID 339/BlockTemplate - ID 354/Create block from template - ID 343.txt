@@ -1,0 +1,152 @@
+# Called from Import all block templates
+
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $language_code[1] ; GetScriptProperty ( "language_code" ) ]
+Set Variable [ $country_code[1] ; GetScriptProperty ( "country_code" ) ]
+Set Variable [ $blocktemplate_id[1] ; GetScriptProperty ( "blocktemplate_id" ) ]
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)> 0 ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Go to Object [ "Blocks" ; Repetition: 1 ]
+	Show Custom Dialog [ Title: "Block already imported" ; Message: "This block is already imported in the title. " ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+Go to Layout [ Layout: "TABLE BlockTemplate" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# When creating new block - only copy values that are not auto-set by relation Lookup 
+Set Variable [ $template_id[1] ; BlockTemplate::PrimaryKey ]
+Set Variable [ $num_of_textfields[1] ; BlockTemplate::Number of text fields ]
+Set Variable [ $num_of_media_containers[1] ; BlockTemplate::Number of media containers ]
+Set Variable [ $io_enabled[1] ; BlockTemplate::IO enabled ]
+Set Variable [ $content_array_enabled[1] ; BlockTemplate::Page item List enabled ]
+Set Variable [ $title_content_array_enabled[1] ; BlockTemplate::List enabled ]
+Set Variable [ $num_of_ca_textfields[1] ; List template @ Block template::Number of text fields ]
+Set Variable [ $num_of_ca_media_container[1] ; List template @ Block template::Number of media containers ]
+Set Variable [ $num_of_ca_valuefield[1] ; List template @ Block template::Number of value fields ]
+Set Variable [ $ca_valuetype[1] ; List template @ Block template::Value 1 type
+				
+				/*BlockTemplate::CA ValueType OLD*/ ]
+Set Variable [ $min_num_of_ca_items[1] ; BlockTemplate::Minimum number of items ]
+Set Variable [ $max_num_of_ca_items[1] ; BlockTemplate::Maximum number of items ]
+Set Variable [ $text1_html[1] ; BlockTemplate::Text 1 HTML format ]
+Set Variable [ $text2_html[1] ; BlockTemplate::Text 2 HTML format ]
+Set Variable [ $text3_html[1] ; BlockTemplate::Text 3 HTML format ]
+Set Variable [ $text4_html[1] ; BlockTemplate::Text 4 HTML format ]
+Set Variable [ $text5_html[1] ; BlockTemplate::Text 5 HTML format ]
+Set Variable [ $text6_html[1] ; BlockTemplate::Text 6 HTML format ]
+Set Variable [ $text7_html[1] ; BlockTemplate::Text 7 HTML format ]
+Set Variable [ $text1_embed[1] ; BlockTemplate::Text 1 JSON embed ]
+Set Variable [ $text2_embed[1] ; BlockTemplate::Text 2 JSON embed ]
+Set Variable [ $text3_embed[1] ; BlockTemplate::Text 3 JSON embed ]
+Set Variable [ $text4_embed[1] ; BlockTemplate::Text 4 JSON embed ]
+Set Variable [ $text5_embed[1] ; BlockTemplate::Text 5 JSON embed ]
+Set Variable [ $text6_embed[1] ; BlockTemplate::Text 6 JSON embed ]
+Set Variable [ $text7_embed[1] ; BlockTemplate::Text 7 JSON embed ]
+
+
+Go to Layout [ Layout: "FAT Block settings" ; Animation: None ]
+New Record/Request
+Set Variable [ $block_id[1] ; FAT Block::PrimaryKey ]
+
+Set Field [ FAT Block::Title id ; $title_id ]
+Set Field [ FAT Block::BlockTemplate id ; $blocktemplate_id ]
+Set Field [ FAT Block::Number of text fields ; $num_of_textfields ]
+Set Field [ FAT Block::Number of media containers ; $num_of_media_containers ]
+Set Field [ FAT Block::IO enabled ; $io_enabled ]
+Set Field [ FAT Block::Page item List enabled ; $content_array_enabled ]
+Set Field [ FAT Block::List enabled ; $title_content_array_enabled ]
+Set Field [ FAT Block::List number of textfields ; $num_of_ca_textfields ]
+Set Field [ FAT Block::List number of media containers ; $num_of_ca_media_container ]
+Set Field [ FAT Block::List number of value fields ; $num_of_ca_valuefield ]
+Set Field [ FAT Block::List ValueType ; $ca_valuetype ]
+Set Field [ FAT Block::Minimum number of items ; $min_num_of_ca_items ]
+Set Field [ FAT Block::Maximum number of items ; $max_num_of_ca_items ]
+Set Field [ FAT Block::Text 1 HTML format ; $text1_html ]
+Set Field [ FAT Block::Text 2 HTML format ; $text2_html ]
+Set Field [ FAT Block::Text 3 HTML format ; $text3_html ]
+Set Field [ FAT Block::Text 4 HTML format ; $text4_html ]
+Set Field [ FAT Block::Text 5 HTML format ; $text5_html ]
+Set Field [ FAT Block::Text 6 HTML format ; $text6_html ]
+Set Field [ FAT Block::Text 7 HTML format ; $text7_html ]
+Set Field [ FAT Block::Text 1 JSON embed ; $text1_embed ]
+Set Field [ FAT Block::Text 2 JSON embed ; $text2_embed ]
+Set Field [ FAT Block::Text 3 JSON embed ; $text3_embed ]
+Set Field [ FAT Block::Text 4 JSON embed ; $text4_embed ]
+Set Field [ FAT Block::Text 5 JSON embed ; $text5_embed ]
+Set Field [ FAT Block::Text 6 JSON embed ; $text6_embed ]
+Set Field [ FAT Block::Text 7 JSON embed ; $text7_embed ]
+
+Commit Records/Requests [ With dialog: OFF ]
+
+
+# Check blockTemplate for modifierTemplates
+Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $attribute_template_id[1] ; ModifierTemplate::PrimaryKey ]
+		Set Variable [ $level[1] ; "Block" ]
+		Set Variable [ $attribute_type[1] ; ModifierTemplate::Type ]
+		Set Variable [ $attribute_name[1] ; ModifierTemplate::Name ]
+		Set Variable [ $modifier_values[1] ; ModifierTemplate::Values ]
+		Set Variable [ $attribute_default_value[1] ; ModifierTemplate::DefaultValue ]
+		Set Variable [ $attribute_description[1] ; ModifierTemplate::Description ]
+		Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+		New Record/Request
+		Set Field [ FAT Modifier::Title id ; $title_id ]
+		Set Field [ FAT Modifier::ModifierTemplate id ; $attribute_template_id ]
+		Set Field [ FAT Modifier::Name ; $attribute_name ]
+		Set Field [ FAT Modifier::Parent id ; $block_id ]
+		Set Field [ FAT Modifier::Level ; $level ]
+		Set Field [ FAT Modifier::Type ; $attribute_type ]
+		Set Field [ FAT Modifier::Values ; $modifier_values ]
+		Set Field [ FAT Modifier::DefaultValue ; $attribute_default_value ]
+		Set Field [ FAT Modifier::Description ; $attribute_description ]
+		Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# Check if BlockTemplate has global texts
+# NOTE NEED TO ADJUST FOR SECONDARY LANGUAGE TEXTS!
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) = 0 ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		If [ $language_code = "en" And $country_code = "global" ]
+			# Texts in en-global is the code default id - then take PrimaryKey
+			Set Variable [ $old_text_id[1] ; FAT Text::PrimaryKey ]
+		Else
+			# If sv-SE or other language then take OriginalKey
+			Set Variable [ $old_text_id[1] ; FAT Text::OriginalKey ]
+		End If
+		Duplicate Record/Request
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT Text::PrimaryKey Override ; $old_text_id ]
+		Set Field [ FAT Text::Parent id ; $block_id ]
+		Set Field [ FAT Text::Title id ; $title_id ]
+		Set Field [ FAT Text::Source reference ; "Block text" ]
+		Set Field [ FAT Text::Source item type ; "global" ]
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+If [ Get(layoutName) = "FAT Title Settings" ]
+	Go to Object [ "Blocks" ; Repetition: 1 ]
+End If
+

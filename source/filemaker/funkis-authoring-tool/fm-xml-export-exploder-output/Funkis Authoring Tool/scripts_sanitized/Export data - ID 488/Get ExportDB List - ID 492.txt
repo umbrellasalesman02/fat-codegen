@@ -1,0 +1,115 @@
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+
+# Package id - current Package
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+
+# Package type - current Package
+Set Variable [ $package_type[1] ; GetScriptProperty ( "package_type" ) ]
+
+Set Variable [ $titleLocalisationCode[1] ; GetScriptProperty ( "titleLocalisationCode" ) ]
+Set Variable [ $exportMode[1] ; GetScriptProperty ( "exportMode" ) ]
+Set Error Capture [ ON ]
+
+# Specific content will be exported depending on package type
+  
+  PrimaryKey							Name			JSON name
+  4C393C7E-B339-4BFA-ADE7-E59F47FBAC60	Scroll		scroll
+  5F127BA8-1BC7-467B-93EF-7BE401615BAA	Slide		slide
+  4B8AB81A-9C99-43AD-8C32-3325D98F688A	Mixed type	mixed type
+  BB6DDA20-C6CE-441E-B99C-CE1F884DC7E5	Site	 old		site
+  B6397ED6-1BA8-4444-BD51-65076EE684F9	Site			scroll
+  C69777FA-7286-422C-9337-B722B10663B6  Title info   title-information
+
+If [ $package_type = "BB6DDA20-C6CE-441E-B99C-CE1F884DC7E5" Or $package_type = "B6397ED6-1BA8-4444-BD51-65076EE684F9" ]
+	# Site
+	Set Variable [ $exportDBList[1] ; List("Page"; "Page item"; "Block"; "Theme"; "Tag"; "Score category"; "Score reward"; "Link"; "Txt variable") ]
+Else If [ $package_type = "4C393C7E-B339-4BFA-ADE7-E59F47FBAC60" Or $package_type = "5F127BA8-1BC7-467B-93EF-7BE401615BAA" ]
+	# Scroll or Slide
+	Set Variable [ $exportDBList[1] ; List("Page"; "Page item"; "Theme"; "Tag"; "Score category"; "Score reward"; "Link"; "Txt variable") ]
+Else If [ $package_type = "C69777FA-7286-422C-9337-B722B10663B6" // Title info ]
+	# title info - must check if it exist any page items, otherwise it will create corrupt JSON
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) = 0 ]
+		Set Variable [ $exportDBList[1] ; List("Page"; "Block"; "Theme"; "Package list"; "Tag"; "Score category"; "Score reward"; "Link"; "Txt variable") ]
+	Else
+		Set Variable [ $exportDBList[1] ; List("Page"; "Page item"; "Block"; "Theme"; "Package list"; "Tag"; "Score category"; "Score reward"; "Link"; "Txt variable") ]
+	End If
+Else
+	# Mixed type
+	Set Variable [ $exportDBList[1] ; "" ]
+End If
+
+If [ $exportMode ≠ "JSON" ]
+	
+	# Find all languages
+	Set Variable [ $localisationList[1] ; $titleLocalisationCode ]
+	Set Variable [ $languageList[1] ; "Text " & $titleLocalisationCode ]
+	Set Variable [ $languageList[1] ; $languageList & ¶  &  "Subtitle FFSub " & $titleLocalisationCode ]
+	Set Variable [ $languageList[1] ; $languageList & ¶  &  "Subtitle VTT " & $titleLocalisationCode ]
+	
+	If [ Not PatternCount ( $exportMode ; "Translation" )
+					// not for exportMode = "translation" or "translation files" ]
+		Go to Layout [ Layout: "TABLE FAT Localisation @ Package" ; Animation: None ]
+		# Export only localisations of stage 4 or higher
+		If [ IsEmpty($package_id) ]
+			# Export title texts
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Else
+			# Export package localisation
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+		End If
+		# Loop through all localisations
+		If [ Get(foundCount)>0 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $localisationList[1] ; $localisationList & ¶ & FAT Localisation @ Package::Localisation code ]
+				Set Variable [ $languageList[1] ; $languageList & ¶ & "Text " &  FAT Localisation @ Package::Localisation code ]
+				# Title info does not include subtitles in separate files - all texts in one file
+				If [ $package_type ≠ "C69777FA-7286-422C-9337-B722B10663B6" // Title info ]
+					Set Variable [ $languageList[1] ; $languageList & ¶ & "Subtitle FFSub " &  FAT Localisation @ Package::Localisation code ]
+					Set Variable [ $languageList[1] ; $languageList & ¶ & "Subtitle VTT " &  FAT Localisation @ Package::Localisation code ]
+				End If
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+	End If
+	
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	If [ PatternCount ( $exportMode ; "Translation" ) ]
+		# Set exportDBList only to the titleLocalisation code documents - Text and Subtitle
+		// Set Variable [ $exportDBList[1] ; $exportDBList & ¶ & $languageList ]
+		Set Variable [ $exportDBList[1] ; $languageList ]
+	Else
+		Set Variable [ $exportDBList[1] ; $exportDBList & ¶ & $languageList ]
+		If [ PatternCount ($exportMode ; "Media") ]
+			# Include both Media update and Media all
+			Set Variable [ $exportDBList[1] ; $exportDBList & ¶ & $exportMode ]
+		End If
+	End If
+End If
+
+# ------ For debugging just one DB - change exportDBList here  -----------------------
+# Package list
+  Page
+  Page item
+  Text en-global
+  Subtitle FFSub en-global
+  Subtitle VTT en-global
+  Media update
+  Media all
+  Block
+  Theme
+  Tag
+  Score category
+  Score reward
+  Link
+  Text variable
+// Set Variable [ $exportDBList[1] ; "Subtitle FFSub en-global" ]
+# ------ End debugging ---------------------------------------------------------------
+
+Exit Script [ $exportDBList ]
+
+
+
+
+

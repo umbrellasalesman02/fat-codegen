@@ -1,0 +1,33 @@
+# Called from IO review overview
+Freeze Window
+If [ FAT IO::Number of instances > 0 ]
+	Show Custom Dialog [ Title: "Cannot delete IO" ; Message: "There are several page items connected to this IO. Please remove these connections before deleting the IO by pressing the button View instances." ; Default Button: "OK" ]
+	Exit Script []
+Else
+	# If IO is included in an array, number of instances will not detect that
+	# IO type score corresponds to a score category
+	If [ FAT IO::IO type = "Score" ]
+		Show Custom Dialog [ Title: "Delete Score IO" ; Message: "The Score IO type corresponds to a score category. Deleting this IO will also delete the score categoy and all its occurences in the Title. ¶¶Are you sure you want to delete this IO?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+		If [ Get(lastMessageChoice) = 2 ]
+			Exit Script []
+		End If
+		Set Variable [ $io_id[1] ; FAT IO::PrimaryKey ]
+		Freeze Window
+		Set Error Capture [ ON ]
+		Delete Portal Row [ With dialog: OFF ]
+		# Find and delete the corresponding score category - if it exist
+		Go to Layout [ Layout: "TABLE FAT Score Category" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get ( foundCount )=1 ]
+			Delete Record/Request [ With dialog: OFF ]
+		End If
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Else
+		# Standard delete of an unused IO
+		Show Custom Dialog [ Title: "Delete IO" ; Message: "This IO is not in use. You can safely delete this IO without losing any data." ; Default Button: "Delete" ; Button 2: "Cancel" ]
+		If [ Get(lastMessageChoice) = 1 ]
+			Delete Portal Row [ With dialog: OFF ]
+		End If
+	End If
+End If
+

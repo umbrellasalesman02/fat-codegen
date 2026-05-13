@@ -1,0 +1,32 @@
+# Called from Clone Title Objects
+
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $new_tt_id[1] ; GetScriptProperty ( "new_tt_id" ) ]
+
+Set Error Capture [ ON ]
+
+# Duplicate Text variables that are NOT connected to a source
+# Other text variables will be generated when creating IOs and Links
+
+Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		Set Variable [ $old_textvariable_id[1] ; FAT Text variable::PrimaryKey ]
+		Duplicate Record/Request
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT Text variable::Title id ; $new_tt_id ]
+		Set Field [ FAT Text variable::Old PrimaryKey from clone ; $old_textvariable_id ]
+		
+		# IO ids needs to be replaced - see Clone Text variable
+		
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+

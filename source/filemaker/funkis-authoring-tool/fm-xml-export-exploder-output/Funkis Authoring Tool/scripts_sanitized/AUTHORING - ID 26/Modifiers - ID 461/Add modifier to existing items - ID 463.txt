@@ -1,0 +1,122 @@
+# Add a new modifier to all existing items that applies
+# Called from script Create new Modifier
+
+Set Error Capture [ ON ]
+Set Variable [ $lp_id[1] ; GetScriptProperty ( "lp_id" ) ]
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+Set Variable [ $symbol_id[1] ; GetScriptProperty ( "symbol_id" ) ]
+
+# Modifier package type = comma separated list of applicable package type id:s for the modifier
+Set Variable [ $modifier_package_type[1] ; GetScriptProperty ( "modifier_package_type" ) ]
+Set Variable [ $modifier_id[1] ; GetScriptProperty ( "modifier_id" ) ]
+Set Variable [ $modifier_name[1] ; GetScriptProperty ( "modifier_name" ) ]
+Set Variable [ $modifier_default_value[1] ; GetScriptProperty ( "modifier_default_value" ) ]
+# Only for attributes
+Set Variable [ $attribute_type[1] ; GetScriptProperty ( "attribute_type" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ $level = "title" ]
+	# already there
+Else If [ $level = "package" ]
+	Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+Else If [ $level = "chapter" ]
+	Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+Else If [ $level = "page" ]
+	Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+Else If [ $level = "page item" ]
+	Go to Related Record [ Table: FAT Page item ; Layout: "TABLE FAT Page Item" ; Show related ]
+Else If [ $level = "insight item" ]
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Go to Related Record [ Table: FAT Page item ; Layout: "TABLE FAT Page Item" ; Show related ; Match found set ]
+Else If [ $level = "block" ]
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+# So the correct way to test for no related records is:
+  - GTRR Match current record only: test for error 101
+  - GTRR Match found set: test for error 401
+
+# Blocks does already have a package type so their found set doesn't need to be constrained
+If [ FAT Title::Base project ≠ "" And $level ≠ "block" ]
+	# Limit to items that have the same package type as the modifier
+	Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+End If
+
+If [ Get(foundCount)>0 And Get(lastError)  ≠ 101 And Get(lastError)  ≠ 401 ]
+	Set Variable [ $itemLayout[1] ; Get(layoutName) ]
+	
+	Loop [ Flush: Always ]
+		If [ $level = "title" ]
+			Set Variable [ $item_id[1] ; FAT Title::PrimaryKey ]
+		Else If [ $level = "package" ]
+			Set Variable [ $item_id[1] ; FAT Package::PrimaryKey ]
+			Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+		Else If [ $level = "chapter" ]
+			Set Variable [ $item_id[1] ; FAT Chapter::PrimaryKey ]
+			Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+		Else If [ $level = "page" ]
+			Set Variable [ $item_id[1] ; FAT Page::PrimaryKey ]
+			Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+		Else If [ $level = "page item" Or $level = "insight item" ]
+			Set Variable [ $item_id[1] ; FAT Page item::PrimaryKey ]
+			Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+		Else If [ $level = "block" ]
+			Set Variable [ $item_id[1] ; FAT Page item::PrimaryKey ]
+		End If
+		Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+		Set Variable [ $duplicate[1] ; False ]
+		If [ $level = "page item" Or $level = "block" Or $level="insight item" ]
+			# Check for existing duplicates on page items / blocks - toggle/attribute name and parent id
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)>0 ]
+				Set Variable [ $duplicate[1] ; True ]
+			End If
+		End If
+		If [ Not $duplicate ]
+			# Modifier value does not exist on this item
+			New Record/Request
+			Set Field [ FAT Modifier Value::Modifier id ; $modifier_id ]
+			Set Field [ FAT Modifier Value::Parent id ; $item_id ]
+			Set Field [ FAT Modifier Value::Value ; Case(
+							
+							   $attribute_type = "Number";  
+							
+							   Substitute ( $modifier_default_value ; "," ; "." ); 
+							
+							   $attribute_type = "Value list checkbox";
+							
+							   Substitute ( $modifier_default_value ; "," ; "¶" );
+							
+							   $modifier_default_value
+							
+							) ]
+			Set Variable [ $attributevalue_id[1] ; FAT Modifier Value::PrimaryKey ]
+			If [ $attribute_type = "Media" ]
+				Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+								SetProperty ( "source_table" ; "attribute" ) &
+								SetProperty ( "source_mediafield" ; GetFieldName ( FAT Modifier Value::Media id ) ) &
+								SetProperty ( "caller_layout" ; Get(layoutName )) &
+								SetProperty ( "learningprogramme_id" ; $lp_id) &
+								SetProperty ( "package_id" ; $package_id) ]
+			Else If [ $attribute_type = "Text" ]
+				Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+								SetProperty ( "source_table" ; "attribute" ) &
+								SetProperty ( "source_textfield" ; GetFieldName ( FAT Modifier Value::Text id ) ) &
+								SetProperty ( "caller_layout" ; Get(layoutName )) &
+								SetProperty ( "learningprogramme_id" ; $lp_id) &
+								SetProperty ( "package_id" ; $package_id) ]
+			End If
+			Commit Records/Requests [ With dialog: OFF ]
+		End If
+		
+		Go to Layout [ Layoutname: $itemLayout ; Animation: None ]
+		# if level = LP and called from the template script - this is a list of lPs
+		Exit Loop If [ $level = "title" ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+

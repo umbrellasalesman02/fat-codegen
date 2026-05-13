@@ -1,0 +1,101 @@
+# Called from:
+  Button in "Media with subtitles" - "Show in context"
+  Button in Media review
+
+Set Error Capture [ ON ]
+Freeze Window
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $location[1] ; FAT Media::Parent id ]
+Set Variable [ $item_type[1] ; FAT Media::Source item type ]
+Set Variable [ $success[1] ; True ]
+
+If [ $item_type = "attribute" ]
+	Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=1 ]
+		Set Variable [ $keyvalue_location[1] ; FAT Modifier Value::Parent id ]
+		Set Variable [ $attribute_level[1] ; FAT Modifier::Level ]
+		If [ $attribute_level = "Title" ]
+			Go to Layout [ Layout: "FAT Title Settings" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)=0 ]
+				Set Variable [ $success[1] ; False ]
+			Else
+				Perform Script [ From list ; "Go tab" ; Parameter: SetProperty ( "tab_name" ; "tab7" ) & 
+								SetProperty ( "field" ; GetFieldName ( FAT Title::LastSettingTab )) ]
+			End If
+		Else If [ $attribute_level = "Package" ]
+			Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)=0 ]
+				Set Variable [ $success[1] ; False ]
+			Else
+				Perform Script [ From list ; "Go previous layout" ]
+				Perform Script [ From list ; "Go Package Settings" ; Parameter: $keyvalue_location ]
+				Go to Object [ "tab2" ; Repetition: 1 ]
+			End If
+		Else If [ $attribute_level = "Chapter" ]
+			# Look in CMT Chapter
+			Go to Layout [ Layout: "FAT Chapter" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)=0 ]
+				Set Variable [ $success[1] ; False ]
+			Else
+				Perform Script [ From list ; "View card chapter setting" ; Parameter: $keyvalue_location ]
+			End If
+		Else If [ $attribute_level="Page" ]
+			# Look in CMT Page
+			Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)=0 ]
+				Set Variable [ $success[1] ; False ]
+			Else
+				Perform Script [ From list ; "View Card Page setting" ; Parameter: $keyvalue_location ]
+			End If
+		Else If [ $attribute_level = "Page item" ]
+			# Look in CMT Page item
+			Set Variable [ $$pageItemRecordLoadTrigger[1] ; False ]
+			Go to Layout [ Layout: "FAT Page item" ; Animation: None ]
+			Set Variable [ $$pageItemRecordLoadTrigger[1] ; True ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)=0 ]
+				Set Variable [ $success[1] ; False ]
+			Else
+				Perform Script [ From list ; "View card Page item setting" ; Parameter: $keyvalue_location ]
+			End If
+		Else
+			# No attribute level found
+			Set Variable [ $success[1] ; False ]
+		End If
+	Else
+		# No attributes found with this id
+		Set Variable [ $success[1] ; False ]
+	End If
+	
+Else If [ $item_type = "page-item" ]
+	# Navigate
+	Perform Script [ From list ; "Save Active Layout" ]
+	Perform Script [ From list ; "Go FAT Item" ; Parameter: SetProperty ( "level" ; "Page item" ) &
+					SetProperty ( "title_id" ; FAT Media::Title id ) &
+					SetProperty ( "item_id" ; FAT Media::Parent id ) ]
+Else If [ $item_type = "theme" ]
+	If [ isDeveloper ]
+		Set Field [ FAT Title::LastSettingTab ; "tab8" //Theme tab ]
+		Go to Layout [ Layout: "FAT Title Settings" ; Animation: None ]
+	Else
+		Set Variable [ $success[1] ; False ]
+	End If
+Else If [ $item_type = "list-item" ]
+	Perform Script [ From list ; "View Card List Setting" ; Parameter: SetProperty ( "list_id" ; $location ) ]
+Else If [ $item_type = "link" ]
+	Perform Script [ From list ; "View Link" ; Parameter: SetProperty ( "link_id" ; $location ) &
+					SetProperty ( "callLayout" ; $callLayout ) ]
+Else
+	Set Variable [ $success[1] ; False ]
+End If
+
+If [ $success = False ]
+	Perform Script [ From list ; "Go previous layout" ]
+	Show Custom Dialog [ Title: "Cannot find media in Title" ; Message: "The media couldn't be found in either attributes or page items. The media file is probably not used anywhere in the Title." ; Default Button: "OK" ]
+End If
+

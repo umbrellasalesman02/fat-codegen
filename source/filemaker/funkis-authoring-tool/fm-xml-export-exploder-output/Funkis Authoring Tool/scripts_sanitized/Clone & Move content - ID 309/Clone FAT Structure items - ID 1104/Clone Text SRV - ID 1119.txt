@@ -1,0 +1,51 @@
+# Normally text is set up using the standard for NEw Text - but not for subtitles, sprig etc
+
+
+
+Set Variable [ $old_parent_id[1] ; GetScriptProperty("old_parent_id") ]
+Set Variable [ $new_parent_id[1] ; GetScriptProperty("new_parent_id") ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty("localisation_code") ]
+Set Variable [ $omit_type[1] ; GetScriptProperty("omit_type") ]
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $package_id[1] ; GetScriptProperty("package_id") ]
+
+# Cloning Texts for parent
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+If [ IsEmpty ( $omit_type ) ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	# Omit one type - i.se "page-item"
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+If [ Get(foundCount)> 0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	
+	Loop [ Flush: Minimum ]
+		
+		Set Variable [ $old_text_id[1] ; FAT Text::PrimaryKey ]
+		
+		Duplicate Record/Request
+		
+		Set Field [ FAT Text::Title id ; $title_id ]
+		Set Field [ FAT Text::Package id ; $package_id ]
+		Set Field [ FAT Text::Parent id ; $new_parent_id ]
+		Set Field [ FAT Text::Language code ; getLanguageCode ($localisation_code) ]
+		Set Field [ FAT Text::Country code ; getCountryCode ($localisation_code) ]
+		
+		If [ $omit_type = "page-item" ]
+			# Using Old PrimaryKey global text to match sprig story JSON text id
+			
+			Set Field [ FAT Text::PrimaryKey Override ; $old_text_id ]
+		End If
+		
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

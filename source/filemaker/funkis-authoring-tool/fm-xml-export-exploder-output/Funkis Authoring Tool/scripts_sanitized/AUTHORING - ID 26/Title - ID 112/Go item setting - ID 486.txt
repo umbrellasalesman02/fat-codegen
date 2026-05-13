@@ -1,0 +1,20 @@
+Set Variable [ $item_type[1] ; FAT Overview::Item type ]
+Set Variable [ $item_id[1] ; FAT Overview::Item id ]
+Set Error Capture [ ON ]
+Freeze Window
+If [ $item_type = "Title" ]
+	Perform Script [ From list ; "Go Title Settings" ]
+Else If [ $item_type = "Package" ]
+	Perform Script [ From list ; "Go Package Settings" ; Parameter: $item_id ]
+Else If [ $item_type = "Chapter" ]
+	Perform Script [ From list ; "View card chapter setting" ; Parameter: $item_id ]
+Else If [ $item_type = "Page" ]
+	Perform Script [ From list ; "View Card Page setting" ; Parameter: $item_id ]
+Else If [ $item_type = "Page item" ]
+	// Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	// Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Set Variable [ $item_id[1] ; FAT Page item::PrimaryKey ]
+	// Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Perform Script [ From list ; "View card Page item setting" ; Parameter: $item_id ]
+End If
+

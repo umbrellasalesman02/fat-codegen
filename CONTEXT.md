@@ -48,6 +48,58 @@ _Avoid_: editing before context loading, guessing Effect idioms from memory
 `CONTEXT.md` as the canonical conceptual guide for coding-agent decisions.
 _Avoid_: README (for conceptual grounding)
 
+**Generated Application Slice**:
+An independently runnable and testable vertical slice generated deterministically from the Structural Source.
+_Avoid_: feature chunk, code fragment, ad hoc port piece
+
+**Ingestion Pipeline**:
+The reproducible flow from FileMaker "Save as XML" export through `fm-xml-export-exploder` that produces the Structural Source as generator input.
+_Avoid_: manual prep step, one-off export process
+
+**Generated Packages**:
+Committed workspace packages under `packages/` produced by generators and treated as read-only by hand edits.
+_Avoid_: ad hoc generated folder, mixed manual/generated module
+
+**Deterministic Regeneration**:
+Generator runs overwrite owned target files in place with stable output for the same input.
+_Avoid_: manual merge step, timestamp-based output drift
+
+**Source Domain**:
+A top-level FileMaker source category used for porting: Data Structure, Behavior Logic, or Reference Data.
+_Avoid_: random export section, technical bucket
+
+**Data Structure Source Domain**:
+Tables and table occurrences/relationships that define entity shape and traversal paths.
+_Avoid_: script logic, UI workflow
+
+**Reference Data Source Domain**:
+Value lists and related lookup structures required by generated behavior.
+_Avoid_: primary entity records, script bodies
+
+**Behavior Logic Source Domain**:
+Scripts and executable flow definitions that implement business behavior.
+_Avoid_: static schema, static lookup-only definitions
+
+**Vertical Slice with Dependency Layering**:
+A Generated Application Slice may span multiple Source Domains, but within the slice it is built in order: Data Structure, then Reference Data, then Behavior Logic.
+_Avoid_: all-schema-first waterfall, script-first generation
+
+**Structural Source**:
+`source/filemaker/funkis-authoring-tool/fm-xml-export-exploder-output/` metadata defining structure and behavior (tables, relationships, scripts, value lists) without full operational record data.
+_Avoid_: production dataset snapshot, full table export
+
+**Source Provenance Path**:
+Canonical source path segments encode system, application, and extractor provenance for immutable structural input.
+_Avoid_: anonymous dump folder, toolless source naming
+
+**Projection Layer**:
+A selective mapping layer that retrieves and reshapes only required runtime records (for example via OData) into slice-focused models, excluding legacy fields by default.
+_Avoid_: mirror-all-fields integration, direct table passthrough
+
+**Progressive Field Curation**:
+Fields are added to slice projections only when required by a failing scenario, contract need, or script dependency, not preemptively.
+_Avoid_: upfront full-field mapping, speculative schema inclusion
+
 ## Relationships
 
 - A **Template Repository** contains multiple **Application**s
@@ -62,6 +114,15 @@ _Avoid_: README (for conceptual grounding)
 - **Effect Core Primitives** drive the baseline architecture and operational patterns across **Application**s
 - **Agent Startup Sequence** defines deterministic setup behavior before changes
 - **Agent Starting Point** describes the concepts and boundaries of the **Template Repository**
+- A **Generated Application Slice** is produced from the **Structural Source** and validated through the **Quality Gate**
+- The **Ingestion Pipeline** produces the **Structural Source**, which is consumed to create a **Generated Application Slice**
+- **Generated Packages** provide stable package boundaries consumed by **Application**s
+- **Deterministic Regeneration** keeps generated outputs diffable and repeatable across runs
+- A **Generated Application Slice** can include multiple **Source Domain**s
+- In each **Vertical Slice with Dependency Layering**, **Data Structure Source Domain** precedes **Reference Data Source Domain**, which precedes **Behavior Logic Source Domain**
+- **Structural Source** provides generator inputs for shape and behavior, while **Projection Layer** governs selective runtime data retrieval
+- **Projection Layer** follows **Progressive Field Curation** to keep runtime scope intentional
+- **Source Provenance Path** standardizes naming of immutable structural inputs
 
 ## Folder Boundaries
 
@@ -80,3 +141,11 @@ _Avoid_: README (for conceptual grounding)
 - "context" was used to mean both conceptual glossary and setup guide — resolved: conceptual glossary lives in **Agent Starting Point** (`CONTEXT.md`), setup stays in `README.md`.
 - "shared" was used for both boundary contracts and internal reuse — resolved: **Shared Contract** is boundary-only.
 - "vendored repo" was used as a generic category — resolved: only centrally authoritative repos are **Reference Source** entries, currently only `repos/effect-smol`.
+- "meta programming" was too vague for planning and scope — resolved as **Generated Application Slice** for concrete delivery units.
+- "input prep" was ambiguous between manual and automated workflow — resolved as **Ingestion Pipeline** with explicit stages.
+- "generated output location" was unclear — resolved as **Generated Packages** under `packages/`.
+- "regen strategy" was undecided between staging and direct writes — resolved as **Deterministic Regeneration** with in-place overwrite.
+- "port sequencing" was ambiguous between phased domains and vertical delivery — resolved as **Vertical Slice with Dependency Layering**.
+- "source data" was ambiguous between metadata exports and runtime records — resolved via **Structural Source** plus **Projection Layer**.
+- "field coverage" was uncertain at kickoff — resolved via **Progressive Field Curation**.
+- "source folder naming" was ambiguous — resolved via **Source Provenance Path** with `source/filemaker/funkis-authoring-tool/fm-xml-export-exploder-output/`.

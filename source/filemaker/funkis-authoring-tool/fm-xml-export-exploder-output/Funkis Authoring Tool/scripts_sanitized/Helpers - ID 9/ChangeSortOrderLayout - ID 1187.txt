@@ -1,0 +1,84 @@
+# Used to arrange order of page items in FAT Page item layout
+# ================================================
+
+Freeze Window
+Set Variable [ $$pageItemRecordLoadTrigger[1] ; False ]
+
+# ================================================
+Set Variable [ $action[1] ; GetScriptProperty ( "action" ) ]
+Set Variable [ $sortField[1] ; GetScriptProperty ( "sortField" ) ]
+Set Variable [ $numberOfPortalRows[1] ; GetField ( GetScriptProperty ( "numberOfChildrenField" ) ) ]
+Set Variable [ $portal_no[1] ; Get(recordNumber) ]
+If [ $action = "up" ]
+	If [ Get(ActivePortalRowNumber)≠1 ]
+		If [ Get(ActivePortalRowNumber)>2 ]
+			// Go to Portal Row [ Exit after last: OFF ; Previous ]
+			Go to Record/Request/Page [ Previous ; Exit after last: ON ]
+			Set Variable [ $sortindex1[1] ; GetField ( $sortField ) ]
+			// Go to Portal Row [ Exit after last: OFF ; Previous ]
+			Go to Record/Request/Page [ Previous ; Exit after last: ON ]
+			Set Variable [ $sortindex2[1] ; GetField ( $sortField ) ]
+			Set Variable [ $newindex[1] ; $sortindex1 + ($sortindex2 - $sortindex1)/2 ]
+		Else If [ Get(ActivePortalRowNumber)=2 ]
+			Go to Portal Row [ Exit after last: OFF ; Previous ]
+			Set Variable [ $sortindex1[1] ; GetField ( $sortField ) ]
+			Set Variable [ $newindex[1] ; $sortindex1 - ,1 ]
+		End If
+		// Go to Portal Row [ With dialog: OFF ; By Calculation… ]
+		Go to Record/Request/Page [ With dialog: OFF ; $portal_no ]
+		Set Field By Name [ Specify target field: ON ; $sortField ; $newindex ]
+		Commit Records/Requests [ With dialog: OFF ]
+		// Go to Portal Row [ With dialog: OFF ; By Calculation… ]
+		// Go to Record/Request/Page [ With dialog: OFF ; $portal_no - 1 ]
+	End If
+Else If [ $action = "down" ]
+	
+	If [ Get(ActivePortalRowNumber) ≠ $numberOfPortalRows ]
+		If [ ($numberOfPortalRows - Get(ActivePortalRowNumber))>1 ]
+			// Go to Portal Row [ Exit after last: OFF ; Next ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			Set Variable [ $sortindex1[1] ; GetField ( $sortField ) ]
+			// Go to Portal Row [ Exit after last: OFF ; Next ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			Set Variable [ $sortindex2[1] ; GetField ( $sortField ) ]
+			Set Variable [ $newindex[1] ; $sortindex1 + ($sortindex2 - $sortindex1)/2 ]
+		Else If [ ($numberOfPortalRows - Get(ActivePortalRowNumber)) = 1 ]
+			// Go to Portal Row [ Exit after last: OFF ; Next ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			Set Variable [ $sortindex1[1] ; GetField ( $sortField ) ]
+			Set Variable [ $newindex[1] ; $sortindex1 + ,1 ]
+		End If
+		// Go to Portal Row [ With dialog: OFF ; By Calculation… ]
+		Go to Record/Request/Page [ With dialog: OFF ; $portal_no ]
+		Set Field By Name [ Specify target field: ON ; $sortField ; $newindex ]
+		Commit Records/Requests [ With dialog: OFF ]
+		// Go to Portal Row [ With dialog: OFF ; By Calculation… ]
+		// Go to Record/Request/Page [ With dialog: OFF ; $portal_no + 1 ]
+	End If
+End If
+
+
+If [ $sortField = "FAT Package::SortIndex" ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+Else If [ $sortField = "FAT Chapter::SortIndex" ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+Else If [ $sortField = "FAT Page::SortIndex" ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Set Variable [ $$pageItemRecordLoadTrigger[1] ; True ]
+	Perform Script [ From list ; "Setup current PageItem" ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+Else If [ $sortField = "FAT Page item::SortIndex" ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Set Variable [ $$pageItemRecordLoadTrigger[1] ; True ]
+	Perform Script [ From list ; "Setup current PageItem" ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+End If
+
+If [ Get(layoutName) = "FAT Title" Or Get(layoutName) = "FAT Package" ]
+	# Only Title and Package have content overviews
+	Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+End If
+
+

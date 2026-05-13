@@ -1,0 +1,127 @@
+
+# This script sets up all visual elements
+# Called from script trigger OnRecordLoad in layout FAT Page item
+# Must stand on the record to set it up
+
+Freeze Window
+
+If [ $$pageItemRecordLoadTrigger ]
+	
+	If [ Not $$cacheWebViewer ]
+		Set Variable [ $$WV_HTML[1] ; "data:text/html," & FAT Page item::gHTML Code ]
+		Set Web Viewer [ "WebViewer Quill" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+		Set Variable [ $$cacheWebViewer[1] ; True ]
+		Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+	Else
+		Set Web Viewer [ "WebViewer Quill" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+		If [ Platform = "WebDirect" Or Platform = "iOS" ]
+			Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+		End If
+	End If
+	
+	Set Variable [ $$hierarchyLevel[1] ; FAT Page item::Hierarchy level ]
+	Set Variable [ $$hierarchyPath[1] ; FAT Title::Reference title & ¶ &
+					Case(FAT Package::Reference name = "" ; "" ; TruncateText ( FAT Package::Reference name ; 25 ) & ¶) &
+					Case(TF CH Header::Text = "" ; "" ; TruncateText ( TF CH Header::Text; 25) & ¶) &
+					Case(TF PG Header::Text = "" ; "" ; TruncateText ( TF PG Header::Text; 25) & ¶) &
+					Case(FAT Block @ Page item::Name = "" ; "" ; TruncateText (FAT Block @ Page item::Name; 25)) ]
+	Refresh Object [ Name: "Breadcrumb" ]
+	# Something went corrupt when doing script step below
+	// Go to Object [ FAT Page item::LastAdaptiveSettingsTab ; Repetition: 1 ]
+	Refresh Object [ Name: "Tag-Score-Condition buttons" ]
+	
+	
+	If [ Platform = "Desktop" ]
+		
+		Loop [ Flush: Always ]
+			Set Variable [ $i[1] ; $i + 1 ]
+			If [ $i < 5 ]
+				Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+			Else
+				Set Web Viewer [ "WebViewer Quill" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+				Refresh Object [ Name: "WebViewer Quill" ]
+				Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+				Refresh Object [ Name: "WebViewer Quill" ]
+			End If
+			Exit Loop If [ Get(lastError) ≠ 5 Or $i > 15 ]
+		End Loop
+	Else
+		# Web Direct
+		Loop [ Flush: Always ]
+			Set Variable [ $i[1] ; $i + 1 ]
+			If [ $i < 5 ]
+				Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+			Else
+				Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+				Set Web Viewer [ "WebViewer Quill" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+				// Refresh Object [ Name: "WebViewer Quill" ]
+				Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+				Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+				// Refresh Object [ Name: "WebViewer Quill" ]
+			End If
+			Exit Loop If [ Get(lastError) ≠ 5 Or $i > 15 ]
+		End Loop
+	End If
+	
+	Go to Object [ FAT Page item::LastSettingTab ; Repetition: 1 ]
+	
+End If
+
+
+
+
+// # THIS IS A WORKING VERSION HERE BELOW - NOT 100% FRO WEB DIRECT
+// # This script sets up all visual elements
+// # Called from script trigger OnRecordLoad in layout FAT Page item
+// # Must stand on the record to set it up
+// 
+// Freeze Window
+// 
+// If [ $$pageItemRecordLoadTrigger ]
+// 
+// If [ Not $$cacheWebViewer ]
+// Set Variable [ $$WV_HTML[1] ; "data:text/html," & FAT Page item::gHTML Code ]
+// Set Web Viewer [ "WebViewer Quill" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+// Set Variable [ $$cacheWebViewer[1] ; True ]
+// Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+// Else
+// Set Web Viewer [ "WebViewer Quill" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+// If [ Platform = "WebDirect" Or Platform = "iOS" ]
+// Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+// End If
+// End If
+// 
+// Set Variable [ $$hierarchyLevel[1] ; FAT Page item::Hierarchy level ]
+// Set Variable [ $$hierarchyPath[1] ; FAT Title::Reference title & ¶ &
+				Case(FAT Package::Reference name = "" ; "" ; TruncateText ( FAT Package::Reference name ; 25 ) & ¶) &
+				Case(TF CH Header::Text = "" ; "" ; TruncateText ( TF CH Header::Text; 25) & ¶) &
+				Case(TF PG Header::Text = "" ; "" ; TruncateText ( TF PG Header::Text; 25) & ¶) &
+				Case(FAT Block @ Page item::Name = "" ; "" ; TruncateText (FAT Block @ Page item::Name; 25)) ]
+// Refresh Object [ Name: "Breadcrumb" ]
+// # Something went corrupt when doing script step below
+// Go to Object [ FAT Page item::LastAdaptiveSettingsTab ; Repetition: 1 ]
+// Go to Object [ FAT Page item::LastSettingTab ; Repetition: 1 ]
+// Refresh Object [ Name: "Tag-Score-Condition buttons" ]
+// 
+// Loop [ Flush: Always ]
+// Set Variable [ $i[1] ; $i + 1 ]
+// If [ $i < 5 ]
+// Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+// Else
+// Set Web Viewer [ "WebViewer Quill" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+// Refresh Object [ Name: "WebViewer Quill" ]
+// Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+// Refresh Object [ Name: "WebViewer Quill" ]
+// End If
+// Exit Loop If [ Get(lastError) ≠ 5 Or $i > 15 ]
+// End Loop
+// 
+// 
+// End If
+// 
+// 
+
+
+
+
+

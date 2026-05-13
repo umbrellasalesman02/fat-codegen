@@ -1,0 +1,16 @@
+# Called from gViewLocalised Language radiobutton
+If [ FAT Title::gCurrentLocalisationCode ≠ "" ]
+	Set Field [ FAT Title::gViewTranslatedLanguage ; "" ]
+	Set Field [ FAT Title::gCurrentLocalisationCode ; "" ]
+	
+	Set Variable [ $$localisation_code[1] ; FAT Title::Original localisation code ]
+	
+	If [ PatternCount ( Get(layoutName) ; "media" ) ]
+		Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+	Else If [ PatternCount ( Get(layoutName) ; "Page item" ) ]
+		Perform Script [ From list ; "Setup current PageItem" ]
+	End If
+End If
+Close Popover
+Commit Records/Requests [ With dialog: OFF ]
+

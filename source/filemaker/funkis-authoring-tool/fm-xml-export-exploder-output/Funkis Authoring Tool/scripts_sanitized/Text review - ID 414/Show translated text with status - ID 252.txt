@@ -1,0 +1,40 @@
+# This script is called from the Text translation layout - filtering texts with different status
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $status[1] ; GetScriptProperty ( "status" ) ]
+Set Variable [ $num_of_texts[1] ; GetAsNumber ( GetScriptProperty ( "num_of_texts" )) ]
+
+# Text status can be:
+  1. Not translated
+  2. Sent to API (only asynchronous machine translation)
+  3. Not reviewed
+  4. In progress
+  5. Approved
+
+If [ $num_of_texts > 0 Or $status = "All" ]
+	If [ $status = "All" ]
+		# Search all texts in Title
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else
+		Set Variable [ $package_id[1] ; FAT Text translated::gPackage ]
+		If [ IsEmpty($package_id) ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Else
+			# Search for all texts that will be sent to localisation
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		End If
+	End If
+	Set Field [ FAT Text translated::gViewTranslationStatus ; $status ]
+	# Omit empty original records. Do this as a last step since it is a related field to improve performance
+	// Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+	# Gives the user an opportunity to cancel the sorting if it takes time.
+	Refresh Window
+	Freeze Window
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	Go to Field [ FAT Text translated::Text ]
+Else
+	Show Custom Dialog [ Title: "No texts found" ; Message: "There are currently no texts with status \"" & $status & "\" in this Title." ; Default Button: "OK" ]
+End If
+

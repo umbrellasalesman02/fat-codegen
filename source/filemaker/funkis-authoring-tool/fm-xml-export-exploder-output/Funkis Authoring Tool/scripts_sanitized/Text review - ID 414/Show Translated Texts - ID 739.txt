@@ -1,0 +1,29 @@
+# Script is called to show all translated texts for a title or package
+# Global variables $$lp_id and $$localisation_code needs to be set
+
+# Called from
+  Go translated texts ƒ Login
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Field [ FAT Text::gFilterType ; "" ]
+
+If [ $package_id ≠ "" ]
+	# Search show Package text including global texts, tags
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT Text translated::gPackage ; $package_id ]
+Else
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT Text translated::gPackage ; "" ]
+End If
+
+// # Omit empty original records. Do this as a last step since it is a related field to improve performance
+// Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+
+# Gives the user an opportunity to cancel the sorting if it takes time.
+Refresh Window
+Freeze Window
+
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+

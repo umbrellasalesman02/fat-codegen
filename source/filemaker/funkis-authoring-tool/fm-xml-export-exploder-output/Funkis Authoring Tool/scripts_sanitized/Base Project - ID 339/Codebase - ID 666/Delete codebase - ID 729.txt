@@ -1,0 +1,22 @@
+Show Custom Dialog [ Title: "Delete codebase" ; Message: "We will check if the codebase is used by any package before deletion. " ; Default Button: "OK" ]
+Freeze Window
+Set Error Capture [ ON ]
+Set Variable [ $codebase[1] ; Baseproject Codebase::PrimaryKey ]
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $package_list[1] ; "" ]
+	Loop [ Flush: Always ]
+		Set Variable [ $package_list[1] ; $package_list & FAT Title::Reference title & " - " & FAT Package::Reference name & ", " ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Set Variable [ $package_list[1] ; Left ( $package_list ; Length ( $package_list )-2 ) ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "Codebase cannot be deleted" ; Message: "This codebase is used by one or several packages. Please change settings for these packages before deletion. The packages are: " & $package_list ; Default Button: "OK" ]
+Else
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Delete Record/Request [ With dialog: OFF ]
+	Show Custom Dialog [ Title: "Codebase deleted" ; Message: "This codebase was not used by any package and could safely be deleted." ; Default Button: "OK" ]
+	
+End If
+

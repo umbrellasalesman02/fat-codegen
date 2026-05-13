@@ -1,0 +1,105 @@
+# Called from Start Cloning after all cloning is ready
+# Only called if PatternCount ( $clone_settings ; "Links" ) or $clone_level = "Title"
+# This script also fix references to Packages, Chapters and Pages (Legacy links)
+
+# SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "clone_level" ; $clone_level ) &
+  SetProperty ( "item_id" ; $item_id )  &
+  SetProperty ( "clone_start_timestamp" ; $clone_start_timestamp ) 
+
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $clone_level[1] ; GetScriptProperty("clone_level") ]
+Set Variable [ $item_id[1] ; GetScriptProperty("item_id") ]
+Set Variable [ $clone_start_timestamp[1] ; GetAsTimeStamp(GetScriptProperty("clone_start_timestamp")) ]
+
+Set Variable [ $clone_end_timestamp[1] ; Get(currentHostTimeStamp) ]
+
+Set Error Capture [ ON ]
+
+# ------------------- CHECK LINKS IN MODIFIER VALUES -------------------------
+Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+
+# Find modifiervalues in title of type link, package id, chapter id or page id and is created in the time between start and stop cloning
+Set Variable [ $modifier_type[1] ; "Link" ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $modifier_type[1] ; "Package id" ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $modifier_type[1] ; "Chapter id" ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $modifier_type[1] ; "Page id" ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $old_item_id[1] ; FAT Modifier Value::Value ]
+		Set Variable [ $item_type[1] ; FAT Modifier::Type ]
+		
+		Perform Script [ From list ; "Find original item" ; Parameter: SetProperty("old_item_id"; $old_item_id) & 
+						SetProperty("item_type"; $item_type) & 
+						SetProperty("title_id"; $title_id) ]
+		Set Variable [ $new_item_id[1] ; Get(ScriptResult) ]
+		
+		Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+		Set Field [ FAT Modifier Value::Value ; $new_item_id ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# ------------------- CHECK LINKS IN LIST ITEM VALUES -------------------------
+
+Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+
+# Find modifiervalues in title of type link, package id, chapter id or page id and is created in the time between start and stop cloning
+Set Variable [ $modifier_type[1] ; "Link" ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $modifier_type[1] ; "Page item" ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $modifier_type[1] ; "Page friendly id" ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $old_item_id[1] ; FAT List item::Value 1 ]
+		Set Variable [ $item_type[1] ; List template::Value 1 type ]
+		
+		Perform Script [ From list ; "Find original item" ; Parameter: SetProperty("old_item_id"; $old_item_id) & 
+						SetProperty("item_type"; $item_type) & 
+						SetProperty("title_id"; $title_id) ]
+		Set Variable [ $new_item_id[1] ; Get(ScriptResult) ]
+		
+		Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+		Set Field [ FAT List item::Value 1 ; $new_item_id ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# ------------------- CHECK LINKS IN PAGE LIST ITEM VALUES -------------------------
+
+Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+
+# Find modifiervalues in title of type link, package id, chapter id or page id and is created in the time between start and stop cloning
+Set Variable [ $modifier_type[1] ; "Link" ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $modifier_type[1] ; "Page item" ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $modifier_type[1] ; "Page friendly id" ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $old_item_id[1] ; FAT List item @ Page item::Value 1 ]
+		Set Variable [ $item_type[1] ; List template @ Page item::Value 1 type ]
+		
+		Perform Script [ From list ; "Find original item" ; Parameter: SetProperty("old_item_id"; $old_item_id) & 
+						SetProperty("item_type"; $item_type) & 
+						SetProperty("title_id"; $title_id) ]
+		Set Variable [ $new_item_id[1] ; Get(ScriptResult) ]
+		
+		Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+		Set Field [ FAT List item @ Page item::Value 1 ; $new_item_id ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+
+

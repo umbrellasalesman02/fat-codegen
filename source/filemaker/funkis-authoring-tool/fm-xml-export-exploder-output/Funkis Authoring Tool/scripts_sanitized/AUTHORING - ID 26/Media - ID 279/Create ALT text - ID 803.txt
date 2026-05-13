@@ -1,0 +1,12 @@
+# Called from button in media card
+Set Variable [ $parent[1] ; FAT Media::PrimaryKey ]
+Set Variable [ $title_id[1] ; FAT Media::Title id ]
+Set Variable [ $package_id[1] ; FAT Media::Package id ]
+
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Media::PrimaryKey ) &
+				SetProperty ( "source_table" ; "alt-text" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Media::Alt text id ) ) &
+				SetProperty ( "learningprogramme_id" ; $title_id ) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+

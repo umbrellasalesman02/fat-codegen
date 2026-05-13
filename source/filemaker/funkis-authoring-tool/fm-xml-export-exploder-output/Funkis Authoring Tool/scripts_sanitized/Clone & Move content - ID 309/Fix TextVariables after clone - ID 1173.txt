@@ -1,0 +1,43 @@
+# Should loop through all new text variables and search and replace in text created after timestamp
+
+
+# SetProperty("title_id"; $title_id) &
+  SetProperty ( "clone_start_timestamp" ; $clone_start_timestamp )
+
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $clone_start_timestamp[1] ; GetAsTimeStamp(GetScriptProperty("clone_start_timestamp")) ]
+
+Set Variable [ $clone_end_timestamp[1] ; Get(currentHostTimeStamp) ]
+
+Set Error Capture [ ON ]
+
+# Find all text variables that was created during the clone process
+Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $new_text_var[1] ; FAT Text variable::Friendly string ]
+		Set Variable [ $old_text_var_id[1] ; FAT Text variable::Old PrimaryKey from clone ]
+		# Find the original text var
+		Go to Layout [ Layout: "TABLE FAT Text variable Alt" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Variable [ $old_text_var[1] ; FAT Text variable Alt::Friendly string ]
+		# Search for the old text var in all texts that was created during the clone process
+		Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount) > 0 ]
+			Loop [ Flush: Always ]
+				# replace the old text var name with the new name
+				Set Variable [ $text[1] ; Substitute ( FAT Text::Text ; $old_text_var; $new_text_var) ]
+				Set Field [ FAT Text::Text ; $text ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+		Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+
+
+

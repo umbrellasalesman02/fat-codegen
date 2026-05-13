@@ -1,0 +1,10 @@
+# Called from an onModify script trigger in IO Value Page item card window
+  The purpose is to warn the user to set the correct write context if they set a field to "Write" 
+
+If [ FAT IO Field Value @ Page item::Field mode = "Write" ]
+	Set Variable [ $io_read_context[1] ; FAT IO Value @ Page item Current::IO Read filter ]
+	Set Field [ FAT IO Value @ Page item Current::IO Write as ; $io_read_context ]
+	Perform Script [ From list ; "CheckIOAccessRights CL" ; Parameter: SetProperty ( "io_id" ; FAT IO Value @ Page item Current::IO id ) ]
+	// Show Custom Dialog [ Title: "Attention, please!" ; Message: "You set a field to \"Write\" on an IO output block.¶¶Now, make sure to set the correct \"Write as\" context on this IO!" ; Default Button: "OK" ]
+End If
+

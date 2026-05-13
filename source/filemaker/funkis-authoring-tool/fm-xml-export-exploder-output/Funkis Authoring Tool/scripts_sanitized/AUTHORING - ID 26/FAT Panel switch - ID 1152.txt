@@ -1,0 +1,13 @@
+# Called from Package, Chapter, Page, Page item
+Set Variable [ $clickedTab[1] ; Get(TriggerTargetPanel) ]
+Set Variable [ $item_type[1] ; Get(scriptParameter) ]
+If [ $item_type = "Package" ]
+Else If [ $item_type = "Chapter" ]
+	Set Field [ FAT Chapter::LastSettingTab ; GetValue ( $clickedTab ; 2 ) ]
+Else If [ $item_type = "Page" ]
+	Set Field [ FAT Page::LastSettingTab ; GetValue ( $clickedTab ; 2 ) ]
+Else If [ $item_type = "Page item" ]
+	Set Field [ FAT Page item::LastSettingTab ; GetValue ( $clickedTab ; 2 ) ]
+End If
+
+

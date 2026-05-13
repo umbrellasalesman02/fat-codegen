@@ -1,0 +1,80 @@
+# Called from Page
+  Click on Page item in portal
+  Called from script Create PageItem in Page CL
+  Called from script Go PageItem ƒ Page
+
+# This script:
+  1. Sets up the found set of page items fo a page /chapter (slide)
+  2. Sorts the found set according to sortIndex
+  3. Navigates to the right page item.
+
+# This script is called from:
+  1. Page - click on Page item in portal. Called from script Go PageItem ƒ Page.
+  2. Page item - Called from script Create PageItem in Page CL
+  3. Called from script Go PageItem ƒ Page
+  
+
+
+Set Variable [ $chapter_id[1] ; GetScriptProperty ( "chapter_id" ) ]
+Set Variable [ $page_id[1] ; GetScriptProperty ( "page_id" ) ]
+Set Variable [ $pageitem_id[1] ; GetScriptProperty ( "pageitem_id" ) ]
+Set Variable [ $proxy_type[1] ; GetScriptProperty ( "proxy_type" ) ]
+Set Variable [ $page_item2[1] ; GetAsBoolean(GetScriptProperty ( "page_item2" )) ]
+
+Freeze Window
+Set Variable [ $$pageItemRecordLoadTrigger[1] ; False ]
+
+Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+
+If [ $proxy_type = "" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Else
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+End If
+
+Set Variable [ $recordNum[1] ; Let ( [
+				
+				  listOfRecordIDs = ¶ & FAT Page item::List of PrimaryKey & ¶;
+				
+				  theDesiredRecordID = ¶ & $pageitem_id & ¶
+				
+				  ] ;
+				
+				  ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+				
+				) ]
+
+If [ $recordNum ≠ Get(recordNumber) ]
+	Go to Record/Request/Page [ With dialog: OFF ; $recordNum ]
+End If
+
+Set Variable [ $$hierarchyLevel[1] ; FAT Page item::Hierarchy level ]
+Set Variable [ $$hierarchyPath[1] ; FAT Title::Reference title & ¶ &
+				Case(FAT Package::Reference name = "" ; "" ; TruncateText ( FAT Package::Reference name ; 25 ) & ¶) &
+				Case(TF CH Header::Text = "" ; "" ; TruncateText ( TF CH Header::Text; 32) & ¶) &
+				Case(TF PG Header::Text = "" ; "" ; TruncateText ( TF PG Header::Text; 32) & ¶) 
+				
+				/*FAT Title::Reference title & ¶ &
+				Case(FAT Package::Reference name = "" ; "" ; TruncateText ( FAT Package::Reference name ; 25 ) & ¶) &
+				Case(TF CH Header::Text = "" ; "" ; TruncateText ( TF CH Header::Text; 25) & ¶) &
+				Case(TF PG Header::Text = "" ; "" ; TruncateText ( TF PG Header::Text; 25) & ¶) &
+				Case(FAT Block @ Page item::Name = "" ; "" ; TruncateText (FAT Block @ Page item::Name; 25))*/ ]
+
+Set Variable [ $$pageItemRecordLoadTrigger[1] ; True ]
+
+If [ Not $page_item2 ]
+	# The default Setup
+	Go to Layout [ Layout: "FAT Page item" ; Animation: None ]
+	Refresh Object [ Name: "Breadcrumb" ]
+Else If [ $page_item2 ]
+	Go to Related Record [ Table: FAT Page item ; Layout: "FAT Page item Card" ; Show related ; Match found set ]
+	Perform Script [ From list ; "Show page item 2" ]
+End If
+
+
+
+
+
+

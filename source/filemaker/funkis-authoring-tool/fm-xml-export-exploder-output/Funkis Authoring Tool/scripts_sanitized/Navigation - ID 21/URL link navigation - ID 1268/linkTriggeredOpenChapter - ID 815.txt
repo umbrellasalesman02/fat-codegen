@@ -1,0 +1,52 @@
+# Called from Insepctor in a title, i.e. fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenPageItem&param=8FAD2EC0-736E-4ED5-AD62-37A5CF8F10DD
+
+
+Allow User Abort [ OFF ]
+Set Error Capture [ ON ]
+
+Select Window [ Name: GetValue ( Variables::gWindowList; 1) ]
+Perform Script [ From list ; "Save Active Layout" ]
+
+Set Variable [ $chapter_id[1] ; Get(scriptParameter) ]
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+
+# ----------- SECURITY CHECKS ----------------------------------
+If [ notDeveloper ]
+	If [ Get(foundCount) = 0 ]
+		Show Custom Dialog [ Title: "Warning" ; Message: "Chapter does not exist" ; Default Button: "OK" ]
+		Exit Application
+	End If
+	
+	# Security check so external users cannot reach other clients programs
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $login_id[1] ; Case( 
+					
+					        PatternCount(Get(accountName); "@") > 0; 
+					        Replace ( Get(accountName) ; Position ( Get(accountName) ; "@" ; 0 ; 1 ) ; 1 ; "\@" );
+					        Get(accountName)
+					) ]
+	Go to Layout [ Layout: "TABLE User X Title" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+	If [ Get(foundCount) =0 ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+		Show Custom Dialog [ Title: "No access" ; Message: "Sorry. Your user does not seem to have access to this page." ; Default Button: "OK" ]
+		Exit Application
+	End If
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+End If
+# --------------- END SECURITY CHECKS ------------------------------------------
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+
+Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+Set Variable [ $$currentPackage[1] ; FAT Package::JSON Friendly id ]
+
+Go to Related Record [ Table: FAT Title ; Layout: "TABLE FAT Title" ; Show related ]
+Set Variable [ $$lp_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $$localisation_code[1] ; FAT Title::Original localisation code ]
+
+Go to Layout [ Layout: "FAT Chapter" ; Animation: None ]
+

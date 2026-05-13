@@ -1,0 +1,51 @@
+# Called from the Eye-icon button in portals
+# Decides if a Chapter, Page or Page item will be included in export or not
+# Update - also works on List items
+
+# itemType can be "Chapter", "Page", "Page item", "List" or "Page item list"
+Set Variable [ $itemType[1] ; GetScriptProperty("itemType") ]
+
+# Command can be "include" or "exclude"
+Set Variable [ $command[1] ; GetScriptProperty("command") ]
+
+
+// Open Transaction [ Skip auto-enter options: OFF ; Skip data entry validation: OFF ; Override ESS locking conflicts: OFF ]
+If [ $itemType = "Chapter" ]
+	Set Field [ FAT Chapter::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+	Set Field [ FAT Overview @ Chapter::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+	If [ FAT Chapter::Proxy type = "Page" ]
+		Set Field [ FAT Page::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+		Set Field [ FAT Overview @ Page::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+	End If
+Else If [ $itemType = "Page" ]
+	Set Field [ FAT Page::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+	Set Field [ FAT Overview @ Page::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+	If [ FAT Page::Proxy type = "page_item" ]
+		Set Field [ FAT Page item::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+		Set Field [ FAT Overview @ Page item::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+	End If
+Else If [ $itemType = "Page item" ]
+	Set Field [ FAT Page item::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+	Set Field [ FAT Overview @ Page item::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+	# Fix the proxy page
+	If [ FAT Package::Package type id = "5F127BA8-1BC7-467B-93EF-7BE401615BAA" // Slide ]
+		Set Field [ FAT Page::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+		Set Field [ FAT Overview @ Page::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+	End If
+Else If [ $itemType = "Page item 2" ]
+	Set Field [ FAT Page item 2::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+	Set Field [ FAT Overview @ Page item 2::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+Else If [ $itemType = "List" ]
+	Set Field [ FAT List item::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+Else If [ $itemType = "Page item list" ]
+	Set Field [ FAT List item @ Page item::Include in export ; Case ( $command = "exclude" ; 0; 1) ]
+Else If [ $itemType = "IO" ]
+	Set Field [ FAT IO::Insight visible ; Case ( $command = "exclude" ; 0; 1) ]
+End If
+Set Variable [ $error[1] ; Get(lastError) ]
+// Revert Transaction [ Condition: $error ≠ 0 ; ErrorCode: 5000 ]
+// Commit Transaction
+If [ Get(lastError)=5000 ]
+	Show Custom Dialog [ Title: "Error" ; Message: "The include/exclude operation could not be performed. Perhaps the record is in use by another user.   Details: " & Get(lastErrorDetail) & ", " & Get(LastErrorLocation) ; Default Button: "OK" ]
+End If
+

@@ -1,0 +1,103 @@
+# Called from Localisation portal in Title Settings
+
+Show Custom Dialog [ Title: "Delete language version" ; Message: "Deleting the language version means that all translated texts in this language in all connected packages will be deleted and cannot be recovered. ¶¶Are you sure you want to delete the language?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice)=1 ]
+	Freeze Window
+	Set Field [ FAT Title::gCurrentLocalisationCode ; "" ]
+	Set Error Capture [ ON ]
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $localisation_code[1] ; FAT Localisation::Localisation code ]
+	Set Variable [ $title_localisation_id[1] ; FAT Localisation::PrimaryKey ]
+	
+	# Behöver kolla att man raderar text + media för varje package localisation - om man har raderat 
+	
+	# Find existing Packages localisations connected to this Title localisation - but do not count SHARED texts
+	Set Variable [ $num_of_packages[1] ; Count ( FAT Package::PrimaryKey) ]
+	Set Variable [ $num_of_existing_package_localisations[1] ; Count ( FAT Localisation @ Title::Package id ) ]
+	
+	If [ $num_of_existing_package_localisations =  $num_of_packages ]
+		# If all package localisations are connected to this title localisation
+		
+		# Delete the Title localisation
+		Delete Portal Row [ With dialog: OFF ]
+		
+		# Delete all texts with this localisation code
+		Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Delete All Records [ With dialog: OFF ]
+		End If
+		
+		# Delete all media with this localisation code
+		Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Delete All Records [ With dialog: OFF ]
+		End If
+		
+		# Delete all localisations using this localisation as their Title localisation
+		Go to Layout [ Layout: "TABLE FAT Localisation" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Delete All Records [ With dialog: OFF ]
+		End If
+		
+	Else If [ $num_of_existing_package_localisations > 0 And $num_of_packages > 0 ]
+		# If it exists package localisations that are NOT connected to this title localisation
+		# Get a list of all package_ids that are connected to the tilte localisation
+		
+		Set Variable [ $existing_package_localisations_list[1] ; List ( FAT Localisation @ Title::Package id ) ]
+		Delete Portal Row [ With dialog: OFF ]
+		
+		Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+		Loop [ Flush: Always ]
+			Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+			If [ PatternCount ( $existing_package_localisations_list ; $package_id) ]
+				
+				# Delete texts with this localisation code only for selected package id
+				Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)>0 ]
+					Delete All Records [ With dialog: OFF ]
+				End If
+				
+				# Delete media with this localisation code only for selected package id
+				Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)>0 ]
+					Delete All Records [ With dialog: OFF ]
+				End If
+				
+				# Delete all package localisations using this localisation as their Title localisation
+				Go to Layout [ Layout: "TABLE FAT Localisation" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)>0 ]
+					Delete Record/Request [ With dialog: OFF ]
+				End If
+				
+				# PAtrik fick ett fel 2024-04-22 där han hade kvar Shared text localisation och den syns itne i portalen eftersom den filreras bort.
+				  Förhoppningsvis fixar dessa rader nedan detta problem
+				# Check if shared localisation is the only loclaisation left
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)=1 ]
+					Delete Record/Request [ With dialog: OFF ]
+					# Delete all texts with this localisation code
+					Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+					Perform Find [ ⚠️ RESTORE ⚠️ ]
+					If [ Get(foundCount)>0 ]
+						Delete All Records [ With dialog: OFF ]
+					End If
+				End If
+				
+				
+			End If
+			Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+		
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+

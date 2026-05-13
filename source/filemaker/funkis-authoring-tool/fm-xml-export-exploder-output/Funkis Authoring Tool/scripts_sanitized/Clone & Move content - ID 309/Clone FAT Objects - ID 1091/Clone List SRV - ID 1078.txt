@@ -1,0 +1,269 @@
+# Called from Clone List CL
+# Called from Clone Tag
+# Called from Clone PageItem SRV
+# Called from Clone IO SRV
+
+# SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+  SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+  SetProperty ( "clone_settings" ; $clone_settings ) &
+  SetProperty ( "suffix" ; $suffix ) &
+  SetProperty ( "object_group_id" ; $object_group_id ) &
+  SetProperty ( "old_list_id" ; $old_list_id ) & 
+  SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "old_tt_id" ; $old_tt_id )
+
+# If old_tt_id is empty - it means that we duplicate the list inside the title. 
+  In that case - suffix is used for renaming
+
+# If the whole Title is cloned we need to point to new Blocks, Modifiers, Lists, Links, Score Categories, IOs, Tags etc
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $clone_settings[1] ; GetScriptProperty ( "clone_settings" ) ]
+# Suffix is only needed when duplicating inside a Title
+Set Variable [ $suffix[1] ; GetScriptProperty ( "suffix") ]
+Set Variable [ $object_group_id[1] ; GetScriptProperty ( "object_group_id" ) ]
+
+# old_list_id is the List id that we will clone
+Set Variable [ $old_list_id[1] ; GetScriptProperty ( "old_list_id" ) ]
+# old_tt_id can be empty - when duplicated inside a Title.
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+# new_tt_id gets the current Title id if not explicitly set
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+
+Set Error Capture [ ON ]
+Freeze Window
+
+Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+# Find old_list_id in FAT List
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $new_name[1] ; TruncateText ( Case ( Not IsEmpty($suffix); FAT List::Name & " " & $suffix ;  FAT List::Name) ; 29 ) // with "..." = 32 characters ]
+Set Variable [ $usage_type[1] ; FAT List::Usage type ]
+
+# Connect to new Object group if any
+If [ $isClonedTitle And Not IsEmpty ( FAT List::Object Group) ]
+	Set Variable [ $old_ogr_id[1] ; FAT List::Object Group ]
+	Go to Layout [ Layout: "TABLE FAT Object Group" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $new_ogr_id[1] ; FAT Object Group::PrimaryKey ]
+	Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+Else If [ $object_group_id ≠ "" ]
+	# If cloning a Package group - a new object group is created
+	Set Variable [ $new_ogr_id[1] ; $object_group_id ]
+End If
+
+# Duplicate Lists - preparing for Page items, IOs and Tags to link via Old PrimaryKey from clone
+
+Duplicate Record/Request
+
+Set Field [ FAT List::Old PrimaryKey from clone ; $old_list_id ]
+Set Field [ FAT List::Title id ; $title_id ]
+Set Field [ FAT List::Usage type ; $usage_type ]
+
+# Set a valid object name - no duplicates allowed in same title, not exceeding number of characters
+Perform Script [ From list ; "Set valid object name" ; Parameter: SetProperty ( "source_textfield" ; GetFieldName ( FAT List::Name ) ) &
+				SetProperty ( "new_name" ; $new_name ) &
+				SetProperty ( "max_characters" ; 32 ) ]
+
+Set Variable [ $new_list_id[1] ; FAT List::PrimaryKey ]
+
+If [ $new_ogr_id ≠ "" ]
+	Set Field [ FAT List::Object Group ; $new_ogr_id ]
+End If
+# Duplicate modifiers
+If [ List template::List has modifiers ]
+	Perform Script [ From list ; "Clone ModifierValue" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) & 
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+					SetProperty ( "old_item_id" ; $old_list_id ) & 
+					SetProperty ( "new_item_id" ; $new_list_id ) &
+					SetProperty ( "suffix" ; $suffix) &
+					SetProperty ( "old_tt_id" ; $old_tt_id ) &
+					SetProperty ( "title_id" ; $title_id ) ]
+	Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+End If
+
+# Duplicate list items
+Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	
+	Set Variable [ $foundCount_LI[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn_LI[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	
+	Loop [ Flush: Always ]
+		
+		# List item loop
+		Set Variable [ $old_li_id[1] ; FAT List item::PrimaryKey ]
+		Set Variable [ $li_text1[1] ; TF LI 1::Text ]
+		Set Variable [ $li_text2[1] ; TF LI 2::Text ]
+		Set Variable [ $li_text3[1] ; TF LI 3::Text ]
+		Set Variable [ $li_media1[1] ; Media LI 1::Media container ]
+		Set Variable [ $li_media2[1] ; Media LI 2::Media container ]
+		
+		Duplicate Record/Request
+		
+		# Save the current found set - used to recreate later
+		Set Variable [ $current_found_set[1] ; FAT List item::List of List items ]
+		Set Variable [ $record_num[1] ; Get(recordNumber) ]
+		
+		Set Field [ FAT List item::Parent id ; $new_list_id ]
+		Set Field [ FAT List item::Old PrimaryKey from clone ; $old_li_id ]
+		
+		Set Variable [ $recordPosn_LI[1] ; $recordPosn_LI  + 1 ]
+		Set Variable [ $new_li_id[1] ; FAT List item::PrimaryKey ]
+		
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_li_id ) &
+						SetProperty ( "source_table" ; "list-item" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item::Text 1 id ) ) &
+						SetProperty ( "learningprogramme_id" ; $title_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF LI 1::Text ; $li_text1 ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_li_id ) &
+						SetProperty ( "source_table" ; "list-item" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item::Text 2 id ) ) &
+						SetProperty ( "learningprogramme_id" ; $title_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF LI 2::Text ; $li_text2 ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_li_id ) &
+						SetProperty ( "source_table" ; "list-item" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item::Text 3 id ) ) &
+						SetProperty ( "learningprogramme_id" ; $title_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF LI 3::Text ; $li_text3 ]
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $new_li_id ) &
+						SetProperty ( "source_table" ; "list-item" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT List item::Media 1 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) ]
+		Set Field [ Media LI 1::Media container ; $li_media1 ]
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $new_li_id ) &
+						SetProperty ( "source_table" ; "list-item" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT List item::Media 2 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) ]
+		Set Field [ Media LI 2::Media container ; $li_media2 ]
+		
+		If [ FAT List::Usage type ≠ "Tag filter" ]
+			# A Tag filter list cannot have tags on list items + it corrupts the script sequence when cloning
+			Perform Script [ From list ; "Clone Tag values" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) & 
+							SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+							SetProperty ( "object_group_id" ; $object_group_id ) &
+							SetProperty ( "old_item_id" ; $old_li_id ) & 
+							SetProperty ( "new_item_id" ; $new_li_id ) & 
+							SetProperty ( "title_id" ; $title_id ) ]
+		End If
+		
+		# Recreate score values
+		Perform Script [ From list ; "Clone Score values" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+						SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+						SetProperty ( "clone_settings" ; $clone_settings ) &
+						SetProperty ( "clone_level" ; $clone_level ) &
+						SetProperty ( "suffix" ; $suffix ) &
+						SetProperty ( "object_group_id" ; $object_group_id ) &
+						SetProperty ( "old_tt_id" ; $old_tt_id ) & 
+						SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "old_item_id" ; $old_li_id ) & 
+						SetProperty ( "new_item_id" ; $new_li_id ) ]
+		
+		# Make sure to recreate the found set and go to right record
+		Perform Script [ From list ; "Recreate List item found set" ; Parameter: SetProperty ( "current_found_set" ; $current_found_set ) &
+						SetProperty ( "record_num" ; $record_num ) ]
+		
+		# List item values of type Link, Package id, Chapter id or Page id will be replaced as the last step in the clone process.
+		
+		If [ List template::Value 1 type = "IO" And Not IsEmpty (FAT List item::Value 1) And (PatternCount ( $clone_settings ; "IO" ) Or $isClonedTitle) ]
+			# Value type IO  - clone check
+			Set Variable [ $old_io_id[1] ; FAT List item::Value 1 ]
+			# Using a unique TO since this script also can be called from Clone IO
+			Go to Layout [ Layout: "TABLE FAT IO @ List item" ; Animation: None ]
+			# Search for IO in oldPrimary if it is created earlier in clone process
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 0 ]
+				Perform Script [ From list ; "Clone IO SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+								SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+								SetProperty ( "clone_level" ; $clone_level ) &
+								SetProperty ( "clone_settings" ; $clone_settings ) &
+								SetProperty ( "object_group_id" ; $object_group_id ) &
+								SetProperty ( "old_tt_id" ; $old_tt_id ) &
+								SetProperty ( "title_id" ; $title_id ) &
+								SetProperty ( "suffix" ; $suffix) &
+								SetProperty ( "old_io_id" ; $old_io_id) ]
+				Set Variable [ $new_io_id[1] ; Get(ScriptResult) ]
+			Else
+				Set Variable [ $new_io_id[1] ; FAT IO @ List Item::PrimaryKey ]
+			End If
+			
+			# Make sure to recreate the found set and go to right record
+			Perform Script [ From list ; "Recreate List item found set" ; Parameter: SetProperty ( "current_found_set" ; $current_found_set ) &
+							SetProperty ( "record_num" ; $record_num ) ]
+			
+			Set Field [ FAT List item::Value 1 ; $new_io_id ]
+		End If
+		
+		Exit Loop If [ $recordPosn_LI > $foundCount_LI ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn_LI ]
+		# ---- End List item Loop
+	End Loop
+End If
+
+Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+If [ $isClonedTitle And Not IsEmpty (FAT List::List of Lists) ]
+	# Point to the new List Group created earlier in Make an empty copy
+	Set Variable [ $old_list_group_id[1] ; FAT List::List of Lists ]
+	Go to Layout [ Layout: "TABLE FAT List of Lists" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $new_list_group_id[1] ; FAT List of Lists::PrimaryKey ]
+	Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+	Set Field [ FAT List::List of Lists ; $new_list_group_id ]
+End If
+
+# Managing Dynamic Lists
+If [ $isClonedTitle And Not IsEmpty (FAT List::Dynamic List IO id) ]
+	Set Variable [ $old_dynamic_list_io_id[1] ; FAT List::Dynamic List IO id ]
+	Set Variable [ $old_dynamic_list_text_1_field_id[1] ; FAT List::Dynamic List Text 1 Field id ]
+	Set Variable [ $old_dynamic_list_text_2_field_id[1] ; FAT List::Dynamic List Text 2 Field id ]
+	Set Variable [ $old_dynamic_list_text_3_field_id[1] ; FAT List::Dynamic List Text 3 Field id ]
+	
+	# Find the new Dynamic List IO created earlier (hopefully!)
+	Go to Layout [ Layout: "TABLE FAT IO Alt" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)= 1 ]
+		Set Variable [ $new_dynamic_list_io_id[1] ; FAT IO Alt::PrimaryKey ]
+	End If
+	# Find the new Dynamic List Fields created earlier (hopefully!)
+	Go to Layout [ Layout: "TABLE FAT IO Field Alt" ; Animation: None ]
+	# Field 1
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)= 1 ]
+		Set Variable [ $new_dynamic_list_text_1_field_id[1] ; FAT IO Field Alt::PrimaryKey ]
+	End If
+	# Field 2
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)= 1 ]
+		Set Variable [ $new_dynamic_list_text_2_field_id[1] ; FAT IO Field Alt::PrimaryKey ]
+	End If
+	# Field 3
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)= 1 ]
+		Set Variable [ $new_dynamic_list_text_3_field_id[1] ; FAT IO Field Alt::PrimaryKey ]
+	End If
+	# Point to the new ids 
+	Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+	Set Field [ FAT List::Dynamic List IO id ; $new_dynamic_list_io_id ]
+	Set Field [ FAT List::Dynamic List Text 1 Field id ; $new_dynamic_list_text_1_field_id ]
+	Set Field [ FAT List::Dynamic List Text 2 Field id ; $new_dynamic_list_text_2_field_id ]
+	Set Field [ FAT List::Dynamic List Text 3 Field id ; $new_dynamic_list_text_3_field_id ]
+	
+	# Not managing Filter and Sort yet
+	
+	
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Exit Script [ $new_list_id ]
+
+
+

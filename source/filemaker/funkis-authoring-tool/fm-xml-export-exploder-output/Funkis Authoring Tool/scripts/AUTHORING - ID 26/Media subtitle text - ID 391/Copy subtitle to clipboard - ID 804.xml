@@ -1,0 +1,313 @@
+<Script>
+	<ScriptReference id="804" name="Copy subtitle to clipboard"></ScriptReference>
+	<ObjectList membercount="23">
+		<Step hash="11E28288B5C914427ABE78D3E2538E21" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Launched from a button in Media Subtitle Layout"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="75CFB4DD16F9556A8C9508A051389D8C" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="EC2E6239499825B1B457FB2DD72B5B3E" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AE007BECF7E9DB07251863233C4855BF" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8EB89DEE98338145702CBB0B087B8665" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Media::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$media_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F01CD78F1D6F015A93E1E5D56F74C2CB" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="64" name="TABLE FAT Text"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="ADFCA419F274C994BBA123D399A483F2" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="2" action="find">
+							<find criteria="$media_id">
+								<FieldReference id="8" name="Parent id">
+									<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$$localisation_code">
+								<FieldReference id="22" name="Localisation code">
+									<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2D5FBEEC28F35F75582CE52654796A89" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3DA8FCF3FEBDEBB646B346399BD57325" id="39" name="Sort Records" enable="True">
+			<Options>33587328</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Restore">
+					<Restore value="True"></Restore>
+				</Parameter>
+				<Parameter type="SortSpecification">
+					<SortSpecification value="True" maintain="True">
+						<SortList membercount="1">
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="35" name="Enter time">
+										<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+						</SortList>
+					</SortSpecification>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="16CC3170D5B8A608859EF584BC5782BC" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="First" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2AD23B1E5B4CB20D950CB636753F7CCF" id="71" name="Loop" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="465F1FB4D099B0BE4CAF54C7A9EE5F11" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$text & " " & Substitute ( FAT Text::Text  ; ¶ ; " " )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FCCFCCD3E4360C08A5111D585A9BA1A8" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>8194</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="True"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3FE0BF5E2C056BCC48A5E3A29293A0B1" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="77050E27CF8D16AFB27FF312FFD5D114" id="76" name="Set Field" breakpoint="True" enable="True">
+			<Options>1064961</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="17" name="gSearchText">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$text]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="186E793600F6C2500E416A307EC6E9CF" id="75" name="Commit Records/Requests" enable="True">
+			<Options>128</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="Skip data entry validation" id="256" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Force Commit" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="69EEB0E852B5840EBDFDA1780137B943" id="47" name="Copy" enable="True">
+			<Options>4097</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="Boolean">
+					<Boolean type="Select" id="4096" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="17" name="gSearchText">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FCABB7878BD5EE6D9444E7CD6BF409EB" id="6" name="Go to Layout" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A76055B6464ED0F9E87D2FD3B8C14098" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Subtitles copied"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["All subtitles to this media is now successfully copied to your clipboard. "]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="13B10EAB4832CBF955630B993DB2128B" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="E530A25428AC2BF41E02CEF45EDC153A" id="6" name="Go to Layout" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AEA3E2885F37FECF472CD807B5DB6F8B" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["No subtitles found"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["Sorry, there's no subtitles found for this media. "]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C453EF4A39E35C069E22BBF1F92B3109" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

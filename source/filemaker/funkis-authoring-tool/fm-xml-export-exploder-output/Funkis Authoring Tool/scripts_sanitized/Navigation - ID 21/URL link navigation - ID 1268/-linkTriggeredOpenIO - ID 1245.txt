@@ -1,0 +1,50 @@
+# Called from Insepctor in a title, i.e. fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenTitle&param=628039FB-04CE-4EF7-8578-CFBE99519784
+// Set Variable [ $title_id[1] ; Get(scriptParameter) ]
+Set Variable [ $fat_io_id[1] ; Get(scriptParameter) ]
+
+Allow User Abort [ OFF ]
+Freeze Window
+Set Error Capture [ ON ]
+
+Select Window [ Name: GetValue ( Variables::gWindowList; 1) ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Go to Layout [ Layout: "FAT IO" ; Animation: None ]
+// Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get ( foundCount ) = 0 ]
+	Show Custom Dialog [ Title: "Warning" ; Message: "IO not found" ; Default Button: "OK" ; Button 2: "Cancel" ]
+End If
+
+// # Find IO title? 
+
+# ----------- SECURITY CHECKS ----------------------------------
+If [ notDeveloper ]
+	If [ Get(foundCount) = 0 ]
+		Show Custom Dialog [ Title: "Warning" ; Message: "Title does not exist" ; Default Button: "OK" ]
+		Exit Application
+	End If
+	
+	# Security check so external users cannot reach other clients programs
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $login_id[1] ; Case( 
+					
+					        PatternCount(Get(accountName); "@") > 0; 
+					        Replace ( Get(accountName) ; Position ( Get(accountName) ; "@" ; 0 ; 1 ) ; 1 ; "\@" );
+					        Get(accountName)
+					) ]
+	Go to Layout [ Layout: "TABLE User X Title" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+	If [ Get(foundCount) =0 ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+		Show Custom Dialog [ Title: "No access" ; Message: "Sorry. Your user does not seem to have access to this page item." ; Default Button: "OK" ]
+		Exit Application
+	End If
+End If
+# --------------- END SECURITY CHECKS ------------------------------------------
+
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+
+Set Variable [ $$lp_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $$localisation_code[1] ; FAT Title::Original localisation code ]
+

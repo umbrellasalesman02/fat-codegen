@@ -1,0 +1,34 @@
+# Called from Start Title Machine Translation
+# Returns True if texts changed in any package in Title or in a specific package
+Freeze Window
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $original_localisation_code[1] ; GetScriptProperty ( "original_localisation_code" ) ]
+Set Variable [ $last_sorted_timestamp[1] ; Case (
+				   
+				   GetScriptProperty ( "last_sorted_timestamp" ) = ""; 
+				
+				   GetAsTimeStamp ( "2000-01-01" ) ;
+				
+				   GetAsTimeStamp ( GetScriptProperty ( "last_sorted_timestamp" ) )
+				) ]
+
+# First check when the last new text was added to this Title.
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Go to Record/Request/Page [ Last ]
+Set Variable [ $last_original_textfield_creation_timestamp[1] ; FAT Text::CreationTimestamp ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+If [ $last_sorted_timestamp > $last_original_textfield_creation_timestamp ]
+	# No new texts are added in Title / Package since last sorting
+	Exit Script [ SetProperty ( "new_arrange_needed"; 0) &
+					SetProperty ( "last_original_textfield_creation_timestamp" ; $last_original_textfield_creation_timestamp ) ]
+Else
+	# New texts have been added in Title / Package since last sorting
+	Exit Script [ SetProperty ( "new_arrange_needed"; 1) &
+					SetProperty ( "last_original_textfield_creation_timestamp" ; $last_original_textfield_creation_timestamp ) ]
+End If
+

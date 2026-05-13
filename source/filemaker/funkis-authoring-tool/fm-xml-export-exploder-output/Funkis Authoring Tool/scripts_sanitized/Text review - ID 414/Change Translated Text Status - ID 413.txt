@@ -1,0 +1,33 @@
+# Called when user clicks the 4 colored status buttons
+# Has been several attempts to be improved - especially for WebDirect
+
+Set Variable [ $newStatus[1] ; Get(scriptParameter) ]
+Set Variable [ $recordNumRef[1] ; FAT Text translated::RecordNumberReference ]
+
+# Text status can be:
+  1. Not translated
+  2. Sent to API (only asynchronous machine translation)
+  3. Not reviewed
+  4. In progress
+  5. Approved
+
+Set Field [ FAT Text translated::Status ; $newStatus ]
+Commit Records/Requests [ With dialog: OFF ]
+
+
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+
+// Perform Script [ From list ; "Refresh Localisation status SRV" ; Parameter: SetProperty ( "mode" ; "Title" ) &
+				SetProperty ( "title_id" ; FAT Text translated::Title id ) &
+				SetProperty ( "localisation_code" ; FAT Text translated::Localisation code ) ]
+
+
+# Refresh indicators
+Refresh Object [ Name: "Black" ]
+Refresh Object [ Name: "Red" ]
+Refresh Object [ Name: "Yellow" ]
+Refresh Object [ Name: "Green" ]
+
+
+Go to Field [ FAT Text translated::Text ]
+

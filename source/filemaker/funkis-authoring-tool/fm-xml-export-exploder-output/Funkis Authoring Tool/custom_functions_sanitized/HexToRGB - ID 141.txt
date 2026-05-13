@@ -1,0 +1,28 @@
+/* 
+--------------------------
+9/13/2004 1.0
+me@jsmall.us
+
+Returns an integer that represents a color obtained by converting standard 6 character hexadecimal input.
+If you pass any value to the RGorB param other than "R" or "G" or "B" the function will return the full spectrum decimal value.
+The RGorB parameter is a switch modifies the calculation to return only the red, green or blue decimal value of Hex.
+
+Hex =  Hexadecimal input. Handles inputs containing leading/trailing spaces and/or # symbol.
+
+RGorB = Switch that determines the spectrum of output ( "R" = red; "G" = green; "B" = Blue; "RGB" or "0" or [not null] = RGB ).
+
+--------------------------
+*/
+
+Let ( 
+
+  [ Boolean = Case ( RGorB = "B" ; 1 ; RGorB = "G" ; 1 ; RGorB = "R" ; 1 ; 0 ) ;
+  Spectrum = Case ( RGorB = "B" ; 5 ; RGorB = "G" ; 3 ; 1 ) ;
+  CleanHex = Trim ( Substitute ( Hex ; "#" ; "" ) ) ;
+  HexInput = If ( Boolean = 1 ; Middle ( CleanHex ; Spectrum ; 2 ) ; CleanHex ) ;
+  Character = Right ( HexInput ; 1 ) ;
+  Length = Length ( HexInput ) ] ;
+
+( Position ( "0123456789ABCDEF" ; Character ; 1 ; 1 ) - 1 ) + If ( Length  >  1 ; 16 * HexToRGB ( Left ( HexInput ; Length - 1 ) ; 0 ) )
+
+)

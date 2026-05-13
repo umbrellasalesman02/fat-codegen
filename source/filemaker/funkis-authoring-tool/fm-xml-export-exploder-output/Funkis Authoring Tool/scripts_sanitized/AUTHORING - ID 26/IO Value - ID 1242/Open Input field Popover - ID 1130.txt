@@ -1,0 +1,31 @@
+# Called from a settings-button in IO value portal in IO Page item setting.
+# Called from a settings-button in Text variable portal in IO Card.
+
+Set Variable [ $type[1] ; GetScriptProperty ( "type" ) ]
+Set Variable [ $parent_id[1] ; GetScriptProperty ( "parent_id" ) ]
+
+
+If [ $type = "Text variable" ]
+	If [ FAT IO::gCurrentTextVariable ≠ $parent_id ]
+		Install OnTimer Script
+		Go to Object [ "TextVars" ; Repetition: 1 ]
+		Set Field [ FAT IO::gCurrentTextVariable ; $parent_id ]
+		Commit Records/Requests [ With dialog: OFF ]
+		Go to Object [ "Input field settings popover" ; Repetition: 1 ]
+	Else
+		Close Popover
+	End If
+Else If [ $type = "Page item" ]
+	If [ FAT Page item::gCurrentIOValue ≠ $parent_id ]
+		Install OnTimer Script
+		Set Field [ FAT Page item::gCurrentIOValue ; $parent_id ]
+		Commit Records/Requests [ With dialog: OFF ]
+		Go to Object [ "Input field settings popover" ; Repetition: 1 ]
+	Else
+		Close Popover
+	End If
+End If
+
+
+
+

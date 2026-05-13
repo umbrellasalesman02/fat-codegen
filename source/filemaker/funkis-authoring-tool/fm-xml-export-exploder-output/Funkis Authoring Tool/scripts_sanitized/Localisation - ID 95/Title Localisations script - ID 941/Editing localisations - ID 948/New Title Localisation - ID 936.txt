@@ -1,0 +1,69 @@
+# Called from Localisation tab in Title Settings
+# Written 20231113
+
+Set Error Capture [ ON ]
+Freeze Window
+
+
+# -------------- Reminders and information before the first localisation ------------------------------------
+If [ Count ( FAT Localisation::PrimaryKey ) = 0 ]
+	# When adding the very first language - a 
+	Show Custom Dialog [ Title: "Important reminder - remove unused block" ; Message: "You are about to add your first localisation to this Title. Please remove all unused blocks before starting the localisation to get rid of all unnecessary texts.¶¶
+					You can do it under the tab Tools." ; Default Button: "OK" ]
+	Show Custom Dialog [ Title: "Protect words from not being translated" ; Message: "If you have expressions or words that you don't want to be translated to each language - for example a brand name or similar - please mark the word and press the NT-button to add <span translate=\"no\"> and </span translate=\"no\"> around those words" ; Default Button: "OK" ]
+End If
+
+# -------------- Set variables needed for creating localisation ------------------------------------
+Set Variable [ $org_localisation_code[1] ; FAT Title::Original localisation code ]
+Set Variable [ $localisation_code[1] ; FAT Title::gSelectedLocalisation ]
+Set Variable [ $translation_method[1] ; FAT Title::gTranslationMethod ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+
+# -------------- Check if a Title localisation already exist ------------------------------------
+Go to Layout [ Layout: "TABLE FAT Localisation" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 Or $localisation_code = $org_localisation_code ]
+	# Check if language already added. FAT cannot handle double localisations using same localisation_code
+	Show Custom Dialog [ Title: "Language already added" ; Message: "This language is already added. You cannot add an existing language to the Title." ; Default Button: "OK" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+Else
+	# -------------- Create the new title localisation ------------------------------------
+	Set Variable [ $localisation_stage[1] ; 1 ]
+	New Record/Request
+	Set Field [ FAT Localisation::Title id ; $title_id ]
+	Set Field [ FAT Localisation::Original Localisation code ; $org_localisation_code ]
+	Set Field [ FAT Localisation::Localisation code ; $localisation_code ]
+	Set Field [ FAT Localisation::Translation method ; $translation_method ]
+	Set Field [ FAT Localisation::Localisation stage ; $localisation_stage ]
+	
+	# ------------------ Add event to log ---------------------------------------------------
+	Set Variable [ $title_localisation_id[1] ; FAT Localisation::PrimaryKey ]
+	Set Variable [ $event_text[1] ; "Language " & $localisation_code & " added for " & $translation_method & "." ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+	# ---------------- Create a localisation that monitors shared texts in title -------------
+	New Record/Request
+	Set Field [ FAT Localisation::Title id ; $title_id ]
+	Set Field [ FAT Localisation::Original Localisation code ; $org_localisation_code ]
+	Set Field [ FAT Localisation::Localisation code ; $localisation_code ]
+	Set Field [ FAT Localisation::Translation method ; $translation_method ]
+	Set Field [ FAT Localisation::Localisation stage ; $localisation_stage ]
+	Set Field [ FAT Localisation::Shared text localisation ; True ]
+	Set Field [ FAT Localisation::Title localisation id ; $title_localisation_id ]
+	Set Variable [ $shared_text_localisation_id[1] ; FAT Localisation::PrimaryKey ]
+	
+	# Go back to the title localisation and add the id of the shared text localisation
+	Go to Record/Request/Page [ Previous ; Exit after last: OFF ]
+	Set Field [ FAT Localisation::Shared text localisation id ; $shared_text_localisation_id ]
+	
+	# --------------------- Add all package localisations as children to this title localisation ---------------------------
+	Perform Script [ From list ; "Add Package localisations to Title" ; Parameter: SetProperty ( "title_id" ; $title_id ) & 
+					SetProperty ( "title_localisation_id" ; $title_localisation_id ) & 
+					SetProperty ( "localisation_code" ; $localisation_code ) ]
+	
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+End If
+

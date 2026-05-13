@@ -1,0 +1,44 @@
+# This script is called from script Publish Remote CL when updating code or creating a delivery
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $package_type[1] ; GetScriptProperty ( "package_type" ) ]
+
+Set Variable [ $version_string[1] ; GetScriptProperty ( "funkisCodeBaseVersion" ) ]
+
+Set Variable [ $incompatible_blocks[1] ; "" ]
+
+
+If [ $version_string ≠ "" ]
+	# Find all blocks in this title that are based on a block template, using the current package type and are used at least once in title.
+	Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Loop [ Flush: Always ]
+			# Set blockStartVersion = version_string if empty -> OK to build
+			Set Variable [ $blockStartVersion[1] ; Case ( IsEmpty ( Codebase Version @ Blocktemplate Introduced::Version string ); $version_string ; Codebase Version @ Blocktemplate Introduced::Version string) ]
+			# Set blockEndVersion = version_string if empty -> OK to build
+			Set Variable [ $blockEndVersion[1] ; Case ( IsEmpty ( Codebase Version @ Blocktemplate Deprecated::Version string ); $version_string & "1" ; Codebase Version @ Blocktemplate Deprecated::Version string) ]
+			# // Version comparison 1: version must be bigger or equal to blockStartVersion
+			  // Version comparison 2: version must be smaller than blockEndVersion
+			If [ versionComparison ( $version_string ; $blockStartVersion; True ) And versionComparison ( $blockEndVersion ; $version_string; False ) ]
+				# Block is OK to build with this codebase version
+			Else
+				# The block is deprecated or not introduced for this codebase version
+				Set Variable [ $incompatible_blocks[1] ; $incompatible_blocks & BlockTemplate::Name & "¶" ]
+			End If
+			Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+End If
+
+# Return empty string if no incompatible blocks
+Exit Script [ $incompatible_blocks ]
+
+
+
+

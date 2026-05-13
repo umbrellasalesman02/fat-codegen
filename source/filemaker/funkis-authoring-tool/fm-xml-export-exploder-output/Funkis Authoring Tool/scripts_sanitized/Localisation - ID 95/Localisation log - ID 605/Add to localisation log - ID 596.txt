@@ -1,0 +1,25 @@
+# This script is called from many locations - updating the localisation event log with all actions
+
+Freeze Window
+Set Variable [ $localisation_id[1] ; GetScriptProperty ( "localisation_id" ) ]
+Set Variable [ $event_text[1] ; GetScriptProperty ( "event_text" ) ]
+Set Variable [ $localisation_stage[1] ; GetScriptProperty ( "localisation_stage" ) ]
+
+If [ IsEmpty ( $localisation_stage) ]
+	Go to Layout [ Layout: "TABLE FAT Localisation @ Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $localisation_stage[1] ; FAT Localisation @ Package::Localisation stage ]
+End If
+
+Go to Layout [ Layout: "TABLE FAT Localisation Log" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Localisation Log @ Package::Localisation id ; $localisation_id ]
+Set Field [ FAT Localisation Log @ Package::Event ; $event_text ]
+Set Field [ FAT Localisation Log @ Package::Localisation stage ; $localisation_stage ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+If [ Not isPSOS ]
+	Go to Object [ "Event log" ; Repetition: 1 ]
+End If
+

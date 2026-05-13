@@ -1,0 +1,159 @@
+# This translation flow is designed for Title Translations
+# Script is called from Import text button in Title Localisation Card Window when translation method = "Human"
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+
+Set Variable [ $title_localisation_id[1] ; FAT Localisation::PrimaryKey ]
+Set Variable [ $localisation_stage[1] ; FAT Localisation::Localisation stage ]
+Set Variable [ $localisation_stage_name[1] ; Translation stage @ Title::Translation stage name ]
+Set Variable [ $title_id[1] ; FAT Localisation::Title id ]
+Set Variable [ $localisation_code[1] ; FAT Localisation::Localisation code ]
+Set Variable [ $text_status[1] ; "In progress" ]
+Set Variable [ $translation_provider[1] ; FAT Localisation::Translation provider ]
+
+Set Variable [ $language_code[1] ; getLanguageCode ( $localisation_code ) ]
+Set Variable [ $country_code[1] ; getCountryCode ( $localisation_code ) ]
+
+Show Custom Dialog [ Title: "Import text" ; Message: "You are about to import texts to this localisation. Your current localisation stage are: " & $localisation_stage_name & ". This means that all imported texts will be labelled \"" & $text_status & "\".¶¶
+				
+				All texts with review status = Approved will not be altered during import. ¶¶
+				
+				Click OK to move on or Cancel to change the localisation stage before importing texts.  " ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+Freeze Window
+Set Error Capture [ ON ]
+
+# --------------------------- Select the translated text file to import -------------------------------------------------
+# NOTE!   The script step below works ONLY if the field is present on the current layout!!!!
+Set Field [ FAT Title::Latest Imported File ; "" ]
+Commit Records/Requests [ With dialog: OFF ]
+Insert File [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ; Target: FAT Title::Latest Imported File ]
+If [ Get(lastError) = 1 ]
+	Exit Script []
+End If
+
+Commit Records/Requests [ With dialog: OFF ]
+Set Variable [ $filename[1] ; GetContainerAttribute ( FAT Title::Latest Imported File ; "filename" ) ]
+
+# ------------------ Make sure the selected file have the right localisation code -----------------------------------
+
+If [ Not PatternCount ( $filename ; $localisation_code & ".json" )
+				
+				And 
+				
+				Not PatternCount ( $filename ; $language_code & "_" & $country_code & ".json" ) ]
+	# The text file does NOT have the correct langugage suffix
+	Show Custom Dialog [ Title: "The selected file does not seem correctly named." ; Message: "The file should have a suffix and an extension as: " & $localisation_code & ".json.¶¶
+					Please select another file." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+Set Variable [ $file_id[1] ; Left ( $filename ; Position ( $filename ; $localisation_code & ".json" ; 0 ; 1 )-1) ]
+# Just validate the JSON - but do not SEND as a script parameter - FileMaker limits script parameters to 1.000.000 characters.
+Set Variable [ $translationJSON[1] ; TextDecode ( FAT Title::Latest Imported File ; "utf-8" ) ]
+
+# ------------------ Make sure the selected file is a proper JSON -----------------------------------
+If [ $translationJSON = "?" ]
+	# Content in file is NOT a valid JSON
+	Show Custom Dialog [ Title: "Cannot parse content in file" ; Message: "Sorry but the content in the selected file does not seem to be a valid json object. Please validate the content at https://jsonlint.com/" ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+# Always start with finding texts using the unique id for the field.
+Set Variable [ $pairing_mode[1] ; "PrimaryKey" ]
+// # WARNING!
+  The pairing mode below is only allowed when we by mistake sent original texts
+  to translation agency WITHOUT having creating localised text fields first.
+  Be very careful since this import can overwrite existing localisations if
+  language setting is not correct.
+// Set Variable [ $pairing_mode[1] ; "PrimaryKey_plus_localisation_code" ]
+
+// Perform Script [ From list ; "Import JSON Translation" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "localisation_code" ; $localisation_code ) &
+				SetProperty ( "translation_method"; "Human translation" ) &
+				SetProperty ( "pairing_mode"; $pairing_mode ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+Set Variable [ $num_of_translated_texts[1] ; GetResultProperty ( "num_of_translated_texts") ]
+Set Variable [ $num_of_untranslated_texts[1] ; GetResultProperty ( "num_of_untranslated_texts") ]
+Set Variable [ $result[1] ; GetResultProperty ( "result") ]
+
+If [ PatternCount ( $result ; "Error" ) ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "Error when importing" ; Message: $result ; Default Button: "OK" ]
+	Set Variable [ $event_text[1] ; "Error when importing texts from " & $translation_provider & ". " & $result & "." ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	Exit Script []
+Else If [ PatternCount ( $result; "Text not found" ) ]
+	Show Custom Dialog [ Title: "Imported texts not found" ; Message: "The imported texts cannot be paired using their unique identifier. ¶¶Do you want to import and pair the texts using id + localisation code? Make sure you have imported the right language (" & $localisation_code & ") before proceeding. Your selected filename is: \"" & $filename & "\"." ; Default Button: "Cancel" ; Button 2: "Import" ]
+	If [ Get(lastMessageChoice) = 1 ]
+		Exit Script []
+	Else
+		# Import - pair with primaryKey + localisation_code instead
+		Set Variable [ $pairing_mode[1] ; "PrimaryKey_plus_localisation_code" ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		
+		Set Variable [ $num_of_translated_texts[1] ; GetResultProperty ( "num_of_translated_texts") ]
+		Set Variable [ $num_of_untranslated_texts[1] ; GetResultProperty ( "num_of_untranslated_texts") ]
+		Set Variable [ $result[1] ; GetResultProperty ( "result") ]
+	End If
+End If
+
+# ---------------------- Stage 4 - Change stage on Title and Package localisations --------------------------------------------
+
+Set Variable [ $localisation_stage[1] ; 4 ]
+
+Set Variable [ $event_text[1] ; Case ( $num_of_untranslated_texts=0 And $num_of_translated_texts > 0; 
+				
+				  "Successfully imported " & $num_of_translated_texts & " texts from "& $translation_provider & ", File: \"" & $filename & "\".";
+				
+				    $num_of_untranslated_texts > 0 And $num_of_translated_texts > 0; 
+				
+				  "Successfully imported " & $num_of_translated_texts & " texts from " & $translation_provider & ". Could not import " &  $num_of_untranslated_texts & " texts.";
+				
+				   $num_of_translated_texts = 0; 
+				
+				  "No texts imported from " & $translation_provider & ". Check JSON-file for errors or missing data."
+				
+				) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+// Perform Script [ From list ; "Change Title localisation stage" ; Parameter: SetProperty ( "title_localisation_id" ; $title_localisation_id ) &
+				SetProperty ( "localisation_stage" ; $localisation_stage ) &
+				SetProperty ( "force_stage" ; "" ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+
+# ---------------------- Update localisation logs with status --------------------------------------------
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Perform Script [ From list ; "Log translation status CL" ; Parameter: SetProperty ( "caller" ; "Title localisation" ) &
+				SetProperty ( "localisation_id" ; $title_localisation_id ) &
+				SetProperty ( "localisation_stage" ; $localisation_stage ) &
+				SetProperty ( "status_type" ; "status" ) ]
+// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+# Make sure all PSOS changes are viewed in window
+Refresh Window
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,62 @@
+# This script is for creating a non-sorted value list of text values - not primaryKeys
+# It is called from on open popup for modifier values using checkbox list
+# Called from an onObjectEnter event trigger
+
+// Set Variable [ $caller[1] ; Get(scriptParameter) ]
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+Set Variable [ $active_portal_row_number[1] ; GetScriptProperty ( "active_portal_row_number" ) ]
+Freeze Window
+
+# This script switches layouts - and this script may therefore be called multiple times
+If [ Get(CurrentTimeUTCMilliseconds) > ($$lastTriggered + 3000) ]
+	
+	// If [ Get(ActivePortalRowNumber) = 0 ]
+	// Go to Field [ FAT ModifierValue @ Page item::Value ]
+	// End If
+	// Go to Portal Row [ With dialog: OFF ; By Calculation… ]
+	
+	If [ $caller = "Package" ]
+		Set Variable [ $valueList[1] ; FAT Modifier @ Package::ValuesList ]
+	Else If [ $caller = "Chapter" ]
+		Set Variable [ $valueList[1] ; FAT Modifier @ Chapter::ValuesList ]
+	Else If [ $caller = "Page" ]
+		Set Variable [ $valueList[1] ; FAT Modifier @ Page::ValuesList ]
+	Else If [ $caller = "Page item" ]
+		Set Variable [ $valueList[1] ; FAT Modifier @ Page item::ValuesList ]
+	Else If [ $caller = "IO" ]
+		Set Variable [ $valueList[1] ; FAT Modifier @ IO::ValuesList ]
+	Else If [ $caller = "List" ]
+		Set Variable [ $valueList[1] ; FAT Modifier @ List::ValuesList ]
+	Else If [ $caller = "IO" ]
+		Set Variable [ $valueList[1] ; FAT Modifier @ IO::ValuesList ]
+	End If
+	Go to Layout [ Layout: "TABLE Dynamic ValueList" ; Animation: None ]
+	Show All Records
+	Delete All Records [ With dialog: OFF ]
+	
+	Set Variable [ $count[1] ; ValueCount ( $valueList ) ]
+	Set Variable [ $i[1] ; 1 ]
+	Loop [ Flush: Always ]
+		Exit Loop If [ $i > $count ]
+		New Record/Request
+		Set Field [ Dynamic ValueList::Text value ; GetValue ( $valueList ; $i ) ]
+		Set Field [ Dynamic ValueList::Order ; $i ]
+		Set Variable [ $i[1] ; $i + 1 ]
+	End Loop
+	
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	// Go to Object [ "Checkbox Popup" ; Repetition: 1 ]
+	
+	Set Variable [ $$lastTriggered[1] ; Get(CurrentTimeUTCMilliseconds) ]
+	
+	If [ $caller = "List" Or $caller = "IO" ]
+		# List setting call is from a tab called "Settings"
+		Go to Object [ "Settings" ; Repetition: 1 ]
+		
+	End If
+	
+	Go to Object [ "Modifier Portal" ; Repetition: 1 ]
+	Go to Portal Row [ With dialog: OFF ; By Calculation… ]
+	Go to Object [ "Checkbox DVL" ; Repetition: 1 ]
+End If
+

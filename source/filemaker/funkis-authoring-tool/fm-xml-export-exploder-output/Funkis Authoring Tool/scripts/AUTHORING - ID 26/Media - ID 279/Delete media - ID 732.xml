@@ -1,0 +1,99 @@
+<Script>
+	<ScriptReference id="732" name="Delete media"></ScriptReference>
+	<ObjectList membercount="6">
+		<Step hash="7FC739F5606B38E35EDBBBD89A5F8C27" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Can be called from a delete button on any authoring layout"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4E83456E5CD746959D686173F76E5A51" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(scriptParameter)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$media_field"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B2C3B0C5A52EE07AFDDA8FA56347B69C" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Delete media"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["Are you sure you want to delete the selected media? ¶¶This cannot be undone. "]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="Cancel">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="83F547A2EFEBF829E23418F826D1AD7B" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastMessageChoice) = 2]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5A003E24D1FC2C54AFB591D6D360D8E7" id="147" name="Set Field By Name" enable="True">
+			<Options>134234112</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="Specify target field" id="134217728" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA[$media_field]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[""]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="52D1631C3DC05E2DB3DE6142C47C3C8E" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

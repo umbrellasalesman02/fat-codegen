@@ -1,0 +1,79 @@
+# #Launched from a button in FAT Link layout
+# Can also be called from Package, Chapter, Page and Page item
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+Set Variable [ $item_type[1] ; GetScriptProperty ( "item_type" ) ]
+Set Variable [ $link_type[1] ; GetScriptProperty ( "link_type" ) ]
+Set Variable [ $link_name[1] ; GetScriptProperty ( "link_name" ) ]
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+
+# Caller can be "New package" - Links are automatically created
+
+# Link type can be:
+  Internal
+  External
+  File
+
+Freeze Window
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Link" ; Animation: None ]
+
+# Check if link already exist.
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Set Variable [ $link_id[1] ; FAT Link::PrimaryKey ]
+Else
+	
+	New Record/Request
+	Set Field [ FAT Link::Title id ; $title_id ]
+	Set Field [ FAT Link::Internal item type ; $item_type ]
+	Set Field [ FAT Link::Internal Item id ; $item_id ]
+	Set Field [ FAT Link::Link type ; $link_type ]
+	
+	Perform Script [ From list ; "Set valid object name" ; Parameter: SetProperty ( "source_textfield" ; GetFieldName ( FAT Link::Name ) ) &
+					SetProperty ( "new_name" ; $link_name ) &
+					SetProperty ( "max_characters" ; 32 ) ]
+	
+	Set Variable [ $link_id[1] ; FAT Link::PrimaryKey ]
+	
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Link::PrimaryKey ) &
+					SetProperty ( "source_table" ; "link" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT Link::Text 1 id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Link::PrimaryKey ) &
+					SetProperty ( "source_table" ; "link" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT Link::Text 2 id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Link::PrimaryKey ) &
+					SetProperty ( "source_table" ; "link" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Link::Media 1 id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Link::PrimaryKey ) &
+					SetProperty ( "source_table" ; "link" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Link::Media 2 id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+If [ IsEmpty ( $caller ) ]
+	Set Variable [ $callLayout[1] ; Case(Get(WindowStyle) = 3; Get(layoutName); "") ]
+	Perform Script [ From list ; "Open card setting" ; Parameter: SetProperty ("card_window_name" ; "Link settings" ) &
+					SetProperty ("card_window_layout" ; "FAT Link Card" ) &
+					SetProperty ("card_window_width" ; "1140" ) &
+					SetProperty ("card_window_height" ; "680" ) &
+					SetProperty ("item_id" ; $link_id ) &
+					SetProperty ("item_type" ; "Link" ) & 
+					SetProperty ( "callLayout" ; $callLayout) ]
+	Perform Script [ From list ; "Init Link Rich Text Editor" ]
+End If
+
+
+
+
+

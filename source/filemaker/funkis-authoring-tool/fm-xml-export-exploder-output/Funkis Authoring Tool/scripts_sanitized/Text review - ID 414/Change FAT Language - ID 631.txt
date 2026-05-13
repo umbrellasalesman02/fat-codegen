@@ -1,0 +1,59 @@
+# Called from Language portal
+Set Variable [ $mode[1] ; Get(scriptParameter) ]
+# Mode can be "" or "review-layout" or "original-text"
+If [ PatternCount ( Get(layoutName) ; "FAT Title" ) ]
+	Set Variable [ $localisation_code[1] ; FAT Localisation::Localisation code ]
+Else
+	Set Variable [ $localisation_code[1] ; FAT Localisation @ Package::Localisation code ]
+End If
+If [ $localisation_code = FAT Title::Original localisation code ]
+	Set Field [ FAT Title::gViewTranslatedLanguage ; False ]
+	Set Variable [ $$localisation_code[1] ; FAT Title::Original localisation code ]
+Else
+	Set Field [ FAT Title::gViewTranslatedLanguage ; True ]
+	Set Field [ FAT Title::gCurrentLocalisationCode ; $localisation_code ]
+	Set Variable [ $$localisation_code[1] ; $localisation_code ]
+End If
+
+# This will trigger a save for page items
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ PatternCount ( Get(layoutName) ; "media" ) ]
+	Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+Else If [ PatternCount ( Get(layoutName) ; "Page item" ) ]
+	Perform Script [ From list ; "Setup current PageItem" ]
+Else
+	Refresh Window [ Flush cached join results ]
+End If
+
+If [ $mode = "original-text" ]
+	Freeze Window
+	Go to Layout [ Layout: "FAT Translated Texts" ; Animation: None ]
+End If
+
+If [ $mode = "review-layout" Or $mode = "original-text" ]
+	Set Variable [ $package_id[1] ; FAT Text::gPackage ]
+	# View text in current translated language
+	Set Field [ FAT Text translated::gViewTranslationStatus ; "All" ]
+	If [ $package_id = "" ]
+		# Search for all current translated texts in title
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text translated::gPackage ; "" ]
+	Else
+		# Search show Package text including global texts, tags
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text translated::gPackage ; $package_id ]
+	End If
+	// # Omit empty original records. Do this as a last step since it is a related field to improve performance
+	// Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+End If
+Close Popover
+Commit Records/Requests [ With dialog: OFF ]
+Refresh Window [ Flush cached join results ]
+
+
+
+
+

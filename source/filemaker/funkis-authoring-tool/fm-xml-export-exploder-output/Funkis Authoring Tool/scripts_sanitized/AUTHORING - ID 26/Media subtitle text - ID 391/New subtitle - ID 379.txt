@@ -1,0 +1,35 @@
+Set Variable [ $media_name[1] ; FAT Media::Container original filename ]
+Set Variable [ $title_id[1] ; FAT Media::Title id ]
+Set Variable [ $package_id[1] ; FAT Media::Package id ]
+Set Variable [ $media_time[1] ; GetAVPlayerAttribute ( "startOffset" ) ]
+Freeze Window
+
+If [ $$localisation_code ≠ FAT Title::Original localisation code ]
+	Show Custom Dialog [ Title: "New localised subtitle" ; Message: "You are currently not looking at subtitles in the original language. Do you want to create a subtitle for \" & $$localisation_code & \" exclusively?\"" ; Default Button: "Yes" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice) = 2 ]
+		Exit Script []
+	End If
+	Set Variable [ $language_code[1] ; getLanguageCode ( $$localisation_code ) ]
+	Set Variable [ $country_code[1] ; getCountryCode ( $$localisation_code ) ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Media::PrimaryKey ) &
+					SetProperty ( "source_table" ; "media" ) &
+					SetProperty ( "source_textfield" ; "Subtitle FFSub" ) &
+					SetProperty ( "caller_layout" ; Get(layoutName ))&
+					SetProperty ( "learningprogramme_id" ; $title_id) & 
+					SetProperty ( "package_id" ; $package_id) & 
+					SetProperty ( "language_code" ; $language_code) & 
+					SetProperty ( "country_code" ; $country_code) ]
+Else
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Media::PrimaryKey ) &
+					SetProperty ( "source_table" ; "media" ) &
+					SetProperty ( "source_textfield" ; "Subtitle FFSub" ) &
+					SetProperty ( "caller_layout" ; Get(layoutName ))&
+					SetProperty ( "learningprogramme_id" ; $title_id) & 
+					SetProperty ( "package_id" ; $package_id) ]
+End If
+
+Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+Set Field [ TF Subtitle::Enter time ; GetAsTime ( "00:00:00" ) ]
+Set Field [ TF Subtitle::Exit time ; GetAsTime ( "00:00:05") ]
+Go to Field [ TF Subtitle::Text ]
+

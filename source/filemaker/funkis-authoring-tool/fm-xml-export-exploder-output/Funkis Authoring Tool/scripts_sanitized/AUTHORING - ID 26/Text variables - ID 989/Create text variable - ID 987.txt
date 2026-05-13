@@ -1,0 +1,52 @@
+# Called from a button in IO Card window AND in Link Card window
+Set Error Capture [ ON ]
+
+Set Variable [ $referer_id[1] ; GetScriptProperty ( "referer_id" ) ]
+Set Variable [ $referer_type[1] ; GetScriptProperty ( "referer_type" ) ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $variable_string[1] ; GetScriptProperty ( "variable_string" ) ]
+
+
+If [ $referer_type = "io" ]
+	Set Variable [ $text_variable_name[1] ; FAT IO::Name ]
+	Set Variable [ $text_variable_source[1] ; "IO" ]
+Else If [ $referer_type = "io_in_list" ]
+	Set Variable [ $text_variable_name[1] ; FAT IO @ LI::Name ]
+	Set Variable [ $text_variable_source[1] ; "IO" ]
+Else If [ $referer_type = "link" ]
+	Set Variable [ $text_variable_name[1] ; FAT Link::Name ]
+	Set Variable [ $text_variable_source[1] ; "Link" ]
+End If
+
+Show Custom Dialog [ Title: "Create new text variable" ; Message: "Please give your text variable a descriptive name. " ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $text_variable_name ; Label 1: "Name" ]
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+
+New Record/Request
+
+Set Field [ FAT Text variable::Title id ; $title_id ]
+Set Field [ FAT Text variable::Source id ; $referer_id ]
+Set Field [ FAT Text variable::Source type ; $text_variable_source ]
+Set Field [ FAT Text variable::String override source definition ; $variable_string ]
+
+# Set a valid object name - no duplicates allowed in same title, not exceeding number of characters
+Perform Script [ From list ; "Set valid object name" ; Parameter: SetProperty ( "source_textfield" ; GetFieldName ( FAT Text variable::Name ) ) &
+				SetProperty ( "new_name" ; $text_variable_name ) &
+				SetProperty ( "max_characters" ; 64 ) ]
+
+Commit Records/Requests [ With dialog: OFF ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Go to Object [ "TextVars" ; Repetition: 1 ]
+
+If [ $referer_type = "link" ]
+	Perform Script [ From list ; "Init Link Rich Text Editor" ]
+End If
+
+
+
+

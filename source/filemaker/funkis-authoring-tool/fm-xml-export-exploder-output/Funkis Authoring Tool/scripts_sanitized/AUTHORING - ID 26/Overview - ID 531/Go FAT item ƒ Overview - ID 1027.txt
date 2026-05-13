@@ -1,0 +1,179 @@
+Freeze Window
+Set Error Capture [ ON ]
+Perform Script [ From list ; "Save Active Layout" ]
+# Sort will happen automatically thanks to relations
+# Can also be called from Links with parameters
+
+Set Variable [ $title_id[1] ; Case(IsEmpty(GetScriptProperty("title_id")); FAT Overview::Title id; GetScriptProperty("title_id")) ]
+Set Variable [ $item_id[1] ; Case(IsEmpty(GetScriptProperty("item_id")); FAT Overview::Item id; GetScriptProperty("item_id")) ]
+Set Variable [ $item_type[1] ; Case(IsEmpty(GetScriptProperty("item_type")); FAT Overview::Item type; GetScriptProperty("item_type")) ]
+
+// Set Variable [ $title_id[1] ; FAT Overview::Title id ]
+// Set Variable [ $item_id[1] ; FAT Overview::Item id ]
+// Set Variable [ $item_type[1] ; FAT Overview::Item type ]
+
+If [ $item_type = "Package" ]
+	# Find all packages in Title and go to selected
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	// Go to Record/Request/Page [ First ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Package::List of PrimaryKey);
+					theDesiredRecordID = $item_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	Go to Layout [ Layout: "FAT Package" ; Animation: None ]
+Else If [ $item_type = "Chapter" ]
+	# Find chapter
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $package_id[1] ; FAT Chapter::Parent id ]
+	# Find all packages in Title and go to selected
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Package::List of PrimaryKey);
+					theDesiredRecordID = $package_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	# Go to chapter
+	Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Chapter::List of PrimaryKey);
+					theDesiredRecordID = $item_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	Go to Layout [ Layout: "FAT Chapter" ; Animation: None ]
+Else If [ $item_type = "Page" ]
+	# Find page
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $chapter_id[1] ; FAT Page::Parent id ]
+	Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	# Find all packages in Title and go to selected
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Package::List of PrimaryKey);
+					theDesiredRecordID = $package_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	# Go to chapter
+	Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Chapter::List of PrimaryKey);
+					theDesiredRecordID = $chapter_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	# Go to page
+	Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Page::List of PrimaryKey);
+					theDesiredRecordID = $item_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+	# Used for navigating between Pages from Page Item layout
+	Set Field [ FAT Page::gRecordNumber ; Get(recordNumber) ]
+	Set Field [ FAT Page::gPageFoundCount ; Get(foundCount) ]
+Else If [ $item_type = "Page item" ]
+	# Find page - only pages are visible in overview (page item proxy in this case)
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $pageitem_id[1] ; FAT Page item::PrimaryKey ]
+	Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+	Set Variable [ $chapter_id[1] ; FAT Chapter::PrimaryKey ]
+	Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	# Find all packages in Title and go to selected
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Package::List of PrimaryKey);
+					theDesiredRecordID = $package_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	# Go to chapter
+	Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Chapter::List of PrimaryKey);
+					theDesiredRecordID = $chapter_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	# Go to page
+	Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Page::List of PrimaryKey);
+					theDesiredRecordID = $page_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	
+	If [ IsEmpty (FAT Page::Proxy type) // not Slide ]
+		Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "chapter_id" ; $chapter_id ) & 
+						SetProperty ( "page_id" ; $page_id ) & 
+						SetProperty ( "pageitem_id" ; $pageitem_id ) &
+						SetProperty ( "proxy_type" ; "" ) ]
+	Else
+		# Used for navigating between Chapters from Page Item layout - Slide
+		Set Field [ FAT Page::gRecordNumber ; Get(recordNumber) ]
+		Set Field [ FAT Page::gPageFoundCount ; Get(foundCount) ]
+		# Go direct to page item view on slides
+		Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "chapter_id" ; $chapter_id ) & 
+						SetProperty ( "page_id" ; $item_id ) & 
+						SetProperty ( "pageitem_id" ; $pageitem_id ) &
+						SetProperty ( "proxy_type" ; "page_item" ) ]
+		
+	End If
+	
+End If
+
+
+

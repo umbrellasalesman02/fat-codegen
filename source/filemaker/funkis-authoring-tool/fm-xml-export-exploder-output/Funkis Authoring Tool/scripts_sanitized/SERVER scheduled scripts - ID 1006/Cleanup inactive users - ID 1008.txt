@@ -1,0 +1,42 @@
+# This script is called from script "SERVER Scheduled script"
+
+Set Error Capture [ ON ]
+
+# Translator users are allowed to be inactive in 180 days without deletion
+Set Variable [ $fat_privilege[1] ; "Translator" ]
+Set Variable [ $expiration_days[1] ; 180 ]
+Set Variable [ $expiration_date[1] ; Get(currentDate) - $expiration_days ]
+Set Variable [ $expiration_timestamp[1] ; Get(currentTimeStamp) - $expiration_days*24*3600 ]
+
+# Translators 
+Go to Layout [ Layout: "TABLE User" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $account_name[1] ; User::email ]
+		Delete Account [ $account_name ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Delete All Records [ With dialog: OFF ]
+End If
+
+
+# All other users are allowed to be inactive in XXX days without deletion
+Set Variable [ $fat_role[1] ; "Translator" // now used to omit records ]
+Set Variable [ $expiration_days[1] ; 180 ]
+Set Variable [ $expiration_date[1] ; Get(currentDate) - $expiration_days ]
+Set Variable [ $expiration_timestamp[1] ; Get(currentTimeStamp) - $expiration_days*24*3600 ]
+
+# ALl other users except Translators
+Go to Layout [ Layout: "TABLE User" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $account_name[1] ; User::email ]
+		Delete Account [ $account_name ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Delete All Records [ With dialog: OFF ]
+End If
+
+

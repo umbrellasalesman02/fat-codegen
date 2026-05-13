@@ -1,0 +1,80 @@
+# This script duplicates text variable and exchange the variable string with the new id
+# Can be called from duplicating TT, PK, CH, PG, PI or from duplicating IO or Link
+
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $suffix[1] ; GetScriptProperty ( "suffix") ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+Set Variable [ $old_item_id[1] ; GetScriptProperty ( "old_item_id" ) ]
+Set Variable [ $new_item_id[1] ; GetScriptProperty ( "new_item_id" ) ]
+
+# Source type is either "io" or "link"
+Set Variable [ $source_type[1] ; GetScriptProperty ( "source_type" ) ]
+Set Variable [ $hasFields[1] ; GetAsBoolean(GetScriptProperty ( "hasFields" )) ]
+
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	
+	Loop [ Flush: Always ]
+		
+		Set Variable [ $old_textvariable_id[1] ; FAT Text variable::PrimaryKey ]
+		Set Variable [ $io_data_key[1] ; FAT Text variable::IO Data key ]
+		Set Variable [ $io_context[1] ; FAT Text variable::IO Context legacy ]
+		Set Variable [ $io_output[1] ; FAT Text variable::IO Output ]
+		Set Variable [ $new_name[1] ; FAT Text variable::Name & Case ( IsEmpty($suffix); "" ;  " " & $suffix) ]
+		Set Variable [ $default_text[1] ; TF TV Default text::Text ]
+		
+		Duplicate Record/Request
+		
+		Set Field [ FAT Text variable::Old PrimaryKey from clone ; $old_textvariable_id ]
+		Set Field [ FAT Text variable::Title id ; $title_id ]
+		Set Field [ FAT Text variable::Source id ; $new_item_id ]
+		Set Field [ FAT Text variable::IO Data key ; $io_data_key ]
+		Set Field [ FAT Text variable::IO Context legacy ; $io_context ]
+		Set Field [ FAT Text variable::IO Output ; $io_output ]
+		
+		# Set a valid object name - no duplicates allowed in same title, not exceeding number of characters
+		Perform Script [ From list ; "Set valid object name" ; Parameter: SetProperty ( "source_textfield" ; GetFieldName ( FAT Text variable::Name ) ) &
+						SetProperty ( "new_name" ; $new_name ) &
+						SetProperty ( "max_characters" ; 64 ) ]
+		
+		If [ Not IsEmpty ( $default_text ) ]
+			Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Text variable::PrimaryKey ) &
+							SetProperty ( "source_table" ; "text_variable" ) &
+							SetProperty ( "source_textfield" ; GetFieldName ( FAT Text variable::Default Text id ) ) &
+							SetProperty ( "caller_layout" ; Get(layoutName )) ]
+			Commit Records/Requests [ With dialog: OFF ]
+			Set Field [ TF TV Default text::Text ; $default_text ]
+		End If
+		
+		Set Variable [ $text_var_string[1] ; FAT Text variable::String override source definition ]
+		Set Field [ FAT Text variable::String override source definition ; Substitute ($text_var_string ; $old_item_id ; $new_item_id ) ]
+		
+		If [ $hasFields ]
+			# Point to the new field created earlier in Make an empty copy
+			Set Variable [ $old_field_id[1] ; FAT Text variable::IO Data key ]
+			Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 1 ]
+				Set Variable [ $new_field_id[1] ; FAT IO Field::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+				Set Field [ FAT Text variable::IO Data key ; $new_field_id ]
+			End If
+		End If
+		
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+	
+End If
+

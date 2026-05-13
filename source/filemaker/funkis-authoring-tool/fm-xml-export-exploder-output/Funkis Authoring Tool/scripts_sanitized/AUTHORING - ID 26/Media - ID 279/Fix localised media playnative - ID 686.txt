@@ -1,0 +1,18 @@
+# Called from three locations - Page item, Page item special and FAT Media - when user changes settings
+If [ Get(scriptParameter) =  "Page item" ]
+	# From layout page item
+	Set Variable [ $playAsNative[1] ; Media PI 1::playAsNativeVideo ]
+	Set Field [ Media PI 1 TRANS::playAsNativeVideo ; $playAsNative ]
+Else If [ Get(scriptParameter) =  "Page item special" ]
+	Freeze Window
+	Set Variable [ $playAsNative[1] ; Media Page Item::playAsNativeVideo ]
+	Go to Related Record [ Table: Media Page Item ; Layout: "TABLE FAT Media" ; Show related ]
+	Replace Field Contents [ FAT Media::playAsNativeVideo ; Replace with calculation: $playAsNative ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Go to Object [ "MediaTab" ; Repetition: 1 ]
+Else
+	# From layout FAT Media Subtitle
+	Set Variable [ $playAsNative[1] ; FAT Media::playAsNativeVideo ]
+	Set Field [ FAT Media TRANS::playAsNativeVideo ; $playAsNative ]
+End If
+

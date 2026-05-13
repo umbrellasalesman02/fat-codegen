@@ -1,0 +1,702 @@
+<Script>
+	<ScriptReference id="1086" name="Clone Package Group SRV"></ScriptReference>
+	<ObjectList membercount="57">
+		<Step hash="EE251B47CA1E7BC564AB965CEBE577E5" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script is called from:&#13;1. From script Start Cloning"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="169D95F6F484FEF428BAB06FE34384DA" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Script is designed to work PSOS"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F388B726821B8000D143EFACD3AF2DE3" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script is similar to Clone Title but does not include a total duplication of all Title items. "></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CFA814C3F916C7A060D20006A266912D" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Depending on what&apos;s in clone_settings (IO, List, Link etc) these items will also be duplicated."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="03B7DAD02270F015EC6215BC43027A02" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="SetProperty ( &quot;isClonedTitle&quot; ; $isClonedTitle ) &amp;&#13;SetProperty ( &quot;isMovedPackage&quot; ; $isMovedPackage ) &amp;&#13;SetProperty ( &quot;clone_level&quot; ; $clone_level ) &amp;&#13;SetProperty ( &quot;clone_settings&quot; ; $clone_settings ) &amp;&#13;SetProperty ( &quot;package_group_id&quot; ; $new_pkgr_id ) &amp;&#13;SetProperty ( &quot;suffix&quot; ; $suffix) &amp;&#13;SetProperty ( &quot;title_id&quot; ; $title_id )"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E110FD57492EADA48EB9FAB5E4235D1A" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="39B252303C3742DD98F96AA72F133452" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="FD288D97B64C1E8B3D0C66607BF799B4" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DA890003210BA043001A19BEA0DDF87E" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8C5CE6DF33555CB2754B9C1002DC73CE" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="If the whole Title is cloned we need to point to new Blocks, Modifiers, Lists, Links, Score Categories, IOs, Tags etc"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C0C54A468AC9AC376C6B86DD2EA2E978" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetAsBoolean(GetScriptProperty ( "isClonedTitle"))]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$isClonedTitle"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D70CD1B074B63BC0451B670BA0A2D5DB" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetAsBoolean(GetScriptProperty ( "isMovedPackage" ))]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$isMovedPackage"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5AD35C32ED8AF3D1FD5826D7D0AD5203" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "clone_level" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$clone_level"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A1AD663E9F5C356B9D5F6EEA6677AEBE" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "clone_settings" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$clone_settings"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3CF375CFD83D78A5D525E40749E6F410" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "suffix" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$suffix"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="764AFE07FA9B5F65E8D8E1676B53A19F" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9197D84875F85DF8C1E0340DA996172A" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "title_id")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="14DF03B7E6C5CDD9F904FBC46691484A" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "package_group_id")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$old_pkgr_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C9046A6102888BB9DEDDF7219F57A56F" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="51BD94268028228211ADE784447A2E56" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="478" name="TABLE FAT Package Group"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8F09543C9A3A7222C05EDE1E8B7AAB3A" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$old_pkgr_id">
+								<FieldReference id="1" name="PrimaryKey">
+									<TableOccurrenceReference id="1065840" name="FAT Package Group"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D330D89F220ABB5934E526A3195B80F3" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="07A179CA37A7F98FD049C7F40C82AAFD" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Case($isClonedTitle ; FAT Package Group::Name; FAT Package Group::Name & " " & $suffix)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$new_pkgr_name"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F2EC90012B36FA6A69C37CA0A9230BE5" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9598E6F2D654C46B2575B8D97C4F6BCE" id="8" name="Duplicate Record/Request" enable="True">
+		</Step>
+		<Step hash="4F11BB7D82DB765613FAC9E6F56CF7C8" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="81E810D97730EA3D2993B5577CBF552E" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$isClonedTitle Or $isMovedPackage]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C849735AA3CD33CFC09431E5FE60C25C" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="6" name="Title id">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065840" name="FAT Package Group"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$title_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="944369B105ADF0D8FB52927DE9633ACE" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="A2211A967518C0C9BECAC32210DC7E51" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4C2F05AA165FC348351A8AA7516D17ED" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Package Group::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$new_pkgr_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AB6E5C37CB138E91B1C6DB61BBEF8F0D" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="10" name="Old PrimaryKey from clone">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065840" name="FAT Package Group"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$old_pkgr_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BED238C4707F0FBEF1A1CA387EF6F2BB" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="7" name="Name">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065840" name="FAT Package Group"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$new_pkgr_name]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3580A5A8F1602064A974B2DCD27D573C" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="53E370CCE049CB8BAFF1B4902D3044B5" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Create new Object group for duplicated IOs, Lists and Tags"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D9F6D234937E5D8FC52E81D0B32319B5" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="433" name="TABLE FAT Object Group"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="58F8B1C37B1510A24DF148BA5B62B050" id="7" name="New Record/Request" enable="True">
+		</Step>
+		<Step hash="C3D8D4F74F087884AF009661B52CB6D0" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="6" name="Title id">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065731" name="FAT Object Group"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$title_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AF209BED022404F2CDE177090951D230" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="7" name="Name">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065731" name="FAT Object Group"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$new_pkgr_name]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="75E73D5516064955AC32BFF6ABB64A11" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Object Group::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$object_group_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0021D88CC715C1E729481574C02B6E76" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F813E37C3DE318510AD58A184D24E2D3" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find all packages in package group"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E23DCEE4CB41D85F0732F97106D20299" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Callers always usde the Alt TO"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C4B15A08593C9D5EF1207EC680E17B0D" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="326" name="TABLE FAT Package Alt"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7B292DB780BD308459CE37890E9F34CF" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$old_pkgr_id">
+								<FieldReference id="95" name="Package Group">
+									<TableOccurrenceReference id="1065506" name="FAT Package Alt"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9E9A6DC7291A9B1B111DEC30A8C8E326" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="21798600C3FCD7A2B5D072C759D2FD97" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9AB53068108D532E54E40288B53440EC" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="16328D0E6144B1F1485617B8F2C4BCEB" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Package Alt::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$package_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3DFC33C2BA4A45CD65B6F4F785E0C99F" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="564" name="Clone Package SRV"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "isClonedTitle" ; $isClonedTitle ) &SetProperty ( "isMovedPackage" ; $isMovedPackage ) &SetProperty ( "clone_level" ; $clone_level ) &SetProperty ( "clone_settings" ; $clone_settings ) &SetProperty ( "package_group_id" ; $new_pkgr_id ) &SetProperty ( "object_group_id" ; $object_group_id ) &SetProperty ( "suffix" ; $suffix) &SetProperty ( "title_id" ; $title_id ) &SetProperty ( "package_id" ; $package_id )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="39A809884C37A9DA94AD153BA8DC224B" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BB20D160C6A3442D0CB4F4015E0F9DC9" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="326" name="TABLE FAT Package Alt"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C6593DB336CC0ED74F4E39584CD022E5" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>8194</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="True"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="25B10F702E38FBE7DB1637AE6D5407BD" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="FD6C1307C142E95C7B9C1CD57C9C8EC7" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7ACB51378F9B7DAA3F28E26CD565031A" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E1AD173755BEE1C7D008D8F33C95C93F" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

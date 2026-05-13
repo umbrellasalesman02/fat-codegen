@@ -1,0 +1,55 @@
+# Called flom button layout Block
+Show Custom Dialog [ Title: "Detach block from template" ; Message: "Are you sure you want to detach this block from the template? You cannot undo this operation." ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice)= 1 ]
+	Set Error Capture [ ON ]
+	Freeze Window
+	Set Variable [ $block_id[1] ; FAT Block::PrimaryKey ]
+	Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Modifier::ModifierTemplate id ; Replace with calculation: "" ]
+	End If
+	Go to Layout [ Layout: "🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; Replace with calculation: "" ]
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Set Variable [ $t1[1] ; BlockTemplate::Label override text 1 ]
+	Set Variable [ $t2[1] ; BlockTemplate::Label override text 2 ]
+	Set Variable [ $t3[1] ; BlockTemplate::Label override text 3 ]
+	Set Variable [ $t4[1] ; BlockTemplate::Label override text 4 ]
+	Set Variable [ $t5[1] ; BlockTemplate::Label override text 5 ]
+	Set Variable [ $t6[1] ; BlockTemplate::Label override text 6 ]
+	Set Variable [ $t7[1] ; BlockTemplate::Label override text 7 ]
+	Set Variable [ $c1[1] ; BlockTemplate::Label override media 1 ]
+	Set Variable [ $c2[1] ; BlockTemplate::Label override media 2 ]
+	Set Variable [ $ca_h[1] ; List template @ Block template::Header ]
+	Set Variable [ $ca_1[1] ; List template @ Block template::Text Label 1 ]
+	Set Variable [ $ca_2[1] ; List template @ Block template::Text Label 2 ]
+	Set Variable [ $ca_3[1] ; List template @ Block template::Text Label 3 ]
+	Set Variable [ $ca_v[1] ; List template @ Block template::Value 1 Label ]
+	Set Variable [ $ca_m[1] ; List template @ Block template::Media Label 1 ]
+	
+	# Detach block from tempalte
+	Set Field [ FAT Block::BlockTemplate id ; "" ]
+	Commit Records/Requests [ With dialog: OFF ]
+	
+	Set Field [ FAT Block::Label override text 1 ; $t1 ]
+	Set Field [ FAT Block::Label override text 2 ; $t2 ]
+	Set Field [ FAT Block::Label override text 3 ; $t3 ]
+	Set Field [ FAT Block::Label override text 4 ; $t4 ]
+	Set Field [ FAT Block::Label override text 5 ; $t5 ]
+	Set Field [ FAT Block::Label override text 6 ; $t6 ]
+	Set Field [ FAT Block::Label override text 7 ; $t7 ]
+	Set Field [ FAT Block::Label override container 1 ; $c1 ]
+	Set Field [ FAT Block::Label override container 2 ; $c2 ]
+	Set Field [ FAT Block::Label override List header ; $ca_h ]
+	Set Field [ FAT Block::Label override List Text 1 ; $ca_1 ]
+	Set Field [ FAT Block::Label override List Text 2 ; $ca_2 ]
+	Set Field [ FAT Block::Label override List Text 3 ; $ca_3 ]
+	Set Field [ FAT Block::Label override List Value ; $ca_v ]
+	Set Field [ FAT Block::Label override List Media ; $ca_m ]
+	
+End If
+

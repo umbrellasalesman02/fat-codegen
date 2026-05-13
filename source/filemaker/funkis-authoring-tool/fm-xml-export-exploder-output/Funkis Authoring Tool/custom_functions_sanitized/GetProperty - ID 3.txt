@@ -1,0 +1,10 @@
+Case ( IsEmpty ( propertyList ) ; "" ;
+Let ( [
+first = GetValue ( propertyList ; 1 ) ;
+eq = Position ( first ; "=" ; 1 ; 1 ) ;
+firstName = Trim ( Left ( first ; eq - 1 ) ) ] ;
+Case (
+firstName = Trim ( Substitute ( propertyName ; [ ¶ ; "" ] ; [ "=" ; "" ] ) ) ;
+Substitute ( Middle ( first ; eq + 1 ; Length( first ) - eq ) ; [ "\\\\" ; "\\" ] ; [ "\r" ; ¶ ] ) ;
+GetProperty ( RightValues ( propertyList ; ValueCount ( propertyList ) - 1 ) ; propertyName )
+) ) )

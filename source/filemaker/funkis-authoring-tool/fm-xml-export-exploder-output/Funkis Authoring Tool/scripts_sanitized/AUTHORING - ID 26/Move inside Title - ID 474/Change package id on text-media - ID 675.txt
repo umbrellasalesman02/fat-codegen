@@ -1,0 +1,49 @@
+# This script changes package id on all text and media in chapters om pages
+# The script is called from Package settings.
+  Maybe this is just a temporary fix since move and duplicate script did not work properly until October 1 2021.
+# Added the localisation as well - if standing on a localised version when running script
+
+Set Variable [ $new_package_id[1] ; Get(scriptParameter) ]
+Set Variable [ $localisation_code[1] ; Case(FAT Title::Original localisation code = FAT Title::gCurrentLocalisationCode; ""; FAT Title::gCurrentLocalisationCode) ]
+Freeze Window
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $title_id[1] ; FAT Package::Parent id ]
+
+# Update Chapter text and media
+Set Field [ TF PK Header::Title id ; $title_id ]
+Set Field [ TF PK Header::Package id ; $new_package_id ]
+Set Field [ TF PK Sub header 1::Package id ; $new_package_id ]
+Set Field [ TF PK Sub header 2::Package id ; $new_package_id ]
+If [ Not IsEmpty ( $localisation_code ) ]
+	Set Field [ TF PK Header TRANS::Title id ; $title_id ]
+	Set Field [ TF PK Header TRANS::Package id ; $new_package_id ]
+	Set Field [ TF PK Sub header 1 TRANS::Package id ; $new_package_id ]
+	Set Field [ TF PK Sub header 2 TRANS::Package id ; $new_package_id ]
+End If
+Perform Script [ From list ; "Set ModifierValue Text Media Package" ; Parameter: SetProperty ( "new_package_id" ; $new_package_id ) &
+				SetProperty ( "cmt_item_id" ; $new_package_id ) &
+				SetProperty ( "localisation_code" ; $localisation_code ) ]
+# Need to use table for Chapter 2 since script Set Package Text Media only find one Chapter in table Chapter
+Go to Layout [ Layout: "TABLE FAT Chapter Alt" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Go to Record/Request/Page [ First ]
+
+If [ Get(foundCount)>0 ]
+	Set Variable [ $fat_item_type[1] ; "Chapter" ]
+	Loop [ Flush: Always ]
+		Set Variable [ $fat_item_id[1] ; FAT Chapter Alt::PrimaryKey ]
+		Perform Script [ From list ; "Set Package Text Media" ; Parameter: SetProperty ( "new_package_id" ; $new_package_id ) &
+						SetProperty ( "fat_item_id" ; $fat_item_id ) &
+						SetProperty ( "fat_item_type" ; $fat_item_type ) &
+						SetProperty ( "localisation_code" ; $localisation_code ) ]
+		Go to Layout [ Layout: "TABLE FAT Chapter Alt" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

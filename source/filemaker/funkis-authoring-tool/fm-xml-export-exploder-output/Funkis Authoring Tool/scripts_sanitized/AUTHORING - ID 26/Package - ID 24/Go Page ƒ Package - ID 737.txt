@@ -1,0 +1,29 @@
+Freeze Window
+Perform Script [ From list ; "Save Active Layout" ]
+Go to Related Record [ Table: FAT Chapter ; Layout: "FAT Chapter" ; Show related ]
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+
+Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ; Match found set ]
+# Go direct to page item view on slides
+Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+If [ FAT Package::Package type id = "slide" And FAT Page::Page type = "default" ]
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) >0 ]
+		# Go direct to page item view on slides
+		Set Variable [ $pageitem_id[1] ; FAT Page item::PrimaryKey ]
+		Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "page_id" ; $page_id ) &
+						SetProperty ( "pageitem_id" ; $pageitem_id ) ]
+	Else
+		Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+		# Used for navigating between Pages from Page Item layout
+		Set Field [ FAT Page::gRecordNumber ; Get(recordNumber) ]
+		Set Field [ FAT Page::gPageFoundCount ; Get(foundCount) ]
+	End If
+Else
+	Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+	# Used for navigating between Pages from Page Item layout
+	Set Field [ FAT Page::gRecordNumber ; Get(recordNumber) ]
+	Set Field [ FAT Page::gPageFoundCount ; Get(foundCount) ]
+End If
+

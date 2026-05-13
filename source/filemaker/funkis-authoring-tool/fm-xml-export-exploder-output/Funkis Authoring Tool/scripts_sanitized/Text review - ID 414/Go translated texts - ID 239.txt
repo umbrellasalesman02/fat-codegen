@@ -1,0 +1,53 @@
+# Called from Title Setting / Portal or from Package Setting /Portal - FAT Localisation
+
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $caller[1] ; Get(scriptParameter) ]
+
+If [ $caller = "Package" ]
+	Set Field [ FAT Title::gCurrentLocalisationCode ; FAT Localisation @ Package::Localisation code ]
+Else
+	Set Field [ FAT Title::gCurrentLocalisationCode ; FAT Localisation::Localisation code ]
+End If
+
+Set Field [ FAT Title::gViewTranslatedLanguage ; True ]
+Commit Records/Requests [ With dialog: ON ]
+
+Perform Script [ From list ; "Save Active Layout" ]
+
+Set Variable [ $$localisation_code[1] ; FAT Title::gCurrentLocalisationCode ]
+Set Variable [ $$lp_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+
+Go to Layout [ Layout: "FAT Translated Texts" ; Animation: None ]
+Set Field [ FAT Text translated::gViewTranslationStatus ; "All" ]
+
+If [ $caller = "Package" ]
+	# Search show Package text including global texts, tags
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	# Gives the user an opportunity to cancel the sorting if it takes time.
+	Refresh Window
+	Freeze Window
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Set Field [ FAT Text translated::gPackage ; $package_id ]
+	Set Field [ FAT Text translated::gFilterType ; "" ]
+Else
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	# Gives the user an opportunity to cancel the sorting if it takes time.
+	Refresh Window
+	Freeze Window
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Set Field [ FAT Text translated::gPackage ; "" ]
+	Set Field [ FAT Text translated::gFilterType ; "" ]
+End If
+
+// # Omit empty original records. Do this as a last step since it is a related field to improve performance
+// Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+Go to Record/Request/Page [ First ]
+
+// Perform Script [ From list ; "Refresh Localisation status" ; Parameter: "Title" ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+
+
+

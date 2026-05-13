@@ -1,0 +1,90 @@
+# Called from button in IO Page Item Setting via script Create and add IO to PI
+  Called from Media Card
+
+Freeze Window
+Set Error Capture [ ON ]
+Set Variable [ $io_parent[1] ; Get(scriptParameter) ]
+
+If [ $io_parent = "Page item" ]
+	
+	# The script is called from the IO Page item setting window
+	Set Variable [ $page_item[1] ; FAT Page item::PrimaryKey ]
+	Set Variable [ $package_usage_type[1] ; FAT Package::Usage type name ]
+	Set Variable [ $io_write[1] ; BlockTemplate @ Page item::IO write enabled ]
+	
+	# Show all IO Block Templates for this Block = The IOs that are possible to add.
+	Go to Related Record [ Table: IO Block Template @ Page item ; Layout: "TABLE IO Block Template" ; Show related ]
+	
+	# So the correct way to test for no related records is:
+	  - GTRR Match current record only: test for error 101
+	  - GTRR Match found set: test for error 401
+	
+	If [ Get(lastError) ≠ 101  //Get(FoundCount)>0 ]
+		Loop [ Flush: Always ]
+			Set Variable [ $io_block_template_id[1] ; IO Block Template::PrimaryKey ]
+			
+			# 18 Nov 2025: Try to avoid adding the Select filter IO value
+			Set Variable [ $unnecessary_io[1] ; FATversion > 3 And IO Block Template::Label = "selection_filter" And IO Block Template::Function = "Read" ]
+			
+			# FAT version < 4: Set the default context based on Package Usage Type
+			If [ FATversion < 4 ]
+				If [ $io_write = 1 ]
+					Set Variable [ $io_default_context[1] ; Case(BlockTemplate::Block type = "5F127BA8-1BC7-467B-93EF-7BE401615BAA"; "group"; "member") ]
+				Else
+					Set Variable [ $io_default_context[1] ; "current_group_members" ]
+				End If
+			End If
+			
+			# 18 Nov 2025: Want to get rid of the unnecessary Selection Filter IO for Posts
+			If [ Not $unnecessary_io ]
+				Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+				# Check if this IO value already exist
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				
+				If [ Get(foundCount)= 0 ]
+					# If not exist
+					New Record/Request
+					Set Field [ FAT IO Value @ Page item::Parent id ; $page_item ]
+					Set Field [ FAT IO Value @ Page item::IO Block template id ; $io_block_template_id ]
+					Set Field [ FAT IO Value @ Page item::IO Context ; $io_default_context ]
+					Set Field [ FAT IO Value @ Page item::IO Read filter ; Case (
+									
+									   $package_usage_type= "Member"; "My Member";
+									   $package_usage_type= "Group"; "My Group";
+									   $package_usage_type= "Session"; "My Session";
+									   $package_usage_type= "Event"; "My Event"
+									 
+									
+									
+									 ) ]
+					Set Field [ FAT IO Value @ Page item::IO Write as ; Case (
+									
+									   $package_usage_type= "Member"; "My Member";
+									   $package_usage_type= "Group"; "My Group";
+									   $package_usage_type= "Session"; "My Session";
+									   $package_usage_type= "Event"; "My Event"
+									 
+									
+									
+									 ) ]
+				End If
+			End If
+			
+			Go to Layout [ Layout: "TABLE IO Block Template" ; Animation: None ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+	
+Else If [ $io_parent = "Media" ]
+	
+	# The script is called from the Media setting window
+	Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+	Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+	New Record/Request
+	Set Field [ FAT IO Value @ Page item::Parent id ; $media_id ]
+	Set Field [ FAT IO Value @ Page item::IO Context ; "Group" ]
+	
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

@@ -1,0 +1,12 @@
+# Gets a bas64 encoded HTML representation of the deliverables under a remoteFolderPath
+Set Variable [ $remoteFolderPath[1] ; GetScriptProperty ( "remoteFolderPath" ) ]
+Set Variable [ $baseURL[1] ; GetScriptProperty ( "baseURL" ) ]
+Set Variable [ $baseURL[1] ; $baseURL & "publish/deliverables" ]
+Set Variable [ $query_remoteFolderPath[1] ; "remoteFolderPath=" & $remoteFolderPath ]
+Set Variable [ $query_format[1] ; "html=true&base64=true" ]
+Set Variable [ $fullURL[1] ; $baseUrl & "?" & $query_RemoteFolderPath & "&" & $query_format ]
+# on server because it's an internal address
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $base64_html ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+// Show Custom Dialog [ Title: "Reponse was" ; Message: $base64_html ; Default Button: "OK" ; Button 2: "Cancel" ]
+Exit Script [ $base64_html ]
+

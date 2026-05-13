@@ -1,0 +1,15 @@
+# Used when changing names on Package, Chapter and Page
+# Triggered onModify field
+# Auto triggers data fields to recalculate
+
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+
+If [ $level = "package" ]
+	Set Field [ FAT Overview @ Package::ModifiedTimeStamp ; FAT Overview @ Package::ModifiedTimeStamp ]
+Else If [ $level = "chapter" ]
+	Set Field [ FAT Overview @ Chapter::ModifiedTimeStamp ; FAT Overview @ Chapter::ModifiedTimeStamp ]
+Else If [ $level = "page" ]
+	Set Field [ FAT Overview @ Page::ModifiedTimeStamp ; FAT Overview @ Page::ModifiedTimeStamp ]
+End If
+
+

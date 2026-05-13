@@ -1,0 +1,24 @@
+
+
+Set Variable [ $title_localisation_id[1] ; FAT Localisation::PrimaryKey ]
+Set Variable [ $localisation_stage[1] ; FAT Localisation::Localisation stage + 1 ]
+
+
+// Perform Script [ From list ; "Change Title localisation stage" ; Parameter: SetProperty ( "title_localisation_id" ; $title_localisation_id ) &
+				SetProperty ( "localisation_stage" ; $localisation_stage ) &
+				SetProperty ( "force_stage" ; "" ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Set Variable [ $error_mess[1] ; Get(ScriptResult) ]
+// Show Custom Dialog [ Title: "Message" ; Message: $error_mess ; Default Button: "OK" ]
+
+Set Variable [ $localisation_stage[1] ; FAT Localisation::Localisation stage + 1 ]
+
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Set Variable [ $error_mess[1] ; Get(ScriptResult) ]
+
+Perform Script [ From list ; "Log translation status CL" ; Parameter: SetProperty ( "caller" ; "Title localisation" ) &
+				SetProperty ( "localisation_id" ; $title_localisation_id ) &
+				SetProperty ( "localisation_stage" ; $localisation_stage ) &
+				SetProperty ( "status_type" ; "status" ) ]
+// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+

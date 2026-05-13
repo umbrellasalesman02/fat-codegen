@@ -1,0 +1,97 @@
+<Script>
+	<ScriptReference id="1033" name="View List template card"></ScriptReference>
+	<ObjectList membercount="6">
+		<Step hash="28B43B439FA7AD1829961E0EA4B7AC80" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called from a button in Title Link Layout"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7FEA6BE1DC919BBED5AEE9D2151F8B42" id="75" name="Commit Records/Requests" enable="True">
+			<Options>128</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="Skip data entry validation" id="256" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Force Commit" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FF1F633BEF5784B575876797C634CBB9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(scriptParameter)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$list_template_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="05A670D861B70A2E2FE6568544B7E652" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2E20B3C7A9838665405A938A3159C743" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Case(Get(WindowStyle) = 3; Get(layoutName); "")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$callLayout"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9BEF8A901818D822DD513D6CEA196503" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="906" name="Open card setting"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ("card_window_name" ; "List template" ) &SetProperty ("card_window_layout" ; "List Template Card" ) &SetProperty ("card_window_width" ; "1140" ) &SetProperty ("card_window_height" ; "680" ) &SetProperty ("item_id" ; $list_template_id ) &SetProperty ("item_type" ; "List template" ) & SetProperty ( "callLayout" ; $callLayout)]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

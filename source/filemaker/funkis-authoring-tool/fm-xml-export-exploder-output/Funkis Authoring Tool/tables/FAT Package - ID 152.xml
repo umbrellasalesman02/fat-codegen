@@ -1,0 +1,807 @@
+<FieldCatalog>
+	<UUID modifications="384" userName="jensthorsen" accountName="jensthorsen" timestamp="2025-06-09T09:53:15">0E8AF482-07FD-4A14-B35E-0B5CADD47D3B</UUID>
+	<BaseTableReference id="152" name="FAT Package"></BaseTableReference>
+	<ObjectList membercount="75">
+		<Field id="1" name="Serial ID" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="4" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:01">80B9E988-1259-4089-AD89-FB61EBA3299E</UUID>
+			<AutoEnter type="SerialNumber" prohibitModification="False">
+				<SerialNumber increment="1" generate="OnCreation"></SerialNumber>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="True" existing="False">
+				<Strict>Numeric</Strict>
+			</Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="2" name="Header txt id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="9" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-08-28T17:25:52">E362E098-63A7-4D6D-944B-F86B6C1C3819</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="3" name="Sub header 1 txt id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="10" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-08-28T17:25:59">0AAEFE2F-5186-4CAF-BEF1-C7F296A807AF</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="4" name="Parent id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="5" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-08-28T17:25:45">36E61DE0-3B8D-48E8-8D41-AF042543E899</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="6" name="Number of chapters" fieldtype="Calculated" datatype="Number" comment="">
+			<UUID modifications="7" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-25T10:57:03">2FEECF05-53DD-4471-9D4D-BB003D4DAD70</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[0 + Count ( FAT Chapter::PrimaryKey ) - Count ( FAT Chapter::Proxy type )]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="7" name="Status" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="4" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-05-28T18:01:17">134BD50A-9F86-4E89-817A-FB2872BA6119</UUID>
+			<AutoEnter type="ConstantData" prohibitModification="False">
+				<ConstantData>To do</ConstantData>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="8" name="Sum Chapters" fieldtype="Summary" datatype="Number" comment="">
+			<UUID modifications="3" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:01">DE19D303-5FC5-4BE1-86B6-93642D72245F</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<SummaryInfo restartEachGroup="False" summarizeRepetition="Together" operation="Total">
+				<SummaryField>
+					<FieldReference id="6" name="Number of chapters">
+						<BaseTableReference id="152" name="FAT Package"></BaseTableReference>
+					</FieldReference>
+				</SummaryField>
+			</SummaryInfo>
+		</Field>
+		<Field id="9" name="Context ID" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="6" userName="Jens Thorsen" accountName="jensthorsen" timestamp="2020-12-25T18:10:34">6266214E-5B26-4FF1-AF7F-20EB79C609F4</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA["package-" & Serial ID]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="10" name="Package JSON Old Export" fieldtype="Calculated" datatype="Text" comment="Still in use for old productions">
+			<UUID modifications="60" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-05-24T08:50:20">A8A64AB4-B35D-44C7-95AD-EE73E512A60B</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[Let ( [json1 = "{" & Case ( ValueCount ( FAT ModifierValue @ Package::Value JSON ) = 0 ; "" ;         Substitute ( List ( FAT ModifierValue @ Package::Value JSON ) ; ¶ ; ", " ) & "" );json2 = json1 & Case ( ValueCount ( <Table Missing>::<Field Missing> ) = 0 ; "}" ;         Case ( json1="{"; ""; "," ) & Substitute ( List ( <Table Missing>::<Field Missing> ) ; ¶ ; ", " ) & "}" );json3 = JSONSetElement ( json2 ;        ["id" ; PrimaryKey ; JSONString ] ;      ["context" ; Context ID ; JSONString ] ;      ["friendly_id" ; JSON Friendly id ; JSONString ] ;      ["parent_id" ; Parent id ; JSONString ] ;      ["parent_type" ; "title" ; JSONString ] ;      ["type" ; "package" ; JSONString ] ;      ["title_txt_id" ; Header txt id ; JSONString ] ;      ["sub_title_1_txt_id" ; Sub header 1 txt id ; JSONString ] ;      ["sub_title_2_txt_id" ; Sub header 2 txt id ; JSONString ] ;      ["tags" ; "[" & Substitute ( List (FAT Tag Value @ PK::Tag Value JSON) ; ¶ ; ", " ) & "]"; JSONArray ] ;      ["number_of_links" ; Number of chapters ; JSONNumber ];      ["sort_index" ; SortIndex ; JSONNumber ];      ["hierarchy_level" ; Hierarchy level ; JSONNumber ];      ["program_type" ; PrettifyDash (Package type id) ; JSONString ];/* From Title */       ["title" ; FAT Title::JSON friendly id ; JSONString ];      ["client" ; PrettifyDash ( FAT Title::<Field Missing> ) ; JSONString ];      ["original_language" ; FAT Title::Original language code ; JSONString] ;      ["original_country" ; FAT Title::Original country code ; JSONString] ;      ["original_localisation_code" ; FAT Title::Original localisation code ; JSONString] ;      ["installed_languages" ; FAT Title::Original localisation code & ", " & Substitute ( List ( FAT Localisation::Localisation code ) ; ¶ ; ", " ); JSONString]   )];JSONFormatElements ( json3 ))]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="11" name="PrimaryKey" fieldtype="Normal" datatype="Text" comment="Unique identifier of each record in this table">
+			<UUID modifications="4" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-09-14T15:41:08">84FD9707-6B41-404A-90D5-D938803E7FFC</UUID>
+			<AutoEnter type="Calculated" prohibitModification="True" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[Get( UUID )]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="True" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<TagList secondary="True">#^FMI_ </TagList>
+		</Field>
+		<Field id="12" name="CreationTimestamp" fieldtype="Normal" datatype="Timestamp" comment="Date and time each record was created">
+			<UUID modifications="2" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">8C4D20A7-FBF0-449C-909A-337875937900</UUID>
+			<AutoEnter type="CreationTimestamp" prohibitModification="True"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="False" existing="False">
+				<Strict>FourDigitYear</Strict>
+			</Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="13" name="CreatedBy" fieldtype="Normal" datatype="Text" comment="Account name of the user who created each record">
+			<UUID modifications="2" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">7BFF62B1-9E90-4EAE-A06A-3740107FB667</UUID>
+			<AutoEnter type="CreationAccountName" prohibitModification="True"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="14" name="ModificationTimestamp" fieldtype="Normal" datatype="Timestamp" comment="Date and time each record was last modified">
+			<UUID modifications="2" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">6AF1A8EC-B231-44A1-8886-7E609B1EC2AB</UUID>
+			<AutoEnter type="ModificationTimestamp" prohibitModification="True"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="False" existing="False">
+				<Strict>FourDigitYear</Strict>
+			</Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="15" name="ModifiedBy" fieldtype="Normal" datatype="Text" comment="Account name of the user who last modified each record">
+			<UUID modifications="2" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">4C313CDD-74DE-47E0-A460-D1DE6ED5BAFC</UUID>
+			<AutoEnter type="ModificationAccountName" prohibitModification="True"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="21" name="JSON Friendly id" fieldtype="Calculated" datatype="Text" comment="Friendly id used in JSON and as Funkis Cloud directory name">
+			<UUID modifications="18" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-08-12T10:43:47">3A744321-89CA-4EE4-8DEC-89FEFEA0225B</UUID>
+			<AutoEnter alwaysEvaluate="True"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[TextFormatRemove(PrettifyDash(Reference name))]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="23" name="SortIndex" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="3" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">38C214B5-E942-4F15-99E9-704C1A821B3B</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[Serial ID]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="24" name="Current localisation code" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="13" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-08-28T17:26:51">AA1A5597-801C-4EC4-A2D5-2AFA56EA7C9F</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Title::gCurrentLocalisationCode]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="29" name="Version" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="2" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">CEA69082-6514-404E-A570-D508566E5961</UUID>
+			<AutoEnter type="ConstantData" prohibitModification="False">
+				<ConstantData>Version 0</ConstantData>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="False" unique="False" existing="False">
+				<ValueListReference id="20" name="Production version"></ValueListReference>
+			</Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="30" name="Comment" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="2" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">1F243FE6-0CE8-4E88-A82D-4A0A89F51DDC</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[TextFormatRemove ( Comment )]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="31" name="Proxy type" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="2" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">5A4A34E2-A071-46A6-A14F-CACE47CCCD09</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="32" name="Hierarchy level" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="3" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T17:59:25">9F96237E-84D0-4F6E-9630-F1E1D460FFCE</UUID>
+			<AutoEnter type="ConstantData" prohibitModification="False">
+				<ConstantData>1</ConstantData>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="34" name="Sub header 2 txt id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="11" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-08-28T17:26:05">08544D58-1C81-46AF-8DFC-650AD7E828D1</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="35" name="Package header" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="4" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:48:28">6FA0AC46-DB7E-4F7F-A940-FBC01D1BBDF6</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[Case( IsEmpty(TF PK Header::Text) ; "Package-" & Serial ID; TF PK Header::Text)]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="37" name="Package type id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="8" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-08-28T17:38:09">8282CCF1-E51D-4940-B778-5C11AE1DAAFB</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="38" name="Publish type" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:45:48">B6DC5DE0-233F-477F-B44D-1D5142289F64</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="39" name="Package Levels" fieldtype="Normal" datatype="Text" comment="Which levels are available to build - Chapter,Page">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:46:09">38142D2E-FFFB-4FD7-9898-40BD76B6399E</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="40" name="Max char title Package" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:45:48">4A048AC9-66B9-4716-BD21-D2D06C654DE2</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="False" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[32]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="41" name="Max char title Chapter" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:45:48">ACB3DA2E-2DA2-464A-9EDA-E4229666DF88</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="False" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[32]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="42" name="Max char title Page" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:45:48">DFC7D9CF-131E-41DD-8AD5-483A249A1B06</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="False" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[32]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="43" name="Max char subtitle 1 Package" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T16:22:15">F7DA4344-2151-4841-8CD6-6A05233C92D8</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="False" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[FAT Title::Max char subtitle 1 Package]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="44" name="Max char subtitle 1 Chapter" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:45:48">DED4E7A5-1FAE-47FC-A68D-0E850BF9A8AA</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="False" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[48]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="45" name="Max char subtitle 1 Page" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:45:48">3C6F6337-4F70-4987-A3EC-FA79903684DD</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="False" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[48]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="46" name="Max char subtitle 2 Package" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:45:48">C1902487-D2DC-47D3-9BF1-7C8F68130EF7</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="False" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[48]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="47" name="Max char subtitle 2 Chapter" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:45:48">3FCD72FA-029A-4F0D-8248-368F466FAEE7</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="False" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[48]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="48" name="Max char subtitle 2 Page" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:45:48">81982A71-F806-486B-A2B5-518E801B09E7</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="False" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[48]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="50" name="Number of pages" fieldtype="Calculated" datatype="Number" comment="">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-25T10:57:36">48349D2B-C861-4ABF-AE70-8B2889966864</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[0 + Count ( FAT Page::PrimaryKey ) - Count(FAT Page::Proxy type)]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="51" name="Number of page items" fieldtype="Calculated" datatype="Number" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-11-08T12:45:48">A668FCAE-5F77-4FF3-BD96-E7400AF50B29</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[0 + Count ( FAT Page item::PrimaryKey )]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="52" name="LastSettingTab" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="4" userName="Jens Thorsen" accountName="jensthorsen" timestamp="2021-01-04T14:49:10">48AB70EC-9047-49B8-AC92-20FAA3100533</UUID>
+			<AutoEnter type="ConstantData" prohibitModification="False">
+				<ConstantData>tab1</ConstantData>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="53" name="GitLab Project code URL" fieldtype="Normal" datatype="Text" comment="URL to the project on GitLab - for download, build and publish functionality. Leave empty for BaseProject URL">
+			<UUID modifications="7" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-09-04T12:21:45">8AABE9DC-C378-4E2D-9D09-4A06922013A0</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="54" name="Reference name" fieldtype="Normal" datatype="Text" comment="The reference name - used in friendly id">
+			<UUID modifications="11" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-01-27T14:53:24">767C617D-2039-466A-A267-51C996700212</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[TextFormatRemove (Reference name)]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="True" unique="False" existing="False">
+				<Message>You must have a reference name for your package. </Message>
+			</Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="55" name="Package JSON" fieldtype="Calculated" datatype="Text" comment="Eventuellt endast för basprojekt - innehåller färger från tema och annat från Title nivån. Dec 2020">
+			<UUID modifications="115" userName="jensthorsen" accountName="jensthorsen" timestamp="2025-06-09T09:52:18">90E76DAD-4CB6-4EAE-809A-7868DF2C6A70</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[Let ( [// Step 1: Create the key values from title leveltheme_json = FAT Theme::Theme JSON;title_modifiers = "{" & Case ( ValueCount ( FAT ModifierValue @ Title::Value JSON ) = 0 ; "" ;         Substitute ( List ( FAT ModifierValue @ Title::Value JSON ) ; ¶ ; ", " ) & "" ) & "}";title_json = JSONSetElement ( theme_json ;      ["title" ; FAT Title::JSON friendly id ; JSONString ];      ["title_id" ; FAT Title::PrimaryKey ; JSONString ];      ["client" ; FAT Title::Client id ; JSONString ];      ["base_project" ; FAT Title::Base project ; JSONString ];      ["title_header" ; FAT Title::Header txt id ; JSONString ];      //["quiddity_key" ; FAT Title::Funkis Cloud Session Key TEST ; JSONString ] ;      ["original_language" ; FAT Title::Original language code ; JSONString] ;      ["original_country" ; FAT Title::Original country code ; JSONString] ;      ["original_localisation_code" ; FAT Title::Original localisation code ; JSONString];      ["installed_languages" ; ValueListToCommaList (FAT Title::Original localisation code;List (FAT Localisation @ Package::Stage enabled localisation code )); JSONString];      ["value_lists" ; "[" & Substitute ( List ( FAT List::List JSON ) ; ¶ ; ", ") & "]"; JSONArray];      ["ios" ; "[" & Substitute ( List ( FAT IO::IO JSON ) ; ¶ ; ", ") & "]"; JSONArray];      ["score_categories" ; "[" & Substitute ( List ( FAT Score variable::Score category JSON ) ; ¶ ; ", ") & "]"; JSONArray];      ["title_modifiers" ; title_modifiers ; JSONObject ]   );// Step 2: Create the the key values from package level. json1 = "{" & Case ( ValueCount ( FAT ModifierValue @ Package::Value JSON ) = 0 ; "" ;         Substitute ( List ( FAT ModifierValue @ Package::Value JSON ) ; ¶ ; ", " ) & "" ) & "}";json3 = JSONSetElement ( json1 ;        ["id" ; PrimaryKey ; JSONString ] ;      ["backend" ; PrettifyDash(Case(FAT Package::Package Backend="Funkis Cloud"; "Quiddity"; FAT Package::Package Backend)) ; JSONString ];      ["context" ; Context ID ; JSONString ] ;      ["friendly_id" ; JSON Friendly id ; JSONString ] ;      ["type" ; "package" ; JSONString ] ;      ["title_txt_id" ; Header txt id ; JSONString ] ;      ["sub_title_1_txt_id" ; Sub header 1 txt id ; JSONString ] ;      ["sub_title_2_txt_id" ; Sub header 2 txt id ; JSONString ] ;      ["tags" ; "[" & Substitute ( List (FAT Tag Value @ PK::Tag Value JSON) ; ¶ ; ", " ) & "]"; JSONArray ] ;      ["number_of_links" ; Number of chapters ; JSONNumber ];      ["sort_index" ; SortIndex ; JSONNumber ];      ["hierarchy_level" ; 0 ; JSONNumber ];      ["program_type" ; PrettifyDash (Package type::Program type) ; JSONString ];      ["program_behaviour" ; PrettifyDash (Package type::Program behaviour) ; JSONString ];      ["usage_type" ; PrettifyDash (Usage type name) ; JSONString ]   )];//Step 3: Merge title level with package level. If any duplicates - package level will override title level.  While (               // initial variables        [           i=0 ;          merge_json = json3;          mergeKeys = JSONListKeys ( merge_json ; "" ) ;          mergeValues = JSONListValues( merge_json ; "" );          // title_json must be declared again for the while scope!           title_json = title_json        ];        // condition        i<ValueCount ( mergeKeys ) ;        // logic         [            i=i+1;           valueType =  JSONGetElementType ( merge_json ; GetValue ( mergeKeys ; i ) );           title_json =               Case (                 valueType = 1;                  JSONSetElement ( title_json ; GetValue ( mergeKeys ; i );  GetValue ( mergeValues ; i ); JSONString );                valueType = 2;                  JSONSetElement ( title_json ; GetValue ( mergeKeys ; i );  GetValue ( mergeValues ; i ); JSONNumber );                valueType = 3;                  JSONSetElement ( title_json ; GetValue ( mergeKeys ; i );  GetValue ( mergeValues ; i ); JSONObject );                valueType = 4;                  JSONSetElement ( title_json ; GetValue ( mergeKeys ; i );  GetValue ( mergeValues ; i ); JSONArray )            ) // end case         ];         // result         JSONFormatElements (title_json )   ) // End While) // End Let]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="57" name="FC Package directory" fieldtype="Normal" datatype="Text" comment="This is the name of the directory on Funkis Cloud. It is based on JSON Friendly id, which in turn is based on Reference name. Reference name can be changed without changing drirectory name.">
+			<UUID modifications="14" userName="jensthorsen" accountName="jensthorsen" timestamp="2025-03-11T13:08:20">F3D73CD6-30F9-41E9-9E27-725DA2488E4C</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="False" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[TextFormatRemove (JSON Friendly id)]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="58" name="Publish Server Package Full Path" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="10" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-08-13T15:38:30">39B16A9B-F622-4DD6-9DD1-042F96EEEC43</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA["https://" & Title Server Preview::URL & "/" &Case ( IsEmpty ( FAT Title::FC Client directory ) ; ""; FAT Title::FC Client directory & "/" ) &Case ( IsEmpty ( FAT Title::FC Title directory ) ; ""; FAT Title::FC Title directory & "/" ) &Case ( IsEmpty ( FAT Package::FC Package directory ) ; ""; FAT Package::FC Package directory & "/" )/*Case (     IsEmpty (FC Package directory) ;        FAT Title::OLD Sync Server Preview Path;          //else         FAT Title::OLD Sync Server Preview Path & FC Package directory & "/")*/]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="59" name="Export Package Sub Path" fieldtype="Calculated" datatype="Text" comment="Should be replaced with FC Package directory instead for new titles">
+			<UUID modifications="15" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-24T15:36:34">01E584AB-4B0D-4C58-9CE3-140F97C5714A</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[Case (     IsEmpty (FC Package directory) ;        FAT Title::Export Title Sub Path;                FAT Title::Export Title Sub Path & FC Package directory & "/")]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="61" name="Export Local Package Path" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="9" userName="Jens Thorsen" accountName="JensThorsen" timestamp="2022-02-07T10:34:16">58B8CC6D-98BD-411E-BE81-0B50D36DC370</UUID>
+			<AutoEnter alwaysEvaluate="True"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[Case ( User X Title @ Title::Package Filepath JSON = "" ;     User X Title @ Title::Title Filepath export & FC Package directory & "/";    JSONGetElement ( User X Title @ Title::Package Filepath JSON ; JSON Friendly id ))]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="62" name="Codebase id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="4" userName="jensthorsen" accountName="jensthorsen" timestamp="2022-08-08T15:32:50">B806F080-9095-4773-B137-517B322BDDD0</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="63" name="Latest Exported file" fieldtype="Normal" datatype="Binary" comment="Used as a temporary container with internal storage for export of JSON files">
+			<UUID modifications="4" userName="Jens Thorsen" accountName="jensthorsen" timestamp="2021-02-25T11:05:45">0ABD87D9-F5A0-4FE4-8458-A4BB50421BD1</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1000"></Storage>
+		</Field>
+		<Field id="65" name="Export mode" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="1" userName="Jens Thorsen" accountName="jensthorsen" timestamp="2021-03-27T10:14:20">0016CA13-9419-497A-9764-5B25CEFF63E3</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="66" name="Delivery format" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="1" userName="Jens Thorsen" accountName="jensthorsen" timestamp="2021-03-27T10:14:20">50CAAF63-7CF9-46E9-8680-A9EDF95F1271</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="67" name="Local export type" fieldtype="Normal" datatype="Text" comment="JSON, TEXT, Media all or Media update">
+			<UUID modifications="2" userName="Jens Thorsen" accountName="jensthorsen" timestamp="2021-04-01T10:54:29">6972A63A-C2CC-4D3C-85F9-14205631F69B</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="70" name="Funkis WOW Delivery" fieldtype="Normal" datatype="Text" comment="Select WOW delivery when building a downloadable package">
+			<UUID modifications="3" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-09-04T10:48:45">F558E136-F16B-47E3-AC64-49170D07C829</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="71" name="Number of localisations" fieldtype="Calculated" datatype="Number" comment="">
+			<UUID modifications="3" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-09-30T13:00:23">3E69959C-482A-4754-82C1-24E3A03542F5</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[0 + Count ( FAT Localisation @ Package::PrimaryKey )]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="72" name="TextInContextualOrderTimeStamp" fieldtype="Normal" datatype="Timestamp" comment="Timestamp that indicates when texts are arranged in the contextual order">
+			<UUID modifications="14" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-09-15T11:24:04">716C8E51-96AD-4D59-9384-DA0E689010B2</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="73" name="Base project" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="JensThorsen" timestamp="2022-02-19T13:30:12">8DB2DDE4-6E24-4D1E-B2F7-25845A1B027A</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Title::Base project]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="74" name="List of PrimaryKey" fieldtype="Summary" datatype="Text" comment="">
+			<UUID modifications="3" userName="jensthorsen" accountName="JensThorsen" timestamp="2022-03-13T09:38:29">9DB77DFF-FCDC-45D6-A331-CD1F44698C11</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<SummaryInfo restartEachGroup="False" summarizeRepetition="Together" operation="List">
+				<SummaryField>
+					<FieldReference id="11" name="PrimaryKey">
+						<BaseTableReference id="152" name="FAT Package"></BaseTableReference>
+					</FieldReference>
+				</SummaryField>
+			</SummaryInfo>
+		</Field>
+		<Field id="76" name="Codebase version id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2022-08-08T15:44:35">789226B1-F2F6-4026-A481-5BDA1E7634FE</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="77" name="Package list JSON" fieldtype="Calculated" datatype="Text" comment="Exported only for Package = Site. Exported in a separate JSON file.">
+			<UUID modifications="107" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-08-05T14:48:25">5483CFAB-5EAA-4140-9FDD-81813E75B59D</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[Let ( [json = JSONSetElement ( "{}" ;      ["package_id" ; PrimaryKey ; JSONString ];      ["friendly_id" ; JSON Friendly id; JSONString ];      ["sort_index" ; SortIndex; JSONNumber ];      ["package_type" ; Package type::Program type; JSONString ];      ["package_usage" ; Package type::Name; JSONString ];      ["full_path" ; Publish Server Package Full Path; JSONString ];      ["code_base" ; Baseproject Codebase @ Package::Name; JSONString ];      ["code_base_version" ; Baseproject Codebase Version @ Package::Version string; JSONString ];      ["reference_name" ; Reference name; JSONString ];      ["package_group_id" ; Package Group; JSONString ];      ["package_group_name" ; FAT Package Group @ Package::Name; JSONString ]    )];json)]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="79" name="Description" fieldtype="Normal" datatype="Text" comment="Only for authors - not used in code.">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2022-09-13T15:19:34">F9E6FA08-0403-4655-9E53-3A987B6B054C</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="80" name="Preview Setting Clear storage" fieldtype="Normal" datatype="Text" comment="Deprecated - now using user specific settings on Title level (Feb 2023)">
+			<UUID modifications="3" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-02-05T13:27:40">45CD01C4-2420-47A5-9223-11A088221DAB</UUID>
+			<AutoEnter type="ConstantData" prohibitModification="False">
+				<ConstantData>false</ConstantData>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="81" name="gChangeDate" fieldtype="Normal" datatype="Date" comment="">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-05-03T07:59:58">49BF86B0-FD9F-4E41-AD39-C7A2E72C57CB</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="True" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="82" name="DisplayText Content" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="15" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-10-29T13:24:56">8E7EA706-0FF7-473A-83D1-FA5AF44F33A5</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[Let ( [    t0 = Reference name  & "¶";    t1 =  Case(IsEmpty(TF PK Header::Text); ""; TextStyleAdd (  TF PK Header::Display text  ; Bold) & "¶");    t2 =  Case(IsEmpty(TF PK Sub header 1::Text); ""; TextColor ( TF PK Sub header 1::Display text & "¶" ; RGB ( 128 ; 128 ; 128 ) )) & "¶";    cmt =  Case(IsEmpty(Comment); ""; TextStyleAdd (TextSize ("Comment: "; 11); Bold+Italic) & TextStyleAdd (TextSize (Comment & "¶"; 11); Italic)) & "¶";       t12 =  Case(Count(FAT ModifierValue @ Package::PrimaryKey) = 0; ""; TextStyleAdd ( "Modifier settings : ¶"; Bold) & List(FAT ModifierValue @ Package::Value JSON) & "¶¶")];  t0 & t1 & t2 & cmt & t12 )]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="83" name="Usage type id" fieldtype="Normal" datatype="Text" comment="How will this package be used. Member, Group, Session. Supports IO creation and settings. ">
+			<UUID modifications="6" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-08-28T17:41:41">018F44A4-40A5-480A-B9F2-10CFF546009E</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="85" name="Package type name" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-08-21T11:25:59">46E6B398-51C8-4254-8677-473C89C9D416</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[Package type::Name]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="86" name="Launch from Funkis Cloud" fieldtype="Normal" datatype="Number" comment="This boolean defines if the package could be launched directly from Funkis Cloud. I.e Title site or a Trainers package.">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-08-21T15:52:42">653C5D17-3DDB-472D-AD95-75FC11F5D541</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="87" name="Package type name icon" fieldtype="Calculated" datatype="Binary" comment="">
+			<UUID modifications="3" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-09-14T15:07:56">0656EE96-69CB-4ED3-921F-09585F54CA3D</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1"></Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[Package type::Icon]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="89" name="Package Backend" fieldtype="Normal" datatype="Text" comment="In som rare situations - the the Package is different than the Title backend">
+			<UUID modifications="4" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-10-04T09:28:13">87BF7DDC-6AF0-4BAC-8CAB-297FBCB6C9E6</UUID>
+			<AutoEnter type="Looked_up" prohibitModification="False">
+				<Looked_up dontCopyIfEmpty="True" noMatchCopyOption="DoNotCopy">
+					<FieldReference id="122" name="Title Backend">
+						<TableOccurrenceReference id="1065132" name="FAT Title"></TableOccurrenceReference>
+					</FieldReference>
+					<Context>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+					</Context>
+				</Looked_up>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="90" name="Last Export Timestamp" fieldtype="Normal" datatype="Timestamp" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-12-04T19:36:04">BF4CD8D4-741E-43B7-AE26-C7C8B17F926B</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="91" name="Last Publish Timestamp" fieldtype="Normal" datatype="Timestamp" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-12-04T19:36:04">4C84D569-A13F-4297-9821-040193AC89CF</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="93" name="View hierarchy level Package" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-20T16:59:48">83E787BA-BC44-49ED-8F8C-F82B668943E1</UUID>
+			<AutoEnter type="ConstantData" prohibitModification="False">
+				<ConstantData>3</ConstantData>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="94" name="FAT version number" fieldtype="Calculated" datatype="Number" comment="">
+			<UUID modifications="5" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-28T15:57:41">B546F1F6-B8F0-48F5-ACF8-78135820BADD</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[Case(Baseproject Codebase @ Package::Codebase type = "branch" Or Baseproject Codebase @ Package::Codebase type = "version";              Baseproject Codebase Version @ Package::FAT Version number;              Baseproject Codebase @ Package::FAT Version number)]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="95" name="Package Group" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-04-12T19:26:12">69DC87EA-1D88-421E-A577-CF306865AF5F</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="96" name="Old PrimaryKey from clone" fieldtype="Normal" datatype="Text" comment="If item is cloned this id is used for reference in clone script">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-05-01T21:16:52">E67F490D-B337-4F7D-94AE-DBE8ECA6FB45</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="97" name="Usage type name" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="3" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-08-28T17:38:55">790A5115-B9AF-4D25-97BB-8484B48405C7</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+				<Text><![CDATA[Usage type::Name]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="101" name="Scroll skip page level" fieldtype="Normal" datatype="Text" comment="This setting affects the behaviour of FAT in scroll production with only one page per chapter">
+			<UUID modifications="11" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-12-26T15:47:19">738EDC99-196D-49B3-9671-20966B7BBF51</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+						<Text><![CDATA[Case(JSONGetElement ( Package JSON; "reveal_menu_chapters" )= "off"; 1; 0)]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="102" name="gReadyStatus" fieldtype="Normal" datatype="Text" comment="Set to &quot;Ready to use&quot; at FAT startup. Used for Value Lists">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2025-02-10T13:36:35">AE17A630-D955-4D61-8AA9-4F38E6674C3F</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="True" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+		</Field>
+	</ObjectList>
+</FieldCatalog>

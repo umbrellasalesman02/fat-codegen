@@ -1,0 +1,52 @@
+# Called from popup menu in localisation settings - 
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+# Caller can be either "Title localisation" or "Package localisation"
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+Set Variable [ $localisation_id[1] ; GetScriptProperty ( "localisation_id" ) ]
+// Set Variable [ $localisation_stage[1] ; GetScriptProperty ( "localisation_stage" ) ]
+If [ $caller = "Title localisation" ]
+	Set Variable [ $localisation_stage[1] ; FAT Localisation::Localisation stage ]
+Else
+	Set Variable [ $localisation_stage[1] ; FAT Localisation @ Package::Localisation stage ]
+End If
+
+Set Error Capture [ ON ]
+Freeze Window
+
+If [ $localisation_stage ≠ $$currentLocalisationStage ]
+	Show Custom Dialog [ Title: "Change localisation stage" ; Message: "Are you sure you want to change localisation stage from " & $$currentLocalisationStage & " to " & $localisation_stage & "?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+	
+	If [ Get(lastMessageChoice) = 1 ]
+		# Add event to log
+		Set Variable [ $event_text[1] ; $caller & ": Manual change of localisation stage from " & $$currentLocalisationStage & " to " & $localisation_stage & "." ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		
+		If [ $caller = "Title localisation" And Count ( FAT Localisation @ Title::PrimaryKey ) > 0 ]
+			# If Title localisation - add to all childrens event log
+			Go to Related Record [ Table: FAT Localisation @ Title ; Layout: "TABLE FAT Localisation @ Package" ; Show related ]
+			Loop [ Flush: Always ]
+				Set Variable [ $localisation_id[1] ; FAT Localisation @ Package::PrimaryKey ]
+				Set Field [ FAT Localisation @ Package::Localisation stage ; $localisation_stage ]
+				Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+		End If
+		Set Variable [ $$currentLocalisationStage[1] ; $localisation_stage ]
+	Else
+		If [ $caller = "Title localisation" ]
+			Set Field [ FAT Localisation::Localisation stage ; $localisation_stage ]
+		Else
+			Set Field [ FAT Localisation @ Package::Localisation stage ; $localisation_stage ]
+		End If
+	End If
+	
+End If
+

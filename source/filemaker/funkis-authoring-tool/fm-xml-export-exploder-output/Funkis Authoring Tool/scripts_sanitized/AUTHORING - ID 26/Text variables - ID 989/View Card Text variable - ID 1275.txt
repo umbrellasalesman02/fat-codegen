@@ -1,0 +1,18 @@
+
+Freeze Window
+Set Variable [ $textvariable_id[1] ; GetScriptProperty ( "textvariable_id" ) ]
+# Caller can be "Title"
+Set Variable [ $caller[1] ; GetScriptProperty("caller") ]
+
+
+# Open card
+Set Variable [ $$currentWindow[1] ; Get(windowName) ]
+If [ $caller = "Title" ]
+	New Window [ Style: Card ; Name: "Text variable - AI prompt" ; Layout: "FAT Text variable Card" ; Height: 680 * Get(WindowZoomLevel)/100 ; Width: 1140 * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+End If
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Go to Object [ FAT List item::LastAdaptiveSettingsTab ; Repetition: 1 ]
+
+Perform Script [ From list ; "Init Text variable Rich Text Editor" ; Parameter: $caller ]
+
+

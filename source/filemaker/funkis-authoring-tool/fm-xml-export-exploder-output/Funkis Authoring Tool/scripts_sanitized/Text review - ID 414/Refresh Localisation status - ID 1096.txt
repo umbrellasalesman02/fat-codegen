@@ -1,0 +1,281 @@
+
+# This script uses SQL calculation in a loop for all 5 statuses for translated texts
+
+# Text status can be:
+  1. Not translated
+  2. Sent to API (only asynchronous machine translation)
+  3. Not reviewed
+  4. In progress
+  5. Approved
+
+Set Variable [ $mode[1] ; Get(scriptParameter) ]
+
+Set Variable [ $status_list[1] ; "Not translated¶Sent to API¶Not reviewed¶In progress¶Approved" ]
+If [ $mode = "Title" ]
+	Set Variable [ $field_list[1] ; GetFieldName ( FAT Title::TFs Not_translated ) &"¶"&
+					GetFieldName ( FAT Title::TFs Sent_to_api )&"¶"&
+					GetFieldName ( FAT Title::TFs Not_reviewed )&"¶"&
+					GetFieldName ( FAT Title::TFs In_progress )&"¶"&
+					GetFieldName ( FAT Title::TFs Approved ) ]
+	
+Else If [ $mode = "Title localisation"  // Localisation ]
+	Set Variable [ $field_list[1] ; GetFieldName ( FAT Localisation::TFs Not_translated ) &"¶"&
+					GetFieldName ( FAT Localisation::TFs Sent_to_api )&"¶"&
+					GetFieldName ( FAT Localisation::TFs Not_reviewed )&"¶"&
+					GetFieldName ( FAT Localisation::TFs In_progress )&"¶"&
+					GetFieldName ( FAT Localisation::TFs Approved ) ]
+Else If [ $mode = "Package localisation"  //Localisation @ Title ]
+	Set Variable [ $field_list[1] ; GetFieldName ( FAT Localisation @ Title::TFs Not_translated ) &"¶"&
+					GetFieldName ( FAT Localisation @ Title::TFs Sent_to_api )&"¶"&
+					GetFieldName ( FAT Localisation @ Title::TFs Not_reviewed )&"¶"&
+					GetFieldName ( FAT Localisation @ Title::TFs In_progress )&"¶"&
+					GetFieldName ( FAT Localisation @ Title::TFs Approved ) ]
+Else If [ $mode = "Localisation"  //Localisation @ Package ]
+	Set Variable [ $field_list[1] ; GetFieldName ( FAT Localisation @ Package::TFs Not_translated ) &"¶"&
+					GetFieldName ( FAT Localisation @ Package::TFs Sent_to_api )&"¶"&
+					GetFieldName ( FAT Localisation @ Package::TFs Not_reviewed )&"¶"&
+					GetFieldName ( FAT Localisation @ Package::TFs In_progress )&"¶"&
+					GetFieldName ( FAT Localisation @ Package::TFs Approved ) ]
+End If
+
+Set Variable [ $i[1] ; 1 ]
+
+Loop [ Flush: Always ]
+	Set Variable [ $status[1] ; GetValue ( $status_list ; $i ) ]
+	If [ $mode = "Title" ]
+		Set Variable [ $num_of_texts[1] ; Let ( [
+						
+						    //input
+						    lc=FAT Title::gCurrentLocalisationCode;
+						    title = FAT Title::PrimaryKey;
+						    status = $status;
+						    package = FAT Text::gPackage;
+						
+						    //count field
+						    cf = #F ( FAT Text::PrimaryKey );
+						    
+						
+						    //from table
+						    table = #T ( FAT Text::PrimaryKey);
+						
+						    //where fields
+						
+						    lc_f = #F ( FAT Text::Localisation code );
+						    status_f = #F ( FAT Text::Status );
+						    title_f = #F ( FAT Text::Title id );
+						    package_f = #F ( FAT Text::Package id );
+						
+						    ~query = Case(package = ""; 
+						
+						       "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=?";
+						       "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f=?"
+						    );
+						
+						~sqlQuery = Substitute (  ~query ; 
+						            ["~cf"; cf];
+						            ["~table"; table];
+						            ["~lc_f"; lc_f];
+						            ["~title_f"; title_f];
+						            ["~package_f"; package_f];
+						            ["~status_f"; status_f]
+						 )
+						
+						   
+						
+						];
+						
+						Case(package = ""; 
+						
+						    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status );
+						
+						    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status; package )
+						)
+						
+						//~sqlQuery & ", " & lc & ", " & title & ", " & status
+						
+						 ) ]
+	Else If [ $mode = "Title localisation" // Localisation ]
+		Set Variable [ $num_of_texts[1] ; Let ( [
+						
+						    //input
+						    lc=FAT Localisation::Localisation code;
+						    title = FAT Title::PrimaryKey;
+						    status = $status;
+						    package = "";
+						
+						    //count field
+						    cf = #F ( FAT Text::PrimaryKey );
+						    
+						
+						    //from table
+						    table = #T ( FAT Text::PrimaryKey);
+						
+						    //where fields
+						
+						    lc_f = #F ( FAT Text::Localisation code );
+						    status_f = #F ( FAT Text::Status );
+						    title_f = #F ( FAT Text::Title id );
+						    package_f = #F ( FAT Text::Package id );
+						
+						    ~query = Case(package = ""; 
+						
+						       "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=?";
+						       "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f=?"
+						    );
+						
+						~sqlQuery = Substitute (  ~query ; 
+						            ["~cf"; cf];
+						            ["~table"; table];
+						            ["~lc_f"; lc_f];
+						            ["~title_f"; title_f];
+						            ["~package_f"; package_f];
+						            ["~status_f"; status_f]
+						 )
+						
+						   
+						
+						];
+						
+						Case(package = ""; 
+						
+						    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status );
+						
+						    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status; package )
+						)
+						
+						//~sqlQuery & ", " & lc & ", " & title & ", " & status
+						
+						 ) ]
+	Else If [ $mode = "Package localisation" // Localisation @ Title ]
+		Set Variable [ $num_of_texts[1] ; Let ( [
+						
+						    //input
+						    lc=FAT Localisation @ Title::Localisation code;
+						    title = FAT Title::PrimaryKey;
+						    status = $status;
+						    package = FAT Localisation @ Title::Package id;
+						
+						    //count field
+						    cf = #F ( FAT Text::PrimaryKey );
+						    
+						
+						    //from table
+						    table = #T ( FAT Text::PrimaryKey);
+						
+						    //where fields
+						
+						    lc_f = #F ( FAT Text::Localisation code );
+						    status_f = #F ( FAT Text::Status );
+						    title_f = #F ( FAT Text::Title id );
+						    package_f = #F ( FAT Text::Package id );
+						
+						    ~query = Case(package = ""; 
+						
+						       "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f IS NULL";
+						       "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f=?"
+						    );
+						
+						~sqlQuery = Substitute (  ~query ; 
+						            ["~cf"; cf];
+						            ["~table"; table];
+						            ["~lc_f"; lc_f];
+						            ["~title_f"; title_f];
+						            ["~package_f"; package_f];
+						            ["~status_f"; status_f]
+						 )
+						
+						   
+						
+						];
+						
+						Case(package = ""; 
+						
+						    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status );
+						
+						    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status; package )
+						)
+						
+						//~sqlQuery & ", " & lc & ", " & title & ", " & status
+						
+						 ) ]
+	Else If [ $mode = "Localisation" // Localisation @ Package ]
+		Set Variable [ $num_of_texts[1] ; Let ( [
+						
+						    //input
+						    lc=FAT Localisation @ Package::Localisation code;
+						    title = FAT Localisation @ Package::Title id;
+						    status = $status;
+						    package = FAT Localisation @ Package::Package id;
+						    shared_text = FAT Localisation @ Package::Shared text localisation;
+						
+						    //count field
+						    cf = #F ( FAT Text::PrimaryKey );
+						    
+						
+						    //from table
+						    table = #T ( FAT Text::PrimaryKey);
+						
+						    //where fields
+						
+						    lc_f = #F ( FAT Text::Localisation code );
+						    status_f = #F ( FAT Text::Status );
+						    title_f = #F ( FAT Text::Title id );
+						    package_f = #F ( FAT Text::Package id );
+						
+						    ~query = Case(
+						
+						       package = "" And Not shared_text; 
+						
+						          "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=?";
+						
+						       package = "" And shared_text; 
+						
+						          "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f IS NULL";
+						
+						
+						          "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f=?"
+						    );
+						
+						/*~query = Case(
+						
+						          package = ""; 
+						
+						          "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f IS NULL";
+						
+						
+						          "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f=?"
+						    );*/
+						
+						~sqlQuery = Substitute (  ~query ; 
+						            ["~cf"; cf];
+						            ["~table"; table];
+						            ["~lc_f"; lc_f];
+						            ["~title_f"; title_f];
+						            ["~package_f"; package_f];
+						            ["~status_f"; status_f]
+						 )
+						
+						   
+						
+						];
+						
+						Case(package = ""; 
+						
+						    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status );
+						
+						    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status; package )
+						)
+						
+						//~sqlQuery & ", " & lc & ", " & title & ", " & status
+						
+						 ) ]
+	End If
+	Set Variable [ $field_name[1] ; GetValue($field_list; $i) ]
+	Set Field By Name [ Specify target field: ON ; $field_name ; $num_of_texts ]
+	Set Variable [ $i[1] ; $i + 1 ]
+	Exit Loop If [ $i > 5 ]
+End Loop
+Commit Records/Requests [ With dialog: OFF ]
+
+
+

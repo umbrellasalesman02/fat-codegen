@@ -1,0 +1,591 @@
+<Script>
+	<ScriptReference id="613" name="Go PageItem Special view"></ScriptReference>
+	<ObjectList membercount="50">
+		<Step hash="65454DD69001FD2AAAA3C2874BF15F0B" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="61EE9BBCD1F10A13F1D2CF3CDF1EF1CB" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1ABC097B444222D190C1E2225BCBEACD" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[PatternCount ( FAT Block @ Page item::Name ; "Quiz")]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="59F5C3B4B6B9E8CC6FB524A5B4F351DC" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Go to assigned quiz page"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EF2D43D1E34DF846EFEA9C1CDB1DBCD0" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Case (    // It exist two quiz attributes depending on block.    JSONGetElement ( FAT Page item::Page item JSON ; "quiz_page" ) = "";   JSONGetElement ( FAT Page item::Page item JSON ; "page_id" ) ;   JSONGetElement ( FAT Page item::Page item JSON ; "quiz_page" ))]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$page_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5FB0E866D9E3EE57C389FA9A46DA327D" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[False]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$$pageItemRecordLoadTrigger"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1CA578BE354F5FB2A4A773380F874641" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="906" name="Open card setting"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ("card_window_name" ; "Quiz questions" ) &SetProperty ("card_window_layout" ; "FAT Page item Card" ) &SetProperty ("card_window_width" ; "1140" ) &SetProperty ("card_window_height" ; "680" ) &SetProperty ("item_id" ; $page_id ) &SetProperty ("item_type" ; "Sub page item" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="640731EB58F221BAFDB7925241502E44" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount) > 0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="96907CF1F906B1E81B4754C5B261207D" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[True]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$$pageItemRecordLoadTrigger"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F73A4567F02E7985BE344A6C9CA47452" id="1" name="Perform Script" enable="True">
+			<Options>64</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="968" name="Show page item 2"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter></Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="25CF934BE0E671FA7C66FE95D10D8577" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="E79B02EA6500D7D09FA5B3CBD4EA7AF2" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="694B730898FFCCD3C88BA8FA47C155F3" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[PatternCount ( FAT Block @ Page item::Name ; "Site Activity")]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="719F804C200E2FBB814E687B8AEEB3D9" id="1" name="Perform Script" enable="True">
+			<Options>64</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="13" name="Save Active Layout"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter></Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EF4A966ED6F17E3268313105727F8D03" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Go to the package that the site link refers to - MUST be updated"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CCC76634606E545B09678E8EB9EE897E" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[JSONGetElement ( FAT Page item::Page item JSON ; "package_id" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$package_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B38300D834065F361A754696D0DB7136" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="32" name="TABLE FAT Title"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BFF8DD104AC527F5956E5A24FB880DD8" id="74" name="Go to Related Record" enable="True">
+			<Options>33554440</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="37" name="TABLE FAT Package"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="92A2655BC932EEA8001240EAA4B65F77" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0002BC60D8034847B570EA2FE9673C57" id="72" name="Exit Loop If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[FAT Package::PrimaryKey = $package_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2D929ED366532C8A3802BB2347B27BC8" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>8194</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="True"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6E393AFA50CF8929417FDCFCBFC24DBE" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="44D6D976B0FAE353554D7658AE275F79" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[FAT Package::PrimaryKey = $package_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5C09EAD7D5AA53D31537EC4DF2C705FD" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="30" name="FAT Package"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="88B33B30167E54C760541B060FA4DD6D" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="2D82C18675B1B51A678B2DA4F0C5AF82" id="6" name="Go to Layout" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D68E45A4660C4517AD60C3888B0267B7" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="A6402C658F931FE8EA5603C8D526C9AF" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[PatternCount ( FAT Block @ Page item::Name ; "Activity link")]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5DA60F90BC85516DB8EAD6DEE4747747" id="1" name="Perform Script" enable="True">
+			<Options>64</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="13" name="Save Active Layout"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter></Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="27C48DB36D6BFB418A2FD6CA9782A112" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Go to the package that the site link refers to - MUST be updated"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FC24E3229E08843EC21F3388B0866EC9" id="141" name="Set Variable" breakpoint="True" enable="True">
+			<Options>1064964</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[JSONGetElement ( FAT Page item::Page item JSON ; "activity_link_fat_link_id" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$link_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="89471C90807D2AAD24BEEBC191F0E192" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="455" name="TABLE FAT Link"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="08434AA5335C2118948D5D24C1EC34A4" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$link_id">
+								<FieldReference id="1" name="PrimaryKey">
+									<TableOccurrenceReference id="1065774" name="FAT Link"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A547AF38C321EF6854E7257F0B8F5CBD" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount) = 1]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CFD02684E715A401FB0ABB63401C1414" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="22C126FC827A9120C1E4E9DA875C6D74" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Link::Internal item type]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$level"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1404E19B9E6DAAEE4FCE5125169FCF03" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Link::Title id]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5987F2F8FF26F6E3EC43B3B7A544BD83" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Link::Internal Item id]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="39CE14AE043A64A088C07286B9466D09" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="816" name="Go FAT Item"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "level" ; $level ) &SetProperty ( "title_id" ; $title_id ) &SetProperty ( "item_id" ; $item_id )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="84FF8979D3A87AE908472D4878C06475" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="BD8554645AE074C7390ABA9BBFE827A3" id="6" name="Go to Layout" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="30B66644376A9D2C4DF84A65833DCD7F" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Cannot find target"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["This activity link does not seem to be valid. Maybe it is not set."]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4232B45E8AE97D87BBA05FD807FC681E" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="8D1C56FDA9B6EC203F104CFA06A43E97" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D9A44F8E85C8CF0C60531FD1DF1B73BD" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4D2ADA736D7CBC2379F235658F483DF2" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5AAACEF65D1DBCE8BE6973003B654B22" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="E1232FD66D6A3B394E59AF6C9E0AE6FA" id="1" name="Perform Script" enable="True">
+			<Options>64</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="13" name="Save Active Layout"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter></Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="33AF7FA994A4B1E8F001BD52344FE34E" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="303" name="FAT Page item Special"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EB14B60A0081ABD6AC2B6B25B24D947C" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

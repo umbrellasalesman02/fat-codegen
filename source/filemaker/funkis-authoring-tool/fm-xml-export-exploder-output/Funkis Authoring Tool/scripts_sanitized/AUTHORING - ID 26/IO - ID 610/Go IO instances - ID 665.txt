@@ -1,0 +1,132 @@
+# Also work for IO concpet and Legacy IO concept
+Set Variable [ $io_id[1] ; GetScriptProperty ( "io_id" ) ]
+Set Variable [ $context[1] ; GetScriptProperty ( "caller" ) ]
+Set Error Capture [ ON ]
+Freeze Window
+
+
+
+If [ $context = "Title" ]
+	
+	If [ FAT IO::Number of instances >0 ]
+		# 0 + Count(FAT IO Value::PrimaryKey) + 
+		  Count(FAT Page item @ IO Legacy::PrimaryKey) + 
+		  Count ( FAT List item @ IO::PrimaryKey ) + 
+		  Count (FAT IO @ Source data IO::PrimaryKey) + 
+		  Count (FAT Score Category @ IO::PrimaryKey)
+		  
+		  
+		  
+		  // No need to check for patterncount in IO arrays, since IO Arrays are 1. Legacy and 2. Always corresponds to a Write IO.
+		Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+		Set Variable [ $io_id[1] ; FAT IO::PrimaryKey ]
+		Set Variable [ $list_id[1] ; FAT List item @ IO::Parent id ]
+		Set Variable [ $dynamic_list_id[1] ; FAT List Dynamic @ IO::PrimaryKey ]
+		Set Variable [ $dynamic_list_name[1] ; FAT List Dynamic @ IO::Name ]
+		
+		If [ Get(WindowStyle) = 3 ]
+			Perform Script [ From list ; "Close card Window" ]
+		End If
+		Perform Script [ From list ; "Save Active Layout" ]
+		
+		# Oct 2024: Re-write to use same approach as for lists since IOs can be used in IOs
+		  NOT STARTED YET
+		// # Check number of page items
+		// Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+		// Perform Find [ ⚠️ RESTORE ⚠️ ]
+		// Set Variable [ $number_of_page_items[1] ; Get(foundCount) ]
+		// # Check  number of IOs
+		// Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+		// Perform Find [ ⚠️ RESTORE ⚠️ ]
+		// Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		// Set Variable [ $number_of_IOs[1] ; Get(foundCount) ]
+		// # Check  number of IO Fields
+		// Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+		// Perform Find [ ⚠️ RESTORE ⚠️ ]
+		// Set Variable [ $number_of_Fields[1] ; Get(foundCount) ]
+		// Go to Layout [ Layout: <original layout> ; Animation: None ]
+		// If [ $number_of_page_items > 0 And ($number_of_IOs+$number_of_Fields) = 0 ]
+		// Set Variable [ $show_list[1] ; "page-items" ]
+		// Else If [ $number_of_page_items = 0 And ($number_of_IOs+$number_of_Fields) > 0 ]
+		// Set Variable [ $show_list[1] ; "ios" ]
+		// Else If [ $number_of_page_items > 0 And ($number_of_IOs + $number_of_Fields) > 0 ]
+		// Show Custom Dialog [ Title: "List used in both Page items and IOs" ; Message: "This list is used in both Page items and IOs.¶¶What do you want to view?" ; Default Button: "Page items" ; Button 2: "IOs" ; Button 3: "Cancel" ]
+		// If [ Get(lastMessageChoice) = 1 ]
+		// Set Variable [ $show_list[1] ; "page-items" ]
+		// Else If [ Get(lastMessageChoice) = 2 ]
+		// Set Variable [ $show_list[1] ; "ios" ]
+		// Else
+		// Exit Script []
+		// End If
+		// Else
+		// Show Custom Dialog [ Title: "No page items or IOs found" ; Message: "No page items or IOs are currently using this list." ; Default Button: "OK" ]
+		// End If
+		// Perform Script [ From list ; "Close card Window" ]
+		// Perform Script [ From list ; "Save Active Layout" ]
+		// If [ $show_list = "page-items" ]
+		// Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+		// Perform Find [ ⚠️ RESTORE ⚠️ ]
+		// Go to Related Record [ Table: FAT Page item ; Layout: "FAT Block instances 2" ; Show related ; Match found set ]
+		// Else If [ $show_list = "ios" ]
+		// Go to Layout [ Layout: "FAT IO Found Set" ; Animation: None ]
+		// Perform Find [ ⚠️ RESTORE ⚠️ ]
+		// Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		// Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		// End If
+		// End If
+		
+		If [ $dynamic_list_name ≠ "" ]
+			Show Custom Dialog [ Title: "IO used in Dynamic list" ; Message: "This IO is used in the dynamic list called: \"" & $dynamic_list_name & "\".¶¶Look for this list in list overview. " ; Default Button: "OK" ]
+		End If
+		# Old approach - only check page items
+		Go to Layout [ Layout: "FAT Block instances" ; Animation: None ]
+		# Find both legacy and new io
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		If [ $list_id ≠ "" ]
+			# Search for page items where a list of IOs are included
+			Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 0 ]
+				Show Custom Dialog [ Title: "IO used in List but list is not used" ; Message: "This IO is used in a list but the list is not attached to a page item yet." ; Default Button: "OK" ]
+				Perform Script [ From list ; "Go previous layout" ]
+			End If
+		End If
+	Else
+		Show Custom Dialog [ Title: "IO not used" ; Message: "No page items use this IO." ; Default Button: "OK" ]
+		Perform Script [ From list ; "Go previous layout" ]
+	End If
+	Go to Related Record [ Table: FAT Page item ; Layout: "FAT Block instances 2" ; Show related ; Match found set ]
+	
+Else If [ $context = "Page item" ]
+	If [ Get(WindowStyle) = 3 ]
+		Perform Script [ From list ; "Close card Window" ]
+		Perform Script [ From list ; "Save Active Layout" ]
+	End If
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $io_id[1] ; FAT IO @ Page item::PrimaryKey ]
+	Set Variable [ $list_id[1] ; FAT Page item::List id ]
+	Go to Layout [ Layout: "FAT Block instances 2" ; Animation: None ]
+	# Search IO in BOTH legacy IO and IO
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	If [ $list_id ≠ "" ]
+		# Search for page items where a list of IOs are included
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	End If
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Else If [ $context = "Page item legacy" ]
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $legacy_io_id[1] ; FAT Page item::IO id Legacy ]
+	Set Variable [ $list_id[1] ; FAT Page item::List id ]
+	Go to Layout [ Layout: "FAT Block instances 2" ; Animation: None ]
+	# Search IO in BOTH legacy IO and IO
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	If [ $list_id ≠ "" ]
+		# Search for page items where a list of IOs are included
+		# Did NOT WORK for IO Rate type!!!!
+		// Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	End If
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+End If
+

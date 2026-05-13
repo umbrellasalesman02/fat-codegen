@@ -1,0 +1,29 @@
+# Called from color layout. Checks if color is used in attributes in the whole title.
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $attribute_type[1] ; "color" ]
+Set Variable [ $color_value[1] ; FAT Theme Color::Predefined Color Name ]
+
+# Check attribute values
+Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $foundCount[1] ; Get(foundCount) ]
+
+# Check list item values
+Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $foundCount[1] ; $foundCount + Get(foundCount) ]
+
+# Check page item list item values 
+Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $foundCount[1] ; $foundCount + Get(foundCount) ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Show Custom Dialog [ Title: "Color usage in title" ; Message: "The color \"" & $color_value & "\" is used " & $foundCount & " times in this Title." ; Default Button: "OK" ]
+

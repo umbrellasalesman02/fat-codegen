@@ -1,0 +1,104 @@
+# Using Private Key to log in
+# Called when creating a Title in FAT
+# Called from script Create new Title Step 2 SRV
+
+Set Variable [ $title_environment[1] ; GetScriptProperty ( "title_environment" ) ]
+Set Variable [ $organization_id[1] ; GetScriptProperty ( "organization_id") ]
+Set Variable [ $reference_title[1] ; GetScriptProperty ( "reference_title") ]
+Set Variable [ $slug[1] ; GetScriptProperty ( "title_directory") ]
+Set Variable [ $launchURL[1] ; GetScriptProperty ( "launchURL") ]
+
+
+Set Variable [ $title_description[1] ; "Title created from FAT by user " & Get(accountName) ]
+
+Set Error Capture [ ON ]
+Set Error Logging [ ON ]
+
+# Get environment info
+Go to Layout [ Layout: "TABLE Title Environment" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)= 0 ]
+	Exit Script [ "Error: Cannot create title on Funkis Cloud. Environment cannot be found." ]
+End If
+
+Set Variable [ $theURL[1] ; Title Environment::Root URL & "/api/admin/v1/titles" ]
+Set Variable [ $private_key[1] ; Title Environment::Private API Key ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+# ----- Set default values --------------
+Set Variable [ $availability_json[1] ; JSONSetElement ( "{}" ; "kind" ; "InviteOnly" ; JSONString ) ]
+Set Variable [ $launchinfo_json[1] ; JSONSetElement ( "{}" ; "url" ; $launchURL ; JSONString ) ]
+Set Variable [ $default_event[1] ; JSONSetElement ( "{}" ; 
+				
+				   ["title" ; "Development Event" ; JSONString];
+				   ["properties"; ""; JSONObject]
+				
+				) ]
+# ----- End default values --------------
+
+# Communicate with the API to create the title on Funkis Cloud
+Set Variable [ $body[1] ; JSONSetElement ( "{}" ; 
+				
+				    [ "title"; $reference_title; JSONString];
+				    [ "description"; $title_description; JSONString];
+				    [ "slug"; $slug; JSONString];
+				    [ "availability"; $availability_json; JSONObject];
+				    [ "launchInfo"; $launchinfo_json; JSONObject];
+				    [ "organization"; $organization_id; JSONString];
+				    [ "events"; "[" & $default_event & "]"; JSONArray]
+				 ) ]
+Set Variable [ $cURL_options[1] ; _cURL_request ( "POST" ) & 
+				_cURL_header ( "Authorization" ; "Bearer " & $private_key ) & 
+				_cURL_header ( "Content-Type" ; "application/json" ) & 
+				_cURL_header ( "Accept" ; "application/json" ) & 
+				_cURL_show_error & 
+				_cURL_data___string ( $body ) ]
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ; $cURL_options ]
+
+Set Variable [ $last_error[1] ; Get(lastError) ]
+If [ $last_error ≠ 0 ]
+	Show Custom Dialog [ Title: "Authentication to server failed" ; Message: "Error: Please check credentials for superAdmin for chosen title environment." ; Default Button: "OK" ]
+	Exit Script [ "Error: Please check credentials for superAdmin for chosen title environment." ]
+End If
+
+# Get the Funkis Cloud's Title id from Funkis Cloud
+Set Variable [ $fc_title_id[1] ; JSONGetElement ( $resultJSON ; "_id" ) ]
+
+# Get the event id
+Set Variable [ $fc_event_id[1] ; JSONGetElement ( JSONGetElement ( $resultJSON ; "events" ); 0) ]
+
+# Create a session, group and add the FAT user.
+Set Variable [ $user_fc_identifier[1] ; Case ( Get(accountName) = "jensthorsen"; "jens.thorsen@funkismultimedia.se" ; Get(accountName) ) ]
+Set Variable [ $theURL[1] ; Title Environment::Root URL & "/api/admin/v1/events/" & $fc_event_id & "/sync" ]
+Set Variable [ $body[1] ; Let ( [
+				
+				 a = JSONSetElement ( "{}" ; "email" ; $user_fc_identifier ; JSONString );
+				 b = JSONSetElement ( "{}"; ["identifier"; a; JSONObject];["group"; "Group 1"; JSONString]);
+				 c = JSONSetElement (  "{}" ; "members" ; "[" & b & "]" ; JSONArray );
+				 d = JSONSetElement (  c ; "title" ; "Development Session" ; JSONString );
+				 e = JSONSetElement ( "{}" ; "quidditySessions" ; "[" & d & "]" ; JSONArray )
+				
+				
+				];
+				
+				e
+				
+				
+				
+				
+				 ) ]
+Set Variable [ $cURL_options[1] ; _cURL_request ( "PUT" ) & 
+				_cURL_header ( "Authorization" ; "Bearer " & $private_key ) & 
+				_cURL_header ( "Content-Type" ; "application/json" ) & 
+				_cURL_header ( "Accept" ; "application/json" ) & 
+				_cURL_show_error & 
+				_cURL_data___string ( $body ) ]
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ; $cURL_options ]
+
+Exit Script [ $fc_title_id ]
+
+
+
+
+
+

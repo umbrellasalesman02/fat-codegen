@@ -1,0 +1,21 @@
+# Called from a button in media subtitle layout
+Show Custom Dialog [ Title: "Hide subtitles" ; Message: "This operation will exclude all subtitles from being exported in the selected language only." ; Default Button: "OK" ; Button 2: "Cancel" ]
+Set Error Capture [ ON ]
+
+If [ Get ( lastMessageChoice ) = 2 ]
+	Exit Script []
+End If
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+
+# Find texts with media as parent for $$localisation_code texts
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Replace Field Contents [ FAT Text::Status ; Replace with calculation: "Hidden" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+Else
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "Cannot hide subtitles" ; Message: "This media is probably localised. MEdia subtitles cannot be hidden with this function yet." ; Default Button: "OK" ]
+End If
+

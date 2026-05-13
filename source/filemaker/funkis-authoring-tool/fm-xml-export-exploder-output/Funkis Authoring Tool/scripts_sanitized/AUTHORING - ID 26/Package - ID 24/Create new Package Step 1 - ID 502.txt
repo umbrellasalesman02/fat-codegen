@@ -1,0 +1,16 @@
+Set Variable [ $$login_id[1] ; User::User_id ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+Set Variable [ $$currentWindow[1] ; Get(windowName) ]
+
+New Window [ Style: Card ; Name: "New Package" ; Layout: "FAT New Package" ; Height: 740 * Get(WindowZoomLevel)/100 ; Width: 960 * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+
+Freeze Window
+New Record/Request
+Set Field [ FAT Package::Parent id ; $title_id ]
+Set Field [ FAT Package::Hierarchy level ; 1 ]
+Set Field [ FAT Package::Reference name ; "Package name " & FAT Package::Serial ID ]
+Commit Records/Requests [ With dialog: OFF ]
+
+Go to Field [ FAT Package::Reference name ]
+

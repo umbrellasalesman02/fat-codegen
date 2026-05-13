@@ -1,0 +1,215 @@
+# This script is called from the Duplicate scripts - Clone Page item - Clone List item etc
+# If old_tt_id is empty - it means that we duplicate the IO inside the title. 
+  In that case - suffix is used for renaming IO
+
+# If the whole Title is cloned we need to point to new Blocks, Modifiers, Lists, Links, Score Categories, IOs, Tags etc
+# SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+  SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+  SetProperty ( "clone_level" ; $clone_level ) &
+  SetProperty ( "clone_settings" ; $clone_settings ) &
+  SetProperty ( "suffix" ; $suffix ) & 
+  SetProperty ( "object_group_id" ; $object_group_id ) &
+  SetProperty ( "old_tt_id" ; $old_tt_id ) &
+  SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "old_io_id" ; $old_io_id )
+
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $clone_level[1] ; GetScriptProperty ( "clone_level") ]
+Set Variable [ $clone_settings[1] ; GetScriptProperty ( "clone_settings") ]
+# Suffix is only needed when duplicating inside a Title
+Set Variable [ $suffix[1] ; GetScriptProperty ( "suffix") ]
+Set Variable [ $object_group_id[1] ; GetScriptProperty ( "object_group_id" ) ]
+
+# old_tt_id can be empty - when duplicated inside a Title.
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id") ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+Set Variable [ $old_io_id[1] ; GetScriptProperty ( "old_io_id" ) ]
+
+Freeze Window
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $new_name[1] ; TruncateText ( FAT IO::Name & Case ( IsEmpty($suffix); "" ;  " " & $suffix) ; 26 ) // with "..." = 29 characters ]
+Set Variable [ $io_text_1[1] ; TF IO 1::Text ]
+Set Variable [ $io_text_2[1] ; TF IO 2::Text ]
+Set Variable [ $io_type[1] ; FAT IO::IO type ]
+Set Variable [ $hasTextVariables[1] ; Count(FAT Text variable @ IO::PrimaryKey) ]
+Set Variable [ $visible_in_insight[1] ; FAT IO::Insight visible ]
+
+# Connect to new Object group if any
+If [ $isClonedTitle And Not IsEmpty ( FAT IO::Object Group) ]
+	Set Variable [ $old_ogr_id[1] ; FAT IO::Object Group ]
+	Go to Layout [ Layout: "TABLE FAT Object Group" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $new_ogr_id[1] ; FAT Object Group::PrimaryKey ]
+	Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+Else If [ $object_group_id ≠ "" ]
+	# If cloning a Package group - a new object group is created
+	Set Variable [ $new_ogr_id[1] ; $object_group_id ]
+End If
+
+Duplicate Record/Request
+
+Set Field [ FAT IO::Old PrimaryKey from clone ; $old_io_id ]
+Set Field [ FAT IO::Title id ; $title_id ]
+Set Field [ FAT IO::Insight visible ; $visible_in_insight ]
+
+# Set a valid object name - no duplicates allowed in same title, not exceeding number of characters
+Perform Script [ From list ; "Set valid object name" ; Parameter: SetProperty ( "source_textfield" ; GetFieldName ( FAT IO::Name ) ) &
+				SetProperty ( "new_name" ; $new_name ) &
+				SetProperty ( "max_characters" ; 32 ) ]
+
+If [ $new_ogr_id ≠ "" ]
+	Set Field [ FAT IO::Object Group ; $new_ogr_id ]
+End If
+
+Set Variable [ $new_io_id[1] ; FAT IO::PrimaryKey ]
+
+Set Variable [ $source_table[1] ; "io" ]
+
+If [ IO Type::IO has modifiers ]
+	Perform Script [ From list ; "Clone ModifierValue" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) & 
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+					SetProperty ( "old_item_id" ; $old_io_id ) & 
+					SetProperty ( "new_item_id" ; $new_io_id ) &
+					SetProperty ( "suffix" ; $suffix) &
+					SetProperty ( "old_tt_id" ; $old_tt_id ) &
+					SetProperty ( "title_id" ; $title_id ) ]
+	Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+End If
+
+# If there are fields connected - clone fields
+If [ IO Type::IO has fields ]
+	Perform Script [ From list ; "Clone Field" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) & 
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+					SetProperty ( "old_item_id" ; $old_io_id ) &
+					SetProperty ( "new_item_id" ; $new_io_id ) &
+					SetProperty ( "suffix" ; $suffix) &
+					SetProperty ( "old_tt_id" ; $old_tt_id ) &
+					SetProperty ( "title_id" ; $title_id ) ]
+	# Clone field will not change found set in FAT IO TO
+	Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+End If
+
+If [ $hasTextVariables ]
+	Perform Script [ From list ; "Clone Text variable" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+					SetProperty ( "old_item_id" ; $old_io_id ) &
+					SetProperty ( "new_item_id" ; $new_io_id ) &
+					SetProperty ( "suffix" ; $suffix) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "source_type" ; "io") &
+					SetProperty ( "hasFields" ; IO Type::IO has fields) ]
+	# Clone text variable will not change found set in FAT IO TO
+	Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+End If
+
+# A source data IO is used when we use an IO to select from a selection. 
+If [ Not IsEmpty ( FAT IO::Source data IO ) //and something that makes it impossible to call recursive two times ]
+	Set Variable [ $old_source_data_io_id[1] ; FAT IO::Source data IO ]
+	Go to Layout [ Layout: "TABLE FAT IO @ List item" ; Animation: None ]
+	# Search for IO in oldPrimary if it is created earlier in clone process
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) = 0 ]
+		Perform Script [ From list ; "Clone IO SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+						SetProperty ( "clone_level" ; $clone_level ) &
+						SetProperty ( "clone_settings" ; $clone_settings ) &
+						SetProperty ( "object_group_id" ; $object_group_id ) &
+						SetProperty ( "old_tt_id" ; $old_tt_id ) &
+						SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "suffix" ; $suffix) &
+						SetProperty ( "old_io_id" ; $old_source_data_io_id) ]
+		Set Variable [ $new_source_data_io_id[1] ; Get(ScriptResult) ]
+	Else
+		Set Variable [ $new_source_data_io_id[1] ; FAT IO @ List Item::PrimaryKey ]
+	End If
+	Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+	# Go back to where we were in FAT IO
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT IO::Source data IO ; $new_source_data_io_id ]
+End If
+
+# If there are corresponding texts to the io (i.e. rate) create textfields
+If [ IO Type::Number of text fields>0 ]
+	Set Variable [ $source_table[1] ; "io" ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_io_id ) &
+					SetProperty ( "source_table" ; $source_table ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT IO::Text 1 id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Set Field [ TF IO 1::Text ; $io_text_1 ]
+End If
+If [ IO Type::Number of text fields>1 ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_io_id ) &
+					SetProperty ( "source_table" ; $source_table ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT IO::Text 2 id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Set Field [ TF IO 2::Text ; $io_text_2 ]
+End If
+
+# List cloning
+If [ Not IsEmpty ( FAT IO::List id) ]
+	# Add cloneSettings include Lists
+	If [ $isClonedTitle Or PatternCount ( $clone_settings ; "Lists" ) ]
+		# Point to the new List created earlier
+		Set Variable [ $old_list_id[1] ; FAT IO::List id ]
+		Go to Layout [ Layout: "TABLE FAT List Alt" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount) = 1 ]
+			Set Variable [ $new_list_id[1] ; FAT List Alt::PrimaryKey ]
+		Else If [ Get(foundCount) = 0 ]
+			Perform Script [ From list ; "Clone List SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+							SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+							SetProperty ( "clone_level" ; $clone_level ) &
+							SetProperty ( "clone_settings" ; $clone_settings ) &
+							SetProperty ( "suffix" ; $suffix ) & 
+							SetProperty ( "object_group_id" ; $object_group_id ) &
+							SetProperty ( "old_tt_id" ; $old_tt_id ) &
+							SetProperty ( "title_id" ; $title_id ) &
+							SetProperty ( "old_list_id" ; $old_list_id ) ]
+			Set Variable [ $new_list_id[1] ; Get(ScriptResult) ]
+		End If
+		Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+		# Go back to IO if Clone List calls Clone IO
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT IO::List id ; $new_list_id ]
+	End If
+End If
+
+# IO List cloning
+If [ Not IsEmpty ( FAT IO::IO List id) ]
+	If [ $isClonedTitle Or PatternCount ( $clone_settings ; "IOs" ) ]
+		# Point to the new List created earlier
+		Set Variable [ $old_io_list_id[1] ; FAT IO::IO List id ]
+		Go to Layout [ Layout: "TABLE FAT List Alt" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount) = 1 ]
+			Set Variable [ $new_io_list_id[1] ; FAT List Alt::PrimaryKey ]
+		Else If [ Get(foundCount) = 0 ]
+			Perform Script [ From list ; "Clone List SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+							SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+							SetProperty ( "clone_level" ; $clone_level ) &
+							SetProperty ( "clone_settings" ; $clone_settings ) &
+							SetProperty ( "suffix" ; $suffix ) & 
+							SetProperty ( "object_group_id" ; $object_group_id ) &
+							SetProperty ( "old_tt_id" ; $old_tt_id ) &
+							SetProperty ( "title_id" ; $title_id ) &
+							SetProperty ( "old_list_id" ; $old_io_list_id ) ]
+			Set Variable [ $new_io_list_id[1] ; Get(ScriptResult) ]
+		End If
+		Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+		# Go back to IO if Clone List calls Clone IO
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT IO::IO List id ; $new_io_list_id ]
+	End If
+End If
+
+
+Exit Script [ $new_io_id ]
+
+
+

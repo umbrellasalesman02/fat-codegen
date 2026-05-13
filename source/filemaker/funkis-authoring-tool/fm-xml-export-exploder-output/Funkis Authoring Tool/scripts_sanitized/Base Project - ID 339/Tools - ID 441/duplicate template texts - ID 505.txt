@@ -1,0 +1,27 @@
+Set Variable [ $baseproj_id[1] ; "432D61A4-618C-4579-A4E4-427A6B521FDD" ]
+Go to Layout [ Layout: "TABLE Base Project" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $secondary_language_code[1] ; Base Project::Secondary language ]
+Set Variable [ $secondary_country_code[1] ; Base Project::Secondary country ]
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		Set Variable [ $original_key[1] ; FAT Text::PrimaryKey ]
+		Duplicate Record/Request
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		
+		Set Field [ FAT Text::OriginalKey ; $original_key ]
+		Set Field [ FAT Text::Language code ; $secondary_language_code ]
+		Set Field [ FAT Text::Country code ; $secondary_country_code ]
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+

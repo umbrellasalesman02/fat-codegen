@@ -1,0 +1,166 @@
+# This script deletes all OldPrimaryKey from Clone for:
+  Title
+  Package
+  Chapter
+  Page
+  
+  Tags
+  List
+  List items
+  Score category
+  Score rewards
+  IOs
+  Text variables
+  ...
+
+# This is called from Prepare Title Cloning and from Start Content Cloning
+# When called from start Contnet Cloning- mode = "content"
+# When called from Prepare Title Cloning - mode = "object"
+
+
+Set Error Capture [ ON ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $mode[1] ; GetScriptProperty("mode") ]
+Set Variable [ $clone_level[1] ; GetScriptProperty("clone_level") ]
+
+If [ $mode = "content" ]
+	If [ $clone_level = "Package group" ]
+		# This is to secure that we don't delete Old PrimaryKey if we're cloning a Title
+		# ---------- Package group -------------------------------------------
+		Go to Layout [ Layout: "TABLE FAT Package Group" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Replace Field Contents [ FAT Package Group::Old PrimaryKey from clone ; Replace with calculation: "" ]
+		End If
+	End If
+	# ---------- Package -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Package::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	
+	# ---------- Chapter -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Chapter::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	
+	# ---------- Page -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Page::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	
+	# ---------- Tag -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Tag" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Tag::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	
+	# ---------- Link -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Link" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Link::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	
+	# ---------- IO -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT IO::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	
+	# ---------- IO Field -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT IO Field::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	
+	# ---------- Text variables -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Text variable::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	
+	# ---------- List -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT List::Old PrimaryKey from clone ; Replace with calculation: "" ]
+		Go to Related Record [ Table: FAT List item ; Layout: "TABLE FAT List item" ; Show related ; Match found set ]
+		# So the correct way to test for no related records is:
+		  - GTRR Match current record only: test for error 101
+		  - GTRR Match found set: test for error 401
+		If [ Get(lastError) ≠ 401 ]
+			Replace Field Contents [ FAT List item::Old PrimaryKey from clone ; Replace with calculation: "" ]
+		End If
+	End If
+	# ---------- Score category -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Score Category" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Score variable::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	
+	# ---------- Score reward -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Score Reward" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Score Reward::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+Else If [ $mode = "object" ]
+	# Called before duplicating Title objects from script Prepare Title Cloning SRV
+	# SetProperty("title_id"; $old_tt_id)  &
+	  SetProperty("mode"; "object") &
+	  SetProperty("clone_level"; "Title")
+	# $title_id = old_tt_id
+	# ---------- Block -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Block::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	# ---------- Text variables -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Text variable::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	# ---------- Package group -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Package Group" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Package Group::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	# ---------- List of lists -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT List of Lists" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT List of Lists::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	# ---------- Object group - Lists, IOs, Links -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Object Group" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Object Group::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+	# ---------- Modifier -------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Modifier::Old PrimaryKey from clone ; Replace with calculation: "" ]
+	End If
+End If
+
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+

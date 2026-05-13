@@ -1,0 +1,136 @@
+# Called from WebViewer from the function handlePageItemSave - don't change name of script!
+# Also used for translated texts using edit_mode property
+# Also used for Page item List item text AND List item text using edit_mode property
+
+Set Variable [ $updatedWebViewerData[1] ; Get(scriptParameter) ]
+
+If [ Get(layoutTableName) = "FAT Page item" ]
+	// Perform Script [ From list ; "SaveToFAT SRV" ; Parameter: SetProperty ( "updatedWebViewerData" ; $updatedWebViewerData ) &
+					SetProperty ( "pageitem_id" ; FAT Page item::PrimaryKey ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+	// Perform Script on Server with Callback [ ⚠️ PARAMETER "CallbackScriptState" NOT PARSED ⚠️ ; ⚠️ PARAMETER "CallbackScriptReference" NOT PARSED ⚠️ ; ⚠️ PARAMETER "CallbackScriptParameter" NOT PARSED ⚠️ ; From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+	
+	Exit Script []
+Else If [ Get(layoutTableName) = "FAT Page item 2" ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+	Exit Script []
+End If
+
+
+# Below - is for other locations where Quill is used.
+Set Variable [ $HTMLeditor_json[1] ; JSONGetElement ( $updatedWebViewerData ; "texts" ) ]
+// Show Custom Dialog [ Title: "Data from editor" ; Message: $updatedWebViewerData ; Default Button: "OK" ]
+
+If [ JSONGetElement ( $updatedWebViewerData ; "localisation_mode" ) = "translate" And 
+				JSONGetElement ( $updatedWebViewerData ; "edit_mode" ) ≠ "textTranslate" ]
+	Set Variable [ $localisation_code[1] ; JSONGetElement ( $updatedWebViewerData ; "localisation_code" ) ]
+	Set Field [ FAT Title::gCurrentLocalisationCode ; $localisation_code ]
+	If [ FAT Title::gCurrentLocalisationCode ≠ $localisation_code ]
+		Show Custom Dialog [ Title: "Current localisation code cannot be set" ; Message: "Your current texts cannot be saved. Please try agian. " ; Default Button: "OK" ]
+		Exit Script []
+	End If
+End If
+
+If [ JSONGetElement ( $updatedWebViewerData ; "edit_mode" ) = "textTranslate" ]
+	# Called from Translation review layout
+	# Update only text fields that are changed
+	If [ Not Exact ( FAT Text translated::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 )) ]
+		Set Field [ FAT Text translated::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 ) ]
+	End If
+	
+Else If [ JSONGetElement ( $updatedWebViewerData ; "edit_mode" ) = "pageItemListItem" ]
+	# Called from Page item List item layout
+	
+	If [ JSONGetElement ( $updatedWebViewerData ; "localisation_mode" ) = "translate" ]
+		# Translated texts
+		# Update only text fields that are changed
+		If [ Not Exact ( TF LI PI 1 TRANS::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 )) ]
+			Set Field [ TF LI PI 1 TRANS::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 ) ]
+		End If
+		If [ Not Exact ( TF LI PI 2 TRANS::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 )) ]
+			Set Field [ TF LI PI 2 TRANS::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 ) ]
+		End If
+		If [ Not Exact ( TF LI PI 3 TRANS::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 )) ]
+			Set Field [ TF LI PI 3 TRANS::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 ) ]
+		End If
+	Else
+		# Original texts
+		# Update only text fields that are changed
+		If [ Not Exact ( TF LI PI 1::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 )) ]
+			Set Field [ TF LI PI 1::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 ) ]
+		End If
+		If [ Not Exact ( TF LI PI 2::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 )) ]
+			Set Field [ TF LI PI 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 ) ]
+		End If
+		If [ Not Exact ( TF LI PI 3::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 )) ]
+			Set Field [ TF LI PI 3::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 ) ]
+		End If
+	End If
+	
+Else If [ JSONGetElement ( $updatedWebViewerData ; "edit_mode" ) = "titleListItem" ]
+	# Called from List item layout
+	
+	If [ JSONGetElement ( $updatedWebViewerData ; "localisation_mode" ) = "translate" ]
+		# Translated texts
+		# Update only text fields that are changed
+		If [ Not Exact ( TF LI 1 TRANS::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 )) ]
+			Set Field [ TF LI 1 TRANS::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 ) ]
+		End If
+		If [ Not Exact ( TF LI 2 TRANS::Text;  trimHTMLBeforeSave ( $HTMLeditor_json ; 2 )) ]
+			Set Field [ TF LI 2 TRANS::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 ) ]
+		End If
+		If [ Not Exact ( TF LI 3 TRANS::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 )) ]
+			Set Field [ TF LI 3 TRANS::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 ) ]
+		End If
+	Else
+		# Original texts
+		# Update only text fields that are changed
+		If [ Not Exact ( TF LI 1::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 )) ]
+			Set Field [ TF LI 1::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 ) ]
+		End If
+		If [ Not Exact ( TF LI 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 )) ]
+			Set Field [ TF LI 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 ) ]
+		End If
+		If [ Not Exact ( TF LI 3::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 )) ]
+			Set Field [ TF LI 3::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 ) ]
+		End If
+	End If
+	
+Else If [ JSONGetElement ( $updatedWebViewerData ; "edit_mode" ) = "titleLink" ]
+	# Called from Link layout
+	
+	If [ JSONGetElement ( $updatedWebViewerData ; "localisation_mode" ) = "translate" ]
+		# Translated texts
+		# Update only text fields that are changed
+		If [ Not Exact ( TF LK 1 TRANS::Text;  trimHTMLBeforeSave ( $HTMLeditor_json ; 2 )) ]
+			Set Field [ TF LK 1 TRANS::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 ) ]
+		End If
+		If [ Not Exact ( TF LK 2 TRANS::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 )) ]
+			Set Field [ TF LK 2 TRANS::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 ) ]
+		End If
+	Else
+		# Original texts
+		# Update only text fields that are changed
+		If [ Not Exact ( TF LK 1::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 )) ]
+			Set Field [ TF LK 1::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 ) ]
+		End If
+		If [ Not Exact ( TF LK 2::Text; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 )) ]
+			Set Field [ TF LK 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 ) ]
+		End If
+	End If
+	
+Else If [ JSONGetElement ( $updatedWebViewerData ; "edit_mode" ) = "textVariable" ]
+	If [ Not Exact ( FAT Text variable::Manuscript ; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 )) ]
+		Set Field [ FAT Text variable::Manuscript ; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 ) ]
+	End If
+	If [ Not Exact ( FAT Text variable::Loading text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 )) ]
+		Set Field [ FAT Text variable::Loading text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 ) ]
+	End If
+	If [ Not Exact ( FAT Text variable::Background context; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 )) ]
+		Set Field [ FAT Text variable::Background context ; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 ) ]
+	End If
+	
+End If
+
+
+

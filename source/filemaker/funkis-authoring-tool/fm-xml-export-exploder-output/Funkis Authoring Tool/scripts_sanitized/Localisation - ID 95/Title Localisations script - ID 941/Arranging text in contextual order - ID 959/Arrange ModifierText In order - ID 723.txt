@@ -1,0 +1,24 @@
+# Called from Arrange text in order
+# Finds all Attribute Texts and set the right order number for these
+Set Variable [ $recordNumberReference[1] ; GetAsNumber (GetScriptProperty ( "recordNumberReference" )) ]
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Go to Related Record [ Table: TF MV ; Layout: "TABLE FAT Text" ; Show related ; Match found set ]
+# So the correct way to test for no related records is:
+  - GTRR Match current record only: test for error 101
+  - GTRR Match found set: test for error 401
+If [ Get(lastError) ≠ 401 ]
+	Loop [ Flush: Defer ]
+		Set Field [ FAT Text::RecordNumberReference ; $recordNumberReference ]
+		Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Exit Script [ $recordNumberReference ]
+

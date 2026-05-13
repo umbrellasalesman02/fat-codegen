@@ -1,0 +1,588 @@
+<Script>
+	<ScriptReference id="1037" name="VCE FIX"></ScriptReference>
+	<ObjectList membercount="47">
+		<Step hash="97B60E8185EA67E08B103E12C512C126" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Knapp med VCE Special i localisation window&#13;Man gör en Machine localisation på varje package&#13;&#13;Skicka in package_id + localisation code&#13;&#13;Visa alla översatta texter&#13;Kopiera orinal texten på engelska och sök efter den i Safety VTC&#13;Om jag får en EXAKT träff - kopiera den översatta texten till VCE-versionen och sätt som “Approved”&#13;&#13;Title id 0AC673FC-B67E-49C4-8ECF-3DF62ABF238E&#13;&#13;&#13;VCE Scroll Package: 498764E7-545E-46C6-870D-679E5E35296D&#13;VTC Orginal id 90DB184C-27F6-4BBF-BDAE-7F7D6D372E7C&#13;&#13;VCE Slide Package: 17BF05F9-74CD-4824-9364-3675DF5D5F1B&#13;VTC Orginal id 7B237CFD-6E95-4907-83B5-8EE9A0D86DB0"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="75778883A6C454948BC9F68E55D5053D" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D6B099675B27E5251205DE5A4E0FCBC0" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="506E383432FAFA2D096F54B3FCB0F006" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Localisation @ Package::Package id]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$package_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="782806EC17D72182D085ACE3B7EF4AF9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Case ( $package_id = "498764E7-545E-46C6-870D-679E5E35296D" ; "90DB184C-27F6-4BBF-BDAE-7F7D6D372E7C";       $package_id = "17BF05F9-74CD-4824-9364-3675DF5D5F1B" ; "7B237CFD-6E95-4907-83B5-8EE9A0D86DB0")/*VCE Scroll Package: 498764E7-545E-46C6-870D-679E5E35296DVTC Orginal id 90DB184C-27F6-4BBF-BDAE-7F7D6D372E7CVCE Slide Package: 17BF05F9-74CD-4824-9364-3675DF5D5F1BVTC Orginal id 7B237CFD-6E95-4907-83B5-8EE9A0D86DB0*/]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$org_package_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B88F7E301E3A8E346261A6B4CEF626B0" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Localisation @ Package::Localisation code]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$localisation_code"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="86DA2A72BF02D44D448F3C9CD4D0ED33" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="31B778F8B2C69A12784F18D77CDEEC56" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(WindowStyle) = 3]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9603B8D80047F9CEC34AD449AD8A3CDD" id="121" name="Close Window" enable="True">
+			<Options>-2147483646</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="WindowReference">
+					<WindowReference>
+						<Select kind="0" type="current"></Select>
+					</WindowReference>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A41FE0404C7C9D1602DF2FD391D17F9F" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="2EE6F84B8922732C25C01DA3898B6D1A" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1F5F7622EED6A34F38F1A413D72204A2" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="54D7CEE74BBFFA364DDCBCDEFC4A43C6" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F811A1A222B71F995092C48A808E6A1A" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="103" name="TABLE FAT Text Translated"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3244C217A31D01759DFEAEE68A3A3D0E" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Visa alla översatta texter"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3FBE2563292E179B106A1BB60E41BAC5" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="2" action="find">
+							<find criteria="$localisation_code">
+								<FieldReference id="22" name="Localisation code">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$package_id">
+								<FieldReference id="48" name="Package id">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EC485D99C8760652235F89D3B4411CD1" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[0]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$num_of_copied_texts"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="013C2BF4DE8D019577C24A11EE310085" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="30D210435A61EAB2B3126278B54AAC72" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B1FD5BBF301E75FE485BB4A4E44319FA" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Text @ Translation::Text]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$org_en_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="438F8B026F519E3735668317FE46443E" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Kopiera original texten på engelska och sök efter den i Safety VTC"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4CD2A2EA55CEA50DFA92F04A695F2DA9" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="64" name="TABLE FAT Text"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9FA6A6CFC3EAF0604051C02661B20757" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="3" action="find">
+							<find criteria="==$org_en_text">
+								<FieldReference id="6" name="Text">
+									<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="&quot;en-global&quot;">
+								<FieldReference id="22" name="Localisation code">
+									<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$org_package_id">
+								<FieldReference id="48" name="Package id">
+									<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B24A0B29794FE53A09F328FFDBDA3E4C" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount) >0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1642D4C476C18EE0C5AA5A09D81A3EC4" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Om jag får en EXAKT träff - kopiera den översatta texten till VCE-versionen och sätt som “Approved”"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1AC8DF0251612FAE08416F44DE1F5BA8" id="141" name="Set Variable" breakpoint="True" enable="True">
+			<Options>1064964</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Text::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$original_key"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8760F0D5B52D9AC2055E95DC0666FED2" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="2" action="find">
+							<find criteria="$original_key">
+								<FieldReference id="13" name="OriginalKey">
+									<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$localisation_code">
+								<FieldReference id="22" name="Localisation code">
+									<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="544A3910B70BEB26DBC2FE8A33BFC282" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount) = 1]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FC2A8517325A2A5CEAABF2DAEBD2766A" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Text::Text]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$translated_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A296CB213A0CFFE75C3505B748DBFA5C" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="103" name="TABLE FAT Text Translated"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C7C2909951939BBEFB144BCB33A74288" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="6" name="Text">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$translated_text]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="84EA51DA33EC29E034E7365C76647AD7" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="15" name="Status">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Approved"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="498F771379A3CCB68BECD5D9AC920EAA" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$num_of_copied_texts + 1]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$num_of_copied_texts"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="346A0A47CF53000A6A108600AB50E188" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="210199C26CEAD31A19A1AD398F5FAC1E" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="FBAB02293250AD8C8C3BD319DD832F51" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="45DCA8EF07A6EC51244B515F2A86ECF4" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="103" name="TABLE FAT Text Translated"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A5E7DA5D94FAF7D4DF3061B720C5EEF5" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>8194</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="True"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="18CB1B4D58E49E92BEA44E1BD706D616" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="44FDD396FC7A30CBE21AAE7B1DE09615" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F50652EC057070712314E97D73BA0E19" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="36A3B7D6CF32F752975F4667F61C7766" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Completed"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["Successfully copied " & $num_of_copied_texts & " texts from VTC Safety to VCE Safety, localisation code = " & $localisation_code & ".¶¶" & "The copied texts are set with status = \"Approved\"."]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Cancel">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="70F47EA591398F699297B9EC64C219A3" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="266" name="FAT Package Settings"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EA4A2F8C84CEC34FD7A87BF1E706E33F" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F23C247F73969228C7378A2B414DEEE8" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AAEBE383049752F6BCAAE8C12BE882F5" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D9813AA7B2DFC57E479685E4A16DFC72" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

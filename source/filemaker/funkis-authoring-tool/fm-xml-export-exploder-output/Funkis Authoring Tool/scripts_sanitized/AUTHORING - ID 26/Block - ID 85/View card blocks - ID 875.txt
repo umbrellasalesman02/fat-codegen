@@ -1,0 +1,26 @@
+# Called from a button in the Page item layout, Page layout or Chapter lyout
+Freeze Window
+Set Error Capture [ ON ]
+Commit Records/Requests [ With dialog: OFF ]
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+Set Variable [ $view_block[1] ; GetScriptProperty ( "view_block" ) ]
+
+Set Variable [ $$currentWindow[1] ; Get(windowName) ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $block_page_type[1] ; FAT Page::Block page type ]
+Set Variable [ $allowed_block_type[1] ; FAT Page::Allowed Block type ]
+New Window [ Style: Card ; Name: "Explore building blocks" ; Layout: "FAT Block Card" ; Height: 680 * Get(WindowZoomLevel)/100 ; Width: 1140 * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+
+# Caller decides what script to call when adding block in script Create Page item ƒ block  - Page item, Page or Chapter
+Freeze Window
+Set Field [ FAT Block::gCallerLayout ; $caller ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Go to Record/Request/Page [ First ]
+If [ Not IsEmpty ( $view_block ) ]
+	Loop [ Flush: Always ]
+		Exit Loop If [ FAT Block::PrimaryKey = $view_block ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+

@@ -1,0 +1,36 @@
+# Called from a popup menu in page item layout and list item layout
+Set Variable [ $item_type[1] ; Get(scriptParameter) ]
+Set Variable [ $activeObject[1] ; "tab2" ]
+
+Freeze Window
+
+Set Variable [ $score_category_id[1] ; FAT Title::gScoreCategory ID ]
+If [ $item_type = "Page item" ]
+	Set Variable [ $item_id[1] ; FAT Page item::PrimaryKey ]
+Else If [ $item_type = "List item" ]
+	Set Variable [ $item_id[1] ; FAT List item::PrimaryKey ]
+Else If [ $item_type = "PI List item" ]
+	Set Variable [ $item_id[1] ; FAT List item @ Page item::PrimaryKey ]
+Else If [ $item_type = "Page" ]
+	Set Variable [ $item_id[1] ; FAT Page::PrimaryKey ]
+Else If [ $item_type = "Chapter" ]
+	Set Variable [ $item_id[1] ; FAT Chapter::PrimaryKey ]
+End If
+
+Go to Layout [ Layout: "TABLE FAT Score Value" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Score Value::Parent id ; $item_id ]
+Set Field [ FAT Score Value::Parent type ; $item_type ]
+Set Field [ FAT Score Value::Score category ; $score_category_id ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Go to Object [ $activeObject ; Repetition: 1 ]
+
+If [ $item_type = "List item" Or $item_type = "PI List item" ]
+	Set Variable [ $caller[1] ; "Title List" ]
+	Perform Script [ From list ; "Init List item Rich Text Editor" ; Parameter: $caller ]
+End If
+
+Set Field [ FAT Title::gScoreCategory ID ; "" ]
+
+

@@ -1,0 +1,18 @@
+# Called from Text variables portal in Variables layout
+
+Set Variable [ $source_id[1] ; FAT Text variable::Source id ]
+Set Variable [ $source_type[1] ; FAT Text variable::Source type ]
+
+If [ $source_type = "IO" ]
+	Perform Script [ From list ; "View Card IO setting" ; Parameter: SetProperty ( "io_id" ; FAT Text variable::Source id) ]
+Else If [ $source_type = "Link" ]
+	Perform Script [ From list ; "View Link" ; Parameter: SetProperty ( "link_id" ; FAT Text variable::Source id) ]
+Else If [ $source_type = "Funkis Player" ]
+	Show Custom Dialog [ Title: "Source cannot be shown" ; Message: "Funkis Player is the source for this text variable. " ; Default Button: "OK" ]
+Else If [ $source_type = "Funkis Cloud" ]
+	Show Custom Dialog [ Title: "Source cannot be shown" ; Message: "Funkis Cloud is the source for this text variable. " ; Default Button: "OK" ]
+Else If [ $source_type = "AI prompt" ]
+	Perform Script [ From list ; "View Card Text variable" ; Parameter: SetProperty ( "textvariable_id" ; FAT Text variable::PrimaryKey ) &
+					SetProperty ( "caller" ; "Title" ) ]
+End If
+

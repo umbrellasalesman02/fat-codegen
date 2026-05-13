@@ -1,0 +1,1194 @@
+<Script>
+	<ScriptReference id="543" name="Add package id Text Media Modifier"></ScriptReference>
+	<ObjectList membercount="105">
+		<Step hash="70E6EDD62773CD82759C05FC40C1E146" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script set the package id reference for all text and media the package where you stand package. It uses the parent id to find texts "></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0EB05FE2C764724E3D68131BE4C63BA9" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AF9C3607F37763F8393AD16FEC891D44" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1DECE7B102DACF713B00DD4BA660DD96" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Case( GetScriptProperty ( "title_id" )= ""; FAT Title::PrimaryKey; GetScriptProperty ( "title_id" ))]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="888CFCA24E08232DE4EDA95885C59772" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Case( GetScriptProperty ( "package_id" )= ""; FAT Package::PrimaryKey; GetScriptProperty ( "package_id" ))]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$package_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8C86D272FA24C531EA6EA8AB9E37A272" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D3A29BA344F9CA36DF4154D3F5E01733" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="32" name="TABLE FAT Title"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="11E4F750BEF8F156A1C70CF6D3C44E54" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$title_id">
+								<FieldReference id="9" name="PrimaryKey">
+									<TableOccurrenceReference id="1065132" name="FAT Title"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="49C5E8186902F53F9B0275B3E707667E" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="37" name="TABLE FAT Package"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1D5DE8604D81E0732E26BA6E06EC3A9A" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$package_id">
+								<FieldReference id="11" name="PrimaryKey">
+									<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="301AE132242023DCB1E9CB280C3A55A7" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E16831932DE0DC0082F97D9FDDEFEABF" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find all modifierValues having text or media"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="48E770B9BFE6CDC9FC439D2F2F25845C" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Package"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C5BA6CFA337FA3D1EBE487E1A038D1D7" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Package Modifier media"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="376B6562D1F2AAC304A0373A9AB39F1C" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="37" name="TABLE FAT Package"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EBECD7AC03CD6DFEBD0D018D95242854" id="74" name="Go to Related Record" enable="True">
+			<Options>33554952</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065310" name="Media MV PK"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="220" name="TABLE FAT Media"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options matchFoundSet="True" ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0A56893C6F05A850EA7F18A2922919A9" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="30E8152861A07F6DBE29A0577E00DD5B" id="91" name="Replace Field Contents" enable="True">
+			<Options>16513</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="32" name="Package id">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065311" name="FAT Media"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="replace">
+					<List name="Replace with calculation: " value="3">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$package_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AD00F9335FCD5889E4431E112DB512DE" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="8764F9456CC621527F42D842C7912EB2" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="01B7C20F2347DF62B32272F7F55699A7" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Package Modifier text"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="76507C74D5A2B06128CB86A8A4424062" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="37" name="TABLE FAT Package"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="116F57A0EC3E14B8A6C5A22A8C57E78B" id="74" name="Go to Related Record" enable="True">
+			<Options>33554952</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065391" name="TF MV PK"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="64" name="TABLE FAT Text"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options matchFoundSet="True" ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="36D2775E857379757D8720F505D70B9A" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A8086B058A7E99F55D931BCFB7A13F0F" id="91" name="Replace Field Contents" enable="True">
+			<Options>16513</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="48" name="Package id">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="replace">
+					<List name="Replace with calculation: " value="3">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$package_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FDA368C60AB1E5229DAFFB5B3970D804" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="EAD13B96D95E69637D939AB13A59BDD5" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8637BB547C8779CFD882CED9666CA739" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Chapter"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5C4EF020E3C0D48FF8B43B64A83BEF60" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="37" name="TABLE FAT Package"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3C8179090DCFEC1FF9AA6AFA62B14877" id="74" name="Go to Related Record" enable="True">
+			<Options>33554952</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065127" name="FAT Chapter"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="38" name="TABLE FAT Chapter"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options matchFoundSet="True" ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FB00A67E9962066A9EBC6D2759545FC2" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C76FE72F0AFA0D2F0EAF3EBD8C32DC24" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="67B4A65583783D8DC4A329DE6D4C01F7" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Chapter Modifier media"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4B079E7BBEC87FD65502256EEB6DECFF" id="74" name="Go to Related Record" enable="True">
+			<Options>33554952</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065309" name="Media MV CH"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="220" name="TABLE FAT Media"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options matchFoundSet="True" ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CADB212D2952C711DE35ACBDC5775CA3" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="19272F5393FBD64C3A6EE42E9AE89207" id="91" name="Replace Field Contents" enable="True">
+			<Options>16513</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="32" name="Package id">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065311" name="FAT Media"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="replace">
+					<List name="Replace with calculation: " value="3">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$package_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5CC0D31C7037A2DCE9A3987B7AE9FC62" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="65B2988E4FDDBD8B0313B87C1F1E2D8B" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Chapter Modifier text"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7849EA83C30498D337C4E1A7D3E7CCE2" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="38" name="TABLE FAT Chapter"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DF6F39A4E4F3568AE7315D02A73E71D3" id="74" name="Go to Related Record" enable="True">
+			<Options>33554952</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065392" name="TF MV CH"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="64" name="TABLE FAT Text"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options matchFoundSet="True" ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6E3573BD1D386D8D148B19678824C921" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5392A4AC8E7001959DB60BE7B7F56A3A" id="91" name="Replace Field Contents" enable="True">
+			<Options>16513</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="48" name="Package id">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="replace">
+					<List name="Replace with calculation: " value="3">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$package_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B313CA360AD1CBE70D5C53EF2E8DB36A" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="BB3E2E5B40EFB692265F861EDBD14D0E" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Pages"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7AADBB7957B90192790908FE1499DF74" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="38" name="TABLE FAT Chapter"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="98CB1FB4448A8BECF2628361A1D29D72" id="74" name="Go to Related Record" enable="True">
+			<Options>33554952</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065128" name="FAT Page"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="39" name="TABLE FAT Page"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options matchFoundSet="True" ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3480759F81E9506E9DFD11FED42ECDD7" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="99497A979575FB4FB102D582698091B5" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0558F517FA35A727AEDEC63DB77D2382" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Page Modifier media"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A8E923203AA1090F28A7A0CF084B6686" id="74" name="Go to Related Record" enable="True">
+			<Options>33554952</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065308" name="Media MV PG"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="220" name="TABLE FAT Media"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options matchFoundSet="True" ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="935017308DA51983E9DD595DEE3902D5" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E982B47534C87EC9193BE58508878C1A" id="91" name="Replace Field Contents" enable="True">
+			<Options>16513</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="32" name="Package id">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065311" name="FAT Media"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="replace">
+					<List name="Replace with calculation: " value="3">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$package_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1684D21DC1097A44A68ADAAA6C7E3AD0" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="40670602E97AE384AABD8B6925A643A8" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Page Modifier text"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="02993D536DB58CD827E2F128BB6699B0" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="39" name="TABLE FAT Page"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="ED8C74EAB11485B186D1C29B5B89C13B" id="74" name="Go to Related Record" enable="True">
+			<Options>33554952</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065393" name="TF MV PG"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="64" name="TABLE FAT Text"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options matchFoundSet="True" ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3C58576474FBDCDA0FEE7AB3078985D1" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6991FAF80C08AE9851EA040787915CA6" id="91" name="Replace Field Contents" enable="True">
+			<Options>16513</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="48" name="Package id">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="replace">
+					<List name="Replace with calculation: " value="3">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$package_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4DE336D89B78AC116C5F176A801A1B01" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="0CBB828ACCACAE593793334E6DF1802F" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2F63939E3D556BFF5246D600653A66FA" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Page items"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B7BA428A9B39015AF0109096AFFF5471" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="39" name="TABLE FAT Page"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B3E520F1CFBE7A7C4A0984F27C946153" id="74" name="Go to Related Record" enable="True">
+			<Options>33554952</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065129" name="FAT Page item"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="60" name="TABLE FAT Page Item"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options matchFoundSet="True" ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="43BFD3F9B31450F9AE9CAA43048BD2C2" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="693D8EE05FD880E917A39346273E2288" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="070C4B00DBD2C51B2987752E55A48A57" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Page item attribute media"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E9E5C67E4E92DEE2621DF6541FBA7CAD" id="74" name="Go to Related Record" enable="True">
+			<Options>33554952</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065307" name="Media MV PI"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="220" name="TABLE FAT Media"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options matchFoundSet="True" ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2D3EFD8A4F9A82B2E7FB7FE76899B7AF" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9F413F00678389E0D5C97F82E732F709" id="91" name="Replace Field Contents" enable="True">
+			<Options>16513</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="32" name="Package id">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065311" name="FAT Media"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="replace">
+					<List name="Replace with calculation: " value="3">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$package_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BB0B30CE96CBB51CFB39862C621C39A3" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="635B126E1F74DEE66424A5936EC5E2A7" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="60" name="TABLE FAT Page Item"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AC2DB0A434A58F9A8B1DC7ECFE68659C" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Page item attribute text"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="80A46FEAFB679BFF2B9EFAC7E61F7D8F" id="74" name="Go to Related Record" enable="True">
+			<Options>33554952</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065394" name="TF MV PI"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="64" name="TABLE FAT Text"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options matchFoundSet="True" ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="870923ADA390B1E76831D04D332D9E15" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CD8D7546DC496107C981138E2B034209" id="91" name="Replace Field Contents" enable="True">
+			<Options>16513</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="48" name="Package id">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="replace">
+					<List name="Replace with calculation: " value="3">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$package_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="67FB57A5532FBA2107E8AB39D4771162" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="66A23672B73F0050EC9D106C605AB1B2" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="12366BB24138CA6D774B480EB727C4DE" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="60" name="TABLE FAT Page Item"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8430D2784DB905AF8242D66B4A18DFF5" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="False"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="87CB4B0CAAD3C37E6E7EB762F5793814" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="5A7ECE2FC2DC60D30885E799C0FE252B" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="742354EB58B3F43214C34FB22ACB47C3" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="60B7777569111DA5760296C853733A96" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="39" name="TABLE FAT Page"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="463CF1A660D6E8CA2EE32890BEF6AEFE" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="False"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E74CB3A04AE31CAB72F5F6F4514F029A" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="2E3FDEEE65525566062C92F92D993D85" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="F8DA48C4744CD1F07F7F177BD8DEC090" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D54FE09A4E540EBF6DAF1AF7C0D69BB2" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="When all media package id are set - find all media mp4 having subtitles in package"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7D7665CF1FC4D30D8FEB8A9AC844A7A0" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="220" name="TABLE FAT Media"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DA184E1A0FD0CC4AAB1FD6DD8D8C9B45" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="2" action="find">
+							<find criteria="&quot;mp4&quot;">
+								<FieldReference id="21" name="Container file extension">
+									<TableOccurrenceReference id="1065311" name="FAT Media"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$package_id">
+								<FieldReference id="32" name="Package id">
+									<TableOccurrenceReference id="1065311" name="FAT Media"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1B4083BF8486B310AEA840660103BC55" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AD2C1F6FE681BA8592EC054F53013DC5" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F060D283369DDEE0B3DF3DE69AFB271A" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Media::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1B0B7BC20438FB4061C9D03E237CCA60" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="64" name="TABLE FAT Text"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F3E394F0DDD0C3C30F753171B3E6F141" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$item_id">
+								<FieldReference id="8" name="Parent id">
+									<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BB6536EFF34548207EE03B50993AECDF" id="91" name="Replace Field Contents" enable="True">
+			<Options>16517</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="48" name="Package id">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="replace">
+					<List name="Replace with calculation: " value="3">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$package_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DD6F60B7C12F0B23B22D42B259877CDC" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="220" name="TABLE FAT Media"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="47B48027272712E9E655DE8E197DB927" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>8194</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="True"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E746FA4531169287D975218B3AD888A4" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="272FC606DEBB0A42F8316FF38031F1C6" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="358FE71CB90786A752EA2D2019BFE234" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="71F5FB23D70C0E065CD86F4EF201E276" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="47EE563B85F0A8DCE870BBE38F9BE141" id="6" name="Go to Layout" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="248B3C8FC1B71DAEE54C0F8A589B4172" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DC95D898A41C2CDEBE0B74C223B3E5E6" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

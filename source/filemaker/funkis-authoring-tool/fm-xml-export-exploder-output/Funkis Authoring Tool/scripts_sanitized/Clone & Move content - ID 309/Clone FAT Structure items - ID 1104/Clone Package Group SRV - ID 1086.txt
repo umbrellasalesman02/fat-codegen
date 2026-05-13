@@ -1,0 +1,73 @@
+# This script is called from:
+  1. From script Start Cloning
+# Script is designed to work PSOS
+# This script is similar to Clone Title but does not include a total duplication of all Title items. 
+# Depending on what's in clone_settings (IO, List, Link etc) these items will also be duplicated.
+# SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+  SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+  SetProperty ( "clone_level" ; $clone_level ) &
+  SetProperty ( "clone_settings" ; $clone_settings ) &
+  SetProperty ( "package_group_id" ; $new_pkgr_id ) &
+  SetProperty ( "suffix" ; $suffix) &
+  SetProperty ( "title_id" ; $title_id )
+
+Freeze Window
+Set Error Capture [ ON ]
+
+# If the whole Title is cloned we need to point to new Blocks, Modifiers, Lists, Links, Score Categories, IOs, Tags etc
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+Set Variable [ $clone_level[1] ; GetScriptProperty ( "clone_level" ) ]
+Set Variable [ $clone_settings[1] ; GetScriptProperty ( "clone_settings" ) ]
+Set Variable [ $suffix[1] ; GetScriptProperty ( "suffix" ) ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+Set Variable [ $old_pkgr_id[1] ; GetScriptProperty ( "package_group_id") ]
+
+Go to Layout [ Layout: "TABLE FAT Package Group" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $new_pkgr_name[1] ; Case($isClonedTitle ; FAT Package Group::Name; FAT Package Group::Name & " " & $suffix) ]
+
+Duplicate Record/Request
+
+If [ $isClonedTitle Or $isMovedPackage ]
+	Set Field [ FAT Package Group::Title id ; $title_id ]
+End If
+
+Set Variable [ $new_pkgr_id[1] ; FAT Package Group::PrimaryKey ]
+Set Field [ FAT Package Group::Old PrimaryKey from clone ; $old_pkgr_id ]
+Set Field [ FAT Package Group::Name ; $new_pkgr_name ]
+
+# Create new Object group for duplicated IOs, Lists and Tags
+Go to Layout [ Layout: "TABLE FAT Object Group" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Object Group::Title id ; $title_id ]
+Set Field [ FAT Object Group::Name ; $new_pkgr_name ]
+Set Variable [ $object_group_id[1] ; FAT Object Group::PrimaryKey ]
+
+# Find all packages in package group
+# Callers always usde the Alt TO
+Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $package_id[1] ; FAT Package Alt::PrimaryKey ]
+		Perform Script [ From list ; "Clone Package SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+						SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+						SetProperty ( "clone_level" ; $clone_level ) &
+						SetProperty ( "clone_settings" ; $clone_settings ) &
+						SetProperty ( "package_group_id" ; $new_pkgr_id ) &
+						SetProperty ( "object_group_id" ; $object_group_id ) &
+						SetProperty ( "suffix" ; $suffix) &
+						SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "package_id" ; $package_id ) ]
+		
+		Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	
+	
+End If
+

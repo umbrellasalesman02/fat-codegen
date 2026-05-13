@@ -1,0 +1,57 @@
+Freeze Window
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $base_project[1] ; FAT Title::Base project ]
+Set Variable [ $language_code[1] ; FAT Title::Original language code ]
+Set Variable [ $country_code[1] ; FAT Title::Original country code ]
+Set Variable [ $lp_id[1] ; FAT Title::PrimaryKey ]
+If [ $base_project = "" ]
+	Show Custom Dialog [ Title: "Base project not defined" ; Message: "You need to set the base project before creating a new Title." ; Default Button: "OK" ]
+	Exit Script [ "Cancel" ]
+End If
+
+Go to Layout [ Layout: "TABLE Base Project" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+# Base project does only contain texts in two languages primary (en-global) amd secondary (sv-SE)
+
+If [ Get(foundCount)>0 ]
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	# Find texts with parent = base project in either primary (en-global) or secondary (sv-SE) language.
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	# If no texts in this language - use en-global instead.
+	If [ Get ( foundCount )= 0 ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+	If [ Get(foundCount)>0 ]
+		Set Variable [ $foundCount[1] ; Get(foundCount) ]
+		Set Variable [ $recordPosn[1] ; 1 ]
+		Go to Record/Request/Page [ First ]
+		Loop [ Flush: Always ]
+			If [ $language_code = "en" And $country_code = "global" ]
+				# Texts in en-global is the code default id - then take PrimaryKey
+				Set Variable [ $old_globaltext_id[1] ; FAT Text::PrimaryKey ]
+			Else
+				# If sv-SE or other language then take OriginalKey
+				Set Variable [ $old_globaltext_id[1] ; FAT Text::OriginalKey ]
+			End If
+			Duplicate Record/Request
+			Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+			Set Field [ FAT Text::PrimaryKey Override ; $old_globaltext_id ]
+			Set Field [ FAT Text::Title id ; $lp_id ]
+			Set Field [ FAT Text::Parent id ; $lp_id ]
+			Set Field [ FAT Text::Source item type ; "global" ]
+			Set Field [ FAT Text::Source reference ; "Global text" ]
+			# Global codebase text might not have same language and country code as new learning programme
+			Set Field [ FAT Text::Language code ; $language_code ]
+			Set Field [ FAT Text::Country code ; $country_code ]
+			Exit Loop If [ $recordPosn > $foundCount ]
+			Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+		End Loop
+	End If
+End If
+
+Go to Layout [ Layout: "FAT Title Settings" ; Animation: None ]
+

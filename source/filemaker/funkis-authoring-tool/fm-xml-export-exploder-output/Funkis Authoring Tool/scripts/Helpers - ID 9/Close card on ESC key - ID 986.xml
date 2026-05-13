@@ -1,0 +1,69 @@
+<Script>
+	<ScriptReference id="986" name="Close card on ESC key"></ScriptReference>
+	<ObjectList membercount="6">
+		<Step hash="74676BD1805F17183FF02F15B54A1B1B" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called from onKeyTrigger in all Card layouts"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="098DE95061BD81B923CB18276AE8344A" id="87" name="Show Custom Dialog" enable="False">
+			<Options>16389</Options>
+			<ParameterValues membercount="4">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(TriggerKeystroke)]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Cancel">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6D0EB29A3A94249B6192ABFBC434B538" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Code (Get(TriggerKeystroke)) = 27 And Get(WindowStyle) = 3 // Escape key]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8F9004D3DE43CFA5403AAE0193250F43" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Get(WIndowStyle)&#13;0 (zero) if the window is a document window&#13;1 if the window is a floating document window&#13;2 if the window is a dialog window&#13;3 if the window is a card"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F57C78B8EDAEE35FD95800781F8BF504" id="1" name="Perform Script" enable="True">
+			<Options>64</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="411" name="Close card Window"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter></Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0E8953F14494F9665F4610D0FD286AC5" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

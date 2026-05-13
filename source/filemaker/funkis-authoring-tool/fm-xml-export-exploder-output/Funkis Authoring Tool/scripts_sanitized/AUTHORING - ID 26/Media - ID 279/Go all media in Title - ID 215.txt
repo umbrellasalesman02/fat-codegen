@@ -1,0 +1,16 @@
+Freeze Window
+Set Error Capture [ ON ]
+Perform Script [ From list ; "Save Active Layout" ]
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; Get(scriptParameter) ]
+
+Go to Layout [ Layout: "FAT Media" ; Animation: None ]
+If [ IsEmpty ( $package_id ) ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	Set Field [ FAT Media::gPackage ; $package_id ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Perform Script [ From list ; "Show Package Media" ]
+End If
+

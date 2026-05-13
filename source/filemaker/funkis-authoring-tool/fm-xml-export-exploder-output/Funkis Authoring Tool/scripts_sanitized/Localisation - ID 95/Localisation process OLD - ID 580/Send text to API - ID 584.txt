@@ -1,0 +1,140 @@
+# This script can be called from a loop or from a single translation request.
+  It returns the translated text or an id depending on if the transltion is asynchronous or not. 
+
+# The text to translate
+Set Variable [ $text_to_translate[1] ; GetScriptProperty ( "text_to_translate" ) ]
+Set Variable [ $original_localisation_code[1] ; GetScriptProperty ( "original_localisation_code" ) ]
+Set Variable [ $target_localisation_code[1] ; GetScriptProperty ( "target_localisation_code" ) ]
+
+# Some api:s doesn't seem to use the country variable
+Set Variable [ $original_language_code[1] ; getLanguageCode ( $original_localisation_code ) ]
+Set Variable [ $target_language_code[1] ; getLanguageCode ( $target_localisation_code ) ]
+
+# THe translation API
+Set Variable [ $translation_api[1] ; GetScriptProperty ( "translation_api" ) ]
+Set Variable [ $send_api_url[1] ; GetScriptProperty ( "send_api_url" ) ]
+Set Variable [ $api_key[1] ; GetScriptProperty ( "api_key" ) ]
+Set Variable [ $asynchronous[1] ; GetScriptProperty ( "asynchronous" ) ]
+Set Variable [ $routing[1] ; GetScriptProperty ( "routing" ) ]
+
+# ----------------  Start logic for different translation apis ------------------------------------
+
+// Set Variable [ $text_to_translate[1] ; Substitute ( $text_to_translate; 
+				
+				[Char(8221) ; Char(34)];
+				[Char(8220) ; Char(34)]
+				
+				) ]
+
+# Do not translate internal URL - Google Translate do this. 2022 Sept
+If [ Left ( $text_to_translate ; 8 ) = "print://" ]
+	
+	Exit Script [ $text_to_translate ]
+	
+Else
+	
+	# Translate text using machine translation.
+	  Yet, there's no other solution than specific code sequences for each API
+	
+	If [ $translation_api = "78E0ADA2-AF9C-4983-887F-555DDF084C0F" Or $translation_api = "E6ED53FD-A4C2-4260-860D-CE4996D16299"// Google Translation API v2 ]
+		
+		# This encode-decode operation was something needed for Google AutoML
+		// Set Variable [ $text_to_translate[1] ; TextDecode ( TextEncode ( $text_to_translate; "utf-8" ; 1 ) ; "utf-8") ]
+		
+		# Set textJSON according to Google Translate API specification
+		Set Variable [ $TheURL[1] ; $send_api_url
+						& "?key=" & $api_key
+						& "&source=" & $original_language_code 
+						& "&target=" & $target_language_code
+						& "&q=" & $text_to_translate ]
+		Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+		If [ PatternCount ( $resultJSON ; "403" ) ]
+			// Show Custom Dialog [ Title: "Looks like there is a problem - code 403" ; Message: FAT Text translated::gJSONFromAPI ; Default Button: "OK" ]
+			Exit Script [ "Error - code 403" &¶& $resultJSON ]
+		Else
+			Set Variable [ $translatedText[1] ; JSONGetElement ( $resultJSON; "data.translations[0].translatedText" ) ]
+			Set Variable [ $translatedText[1] ; Substitute ( $translatedText ; 
+							
+							["<p> " ; "<p>" ];
+							[" </p>" ; "</p>" ];
+							["<QUOTE>" ; Char(34) ];
+							["&quot;" ; Char(34) ];
+							["&#39;" ; "'" ]
+							
+							) ]
+			Exit Script [ $translatedText ]
+		End If
+		
+		
+	Else If [ $translation_api = "EE355B37-B655-48F6-9D4D-B7B3DE745DDF" // Intento IKEA ikea-best-engines
+					
+					Or 
+					
+					$translation_api = "6A20D8F0-DD6F-41A6-A5EA-FC5617233FB3"  // Intento IKEA ikea-it-desk ]
+		
+		# Set textJSON according to IKEAs Intento Translation API specification
+		Set Variable [ $textJSON[1] ; Let ( 
+						
+						[
+						
+						  context = JSONSetElement ( "{}" ; 
+						            ["text" ; JSONSetElement ( "[]" ; 0 ; $text_to_translate ; JSONString ) ; JSONArray];
+						            ["to" ; $target_localisation_code ; JSONString];
+						            ["from"; $original_localisation_code ; JSONString]);
+						  
+						  service = JSONSetElement ( "{}" ; 
+						            ["routing" ; $routing; JSONString ]; 
+						            ["async" ; True; JSONBoolean ]);
+						
+						  data = JSONSetElement ( "{}" ; 
+						            ["context" ; context ; JSONObject ];
+						            ["service" ; service ; JSONObject ])
+						
+						];
+						
+						data
+						
+						
+						 ) ]
+		
+		# FileMaker Quote function escapes all kind of quotes. These steps escape straight quotes but converts escaped smart quotes back to smart quotes which works. 
+		# In 2023-11-06 Smart quotes was not supported by Intento. The API converted these to straight quotes.
+		Set Variable [ $cURL_textdata[1] ; Quote ( $textJSON ) ]
+		Set Variable [ $cURL_textdata[1] ; Substitute ( $cURL_textdata; 
+						
+						["\\" & Char(8221) ; Char(8221)];
+						["\\" & Char(8220) ; Char(8220)]
+						
+						) ]
+		
+		// Set Variable [ $cURL_options[1] ; _cURL_request ( "POST" ) & 
+						_cURL_header ( "Content-Type" ; "application/json" ) & 
+						_cURL_header ( "Accept" ; "application/json" ) & 
+						_cURL_header ( "apikey" ; $api_key ) & 
+						_cURL_data___string ( $textJSON ) ]
+		Set Variable [ $cURL_options[1] ; _cURL_request ( "POST" ) & 
+						_cURL_header ( "Content-Type" ; "application/json" ) & 
+						_cURL_header ( "Accept" ; "application/json" ) & 
+						_cURL_header ( "apikey" ; $api_key ) & 
+						" -d " & $cURL_textdata ]
+		
+		Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ; $cURL_options ]
+		If [ Not JSONGetElement ( $resultJSON ; "error" ) = False ]
+			# Return something that cannot be a translated text response
+			Exit Script [ "--- ERROR --- " & $resultJSON ]
+		Else
+			Set Variable [ $translation_id[1] ; JSONGetElement ( $resultJSON ; "id" ) ]
+			Exit Script [ $translation_id ]
+		End If
+	End If
+End If
+
+# ------------------------------- End translation APIs -------------------------------
+
+
+
+
+
+
+
+

@@ -1,0 +1,6 @@
+<CustomFunctionCalc>
+	<CustomFunctionReference id="164" name="PrivilegeAccess"></CustomFunctionReference>
+	<Calculation>
+		<Text><![CDATA[// Returns 1 if current accounts privilege set is the same or "above" privilege. // Privilege hierarchy: Translator, Editor, Author, Developer, [Full access]Let ( [        currentPrivilege = Get ( currentPrivilegeSetName ) ;    access = Case(                        currentPrivilege = "[Full access]" ;                        1;                        Case(currentPrivilege = "Developer" And privilege ≠ "[Full access]";                        1;                        Case(currentPrivilege = "Author" And privilege ≠ "Developer" And privilege ≠ "[Full access]";                        1;                        Case(currentPrivilege = "Editor" And privilege = "Translator" Or privilege = "Editor";                        1;                        Case(currentPrivilege = "Translator" And privilege ="Translator";                        1;                       0                   )))))];  access )]]></Text>
+	</Calculation>
+</CustomFunctionCalc>

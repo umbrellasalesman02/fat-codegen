@@ -1,0 +1,22 @@
+/* --------------------------------------------------------------------------------
+Returns a list with value at position 'index' removed
+
+Syntax: DeleteValue ( valuelist ; index )
+
+In: list - the return delimited list to search
+      index - the position (1-...) of the value to delete
+
+Return type: Text (a list with leading and trailing returns removed)
+
+DeleteValue ( "John¶Paul¶Brian¶George¶Ringo" ; 3 )   --> "John¶Paul¶George¶Ringo"
+
+Theo Ros
+-------------------------------------------------------------------------------- */
+
+Let ( [ valuelist = LeftWords ( valuelist ; 999999999 ) ;
+           totalvalues = ValueCount ( valuelist ) ] ;
+  Case ( index < 1 Or index > totalvalues ; valuelist ;
+    LeftWords ( LeftValues ( valuelist ; index - 1 ) & 
+                        MiddleValues ( valuelist ; index + 1 ; 999999999 ) ; 999999999 )
+  )
+)

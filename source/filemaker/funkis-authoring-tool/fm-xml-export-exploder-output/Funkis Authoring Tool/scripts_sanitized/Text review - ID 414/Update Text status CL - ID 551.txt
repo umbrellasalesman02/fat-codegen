@@ -1,0 +1,20 @@
+# This script is called from an update button in the Translated Text Review layout
+  Package id might not be selected from the dropdown gPackage
+# The script is also called from Login window via script Go translated texts ƒ login
+# The script is also called from Show Package Text - the OnObjectModifiy trigger popup menu
+
+
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+# Commented row below 2023-11-20 - only Title progress is dispalyed
+// Set Variable [ $package_id[1] ; FAT Text translated::gPackage ]
+
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+// Perform Script [ From list ; "Get translation progress" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty ( "localisation_code" ; $$localisation_code ) ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+Set Field [ FAT Text translated::gViewTranslationStatus ; "All" ]
+

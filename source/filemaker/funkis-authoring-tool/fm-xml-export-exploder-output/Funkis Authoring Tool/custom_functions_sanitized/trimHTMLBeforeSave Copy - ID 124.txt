@@ -1,0 +1,27 @@
+Let ( 
+
+[
+textArrayPos = textFieldNum - 1 + 1;
+isHTML= GetAsBoolean(JSONGetElement(HTMLeditor_json; "[" & textArrayPos & "]html" ));
+textstring = JSONGetElement(HTMLeditor_json; "[" & textArrayPos & "]value" );
+textString = Substitute(textstring ;
+["---percent---"; "%"] ;
+["---plus---"; "+"] ;
+["---hash---"; "#"];
+["---and---"; "&"];
+["---equals---"; "="]
+
+);
+
+textString = Case ( textString="<p><br></p>" Or textString = "<br> "; "" ; textString ) ;
+textString = Case (isHTML = False;  
+  textString = Substitute(textstring ;
+       ["<p>"; "<br>"] ;
+       ["</p>"; ""] ))
+
+
+]; 
+
+textString
+
+)

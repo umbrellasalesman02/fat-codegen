@@ -1,0 +1,16 @@
+# This script is logging events that goes wrong when using the API and a custom dialog cannot be shown to the user. 
+Set Variable [ $$changeLog[1] ; "" ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $user[1] ; Case(IsEmpty(GetScriptProperty ( "user" )); "*"; GetScriptProperty ( "user" )) ]
+Set Variable [ $fromDate[1] ; Case(IsEmpty(GetScriptProperty ( "fromDate" )); "*"; "≥" & GetScriptProperty ( "fromDate" )) ]
+Set Variable [ $toDate[1] ; Case(IsEmpty(GetScriptProperty ( "toDate" )); "*"; "≤" & GetScriptProperty ( "toDate" )) ]
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+
+

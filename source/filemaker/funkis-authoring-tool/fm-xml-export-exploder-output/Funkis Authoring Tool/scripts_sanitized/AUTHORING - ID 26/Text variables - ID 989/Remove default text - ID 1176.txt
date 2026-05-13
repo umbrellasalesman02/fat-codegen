@@ -1,0 +1,33 @@
+
+
+# Called from a button in IO Card window AND in Link Card window
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+
+If [ $caller = "Link" ]
+	Set Variable [ $text_id[1] ; FAT Text variable @ Link::Default Text id ]
+Else If [ $caller = "IO" ]
+	Set Variable [ $text_id[1] ; FAT Text variable @ IO::Default Text id ]
+Else If [ $caller = "IO_in_list" ]
+	Set Variable [ $text_id[1] ; FAT Text variable @ IO LI::Default Text id ]
+End If
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Delete Record/Request [ With dialog: OFF ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+If [ $caller = "Link" ]
+	
+Else If [ $caller = "IO" ]
+	Go to Object [ "TextVars" ; Repetition: 1 ]
+Else If [ $caller = "IO_in_list" ]
+	Go to Object [ "TextVars" ; Repetition: 1 ]
+End If
+

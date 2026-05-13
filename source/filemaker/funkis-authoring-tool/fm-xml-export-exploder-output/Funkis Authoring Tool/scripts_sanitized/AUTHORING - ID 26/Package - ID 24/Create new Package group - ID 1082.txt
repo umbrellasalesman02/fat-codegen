@@ -1,0 +1,13 @@
+Show Custom Dialog [ Title: "New package group" ; Message: "What is the name of your package group?" ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $group_name ; Label 1: "Package group name" ]
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Package Group" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Package Group::Title id ; $title_id ]
+Set Field [ FAT Package Group::Name ; $group_name ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+

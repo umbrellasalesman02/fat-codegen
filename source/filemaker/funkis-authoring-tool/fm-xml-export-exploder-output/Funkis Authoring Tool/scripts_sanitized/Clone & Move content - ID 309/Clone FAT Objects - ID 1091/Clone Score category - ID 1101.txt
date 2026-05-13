@@ -1,0 +1,106 @@
+# Called from Clone Score Values
+# Called from inside loop of Clone Title Score category using FAT Score Category Alt TO
+# when this script is called we clone WITHOUT checking if it already exist an old cloned Sore category
+
+# SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+  SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+  SetProperty ( "clone_settings" ; $clone_settings ) &
+  SetProperty ( "suffix" ; $suffix ) & 
+  SetProperty ( "object_group_id" ; $object_group_id ) &
+  SetProperty ( "old_tt_id" ; $old_tt_id ) &
+  SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "old_score_category_id" ; $old_score_category_id )
+
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle" )) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $clone_settings[1] ; GetScriptProperty ( "clone_settings" ) ]
+Set Variable [ $suffix[1] ; GetScriptProperty ( "suffix" ) ]
+Set Variable [ $object_group_id[1] ; GetScriptProperty ( "object_group_id" ) ]
+
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $old_score_category_id[1] ; GetScriptProperty ( "old_score_category_id" ) ]
+
+Set Error Capture [ ON ]
+
+# Duplicate Score categories - preparing fto link via Old PrimaryKey from clone
+# Check how texts are handled
+Go to Layout [ Layout: "TABLE FAT Score Category" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $name[1] ; Case ( Not IsEmpty($suffix); TF SC Name::Text & " " & $suffix; TF SC Name::Text) ]
+Set Variable [ $description[1] ; TF SC Description::Text ]
+Set Variable [ $unit[1] ; TF SC Unit::Text ]
+Set Variable [ $conversion_value[1] ; TF SC Conversion value::Text ]
+Set Variable [ $score_icon[1] ; Media SC Icon::Media container ]
+
+Duplicate Record/Request
+
+Set Field [ FAT Score variable::Old PrimaryKey from clone ; $old_score_category_id ]
+Set Field [ FAT Score variable::Title id ; $title_id ]
+Set Variable [ $new_score_category_id[1] ; FAT Score variable::PrimaryKey ]
+Set Variable [ $old_io_id[1] ; FAT Score variable::IO id ]
+# Change IO id since it has to be a unique value when we leave this layout
+Set Field [ FAT Score variable::IO id ; $old_io_id & GetAsText ( Get(currentTimeStamp)) ]
+
+# All score categories needs a corresponding IO
+Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+# Look for an IO in oldPrimaryKey
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) = 1 ]
+	Set Variable [ $new_io_id[1] ; FAT IO::PrimaryKey ]
+Else If [ Get(foundCount)=0 ]
+	Perform Script [ From list ; "Clone IO SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+					SetProperty ( "clone_settings" ; $clone_settings ) &
+					SetProperty ( "suffix" ; $suffix ) & 
+					SetProperty ( "object_group_id" ; $object_group_id ) &
+					SetProperty ( "old_tt_id" ; $old_tt_id ) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "old_io_id" ; $old_io_id ) ]
+	Set Variable [ $new_io_id[1] ; Get(ScriptResult) ]
+End If
+Go to Layout [ Layout: "TABLE FAT Score Category" ; Animation: None ]
+Set Field [ FAT Score variable::IO id ; $new_io_id ]
+
+
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_score_category_id ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Score variable::Name text id ) ) &
+				SetProperty ( "learningprogramme_id" ; $title_id ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Set Field [ TF SC Name::Text ; $name ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_score_category_id ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Score variable::Description text id ) ) &
+				SetProperty ( "learningprogramme_id" ; $title_id ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Set Field [ TF SC Description::Text ; $description ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_score_category_id ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Score variable::Unit text id ) ) &
+				SetProperty ( "learningprogramme_id" ; $title_id ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Set Field [ TF SC Unit::Text ; $unit ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_score_category_id ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Score variable::Conversion value text id ) ) &
+				SetProperty ( "learningprogramme_id" ; $title_id ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Set Field [ TF SC Conversion value::Text ; $conversion_value ]
+
+Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $new_score_category_id ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_mediafield" ; GetFieldName ( FAT Score variable::Score icon media id) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) &
+				SetProperty ( "learningprogramme_id" ; $title_id ) ]
+Set Field [ Media SC Icon::Media container ; $score_icon ]
+
+
+
+# Return the new Tag id
+Exit Script [ $new_score_category_id ]
+
+
+

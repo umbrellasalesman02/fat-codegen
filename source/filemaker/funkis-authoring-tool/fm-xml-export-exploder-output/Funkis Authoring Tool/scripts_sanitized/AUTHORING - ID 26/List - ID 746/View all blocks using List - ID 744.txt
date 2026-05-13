@@ -1,0 +1,14 @@
+# Called from a button on layout Title Content Array Setting
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $title_id[1] ; FAT IO::Title id ]
+Set Variable [ $tca_id[1] ; FAT List::PrimaryKey ]
+Perform Script [ From list ; "Close card Window" ]
+Perform Script [ From list ; "Save Active Layout" ]
+Go to Layout [ Layout: "FAT Block instances" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) = 0 ]
+	Show Custom Dialog [ Title: "No page items found" ; Message: "There are no page items in this Title that use this List yet." ; Default Button: "OK" ]
+	Perform Script [ From list ; "Go previous layout" ]
+End If
+

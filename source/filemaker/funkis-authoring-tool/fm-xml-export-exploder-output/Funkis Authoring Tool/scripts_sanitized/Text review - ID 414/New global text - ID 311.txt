@@ -1,0 +1,16 @@
+Set Variable [ $location_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $source_table[1] ; "global" ]
+Set Variable [ $source_textfield[1] ; "Global text" ]
+Set Variable [ $caller_layout[1] ; Get(layoutName) ]
+
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $location_id ) &
+				SetProperty ( "source_table" ; $source_table ) &
+				SetProperty ( "source_textfield" ; $source_textfield ) &
+				SetProperty ( "caller_layout" ; $caller_layout) ]
+Set Field [ FAT Text::Text ; "New global text" ]
+Set Field [ FAT Text::gFilterType ; "Global texts" ]
+Perform Script [ From list ; "Filter text" ]
+Go to Portal Row [ Select: ON ; Last ]
+Go to Field [ Select/perform ; FAT Text::Text ]
+
+

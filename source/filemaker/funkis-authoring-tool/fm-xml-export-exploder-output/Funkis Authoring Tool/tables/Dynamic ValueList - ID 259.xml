@@ -1,0 +1,33 @@
+<FieldCatalog>
+	<UUID modifications="6" userName="jensthorsen" accountName="jensthorsen" timestamp="2025-05-19T15:33:56">901D023A-6585-4C1A-84CE-4E5CDCD9EC5A</UUID>
+	<BaseTableReference id="259" name="Dynamic ValueList"></BaseTableReference>
+	<ObjectList membercount="3">
+		<Field id="6" name="Text value" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="3" userName="jensthorsen" accountName="jensthorsen" timestamp="2025-05-19T15:32:39">806D7696-51EF-4CE3-8CB6-D9A7984F19DF</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="7" name="Order" fieldtype="Normal" datatype="Number" comment="">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2025-05-19T15:32:47">D659C102-49C9-4860-A810-6D6DEF940811</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="8" name="sortOrder Calculation" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2025-05-19T15:33:55">6D4DA003-0842-415E-BA0D-92C11CB7A5D1</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="True" autoIndex="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065972" name="Dynamic ValueList"></TableOccurrenceReference>
+				<Text><![CDATA[Substitute ( 10^Order - 1 ; 9 ; " " )//This calculation can be a bit hard to figure out unless you hand calculate it a step at a time.//10^Order is an exponent calculation, 10 rased to the power of the value of Order. If order = 3, this part evaluates as 10^3 or 1000//Subtracting 1 changes the value to a number where all the digits are 9's. If order = 3, you get 1000- 1 or 999. Note that the number of digits = the value of Order//The substitute function then replaces each digit of 9 with a space so 999 becomes "   " or 3 space characters. The number of spaces equals the value of Order//Since spaces are not visible, they do not appear in a value list when you use this field as Field 2 in a value list and specify field 2 as the sort field.]]></Text>
+			</Calculation>
+		</Field>
+	</ObjectList>
+</FieldCatalog>

@@ -1,0 +1,77 @@
+# This script is called from both translation scripts and from review scripts
+
+# Updated 2024-03-28 - Using SQL
+  Package progress ONLY include Package texts and Shared Titles texts are managed in a separate localisation
+
+Set Error Capture [ ON ]
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+# Status type = "progress" or "status" - decides what to report back
+Set Variable [ $status_type[1] ; GetScriptProperty ( "status_type" ) ]
+
+# Either send in localisation id
+Set Variable [ $localisation_id[1] ; GetScriptProperty ( "localisation_id" ) ]
+
+# Or Title, Package and localisation code - from translation review?
+# Since 2023-11-19 onlyt Title progress is shown in Translation review - so no need for package id? 
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty ( "localisation_code" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Localisation @ Package" ; Animation: None ]
+If [ $localisation_id = "" ]
+	If [ $package_id ≠ "" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Variable [ $localisation_id[1] ; FAT Localisation @ Package::PrimaryKey ]
+	Else
+		# Show all localisation for this Title
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+Else
+	# Find the localisation
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $title_id[1] ; FAT Localisation @ Package::Title id ]
+	Set Variable [ $package_id[1] ; FAT Localisation @ Package::Package id ]
+	Set Variable [ $localisation_code[1] ; FAT Localisation @ Package::Localisation code ]
+	Set Variable [ $shared_text_localisation_id[1] ; FAT Localisation @ Package::Shared text localisation id ]
+	Set Variable [ $shared_text_localisation[1] ; FAT Localisation @ Package::Shared text localisation ]
+End If
+
+# Text status can be:
+  1. Not translated
+  2. Sent to API (only asynchronous machine translation)
+  3. Not reviewed
+  4. In progress
+  5. Approved
+
+# Refresh all status
+Perform Script [ From list ; "Refresh Localisation status" ; Parameter: "Localisation" ]
+
+Set Variable [ $not_translated[1] ; FAT Localisation @ Package::TFs Not_translated ]
+Set Variable [ $sent_to_api[1] ; FAT Localisation @ Package::TFs Sent_to_api ]
+Set Variable [ $not_reviewed[1] ; FAT Localisation @ Package::TFs Not_reviewed ]
+Set Variable [ $in_progress[1] ; FAT Localisation @ Package::TFs In_progress ]
+Set Variable [ $approved[1] ; FAT Localisation @ Package::TFs Approved ]
+
+If [ $status_type = "progress" ]
+	Exit Script [ Round ( 100*$approved/($not_translated + $sent_to_api + $not_reviewed + $in_progress + $approved) ; 0) & "% texts approved." ]
+Else If [ $status_type = "status" ]
+	Exit Script [ "Not translated: " & $not_translated & ", Sent to API: "& $sent_to_api & ", Not reviewed: " &  $not_reviewed & ", In progress: " & $in_progress & ", Appproved: " & $approved ]
+End If
+
+
+
+
+
+
+
+
+

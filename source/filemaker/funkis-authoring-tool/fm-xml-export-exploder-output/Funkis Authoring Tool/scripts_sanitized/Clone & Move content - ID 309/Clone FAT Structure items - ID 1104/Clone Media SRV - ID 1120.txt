@@ -1,0 +1,54 @@
+# Normally Media is set up using the standard for New Media
+# This script is called from Clone PageItem SRV and used for Sprig Stories
+
+Set Variable [ $old_parent_id[1] ; GetScriptProperty("old_parent_id") ]
+Set Variable [ $new_parent_id[1] ; GetScriptProperty("new_parent_id") ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty("localisation_code") ]
+Set Variable [ $omit_type[1] ; GetScriptProperty("omit_type") ]
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $package_id[1] ; GetScriptProperty("package_id") ]
+
+# Cloning Media for parent
+Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+If [ IsEmpty ( $omit_type ) ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	# Omit one type - i.se "page-item"
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+If [ Get(foundCount)> 0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Minimum ]
+		
+		Set Variable [ $old_subtitle_media_id[1] ; FAT Media::PrimaryKey ]
+		
+		Duplicate Record/Request
+		
+		Set Field [ FAT Media::Title id ; $title_id ]
+		Set Field [ FAT Media::Package id ; $package_id ]
+		Set Field [ FAT Media::Parent id ; $new_parent_id ]
+		Set Field [ FAT Media::Language code ; getLanguageCode ($localisation_code) ]
+		Set Field [ FAT Media::Country code ; getCountryCode ($localisation_code) ]
+		
+		# Cloning Texts for Media with subtitles etc that uses Media as parent
+		If [ FAT Media::hasMedia ]
+			Set Variable [ $new_subtitle_media_id[1] ; FAT Media::PrimaryKey ]
+			Perform Script [ From list ; "Clone Text SRV" ; Parameter: SetProperty ( "old_parent_id" ; $old_subtitle_media_id ) &
+							SetProperty ( "new_parent_id" ; $new_subtitle_media_id ) &
+							SetProperty ( "localisation_code" ; $localisation_code ) &
+							SetProperty ( "omit_type" ; "" ) &
+							SetProperty ( "title_id" ; $title_id ) &
+							SetProperty ( "package_id" ; $package_id ) ]
+		End If
+		
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

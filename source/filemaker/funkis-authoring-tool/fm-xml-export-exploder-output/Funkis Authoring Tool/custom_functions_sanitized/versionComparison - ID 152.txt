@@ -1,0 +1,30 @@
+// Returns a boolean = true if biggerVersionString ≥ smallerOrEqualVersionString
+// Versionstring defined by "Majorversion.Minorversion.Patchversion"
+// Equal if True - test conditions includes ≥, if False - test condition includes >
+
+
+Let (
+      [
+         biggerVersionString = Substitute ( biggerVersionString ; "." ; " " );
+         biggerVersionMajor = GetAsNumber ( LeftWords( biggerVersionString ;1 )) * 1000000;
+         biggerVersionMinor = GetAsNumber ( MiddleWords (biggerVersionString ; 2; 1)) * 1000; 
+         biggerVersionPatch = GetAsNumber ( RightWords (biggerVersionString ; 1));
+         biggerVersion = biggerVersionMajor + biggerVersionMinor + biggerVersionPatch;
+
+
+         smallerVersionString = Substitute ( smallerVersionString ; "." ; " " );
+         smallerVersionMajor = GetAsNumber ( LeftWords( smallerVersionString ;1 )) * 1000000;
+         smallerVersionMinor = GetAsNumber ( MiddleWords (smallerVersionString ; 2;1)) * 1000;
+         smallerVersionPatch = GetAsNumber ( RightWords (smallerVersionString; 1));
+         smallerVersion = smallerVersionMajor + smallerVersionMinor + smallerVersionPatch
+
+
+      ];
+
+       Case (equals ; 
+            Case ( biggerVersion ≥ smallerVersion; True; False);
+
+            Case ( biggerVersion > smallerVersion; True; False)
+
+       )
+)

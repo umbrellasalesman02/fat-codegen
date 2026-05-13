@@ -1,0 +1,34 @@
+# Is called from a button in Users layout
+# User must have full access
+# Script deletes users that haven't been active the last 6 months
+
+Go to Layout [ Layout: "Administrate users" ; Animation: None ]
+Set Variable [ $modDateTimeStamp[1] ; Get(currentTimeStamp) - 6 *30 *24*60*60 ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+
+Show Custom Dialog [ Title: "Delete accounts" ; Message: "Are you sure you want to delete these accounts from Funkis Authoring Tool? ¶¶You cannot undo this operation. " ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get ( lastMessageChoice )=1 ]
+	Replace Field Contents [ User @ User::deleteUser ; Replace with calculation: 0 ]
+	Loop [ Flush: Always ]
+		# Delete the user in the table
+		Set Variable [ $user_id[1] ; User @ User::User_id ]
+		Set Field [ User @ User::deleteUser ; 1 ]
+		# Delete the account
+		Delete Account [ $user_id ]
+		Set Error Capture [ ON ]
+		# Delete all Title shortcuts on start page
+		Go to Layout [ Layout: "TABLE User X Title" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Delete All Records [ With dialog: OFF ]
+		End If
+		Go to Layout [ Layout: "Administrate users" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Delete All Records [ With dialog: ON ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+

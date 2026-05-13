@@ -1,0 +1,96 @@
+# Called from Clone Title Objects
+
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $new_tt_id[1] ; GetScriptProperty ( "new_tt_id" ) ]
+Set Variable [ $new_theme_template_id[1] ; GetScriptProperty ( "new_theme_template_id" ) ]
+
+Set Error Capture [ ON ]
+
+# Duplicate theme
+Go to Layout [ Layout: "TABLE FAT Theme" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)=1 ]
+	
+	Set Variable [ $old_theme_id[1] ; FAT Theme::PrimaryKey ]
+	Set Variable [ $old_theme_template_id[1] ; FAT Theme::Theme template id ]
+	Set Variable [ $old_theme_identifier[1] ; FAT Theme::Theme identifier ]
+	# In some rare cases the theme identifier is not the same as in the theme template
+	  In those cases we will keep the original theme identifier and not use the lookup in the DB design-
+	Set Variable [ $keep_old_theme_identifier[1] ; Case ( Theme Template @ FAT Theme::Theme identifier ≠ FAT Theme::Theme identifier; 1; 0) ]
+	Set Variable [ $logo_scroll_image[1] ; Theme Template @ FAT Theme::Logo Scroll ]
+	Set Variable [ $logo_slide_image[1] ; Theme Template @ FAT Theme::Logo Slide ]
+	Set Variable [ $side_menu_icon_image[1] ; Theme Template @ FAT Theme::Side Menu Icon ]
+	Set Variable [ $block_divider_image[1] ; Theme Template @ FAT Theme::Block Divider Image ]
+	
+	Duplicate Record/Request
+	
+	Set Variable [ $new_theme_id[1] ; FAT Theme::PrimaryKey ]
+	
+	# Get logo and menu icons from new theme template
+	Set Field [ FAT Theme::Title id ; $new_tt_id ]
+	Set Field [ FAT Theme::Theme template id ; $new_theme_template_id ]
+	Commit Records/Requests [ With dialog: OFF ]
+	
+	If [ $keep_old_theme_identifier ]
+		Set Field [ FAT Theme::Theme identifier ; $old_theme_identifier ]
+	End If
+	
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Theme::PrimaryKey ) &
+					SetProperty ( "source_table" ; "theme" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Theme::Logo scroll media id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Theme::PrimaryKey ) &
+					SetProperty ( "source_table" ; "theme" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Theme::Logo slide media id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Theme::PrimaryKey ) &
+					SetProperty ( "source_table" ; "theme" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Theme::Side Menu Icon media id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Theme::PrimaryKey ) &
+					SetProperty ( "source_table" ; "theme" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Theme::Block divider image id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	
+	Set Field [ Media TSC::Media container ; $logo_scroll_image ]
+	Set Field [ Media TSL::Media container ; $logo_slide_image ]
+	Set Field [ Media SMI::Media container ; $side_menu_icon_image ]
+	Set Field [ Media BDI::Media container ; $block_divider_image ]
+	
+	# Get colors from the titles colors - not the theme template colors. 
+	Go to Layout [ Layout: "TABLE FAT Theme Color" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+	If [ Get(foundCount)>0 ]
+		Set Variable [ $foundCount[1] ; Get(foundCount) ]
+		Set Variable [ $recordPosn[1] ; 1 ]
+		Go to Record/Request/Page [ First ]
+		Loop [ Flush: Always ]
+			Set Variable [ $old_color_id[1] ; FAT Theme Color::PrimaryKey ]
+			
+			Duplicate Record/Request
+			
+			Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+			Set Field [ FAT Theme Color::Theme id ; $new_theme_id ]
+			Set Field [ FAT Theme Color::Old PrimaryKey from clone ; $old_color_id ]
+			
+			Exit Loop If [ $recordPosn > $foundCount ]
+			Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+		End Loop
+	End If
+Else
+	# Setup a new theme based on selected theme
+	Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+	Set Variable [ $language_code[1] ; FAT Title::Original language code ]
+	Set Variable [ $country_code[1] ; FAT Title::Original country code ]
+	Perform Script [ From list ; "Setup new Title Theme" ; Parameter: SetProperty ( "title_id" ; $new_tt_id ) &
+					SetProperty ( "new_theme_template_id" ; $new_theme_template_id ) & 
+					SetProperty ( "language_code" ; $language_code ) & 
+					SetProperty ( "country_code" ; $country_code ) ]
+End If
+

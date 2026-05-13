@@ -1,0 +1,48 @@
+# Called from button in Title localisation
+  Called when creating new Title localisation
+# Script is adding all Packages as new localisations to the parent Title localisation
+
+Set Variable [ $title_localisation_id[1] ; GetScriptProperty ( "title_localisation_id" ) ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty ( "localisation_code" ) ]
+Set Variable [ $translation_method[1] ; GetScriptProperty ( "translation_method" ) ]
+
+Set Error Capture [ ON ]
+Freeze Window
+
+# --------------------- Find existing Packages localisations connected to this Title localisation ------------------------------
+Set Variable [ $existing_package_localisations_list[1] ; List ( FAT Localisation @ Title::Package id ) ]
+Set Variable [ $num_of_added_package_localisations[1] ; 0 ]
+
+# ------------------------------------- Find Packages in Title ------------------------------------------
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Not IsEmpty(FAT Package::PrimaryKey) ]
+	Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+	# ------------------------------- Loop through all packages and add localisation if not exist -----------------------------------
+	Loop [ Flush: Always ]
+		If [ Not PatternCount ( $existing_package_localisations_list ; FAT Package::PrimaryKey) ]
+			# Package not included in Localisations connected to the Title localisation
+			# Check if Package localisation exist on its own
+			Go to Layout [ Layout: "TABLE FAT Localisation @ Package" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			# Package localisation does not exist on its own
+			Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+			Perform Script [ From list ; "New Package Localisation" ; Parameter: SetProperty ( "title_localisation_id" ; $title_localisation_id ) &
+							SetProperty ( "localisation_code" ; $localisation_code ) &
+							SetProperty ( "translation_method" ; $translation_method ) ]
+			Set Variable [ $num_of_added_package_localisations[1] ; $num_of_added_package_localisations + GetAsNumber ( Get(ScriptResult )) ]
+		End If
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# ---------- Go to original layout needed if called from the button ---------------------------------
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Go to Object [ "Package localisations" ; Repetition: 1 ]
+
+Set Variable [ $event_text[1] ; $num_of_added_package_localisations & " Package localisations was added to this Title localisation." ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+

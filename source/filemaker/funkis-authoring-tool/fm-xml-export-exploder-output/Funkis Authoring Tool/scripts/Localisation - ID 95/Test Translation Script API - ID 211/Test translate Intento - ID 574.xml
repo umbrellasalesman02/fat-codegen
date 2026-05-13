@@ -1,0 +1,306 @@
+<Script>
+	<ScriptReference id="574" name="Test translate Intento"></ScriptReference>
+	<ObjectList membercount="13">
+		<Step hash="5AF4AC656D49B690237E6C073647CD2B" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["https://api.inten.to/ai/text/translate"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$translationAPI"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B3F25162F8EB8C34CCE3E90A095F0CAF" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="6">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Text to translate from English"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Cancel">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Field1">
+					<Parameter type="Target">
+						<Variable value="$language_code">
+							<repetition>
+								<Calculation datatype="1" position="10">
+									<Calculation>
+										<Text><![CDATA[1]]></Text>
+									</Calculation>
+								</Calculation>
+							</repetition>
+						</Variable>
+					</Parameter>
+					<Boolean type="Password" value="False"></Boolean>
+					<Parameter type="Label">
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA["Language code"]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Field2">
+					<Parameter type="Target">
+						<Variable value="$text">
+							<repetition>
+								<Calculation datatype="1" position="10">
+									<Calculation>
+										<Text><![CDATA[1]]></Text>
+									</Calculation>
+								</Calculation>
+							</repetition>
+						</Variable>
+					</Parameter>
+					<Boolean type="Password" value="False"></Boolean>
+					<Parameter type="Label">
+						<Calculation datatype="1" position="3">
+							<Calculation>
+								<Text><![CDATA["Text to translate"]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="84D04B116D483BA8EE52BE721C223926" id="141" name="Set Variable" enable="False">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Today is the big grand prix race in Monaco"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9ED6D67B7865A7D8CA688F1C20913CF2" id="141" name="Set Variable" enable="False">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["sv"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$language_code"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="87D30BED00F17683928EBB8B0AD27CBD" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Let ( [  txtArr = "[\"" & $text & "\"]";  context = JSONSetElement ( "{}" ;             ["text" ; txtArr ; JSONArray];            ["to" ; $language_code ; JSONString];            ["from"; "en" ; JSONString]);    service = JSONSetElement ( "{}" ;             ["routing" ; "ikea-it-desk"; JSONString ];            // means something for intento - ikea specific glossary            ["async" ; True; JSONBoolean ]);  data = JSONSetElement ( "{}" ;             ["context" ; context ; JSONObject ];            ["service" ; service ; JSONObject ])];data )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$textJSON"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CF87B1F112B35A3C641BE939589C260C" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["REDACTED_INTENTO_API_KEY"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$api_key"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="55B26C2407AEFF1DD5E80090D5074023" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F33C1CC25D00762966D6F512D8B90568" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[_cURL_request ( "POST" ) & _cURL_header ( "Content-Type" ; "application/json" ) & _cURL_header ( "Accept" ; "application/json" ) & _cURL_header ( "apikey" ; $api_key ) & _cURL_data___string ( $textJSON )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$cURL_options"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="652D1E8305A598A5A2B6F75A81AB0EAA" id="160" name="Insert from URL" enable="True">
+			<Options>20613</Options>
+			<ParameterValues membercount="6">
+				<Parameter type="Boolean">
+					<Boolean type="Verify SSL Certificates" id="268435456" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Select" id="4096" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Target">
+					<Variable value="$resultJSON">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+					</Variable>
+				</Parameter>
+				<Parameter type="URL">
+					<URL autoEncode="True">
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$translationAPI]]></Text>
+							</Calculation>
+						</Calculation>
+					</URL>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA[$cURL_options]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8ACB41AA121885AB38D6D52AEC54BC52" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4C9973C5199E86F51FED079E2FBA6485" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[JSONGetElement ( $resultJSON ; "id" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$$translation_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9EA17441F39236E3B59F18133923C89C" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="95388CE7B71F5454AFB68CD8F2541899" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[""]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$des"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

@@ -1,0 +1,185 @@
+# Note - this script does only update changes in Description, number of textfields, mediafields, content arrays an. It will NOT update Global texts, Attributes or StateToggles. 
+Show Custom Dialog [ Title: "Update all blocks using this template" ; Message: "This is what's going to be updated: ¶¶
+				- Block description¶
+				- All input labels ¶
+				- stateToggle states, default state, description ¶
+				- attribute default value, description ¶
+				- number of textFields, mediaFields, contentArray-fields, IO  ¶
+				- block icon and descriptive image  ¶
+				- all text fields HTML- and embed JSON-settings ¶¶
+				
+				
+				Global texts, attributes and stateToggles will not be affected.  And naturally NO SETTINGS will be affected on exisiting page items. ¶¶
+				
+				Do you want to update all blocks?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get (lastMessageChoice) = 1 ]
+	Show Custom Dialog [ Title: "WARNING: Potential risk for breaking with code" ; Message: "If updated any of the following properties you also need to update the BaseProject Code - otherwise you will introduce new bugs: ¶¶
+					- input labels ¶
+					- number of textFields, mediaFields, contentArray-fields, IOs  ¶
+					- text fields HTML- and embed JSON-settings ¶
+					- new or removed stateToggles or attributes ¶¶
+					
+					
+					Do you want to update all blocks?" ; Default Button: "Cancel" ; Button 2: "OK" ]
+	If [ Get (lastMessageChoice) = 2 ]
+		Freeze Window
+		Set Error Capture [ ON ]
+		Set Variable [ $listOfLPs[1] ; Substitute ( List(FAT Title::Reference title); ¶ ; ", ") ]
+		Set Variable [ $description[1] ; BlockTemplate::Description ]
+		Set Variable [ $template_id[1] ; BlockTemplate::PrimaryKey ]
+		Set Variable [ $num_of_textfields[1] ; BlockTemplate::Number of text fields ]
+		Set Variable [ $num_of_media_containers[1] ; BlockTemplate::Number of media containers ]
+		Set Variable [ $io_enabled[1] ; BlockTemplate::IO enabled ]
+		Set Variable [ $content_array_enabled[1] ; BlockTemplate::Page item List enabled ]
+		Set Variable [ $title_content_array_enabled[1] ; BlockTemplate::List enabled ]
+		
+		Set Variable [ $num_of_ca_textfields[1] ; List template @ Block template::Number of text fields ]
+		Set Variable [ $num_of_ca_media_container[1] ; List template @ Block template::Number of media containers ]
+		Set Variable [ $num_of_ca_valuefield[1] ; List template @ Block template::Number of value fields ]
+		
+		Set Variable [ $min_num_of_ca_items[1] ; BlockTemplate::Minimum number of items ]
+		Set Variable [ $max_num_of_ca_items[1] ; BlockTemplate::Maximum number of items ]
+		Set Variable [ $ca_valuetype[1] ; List template @ Block template::Value 1 type
+						
+						/*BlockTemplate::CA ValueType OLD*/ ]
+		Set Variable [ $text1_html[1] ; BlockTemplate::Text 1 HTML format ]
+		Set Variable [ $text2_html[1] ; BlockTemplate::Text 2 HTML format ]
+		Set Variable [ $text3_html[1] ; BlockTemplate::Text 3 HTML format ]
+		Set Variable [ $text4_html[1] ; BlockTemplate::Text 4 HTML format ]
+		Set Variable [ $text5_html[1] ; BlockTemplate::Text 5 HTML format ]
+		Set Variable [ $text6_html[1] ; BlockTemplate::Text 6 HTML format ]
+		Set Variable [ $text7_html[1] ; BlockTemplate::Text 7 HTML format ]
+		Set Variable [ $text1_embed[1] ; BlockTemplate::Text 1 JSON embed ]
+		Set Variable [ $text2_embed[1] ; BlockTemplate::Text 2 JSON embed ]
+		Set Variable [ $text3_embed[1] ; BlockTemplate::Text 3 JSON embed ]
+		Set Variable [ $text4_embed[1] ; BlockTemplate::Text 4 JSON embed ]
+		Set Variable [ $text5_embed[1] ; BlockTemplate::Text 5 JSON embed ]
+		Set Variable [ $text6_embed[1] ; BlockTemplate::Text 6 JSON embed ]
+		Set Variable [ $text7_embed[1] ; BlockTemplate::Text 7 JSON embed ]
+		Set Variable [ $text1_label[1] ; BlockTemplate::Label override text 1 ]
+		Set Variable [ $text2_label[1] ; BlockTemplate::Label override text 2 ]
+		Set Variable [ $text3_label[1] ; BlockTemplate::Label override text 3 ]
+		Set Variable [ $text4_label[1] ; BlockTemplate::Label override text 4 ]
+		Set Variable [ $text5_label[1] ; BlockTemplate::Label override text 5 ]
+		Set Variable [ $text6_label[1] ; BlockTemplate::Label override text 6 ]
+		Set Variable [ $text7_label[1] ; BlockTemplate::Label override text 7 ]
+		Set Variable [ $media1_label[1] ; BlockTemplate::Label override media 1 ]
+		Set Variable [ $media2_label[1] ; BlockTemplate::Label override media 2 ]
+		Set Variable [ $media1_crop_fit[1] ; BlockTemplate::Media 1 Crop Fit ]
+		Set Variable [ $media1_io[1] ; BlockTemplate::Media 1 IO ]
+		Set Variable [ $media2_crop_fit[1] ; BlockTemplate::Media 2 Crop Fit ]
+		Set Variable [ $media2_io[1] ; BlockTemplate::Media 2 IO ]
+		Set Variable [ $ca_header_label[1] ; List template @ Block template::Header ]
+		Set Variable [ $ca_text1_label[1] ; List template @ Block template::Text Label 1 ]
+		Set Variable [ $ca_text2_label[1] ; List template @ Block template::Text Label 2 ]
+		Set Variable [ $ca_text3_label[1] ; List template @ Block template::Text Label 3 ]
+		Set Variable [ $ca_media_label[1] ; List template @ Block template::Media Label 1 ]
+		Set Variable [ $ca_value_label[1] ; List template @ Block template::Value 1 Label ]
+		// Set Variable [ $block_icon[1] ; BlockTemplate::Descriptive icon ]
+		// Set Variable [ $block_image[1] ; BlockTemplate::Descriptive image ]
+		Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+		
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Show Custom Dialog [ Title: "Found " & Get(foundCount) & " blocks" ; Message: "Found  " & Get(foundCount) & " blocks using this template in programmes: " & $listOfLPs & "." & ¶ & ¶ &   "Are you OK to update the blocks in these programmes to reflect the template? This cannot be undone." ; Default Button: "Cancel" ; Button 2: "Update" ]
+			If [ Get(lastMessageChoice) =2 ]
+				Open Transaction [ Skip auto-enter options: OFF ; Skip data entry validation: OFF ; Override ESS locking conflicts: OFF ]
+				Loop [ Flush: Always ]
+					Set Variable [ $current_symbol_id[1] ; FAT Block::PrimaryKey ]
+					Set Field [ FAT Block::Description ; $description ]
+					Set Field [ FAT Block::Number of text fields ; $num_of_textfields ]
+					Set Field [ FAT Block::Number of media containers ; $num_of_media_containers ]
+					Set Field [ FAT Block::IO enabled ; $io_enabled ]
+					Set Field [ FAT Block::Page item List enabled ; $content_array_enabled ]
+					Set Field [ FAT Block::List enabled ; $title_content_array_enabled ]
+					Set Field [ FAT Block::List number of textfields ; $num_of_ca_textfields ]
+					Set Field [ FAT Block::List number of media containers ; $num_of_ca_media_container ]
+					Set Field [ FAT Block::List number of value fields ; $num_of_ca_valuefield ]
+					Set Field [ FAT Block::Minimum number of items ; $min_num_of_ca_items ]
+					Set Field [ FAT Block::Maximum number of items ; $max_num_of_ca_items ]
+					Set Field [ FAT Block::List ValueType ; $ca_valuetype ]
+					Set Field [ FAT Block::Text 1 HTML format ; $text1_html ]
+					Set Field [ FAT Block::Text 2 HTML format ; $text2_html ]
+					Set Field [ FAT Block::Text 3 HTML format ; $text3_html ]
+					Set Field [ FAT Block::Text 4 HTML format ; $text4_html ]
+					Set Field [ FAT Block::Text 5 HTML format ; $text5_html ]
+					Set Field [ FAT Block::Text 6 HTML format ; $text6_html ]
+					Set Field [ FAT Block::Text 7 HTML format ; $text7_html ]
+					Set Field [ FAT Block::Text 1 JSON embed ; $text1_embed ]
+					Set Field [ FAT Block::Text 2 JSON embed ; $text2_embed ]
+					Set Field [ FAT Block::Text 3 JSON embed ; $text3_embed ]
+					Set Field [ FAT Block::Text 4 JSON embed ; $text4_embed ]
+					Set Field [ FAT Block::Text 5 JSON embed ; $text5_embed ]
+					Set Field [ FAT Block::Text 6 JSON embed ; $text6_embed ]
+					Set Field [ FAT Block::Text 7 JSON embed ; $text7_embed ]
+					
+					Set Field [ FAT Block::Label override text 1 ; $text1_label ]
+					Set Field [ FAT Block::Label override text 2 ; $text2_label ]
+					Set Field [ FAT Block::Label override text 3 ; $text3_label ]
+					Set Field [ FAT Block::Label override text 4 ; $text4_label ]
+					Set Field [ FAT Block::Label override text 5 ; $text5_label ]
+					Set Field [ FAT Block::Label override text 6 ; $text6_label ]
+					Set Field [ FAT Block::Label override text 7 ; $text7_label ]
+					Set Field [ FAT Block::Label override container 1 ; $media1_label ]
+					Set Field [ FAT Block::Label override container 2 ; $media2_label ]
+					// Set Field [ FAT Block::Media 1 Crop Fit ; $media1_crop_fit ]
+					// Set Field [ FAT Block::Media 1 IO ; $media1_io ]
+					// Set Field [ FAT Block::Media 2 Crop Fit ; $media2_crop_fit ]
+					// Set Field [ FAT Block::Media 2 IO ; $media2_io ]
+					Set Field [ FAT Block::Label override List header ; $ca_header_label ]
+					Set Field [ FAT Block::Label override List Text 1 ; $ca_text1_label ]
+					Set Field [ FAT Block::Label override List Text 2 ; $ca_text2_label ]
+					Set Field [ FAT Block::Label override List Text 3 ; $ca_text3_label ]
+					Set Field [ FAT Block::Label override List Media ; $ca_media_label ]
+					Set Field [ FAT Block::Label override List Value ; $ca_value_label ]
+					// Set Field [ FAT Block::Descriptive icon ; $block_icon ]
+					// Set Field [ FAT Block::Descriptive image ; $block_image ]
+					
+					Set Variable [ $error[1] ; Get(lastError) ]
+					Revert Transaction [ Condition: $error ≠ 0 And $error ≠ 401 ; ErrorCode: 5000 ]
+					
+					Go to Record/Request/Page [ Next ; Exit after last: ON ]
+				End Loop
+				Commit Transaction
+			End If
+			# Only show one block in this table
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			
+		End If
+		
+		# Update default value and description for all attributes in exisiting Titles
+		Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount) > 0 ]
+			Open Transaction [ Skip auto-enter options: OFF ; Skip data entry validation: OFF ; Override ESS locking conflicts: OFF ]
+			Loop [ Flush: Always ]
+				Set Variable [ $attributeTemplate_id[1] ; ModifierTemplate::PrimaryKey ]
+				Set Variable [ $default_value[1] ; ModifierTemplate::DefaultValue ]
+				Set Variable [ $values[1] ; ModifierTemplate::Values ]
+				Set Variable [ $description[1] ; ModifierTemplate::Description ]
+				
+				# Find Modifiers based on Template
+				Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)>0 ]
+					Replace Field Contents [ FAT Modifier::Description ; Replace with calculation: $description ]
+					Replace Field Contents [ FAT Modifier::DefaultValue ; Replace with calculation: $default_value ]
+					Replace Field Contents [ FAT Modifier::Values ; Replace with calculation: $values ]
+				End If
+				Set Variable [ $error[1] ; Get(lastError) ]
+				Revert Transaction [ Condition: $error ≠ 0 And $error ≠ 401 ; ErrorCode: 5000 ]
+				Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+			Commit Transaction
+		End If
+		
+		If [ Get(lastError)=5000 ]
+			Show Custom Dialog [ Title: "Error" ; Message: "The operation could not be performed. Perhaps records are in use by another user.   Details: " & Get(lastErrorDetail) & ", " & Get(LastErrorLocation) ; Default Button: "OK" ]
+		End If
+		
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	End If
+End If
+
+

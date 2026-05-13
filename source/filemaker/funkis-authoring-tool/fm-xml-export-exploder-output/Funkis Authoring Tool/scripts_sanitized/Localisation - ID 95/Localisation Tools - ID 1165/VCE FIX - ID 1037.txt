@@ -1,0 +1,76 @@
+# Knapp med VCE Special i localisation window
+  Man gör en Machine localisation på varje package
+  
+  Skicka in package_id + localisation code
+  
+  Visa alla översatta texter
+  Kopiera orinal texten på engelska och sök efter den i Safety VTC
+  Om jag får en EXAKT träff - kopiera den översatta texten till VCE-versionen och sätt som “Approved”
+  
+  Title id 0AC673FC-B67E-49C4-8ECF-3DF62ABF238E
+  
+  
+  VCE Scroll Package: 498764E7-545E-46C6-870D-679E5E35296D
+  VTC Orginal id 90DB184C-27F6-4BBF-BDAE-7F7D6D372E7C
+  
+  VCE Slide Package: 17BF05F9-74CD-4824-9364-3675DF5D5F1B
+  VTC Orginal id 7B237CFD-6E95-4907-83B5-8EE9A0D86DB0
+
+
+Set Variable [ $package_id[1] ; FAT Localisation @ Package::Package id ]
+Set Variable [ $org_package_id[1] ; Case ( $package_id = "498764E7-545E-46C6-870D-679E5E35296D" ; "90DB184C-27F6-4BBF-BDAE-7F7D6D372E7C";
+				       $package_id = "17BF05F9-74CD-4824-9364-3675DF5D5F1B" ; "7B237CFD-6E95-4907-83B5-8EE9A0D86DB0")
+				
+				
+				
+				/*
+				VCE Scroll Package: 498764E7-545E-46C6-870D-679E5E35296D
+				VTC Orginal id 90DB184C-27F6-4BBF-BDAE-7F7D6D372E7C
+				
+				VCE Slide Package: 17BF05F9-74CD-4824-9364-3675DF5D5F1B
+				VTC Orginal id 7B237CFD-6E95-4907-83B5-8EE9A0D86DB0
+				*/ ]
+Set Variable [ $localisation_code[1] ; FAT Localisation @ Package::Localisation code ]
+
+If [ Get(WindowStyle) = 3 ]
+	Close Window
+End If
+
+Freeze Window
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+# Visa alla översatta texter
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $num_of_copied_texts[1] ; 0 ]
+
+Loop [ Flush: Always ]
+	Set Variable [ $org_en_text[1] ; FAT Text @ Translation::Text ]
+	# Kopiera original texten på engelska och sök efter den i Safety VTC
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) >0 ]
+		# Om jag får en EXAKT träff - kopiera den översatta texten till VCE-versionen och sätt som “Approved”
+		Set Variable [ $original_key[1] ; FAT Text::PrimaryKey ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount) = 1 ]
+			Set Variable [ $translated_text[1] ; FAT Text::Text ]
+			Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+			Set Field [ FAT Text translated::Text ; $translated_text ]
+			Set Field [ FAT Text translated::Status ; "Approved" ]
+			Set Variable [ $num_of_copied_texts[1] ; $num_of_copied_texts + 1 ]
+		End If
+	End If
+	
+	Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+
+Show Custom Dialog [ Title: "Completed" ; Message: "Successfully copied " & $num_of_copied_texts & " texts from VTC Safety to VCE Safety, localisation code = " & $localisation_code & ".¶¶" & 
+				"The copied texts are set with status = \"Approved\"." ; Default Button: "OK" ; Button 2: "Cancel" ]
+Go to Layout [ Layout: "FAT Package Settings" ; Animation: None ]
+
+
+
+
+

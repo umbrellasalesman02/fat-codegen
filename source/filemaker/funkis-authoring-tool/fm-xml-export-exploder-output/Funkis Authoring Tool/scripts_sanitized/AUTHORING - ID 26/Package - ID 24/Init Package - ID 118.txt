@@ -1,0 +1,25 @@
+Set Field [ FAT Title::gLevel ; "Package" ]
+Set Field [ FAT Title::gTagID ; "" ]
+Set Field [ FAT Title::gTagName ; "" ]
+Set Variable [ $$hierarchyLevel[1] ; FAT Package::Hierarchy level ]
+Set Variable [ $$hierarchyPath[1] ; FAT Title::Reference title & ¶ &
+				Case(FAT Package::Reference name = "" ; "" ; FAT Package::Reference name & ¶) 
+				
+				
+				/* &
+				Case(TF CH Header::Text = "" ; "" ; TF CH Header::Text & ¶) &
+				Case(TF PG Header::Text = "" ; "" ; TF PG Header::Text & ¶) &
+				Case(TF PI Text 1::Text = "" ; "" ; TF PI Text 1::Text) */ ]
+Set Variable [ $$hierarchyType[1] ; "Title" & ¶  & 
+				"Package" ]
+
+
+# Go settings tab
+// Set Field [ FAT Package::LastSettingTab ; "tab5" ]
+If [ isDeveloper Or isSuperAdmin ]
+	Go to Object [ FAT Package::LastSettingTab ; Repetition: 1 ]
+Else If [ isAuthor ]
+	# Authors will only see tab Modifiers
+	Go to Object [ "tab2" ; Repetition: 1 ]
+End If
+

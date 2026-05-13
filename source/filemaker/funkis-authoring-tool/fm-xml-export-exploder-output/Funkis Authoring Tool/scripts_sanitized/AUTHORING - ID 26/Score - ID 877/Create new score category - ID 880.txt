@@ -1,0 +1,55 @@
+# Called from Gamfication layout
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+Show Custom Dialog [ Title: "New score category" ; Message: "Please select a name for your score category.¶¶A score category can be points, profit, brand value, customer satisfaction or basically anything that can be measured with a numerical value." ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $category_name ; Label 1: "Score category name" ]
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Score Category" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Score variable::Title id ; $title_id ]
+Set Variable [ $score_category_id[1] ; FAT Score variable::PrimaryKey ]
+
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $score_category_id ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Score variable::Name text id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $score_category_id ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Score variable::Description text id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $score_category_id ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Score variable::Unit text id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+
+Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $score_category_id ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_mediafield" ; GetFieldName ( FAT Score variable::Score icon media id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) &
+				SetProperty ( "learningprogramme_id" ; $title_id) ]
+
+Set Field [ TF SC Name::Text ; $category_name ]
+
+
+# Create a corresponding IO of type = Score where user result is stored
+Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+New Record/Request
+Set Field [ FAT IO::Title id ; $title_id ]
+Set Field [ FAT IO::IO type ; "Score" ]
+Set Field [ FAT IO::IO Write Permissions ; "My Member¶My Group¶My Session" ]
+Set Field [ FAT IO::IO Read Permissions ; "My Member¶My Group¶My Session" ]
+Set Field [ FAT IO::Author description ; "This IO is connected to a score category with the same name." ]
+
+Perform Script [ From list ; "Set valid object name" ; Parameter: SetProperty ( "source_textfield" ; GetFieldName ( FAT IO::Name ) ) &
+				SetProperty ( "new_name" ; $category_name ) &
+				SetProperty ( "max_characters" ; 32 ) ]
+
+Set Variable [ $io_id[1] ; FAT IO::PrimaryKey ]
+Go to Layout [ Layout: "TABLE FAT Score Category" ; Animation: None ]
+Set Field [ FAT Score variable::IO id ; $io_id ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

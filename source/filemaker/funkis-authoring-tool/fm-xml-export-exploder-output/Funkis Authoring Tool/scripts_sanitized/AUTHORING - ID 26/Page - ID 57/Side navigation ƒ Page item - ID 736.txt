@@ -1,0 +1,55 @@
+# Test script 
+Freeze Window
+Set Error Capture [ ON ]
+# Direction can be "Next" or "Previous"
+Set Variable [ $direction[1] ; Get(scriptParameter) ]
+If [ FAT Page::Proxy type = "page_item" ]
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	If [ $direction = "Next" ]
+		Go to Record/Request/Page [ Next ; Exit after last: OFF ]
+	Else If [ $direction = "Previous" ]
+		Go to Record/Request/Page [ Previous ; Exit after last: OFF ]
+	End If
+	# Used for navigating between Pages from Page Item layout
+	Set Field [ FAT Page::gRecordNumber ; Get(recordNumber) ]
+	Set Field [ FAT Page::gPageFoundCount ; Get(foundCount) ]
+	Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+	# So the correct way to test for no related records is:
+	  - GTRR Match current record only: test for error 101
+	  - GTRR Match found set: test for error 401
+	# Go direct to page item view on slides
+	If [ Get(lastError) ≠ 101 ]
+		Go to Record/Request/Page [ First ]
+		Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+		Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Not IsEmpty ( FAT Page item::PrimaryKey ) ]
+			Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "chapter_id" ; FAT Chapter::PrimaryKey ) & 
+							SetProperty ( "page_id" ; FAT Page::PrimaryKey ) & 
+							SetProperty ( "pageitem_id" ; FAT Page item::PrimaryKey ) &
+							SetProperty ( "proxy_type" ; FAT Page::Proxy type ) ]
+		End If
+	Else
+		Go to Layout [ Layout: "FAT Chapter" ; Animation: None ]
+	End If
+Else
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	If [ $direction = "Next" ]
+		Go to Record/Request/Page [ Next ; Exit after last: OFF ]
+	Else If [ $direction = "Previous" ]
+		Go to Record/Request/Page [ Previous ; Exit after last: OFF ]
+	End If
+	# Used for navigating between Pages from Page Item layout
+	Set Field [ FAT Page::gRecordNumber ; Get(recordNumber) ]
+	Set Field [ FAT Page::gPageFoundCount ; Get(foundCount) ]
+	If [ Not IsEmpty ( FAT Page item::PrimaryKey ) ]
+		Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "chapter_id" ; FAT Chapter::PrimaryKey ) & 
+						SetProperty ( "page_id" ; FAT Page::PrimaryKey ) & 
+						SetProperty ( "pageitem_id" ; FAT Page item::PrimaryKey ) &
+						SetProperty ( "proxy_type" ; FAT Page::Proxy type ) ]
+	Else
+		Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+	End If
+End If
+
+

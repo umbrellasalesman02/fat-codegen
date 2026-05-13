@@ -1,0 +1,72 @@
+# Called from the New Title card window
+# The process is that this script: 
+  1. Prepare all Title unique objects - Theme, Blocks, Modifiers and groupings
+  2. Continue with the standard cloning process in Start cloning script
+
+
+Show Custom Dialog [ Title: "Make sure no one is using the title" ; Message: "Duplication of the title will fail if any other user are using it now and locking records. The duplication can take several minutes to complete depending on the size of the title. ¶¶Are you sure you want to duplicate the title?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+Freeze Window
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $old_tt_id[1] ; FAT Title::Old PrimaryKey from clone ]
+Set Variable [ $new_theme_template_id[1] ; FAT Title::gThemeTemplate ]
+Set Variable [ $client_directory[1] ; Client::Funkis Cloud Directory name ]
+
+Set Field [ FAT Title::gCloneSuffix ; "" ]
+Set Field [ FAT Title::gCloneItemInfo ; FAT Title::Description ]
+Set Field [ FAT Title::gCloneLevel ; "Title" ]
+Set Field [ FAT Title::gCloneItemId ; $old_tt_id ]
+Set Field [ FAT Title::gCloneItemParentId ; "" ]
+
+Set Variable [ $language_code[1] ; getLanguageCode ( FAT Title::gSelectedLocalisation ) ]
+Set Variable [ $country_code[1] ; getCountryCode ( FAT Title::gSelectedLocalisation ) ]
+Set Field [ FAT Title::Original language code ; $language_code ]
+Set Field [ FAT Title::Original country code ; $country_code ]
+Set Field [ FAT Title::FC Client directory ; $client_directory ]
+
+Set Variable [ $$localisation_code[1] ; $language_code & "-" & $country_code ]
+
+Set Error Capture [ ON ]
+Commit Records/Requests [ With dialog: OFF ]
+
+# Close card window - do all operations in main window.
+If [ PatternCount (Get(windowName); "Clone Title")
+				// New Title ]
+	Close Window
+End If
+
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# Duplicate all Title unique objects
+// If [ notJens ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+// Else
+// Perform Script [ From list ; "Prepare Title Cloning SRV" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "old_tt_id" ; $old_tt_id ) &
+				SetProperty ( "new_theme_template_id" ; $new_theme_template_id ) &
+				SetProperty ( "language_code" ; $language_code ) &
+				SetProperty ( "country_code" ; $country_code ) ]
+// End If
+
+
+# Duplicate Title content - this script perform all other scripts PSOS
+Perform Script [ From list ; "Clone Content MASTER" ; Parameter: SetProperty ( "old_tt_id" ; $old_tt_id ) &
+				SetProperty ( "title_id" ; $title_id ) ]
+
+# Add duplicated title to user
+Go to Layout [ Layout: "TABLE User X Title" ; Animation: None ]
+New Record/Request
+Set Field [ User X Title::User id ; $$login_id ]
+Set Field [ User X Title::Title id ; $title_id ]
+Set Field [ User X Title::Localisation code ; $$localisation_code ]
+
+# Go to Title Content layout
+Go to Layout [ Layout: "FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+

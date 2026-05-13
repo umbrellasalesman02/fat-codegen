@@ -1,0 +1,18 @@
+Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+Set Variable [ $list_type[1] ; "AI Aspects" ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $text_1[1] ; TF LI 1::Text ]
+		Set Variable [ $text_2[1] ; TF LI 2::Text ]
+		Set Variable [ $text_3[1] ; TF LI 3::Text ]
+		Set Field [ TF LI 1::Text ; Case ( IsEmpty ( $text_3 ); $text_1; $text_3) ]
+		Set Field [ TF LI 2::Text ; $text_1 ]
+		Set Field [ TF LI 3::Text ; $text_2 ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		
+		
+	End Loop
+	
+End If
+

@@ -1,0 +1,61 @@
+<Script>
+	<ScriptReference id="995" name="Save HTML Text on command-s key"></ScriptReference>
+	<ObjectList membercount="5">
+		<Step hash="D6E61F68B086A871364ED3B37E8BDE3D" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called from onKeyTrigger in Page item layout"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D5E0D97438B4E32968C3A364D07E7299" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="4">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(TriggerKeystroke)]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Cancel">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CA41C172C142A639159778D9ECCC9B0C" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(TriggerKeystroke) = "s"  And Get(activeModifierKeys)=16 // S + ctrl key]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3FDC414ECED223AB0B916537BD1A8DD7" id="1" name="Perform Script" enable="True">
+			<Options>64</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="398" name="SavePageItem"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter></Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="66F455471349F16DDC020EE5A86C83E1" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

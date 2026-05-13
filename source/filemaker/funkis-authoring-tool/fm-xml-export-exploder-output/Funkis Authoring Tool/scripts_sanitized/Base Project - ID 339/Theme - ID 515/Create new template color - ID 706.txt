@@ -1,0 +1,26 @@
+# Creates new color
+Set Variable [ $color_pd[1] ; FAT Theme Color::gColor ]
+Set Variable [ $theme_template_id[1] ; Theme Template::PrimaryKey ]
+
+Freeze Window
+Go to Related Record [ Table: FAT Theme Color @ Template ; Layout: "TABLE FAT Theme Color" ; Show related ]
+Go to Record/Request/Page [ First ]
+Loop [ Flush: Always ]
+	If [ $color_pd = FAT Theme Color::Predefined Color Name ]
+		Show Custom Dialog [ Title: "Color already defined" ; Message: "This color is already defined in the theme template and duplicates are not allowed. " ; Default Button: "OK" ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Exit Script []
+	End If
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+New Record/Request
+Set Field [ FAT Theme Color::Theme template id ; $theme_template_id ]
+Set Field [ FAT Theme Color::Predefined Color Name ; $color_pd ]
+Set Field [ FAT Theme Color::Custom Color Name ; UnPrettify ($color_pd) ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Go to Object [ "Color" ; Repetition: 1 ]
+
+
+

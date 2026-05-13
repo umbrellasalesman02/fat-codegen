@@ -1,0 +1,108 @@
+# This script is called by Clone content SRV  for each item that can have a tag
+
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $clone_level[1] ; GetScriptProperty ( "clone_level" ) ]
+Set Variable [ $clone_settings[1] ; GetScriptProperty ( "clone_settings" ) ]
+Set Variable [ $suffix[1] ; GetScriptProperty ( "suffix" ) ]
+Set Variable [ $object_group_id[1] ; GetScriptProperty ( "object_group_id" ) ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+Set Variable [ $old_item_id[1] ; GetScriptProperty ( "old_item_id") ]
+Set Variable [ $new_item_id[1] ; GetScriptProperty ( "new_item_id") ]
+
+# -----------------------------------------------------------------------------
+# --------------- SCORE VALUE --------------------------------------------------------
+
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Score Value" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		
+		Duplicate Record/Request
+		
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT Score Value::Parent id ; $new_item_id ]
+		
+		If [ $isClonedTitle Or PatternCount($clone_settings; "Score categories") ]
+			# Point to the new score value created earlier in Make an empty copy
+			Set Variable [ $old_score_category_id[1] ; FAT Score Value::Score category ]
+			Go to Layout [ Layout: "TABLE FAT Score Category" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 1 ]
+				Set Variable [ $new_score_category_id[1] ; FAT Score variable::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT Score Value" ; Animation: None ]
+				Set Field [ FAT Score Value::Score category ; $new_score_category_id ]
+			Else If [ Get(foundCount)=0 And PatternCount($clone_settings; "Score categories") ]
+				# No oldPrimaryKey found. Create a new Score category and add it to the score value
+				Perform Script [ From list ; "Clone Score category" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+								SetProperty ( "clone_level" ; $clone_level ) &
+								SetProperty ( "clone_settings" ; $clone_settings ) &
+								SetProperty ( "suffix" ; $suffix ) &
+								SetProperty ( "object_group_id" ; $object_group_id ) &
+								SetProperty ( "title_id" ; $title_id ) &
+								SetProperty ( "old_score_category_id" ; $old_score_category_id ) ]
+				Set Variable [ $new_score_category_id[1] ; Get(ScriptResult) ]
+				Go to Layout [ Layout: "TABLE FAT Score Value" ; Animation: None ]
+				Set Field [ FAT Score Value::Score category ; $new_score_category_id ]
+			End If
+		End If
+		
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+# -----------------------------------------------------------------------------
+# --------------- SCORE CONDITIONS --------------------------------------------------------
+
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Score Condititon" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		Duplicate Record/Request
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT Score Condititon::Parent id ; $new_item_id ]
+		
+		If [ $isClonedTitle Or PatternCount($clone_settings; "Score categories") ]
+			# Point to the new score value created earlier in Make an empty copy
+			Set Variable [ $old_score_category_id[1] ; FAT Score Condititon::Score Category id ]
+			Go to Layout [ Layout: "TABLE FAT Score Category" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 1 ]
+				Set Variable [ $new_score_category_id[1] ; FAT Score variable::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT Score Condititon" ; Animation: None ]
+				Set Field [ FAT Score Condititon::Score Category id ; $new_score_category_id ]
+			Else If [ Get(foundCount)=0 And PatternCount($clone_settings; "Score categories") ]
+				# No oldPrimaryKey found. Create a new Score category and add it to the score value
+				Perform Script [ From list ; "Clone Score category" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+								SetProperty ( "clone_level" ; $clone_level ) &
+								SetProperty ( "clone_settings" ; $clone_settings ) &
+								SetProperty ( "suffix" ; $suffix ) & 
+								SetProperty ( "old_tt_id" ; $old_tt_id ) &
+								SetProperty ( "title_id" ; $title_id ) &
+								SetProperty ( "old_score_category_id" ; $old_score_category_id ) ]
+				Set Variable [ $new_score_category_id[1] ; Get(ScriptResult) ]
+				Go to Layout [ Layout: "TABLE FAT Score Condititon" ; Animation: None ]
+				Set Field [ FAT Score Condititon::Score Category id ; $new_score_category_id ]
+			End If
+		End If
+		
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+
+

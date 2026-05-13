@@ -1,0 +1,11 @@
+#  Author, Erik Wiberg - 2021-07
+
+// Set Variable [ $fullURL[1] ; "" & GetField ( Variables::taskServerURL ) & "/publish/package-releases" ]
+Set Variable [ $fullURL[1] ; Variables::taskServerURL & "publish/package-releases" ]
+Perform Script [ From list ; "GetTaskServerResponse" ; Parameter: $fullURL ]
+Set Variable [ $base64Data[1] ; Get(ScriptResult) ]
+Set Variable [ $resultURL[1] ; "https://biz.funkismultimedia.se/utils/run-in-iframe.html?data=" & $base64Data ]
+Open URL [ In external browser: OFF ; With dialog: OFF ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+
+
+

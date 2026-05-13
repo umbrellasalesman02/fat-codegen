@@ -1,0 +1,79 @@
+# Called from SaveToFAT
+# Designed for PSOS - wait for complete = "OFF"
+# Purpose is to speed up when changing page item records
+
+Set Variable [ $updatedWebViewerData[1] ; GetScriptProperty ( "updatedWebViewerData" ) ]
+Set Variable [ $pageitem_id[1] ; GetScriptProperty ( "pageitem_id" ) ]
+
+Set Variable [ $HTMLeditor_json[1] ; JSONGetElement ( $updatedWebViewerData ; "texts" ) ]
+Set Variable [ $record_id[1] ; GetAsNumber (JSONGetElement ( $updatedWebViewerData ; "record-id" )) ]
+Go to Layout [ Layout: "TABLE FAT Page Item 2" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ JSONGetElement ( $updatedWebViewerData ; "localisation_mode" ) = "translate" And 
+				JSONGetElement ( $updatedWebViewerData ; "edit_mode" ) ≠ "textTranslate" ]
+	Set Variable [ $localisation_code[1] ; JSONGetElement ( $updatedWebViewerData ; "localisation_code" ) ]
+	Set Field [ FAT Title::gCurrentLocalisationCode ; $localisation_code ]
+	Commit Records/Requests [ With dialog: OFF ]
+End If
+
+If [ $record_id = Get(recordID) ]
+	# Go on and save
+	If [ JSONGetElement ( $updatedWebViewerData ; "localisation_mode" ) = "translate" ]
+		
+		# Update only text fields that are changed
+		Set Field [ TF PI Text 1 TRANS 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 ) ]
+		Set Field [ TF PI Text 2 TRANS 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 ) ]
+		Set Field [ TF PI Text 3 TRANS 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 ) ]
+		Set Field [ TF PI Text 4 TRANS 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 4 ) ]
+		Set Field [ TF PI Text 5 TRANS 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 5 ) ]
+		Set Field [ TF PI Text 6 TRANS 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 6 ) ]
+		Set Field [ TF PI Text 7 TRANS 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 7) ]
+	Else
+		// Show Custom Dialog [ Message: trimHTMLBeforeSave ( $HTMLeditor_json ; 1 ) & ¶ & ¶  & 
+						trimHTMLBeforeSave ( $HTMLeditor_json ; 2 ) & ¶ & ¶ & 
+						$HTMLeditor_json ; Default Button: "OK" ; Button 2: "Cancel" ]
+		
+		// Set Variable [ $textFromQuill[1] ; Let ( 
+						
+						[
+						item = 3;
+						
+						textJSON = JSON.FilterByExpression ( $HTMLeditor_json ; "JSONGetElement ($item ; \"id\") = " & item );
+						textString = JSONGetElement(textJSON ; "[0]value")
+						
+						];
+						
+						
+						textString
+						
+						
+						
+						 ) ]
+		// Set Variable [ $trimText[1] ; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 ) ]
+		Set Field [ TF PI Text 1 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 1 ) ]
+		Set Field [ TF PI Text 2 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 2 ) ]
+		Set Field [ TF PI Text 3 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 3 ) ]
+		Set Field [ TF PI Text 4 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 4 ) ]
+		Set Field [ TF PI Text 5 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 5 ) ]
+		Set Field [ TF PI Text 6 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 6 ) ]
+		Set Field [ TF PI Text 7 2::Text ; trimHTMLBeforeSave ( $HTMLeditor_json ; 7) ]
+		# Update recalculation fields
+		Set Field [ FAT Page item 2::Comment ; FAT Page item 2::Comment ]
+		# Update content overview - force recalculation of auto-enter fields
+		Set Field [ FAT Overview @ Page item 2::ModifiedTimeStamp ; FAT Overview @ Page item 2::ModifiedTimeStamp ]
+	End If
+	If [ Not isPSOS ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	End If
+Else
+	# Record id not the same between HTML and Page item
+	Set Variable [ $error[1] ; "Error: Record id not the same between HTML and Page item" ]
+	If [ Not isPSOS ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	End If
+	Exit Script [ $error ]
+End If
+
+
+

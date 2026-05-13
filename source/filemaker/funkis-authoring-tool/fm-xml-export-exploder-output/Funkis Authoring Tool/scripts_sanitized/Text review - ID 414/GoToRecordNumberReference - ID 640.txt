@@ -1,0 +1,23 @@
+# Called from button in interface and when going back and show the last reviewed text
+Freeze Window
+Set Error Capture [ ON ]
+# Is a sort needed here?
+// Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Set Variable [ $recordNumRef[1] ; GetAsNumber (Get(scriptParameter)) ]
+Go to Record/Request/Page [ First ]
+
+Loop [ Flush: Always ]
+	Exit Loop If [ FAT Text translated::RecordNumberReference = $recordNumRef ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+// 
+// If [ $recordNumRef > 0 And $recordNumRef ≤ Get(foundCount) ]
+// Go to Record/Request/Page [ With dialog: OFF ; $recordNumRef ]
+// # Change 2022-02-21 after Hannah got the eternal scroll loop in WebDirect
+// # Eternal scroll loop should be fixed due to a FileMaker Server update
+// Perform Script [ From list ; "UpdateLastEditedRecord" ; Parameter: $recordNumRef ]
+// Else If [ IsEmpty ( $recordNumRef ) ]
+// Go to Record/Request/Page [ First ]
+// End If
+Go to Field [ FAT Text translated::Text ]
+

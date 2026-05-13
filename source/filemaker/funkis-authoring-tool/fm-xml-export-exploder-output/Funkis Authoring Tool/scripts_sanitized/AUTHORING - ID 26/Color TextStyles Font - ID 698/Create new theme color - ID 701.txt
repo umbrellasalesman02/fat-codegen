@@ -1,0 +1,48 @@
+# Creates new color
+# Can be called from either Title Settings or Color overview
+Set Variable [ $caller[1] ; Get(scriptParameter) ]
+
+Set Variable [ $color_pd[1] ; FAT Theme Color::gColor ]
+Set Variable [ $theme_id[1] ; FAT Theme::PrimaryKey ]
+Freeze Window
+Set Error Capture [ ON ]
+
+If [ $caller = "Title" ]
+	Go to Layout [ Layout: "TABLE FAT Theme Color" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+Go to Record/Request/Page [ First ]
+Loop [ Flush: Always ]
+	If [ $color_pd = FAT Theme Color::Predefined Color Name ]
+		If [ $caller = "Title" ]
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+			Go to Object [ "Color" ; Repetition: 1 ]
+		End If
+		Show Custom Dialog [ Title: "Color already defined" ; Message: "This color is already defined in the theme and duplicates are not allowed. " ; Default Button: "OK" ]
+		Exit Script []
+	End If
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+New Record/Request
+Set Field [ FAT Theme Color::Theme id ; $theme_id ]
+Set Field [ FAT Theme Color::Predefined Color Name ; $color_pd ]
+Set Field [ FAT Theme Color::Custom Color Name ; UnPrettify ($color_pd) ]
+Set Field [ FAT Theme Color::Color Hex Value ; Case ( 
+				
+				   $color_pd = "black"; "#000000";
+				   
+				   $color_pd = "white"; "#ffffff";
+				
+				   $color_pd = "transparent"; "transparent"
+				
+				
+				 ) ]
+
+If [ $caller = "Title" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Go to Object [ "Color" ; Repetition: 1 ]
+End If
+
+
+

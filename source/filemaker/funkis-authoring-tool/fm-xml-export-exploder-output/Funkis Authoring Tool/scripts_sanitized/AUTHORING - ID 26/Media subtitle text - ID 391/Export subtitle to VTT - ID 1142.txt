@@ -1,0 +1,39 @@
+# Launched from a button in Media Subtitle Layout
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+
+Set Variable [ $vtt_style[1] ; JSONGetElement ( FAT Title::Title JSON ; "vtt_style" ) ]
+Set Variable [ $localisation_code[1] ; Case ( IsEmpty ($$localisation_code) Or $$localisation_code = FAT Title::Original localisation code; FAT Title::Original localisation code;  $$localisation_code ) ]
+Set Variable [ $localisation_extension[1] ; Case ( IsEmpty ($$localisation_code) Or $$localisation_code = FAT Title::Original localisation code; ""; "." & $$localisation_code ) ]
+Set Variable [ $video_filename[1] ; getChar ( FAT Media::Container original filename ; 1 ; Position(FAT Media::Container original filename; "."; 1; PatternCount ( FAT Media::Container original filename ; "." ))-1) & $localisation_extension ]
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# Sort text entries for media id:s and enter time since webvtt is not referenced by id
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Set Variable [ $fieldname[1] ; GetFieldName ( FAT Text::FAT WebVTT) ]
+#  Start each new entry with WEBVTT and media id. Media id will be used when finding media filenamn for export
+Set Variable [ $fileContent[1] ; "WEBVTT   " & $media_id & ¶ & ¶ ]
+If [ $vtt_style ≠ "" ]
+	#  Add specific styles to VTT subtitle. Fetched from LP attribute vtt_Style
+	Set Variable [ $fileContent[1] ; $fileContent & "STYLE" &  ¶ & "::cue " & $vtt_style & ¶ & ¶ ]
+End If
+# Loop - exporting VTT
+Loop [ Flush: Defer ]
+	# Set VTT data
+	Set Variable [ $fileContent[1] ; $fileContent & GetField ( $fieldname ) & ¶ & ¶ ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+Set Field [ FAT Title::Latest Exported file ; Base64Decode(Base64Encode(TextEncode ( $fileContent ; "utf-8" ; 1 )); $video_filename & ".vtt") ]
+Commit Records/Requests [ With dialog: OFF ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Export Field Contents [ Create folders: OFF ; FAT Title::Latest Exported file ]
+
+

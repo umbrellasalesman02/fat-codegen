@@ -1,0 +1,13 @@
+# Called from a button in Page item layout. Purpose is to localise media easier
+Perform Script [ From list ; "Save Active Layout" ]
+Set Error Capture [ ON ]
+Set Variable [ $media_parent[1] ; Get(scriptParameter) ]
+Set Variable [ $localisation_code[1] ; FAT Title::Original localisation code ]
+Go to Layout [ Layout: "FAT Media" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get ( foundCount ) = 0 ]
+	Show Custom Dialog [ Title: "No media found" ; Message: "No media found" ; Default Button: "OK" ]
+	Perform Script [ From list ; "Go previous layout" ]
+End If
+
+

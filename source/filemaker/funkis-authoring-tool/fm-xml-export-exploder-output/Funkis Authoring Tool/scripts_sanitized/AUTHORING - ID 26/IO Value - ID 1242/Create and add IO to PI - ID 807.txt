@@ -1,0 +1,225 @@
+# Called from a button in IO Page item setting. Button only visible for IO Input blocks
+# Also called when creating a new Page item in a page - that's when we need the page_item_id
+# This script creates a new IO for "write" and adds it automativcally to the page item.
+  The purpose is to speed up the authoring process.
+
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $page_item_id[1] ; Get(scriptParameter) ]
+Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $list_id[1] ; FAT Page item::List id ]
+Set Variable [ $list_template_id[1] ; BlockTemplate @ Page item::List template id ]
+
+# Usage type can be Member or Group or Session - given by the package type
+Set Variable [ $io_write_context[1] ; Usage type::Name ]
+
+If [ Count(IO Block Template @ Page item::PrimaryKey) > 0 ]
+	# Standard IO
+	# Set up IO values
+	
+	Perform Script [ From list ; "Setup IO Values" ; Parameter: "Page item" ]
+	
+	# Find the Write IOs (can be more than one)
+	Go to Related Record [ Table: FAT IO Value @ Page item ; Layout: "TABLE FAT IO Value @ Page item" ; Show related ]
+	If [ Get(foundCount)>0 ]
+		Set Variable [ $num_of_ios_created[1] ; 0 ]
+		Loop [ Flush: Always ]
+			
+			Set Variable [ $io_block_template_id[1] ; FAT IO Value @ Page item::IO Block template id ]
+			# Check that function is Write - only write IOs are created with this function
+			# IO context is given by the Package usage type and already set with Setup IO values
+			If [ IO Block Template @ IO Value::Function = "Write" ]
+				
+				# Create only WRITE IOs
+				Set Variable [ $io_type[1] ; FAT IO Value @ Page item::IO Type ]
+				Set Variable [ $io_base_name[1] ; Proper(IO Block Template @ Page item::Label) ]
+				Set Variable [ $io_name[1] ; $io_base_name ]
+				
+				Show Custom Dialog [ Title: "Enter IO name" ; Message: "What do you want to store in this IO?" ; Default Button: "Save" ; Button 2: "Skip" ; Input 1: $io_name ; Label 1: $io_type ]
+				
+				If [ Get(lastMessageChoice) = 2 ]
+					Go to Layout [ Layout: <original layout> ; Animation: None ]
+					Exit Script []
+				End If
+				
+				If [ $list_id = "" ]
+					# The Hotspot building block (for example) requires an IO but is populated by a page item list. That's why this IO does not need a Title list.
+					Perform Script [ From list ; "Create List to IO" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+									SetProperty ( "list_id" ; $list_id ) &
+									SetProperty ( "list_template_id" ; $list_template_id ) &
+									SetProperty ( "io_name" ; Proper($io_name) ) &
+									SetProperty ( "io_type" ; $io_type ) ]
+					Set Variable [ $list_id[1] ; Get(ScriptResult) ]
+					
+					Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+					If [ $list_id ≠ "" ]
+						Set Field [ FAT Page item::List id ; $list_id ]
+					End If
+				End If
+				
+				Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+				
+				# Create an IO of the right type
+				New Record/Request
+				Set Variable [ $io_id[1] ; FAT IO::PrimaryKey ]
+				Set Field [ FAT IO::Title id ; $title_id ]
+				Set Field [ FAT IO::IO type ; $io_type ]
+				Set Field [ FAT IO::Author description ; $io_name & " - " & $io_base_name ]
+				Set Field [ FAT IO::Insight description ; $io_name & " - " & $io_base_name ]
+				Set Field [ FAT IO::Insight visible ; 0 ]
+				
+				# Set a valid object name - no duplicates allowed in same title, not exceeding number of characters
+				Perform Script [ From list ; "Set valid object name" ; Parameter: SetProperty ( "source_textfield" ; GetFieldName ( FAT IO::Name ) ) &
+								SetProperty ( "new_name" ; $io_name ) &
+								SetProperty ( "max_characters" ; 32 ) ]
+				
+				# Setting FATversion default values
+				If [ FATversion < 4 ]
+					# Setting default write context to package usage type = io_write_context
+					Set Field [ FAT IO::IO Write Context ; $io_write_context ]
+				Else If [ FATversion ≥ 4 ]
+					# Setting default permissions to package usage type = io_write_context
+					Set Field [ FAT IO::IO Write Permissions ; "My " & $io_write_context ]
+					Set Field [ FAT IO::IO Read Permissions ; "My " & $io_write_context ]
+				End If
+				
+				If [ ($io_type = "Rate" Or $io_type ="Dilemma" Or $io_type ="Select" Or $io_type ="Choice" Or $io_type ="IO group") And $list_id≠"" ]
+					# These IO types have a list - which enables the Insights function automatically
+					Set Field [ FAT IO::List id ; $list_id ]
+				End If
+				
+				# If there are modifiers connected
+				If [ IO Type::IO has modifiers ]
+					Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "IO" ) & 
+									SetProperty ( "item_id" ; $io_id ) &
+									SetProperty ( "learningprogramme_id" ; $title_id ) &
+									SetProperty ( "symbol_id" ; $io_type ) ]
+					Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+				End If
+				
+				# If there are fields connected - create one field!
+				If [ IO Type::IO has fields ]
+					Perform Script [ From list ; "New input field" ; Parameter: SetProperty ( "io_id" ; $io_id ) &
+									SetProperty ( "title_id" ; $title_id ) &
+									SetProperty ( "new_io" ; True ) ]
+					Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+				End If
+				
+				Commit Records/Requests [ With dialog: OFF ]
+				Set Field [ FAT IO::xAPI storage ; Case ( PatternCount (FAT Title::Title Backend; "xAPI") And IO Type::xAPI enabled ; 1 ; 0 ) ]
+				# Connect the IO to this block
+				
+				Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+				If [ Get(foundCount)>0 ]
+					Set Field [ FAT IO Value @ Page item::IO id ; $io_id ]
+					
+					If [ FATversion ≥ 4 ]
+						Set Field [ FAT IO Value @ Page item::IO Read filter ; "My " & $io_write_context ]
+					End If
+					
+					Perform Script [ From list ; "Modify IO Value at Page item" ; Parameter: FAT IO Value @ Page item::PrimaryKey ]
+					
+					Set Variable [ $num_of_ios_created[1] ; $num_of_ios_created + 1 ]
+				Else
+					Show Custom Dialog [ Title: "Error" ; Message: "Something is wrong with auto creation of IOs" ; Default Button: "OK" ]
+				End If
+				
+			End If
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+		
+		If [ Get(WindowStyle) = 9 //card window ]
+			Go to Layout [ Layout: "FAT IO Value PI Card" ; Animation: None ]
+		End If
+		
+		# Check if we created any IOs
+		If [ $num_of_ios_created = 0 ]
+			Show Custom Dialog [ Title: "Could not create and add IO" ; Message: "Check the IO pop-up meny to select an existing IO or go to Content-> IOs to create one manually." ; Default Button: "OK" ]
+		Else If [ $num_of_ios_created = 1 ]
+			// Show Custom Dialog [ Title: "New IO of type " & $io_type & " created" ; Message: "A new IO of type " & Upper($io_type) & " and with the name \"" & $io_name & "\" created and connected to this page item." & ¶ & ¶ & 
+							"This IO is now available everywhere in the Title. If you want to modify the IO - go to Content -> IOs." ; Default Button: "OK" ]
+		Else
+			// Show Custom Dialog [ Title: "New IOs created" ; Message: "Several new IOs were created and connected to this page item." & ¶ & ¶ & 
+							"These IOs are now available everywhere in the Title. If you want to modify the IOs - go to Content -> IOs." ; Default Button: "OK" ]
+		End If
+	End If
+	
+Else If [ BlockTemplate @ Page item::PrimaryKey ≠ "9D44EDFB-8DE5-42DA-B191-A08F8E6B7D78" //Categorize V2 is a write enabled block but no new IOs should be created. ]
+	
+	# -------------- Legacy IO --------------------------------------------------------------------------------
+	Set Variable [ $io_write[1] ; BlockTemplate @ Page item::IO write enabled ]
+	If [ $io_write = 1 ]
+		Set Variable [ $io_base_name[1] ; Case ( IsEmpty(TF PI Text 1::Text); "IO for " & FAT Block @ Page item::Name; TF PI Text 1::Text) ]
+		Set Variable [ $io_name[1] ; $io_base_name ]
+		Set Variable [ $io_type[1] ; BlockTemplate @ Page item::IO Type Legacy ]
+		Show Custom Dialog [ Title: "Enter IO name" ; Message: "What do you want to store in this IO?" ; Default Button: "Save" ; Button 2: "Cancel" ; Input 1: $io_name ; Label 1: $io_type ]
+		
+		If [ Get(lastMessageChoice) = 2 ]
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+			Exit Script []
+		End If
+		
+		Perform Script [ From list ; "Create List to IO" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "list_id" ; $list_id ) &
+						SetProperty ( "list_template_id" ; $list_template_id ) &
+						SetProperty ( "io_name" ; Proper($io_name) ) &
+						SetProperty ( "io_type" ; $io_type ) ]
+		Set Variable [ $list_id[1] ; Get(ScriptResult) ]
+		
+		Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+		New Record/Request
+		Set Variable [ $io_id[1] ; FAT IO::PrimaryKey ]
+		Set Field [ FAT IO::Title id ; $title_id ]
+		Set Field [ FAT IO::Name ; Proper ($io_name) ]
+		Set Field [ FAT IO::Author description ; Proper($io_name) & " - " & $io_base_name ]
+		Set Field [ FAT IO::Insight description ; Proper($io_name) & " - " & $io_base_name ]
+		Set Field [ FAT IO::IO type ; $io_type ]
+		Set Field [ FAT IO::Object Group ; $io_group ]
+		Set Field [ FAT IO::IO Write Context ; $io_write_context ]
+		
+		If [ $io_type = "Rate" Or $io_type ="Dilemma" Or $io_type ="Select" Or $io_type ="Choice" Or $io_type ="IO group" ]
+			# These IO types have a list - which enables the Insights function automatically
+			Set Field [ FAT IO::List id ; $list_id ]
+		End If
+		Go to Layout [ Layout: "FAT IO Value PI Card" ; Animation: None ]
+		Set Field [ FAT Page item::IO id Legacy ; $io_id ]
+		If [ $list_id ≠ "" ]
+			Set Field [ FAT Page item::List id ; $list_id ]
+		End If
+		// Show Custom Dialog [ Title: "New IO of type " & $io_type & " created" ; Message: "A new IO of type " & Upper($io_type) & " and with the name \"" & $io_base_name & "\" created and connected to this page item." & ¶ & ¶ & 
+						"This IO is now available everywhere in the Title. If you want to modify the IO - go to Content -> IOs." ; Default Button: "OK" ]
+	Else
+		# Not a write IO
+		If [ FAT Title::Title Backend = "Funkis Cloud" ]
+			# Current group members is the most commonly used context for reading IOs
+			Set Variable [ $io_default_context[1] ; "current_group_members" ]
+		Else
+			# LMS or xAPI
+			Set Variable [ $io_default_context[1] ; "member" ]
+		End If
+	End If
+	
+	Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+	# Search for stateToggle "io_context"
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=1 ]
+		Set Field [ FAT Modifier Value::Value ; $io_default_context ]
+	End If
+	
+	If [ Get(WindowStyle) = 9 //card window ]
+		Go to Layout [ Layout: "FAT IO Value PI Card" ; Animation: None ]
+	End If
+	
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+
+
+
+

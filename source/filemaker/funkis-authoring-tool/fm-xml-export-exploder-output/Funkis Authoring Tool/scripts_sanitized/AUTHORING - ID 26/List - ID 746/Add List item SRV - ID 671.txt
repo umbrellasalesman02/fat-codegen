@@ -1,0 +1,104 @@
+Set Variable [ $optionlist_id[1] ; GetScriptProperty ( "optionlist_id" ) ]
+Set Variable [ $tag_category[1] ; GetScriptProperty ( "tag_category" ) ]
+Set Variable [ $source_table[1] ; GetScriptProperty ( "source_table" ) ]
+Set Variable [ $numOfItems[1] ; GetAsNumber (GetScriptProperty ( "num_of_items" )) ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $io_base_name[1] ; GetScriptProperty ( "io_base_name" ) ]
+Set Variable [ $io_type[1] ; GetScriptProperty ( "io_type" ) ]
+
+# Creating tag filters will require level. For now - page item is only valid level
+Set Variable [ $level[1] ; "Page item" ]
+
+# Get usage type for value list. Usage type can be "Default" or "Tag filter"
+Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $usage_type[1] ; FAT List::Usage type ]
+
+# For SRV execution - set DB position right
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+
+If [ $numOfItems>0 And $numOfItems ≤12 ]
+	Set Variable [ $i[1] ; 1 ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Loop [ Flush: Always ]
+		Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+		New Record/Request
+		Set Variable [ $optionlist_item_id[1] ; FAT List item::PrimaryKey ]
+		Set Field [ FAT List item::Parent id ; $optionlist_id ]
+		Commit Records/Requests [ With dialog: OFF ]
+		
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $optionlist_id ) &
+						SetProperty ( "source_table" ; $source_table ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item::Text 1 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $optionlist_id ) &
+						SetProperty ( "source_table" ; $source_table ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item::Text 2 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $optionlist_id ) &
+						SetProperty ( "source_table" ; $source_table ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item::Text 3 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $optionlist_id ) &
+						SetProperty ( "source_table" ; $source_table ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT List item::Media 1 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) ]
+		# Two media fields in List not enabled yet - 2022-04-25. 
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $optionlist_id ) &
+						SetProperty ( "source_table" ; $source_table ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT List item::Media 2 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) ]
+		
+		If [ $io_base_name ≠ "" ]
+			# For lists with IOs.
+			Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+			# Create an IO of the right type
+			New Record/Request
+			Set Variable [ $io_id[1] ; FAT IO::PrimaryKey ]
+			Set Field [ FAT IO::Title id ; $title_id ]
+			Set Field [ FAT IO::Name ; $io_base_name & " " & $i ]
+			Set Field [ FAT IO::IO type ; $io_type ]
+			Set Field [ FAT IO::Author description ; $io_base_name ]
+			Set Field [ FAT IO::Insight description ; $io_base_name ]
+			Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+			Set Field [ FAT List item::Value 1 ; $io_id ]
+		End If
+		
+		If [ $usage_type = "Tag filter" ]
+			# This is a hack - tag text uses the same text instance as the value list item
+			Set Variable [ $text_id[1] ; FAT List item::Text 1 id ]
+			# If changing the text option for the value list, the tag text is also changed
+			# If deleting a tag, text for both tag and TCA will be deleted
+			
+			Go to Layout [ Layout: "TABLE FAT Tag" ; Animation: None ]
+			New Record/Request
+			Set Field [ FAT Tag::Title id ; $title_id ]
+			Set Field [ FAT Tag::Level ; $level ]
+			Set Field [ FAT Tag::Name text id ; $text_id ]
+			Set Field [ FAT Tag::List id ; $optionlist_id ]
+			Set Field [ FAT Tag::Tag category ; $tag_category ]
+			Set Field [ FAT Tag::List item id ; $optionlist_item_id ]
+			Commit Records/Requests [ With dialog: OFF ]
+			
+			# If adding a tag at a new level - enable level and tag interface
+			# Level can be Chapter, Page or Page item
+			Set Variable [ $tags_levels[1] ; FAT Title::Tags levels ]
+			If [ Not PatternCount ( $tags_levels ; $level ) ]
+				Set Variable [ $tags_levels[1] ; $tags_levels & ¶ & $level ]
+				Set Field [ FAT Title::Tags levels ; $tags_levels ]
+			End If
+		End If
+		
+		Set Variable [ $i[1] ; $i+1 ]
+		Exit Loop If [ $i > $numOfItems ]
+	End Loop
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+

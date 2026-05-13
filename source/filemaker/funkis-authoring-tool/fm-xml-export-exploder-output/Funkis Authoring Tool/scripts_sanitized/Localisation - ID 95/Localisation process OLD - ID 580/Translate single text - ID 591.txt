@@ -1,0 +1,64 @@
+# This script is called from the Text translation layout - both review and HTML editor view
+Show Custom Dialog [ Title: "Re-translate text" ; Message: "Are you sure you want to replace the current translation with a new one? " ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+Freeze Window
+Set Error Capture [ ON ]
+Set Field [ FAT Text translated::Text ; "Translating.." ]
+Set Variable [ $text_to_translate[1] ; GetScriptProperty("text_to_translate") ]
+Set Variable [ $text_ref_num[1] ; GetScriptProperty ( "text_ref_num" ) ]
+Set Field [ FAT Text translated::gRecordNumberReference ; $text_ref_num ]
+
+# Translate one or more texts
+Set Variable [ $original_localisation_code[1] ; FAT Title::Original localisation code ]
+Set Variable [ $target_localisation_code[1] ; $$localisation_code ]
+Set Variable [ $translation_api[1] ; FAT Text translated::gTranslation API ]
+
+# Get all info for the translation API
+Go to Layout [ Layout: "TABLE Translation API" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $send_api_url[1] ; Translation API @ Title::Send translation URL ]
+Set Variable [ $get_api_url[1] ; Translation API @ Title::Get translation URL ]
+Set Variable [ $api_key[1] ; Translation API @ Title::API PrivateKey ]
+Set Variable [ $asynchronous[1] ; Translation API @ Title::Asynchronous ]
+Set Variable [ $routing[1] ; Translation API @ Title::Routing ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+Perform Script [ From list ; "Send text to API" ; Parameter: SetProperty( "text_to_translate" ; $text_to_translate ) &
+				SetProperty( "original_localisation_code" ; $original_localisation_code) &
+				SetProperty( "target_localisation_code" ; $target_localisation_code) &
+				SetProperty( "translation_api" ; $translation_api ) &
+				SetProperty( "send_api_url"; $send_api_url) &
+				SetProperty( "api_key"; $api_key) &
+				SetProperty( "asynchronous"; $asynchronous) &
+				SetProperty( "routing"; $routing) ]
+
+# Use result in different ways depending if the api requires asynchronous translations or not
+If [ $asynchronous ]
+	# Result is an id that will be used when fetching the translation later
+	Set Variable [ $$translation_suggestion_id[1] ; Get(ScriptResult) ]
+	If [ $$translation_suggestion_id ≠ "" And Not PatternCount ( $$translation_suggestion_id ; "--- ERROR ---" ) ]
+		Set Variable [ $$async_calls[1] ; 0 ]
+		Install OnTimer Script [ "Async Get Single text OnTimer" ; 5 ]
+	Else
+		// Set Field [ FAT Text translated::gTranslationSuggestion ; "Could not translate." ]
+		Set Field [ FAT Text translated::Text ; "API could not translate this text. " & $$translation_suggestion_id ]
+		Perform Script [ From list ; "Change Translated Text Status" ; Parameter: "Not translated" ]
+	End If
+Else
+	# Result is the translated text
+	Set Variable [ $translation_text[1] ; Get(ScriptResult) ]
+	Set Field [ FAT Text translated::Text ; $translation_text ]
+	Perform Script [ From list ; "Change Translated Text Status" ; Parameter: "Not reviewed" ]
+End If
+
+# Go back to the record
+// Perform Script [ From list ; "GoToRecordNumberReference" ]
+// If [ PatternCount (Get(layoutName); "Editor") ]
+// 
+// End If
+
+
+
+

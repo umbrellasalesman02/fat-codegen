@@ -1,0 +1,78 @@
+# Called from a Move button in any layout
+
+# EXAMPLE
+  SetProperty ( "item_type" ; "Chapter" ) &
+  SetProperty ( "item_id" ; FAT Chapter::PrimaryKey ) &
+  SetProperty ( "item_parent_id" ; FAT Chapter::Parent id) &
+  SetProperty ( "item_parent_type" ; "Package" ) &
+  SetProperty ( "item_level" ; 2 ) &
+  SetProperty ( "proxy_type" ; FAT Chapter::Proxy type )
+
+Set Variable [ $proxy_type[1] ; GetScriptProperty ( "proxy_type") ]
+
+
+# 2025-11-17: This is not the final solution since a proxy page should both be positioned in a package and in a chapter
+
+If [ $proxy_type = "Page" And FAT Package::Package type name = "Site" ]
+	Show Custom Dialog [ Title: "Move to package type" ; Message: "This item can be moved to packages of both Scroll and Site types. ¶¶What type of package do you want to move this item to?" ; Default Button: "Scroll" ; Button 2: "Site" ]
+	If [ Get(lastMessageChoice) = 1 ]
+		Perform Script [ From list ; "Start Move FAT item" ; Parameter: SetProperty ( "item_type" ; "Page") &
+						
+						SetProperty ( "item_id" ; FAT Page::PrimaryKey ) &
+						
+						SetProperty ( "item_parent_id" ; FAT Chapter::PrimaryKey) &
+						
+						SetProperty ( "item_parent_type" ; "Chapter" ) &
+						
+						SetProperty ( "item_level" ; 3 ) ]
+		Exit Script []
+	End If
+End If
+
+
+
+# fat_item_id = PrimaryKey for Package, Chapter, Page or Page item
+Set Variable [ $$fat_item_id[1] ; GetScriptProperty ( "item_id" ) ]
+
+# fat_item_parent_id = PrimaryKey for the parent
+Set Variable [ $$fat_item_parent_id[1] ; GetScriptProperty ( "item_parent_id" ) ]
+
+# fat_item_type = "Package", "Chapter", "Page" or "Page item"
+Set Variable [ $$fat_item_type[1] ; GetScriptProperty ( "item_type" ) ]
+
+# fat_item_parent_proxy = ??? Cannot see it is in use
+Set Variable [ $$fat_item_proxy_type[1] ; GetScriptProperty ( "proxy_type" ) ]
+
+# fat_item_parent_type = What kind of item can the item be moved to
+Set Variable [ $$fat_item_parent_type[1] ; GetScriptProperty ( "item_parent_type" ) ]
+
+# fat_caller_layout = the layout to return to after move operation done
+Set Variable [ $$fat_caller_layout[1] ; Get(layoutName) ]
+
+# fat_text  = The help text to display in move layout
+Set Variable [ $$fat_text[1] ; Case ( $$fat_item_type = "Package" ; "Package " & FAT Package::Reference name ;
+				
+				Case ( $$fat_item_type = "Chapter" ; "Chapter " & FAT Chapter::DisplayText ;
+				
+				Case ( $$fat_item_type = "Page" And FAT Package::Package type name = "Scroll"; "Page " & FAT Page::DisplayText ; 
+				
+				Case ( $$fat_item_type = "Page" And FAT Package::Package type name = "Slide"; "Page item " & Left (FAT Page item::DisplayText; 50); 
+				
+				Case ( $$fat_item_type = "Page item" ; "Page item " & Left (FAT Page item::DisplayText; 50) ; ""
+				
+				))))) ]
+
+# old_package_id = PrimaryKey for Package - needed when moving Text and Media to a new package
+Set Variable [ $$old_package_id[1] ; FAT Package::PrimaryKey ]
+
+# old_package_type = id to the specific package type site, scroll, slide
+Set Variable [ $$old_package_type[1] ; FAT Package::Package type name ]
+
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+Perform Script [ From list ; "Save Active Layout" ]
+Go to Layout [ Layout: "FAT Move items" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+

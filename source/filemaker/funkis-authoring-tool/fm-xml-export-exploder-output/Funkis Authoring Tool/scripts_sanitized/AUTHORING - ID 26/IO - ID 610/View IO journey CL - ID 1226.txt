@@ -1,0 +1,204 @@
+
+
+# Can be called from both IO List view (FAT Title) and FAT Page item
+# Will display all content items that are in contact with the IO - also media IOs and text variable usage
+
+
+
+Perform Script [ From list ; "Save Active Layout" ]
+# Can be called from both Title Settings and FAT Page item
+# Also work for IO concept and Legacy IO concept
+
+Set Variable [ $context[1] ; GetScriptProperty ( "caller" ) ]
+Set Variable [ $io_id[1] ; GetScriptProperty ( "io_id" ) ]
+
+Set Error Capture [ ON ]
+Freeze Window
+
+Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ FAT IO::Number of instances >0 ]
+	# 0 + Count(FAT IO Value::PrimaryKey) +
+	  Count ( FAT List item @ IO::PrimaryKey ) + 
+	  Count (FAT Score Category @ IO::PrimaryKey) +
+	  Count(FAT Page item @ IO Legacy::PrimaryKey) 
+	  
+	  No need to check for patterncount in IO arrays to get a hit, since comma-separated IO Arrays are 1. Legacy and 2. Always corresponds to a Write IO.
+	  However - comma-separated IO arrays are included in search below
+	  
+	  Text variables are not included.
+	
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $list_id[1] ; FAT List item @ IO::Parent id ]
+	Set Variable [ $item_id_list[1] ; ""  //List with all ids to match with overview ]
+	Set Variable [ $item_occurance_type_list[1] ; ""  //List with all occurence types to match with overview ]
+	
+	If [ Count(FAT IO Value::PrimaryKey) > 0 ]
+		# Search IO in IO Value
+		Go to Layout [ Layout: "TABLE FAT Page Item 2" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Variable [ $item_id_list[1] ; $item_id_list & ¶  & FAT Page item 2::List of PrimaryKey ]
+		Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+	End If
+	
+	If [ Count ( FAT List item @ IO::PrimaryKey ) > 0 ]
+		# Search IO in List items
+		Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Go to Related Record [ Table: FAT Page item @ LI ; Layout: "TABLE FAT Page Item 2" ; Show related ; Match found set ]
+		# So the correct way to test for no related records is:
+		  - GTRR Match current record only: test for error 101
+		  - GTRR Match found set: test for error 401
+		If [ Get(lastError) ≠ 401 ]
+			Set Variable [ $item_id_list[1] ; $item_id_list & ¶  & FAT Page item 2::List of PrimaryKey ]
+		End If
+		Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+	End If
+	
+	If [ Count (FAT Score variable @ IO::PrimaryKey) > 0 ]
+		# Find the score that corresponds with the IO - only one Score category!
+		Go to Layout [ Layout: "TABLE FAT Score Category" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Variable [ $score_category_id[1] ; FAT Score variable::PrimaryKey ]
+		
+		Go to Layout [ Layout: "TABLE FAT Score Value" ; Animation: None ]
+		
+		# Find all score values for page items
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)> 0 ]
+			Set Variable [ $item_id_list[1] ; $item_id_list & ¶  & FAT Score Value::List of Parent ids ]
+		End If
+		
+		# Find all score values for list items
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)> 0 ]
+			
+			# So the correct way to test for no related records is:
+			  - GTRR Match current record only: test for error 101
+			  - GTRR Match found set: test for error 401
+			If [ Get(lastError) ≠ 401 ]
+				Go to Related Record [ Table: FAT Page item @ LI ; Layout: "TABLE FAT Page Item 2" ; Show related ; Match found set ]
+				# So the correct way to test for no related records is:
+				  - GTRR Match current record only: test for error 101
+				  - GTRR Match found set: test for error 401
+				If [ Get(lastError) ≠ 401 ]
+					Set Variable [ $item_id_list[1] ; $item_id_list & ¶  & FAT Page item 2::List of PrimaryKey ]
+				End If
+			End If
+			
+			
+			
+		End If
+		
+		
+		
+		
+		Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+	End If
+	
+	
+	# Oct 2024: Re-write to use same approach as for lists since IOs can be used in IOs
+	  NOT STARTED YET
+	// # Check number of page items
+	// Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	// Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Set Variable [ $number_of_page_items[1] ; Get(foundCount) ]
+	// # Check  number of IOs
+	// Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+	// Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	// Set Variable [ $number_of_IOs[1] ; Get(foundCount) ]
+	// # Check  number of IO Fields
+	// Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+	// Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Set Variable [ $number_of_Fields[1] ; Get(foundCount) ]
+	// Go to Layout [ Layout: <original layout> ; Animation: None ]
+	// If [ $number_of_page_items > 0 And ($number_of_IOs+$number_of_Fields) = 0 ]
+	// Set Variable [ $show_list[1] ; "page-items" ]
+	// Else If [ $number_of_page_items = 0 And ($number_of_IOs+$number_of_Fields) > 0 ]
+	// Set Variable [ $show_list[1] ; "ios" ]
+	// Else If [ $number_of_page_items > 0 And ($number_of_IOs + $number_of_Fields) > 0 ]
+	// Show Custom Dialog [ Title: "List used in both Page items and IOs" ; Message: "This list is used in both Page items and IOs.¶¶What do you want to view?" ; Default Button: "Page items" ; Button 2: "IOs" ; Button 3: "Cancel" ]
+	// If [ Get(lastMessageChoice) = 1 ]
+	// Set Variable [ $show_list[1] ; "page-items" ]
+	// Else If [ Get(lastMessageChoice) = 2 ]
+	// Set Variable [ $show_list[1] ; "ios" ]
+	// Else
+	// Exit Script []
+	// End If
+	// Else
+	// Show Custom Dialog [ Title: "No page items or IOs found" ; Message: "No page items or IOs are currently using this list." ; Default Button: "OK" ]
+	// End If
+	// Perform Script [ From list ; "Close card Window" ]
+	// Perform Script [ From list ; "Save Active Layout" ]
+	// If [ $show_list = "page-items" ]
+	// Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	// Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Go to Related Record [ Table: FAT Page item ; Layout: "FAT Block instances 2" ; Show related ; Match found set ]
+	// Else If [ $show_list = "ios" ]
+	// Go to Layout [ Layout: "FAT IO Found Set" ; Animation: None ]
+	// Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	// Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	// End If
+	// End If
+	
+	# Old approach - only check page items
+	Go to Layout [ Layout: "FAT Block instances" ; Animation: None ]
+	
+	# Find both IO Value and Legacy
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	
+	Set Variable [ $number_of_page_items[1] ; Get(foundCount) ]
+	
+	If [ $list_id ≠ "" ]
+		# Search for page items where a list of IOs are included
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount) = 0 ]
+			Show Custom Dialog [ Title: "IO used in List but list is not used" ; Message: "This IO is used in a list but the list is not attached to a page item yet." ; Default Button: "OK" ]
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+		End If
+	End If
+	If [ True ]
+	Else
+		Show Custom Dialog [ Title: "IO not used" ; Message: "No page items use this IO yet." ; Default Button: "OK" ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	End If
+	Go to Related Record [ Table: FAT Page item ; Layout: "FAT Block instances 2" ; Show related ; Match found set ]
+Else If [ $context = "Page item" ]
+	If [ Get(WindowStyle) = 3 ]
+		Perform Script [ From list ; "Close card Window" ]
+		Perform Script [ From list ; "Save Active Layout" ]
+	End If
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $io_id[1] ; FAT IO @ Page item::PrimaryKey ]
+	Set Variable [ $list_id[1] ; FAT Page item::List id ]
+	Go to Layout [ Layout: "FAT Block instances 2" ; Animation: None ]
+	# Search IO in BOTH legacy IO and IO
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	If [ $list_id ≠ "" ]
+		# Search for page items where a list of IOs are included
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	End If
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Else If [ $context = "Page item legacy" ]
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $legacy_io_id[1] ; FAT Page item::IO id Legacy ]
+	Set Variable [ $list_id[1] ; FAT Page item::List id ]
+	Go to Layout [ Layout: "FAT Block instances 2" ; Animation: None ]
+	# Search IO in BOTH legacy IO and IO
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	If [ $list_id ≠ "" ]
+		# Search for page items where a list of IOs are included
+		# Did NOT WORK for IO Rate type!!!!
+		// Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	End If
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+End If
+
+
+

@@ -1,0 +1,6 @@
+<CustomFunctionCalc>
+	<CustomFunctionReference id="172" name="FM_ApplyCase"></CustomFunctionReference>
+	<Calculation>
+		<Text><![CDATA[/* FM_ApplyCase ( pattern ; replacement )   Returns replacement where each letter is upper/lower to match the corresponding letter in pattern.   If replacement is longer than pattern, the last pattern char is reused.*/Let ( [  lp = Length ( pattern ) ;  lr = Length ( replacement ) ;  headP = Left ( pattern ; 1 ) ;  headR = Left ( replacement ; 1 ) ;  restP = Middle ( pattern ; 2 ; lp - 1 ) ;  restR = Middle ( replacement ; 2 ; lr - 1 ) ;  isLetter =    Case (      headR = "" ; 0 ;      Position ( "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" ; headR ; 1 ; 1 ) > 0 ; 1 ;      0    ) ;  isPUpper = ( Upper ( headP ) = headP ) And ( Lower ( headP ) ≠ headP ) ;  isPLower = ( Lower ( headP ) = headP ) And ( Upper ( headP ) ≠ headP ) ;  headOut =    Case (      isLetter = 0 ; headR ;      isPUpper ; Upper ( headR ) ;      isPLower ; Lower ( headR ) ;      headR    )] ;Case (  lr = 0 ; "" ;  headOut &    FM_ApplyCase (      Case ( lp > 1 ; restP ; headP ) ;      restR    )))]]></Text>
+	</Calculation>
+</CustomFunctionCalc>

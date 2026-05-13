@@ -1,0 +1,37 @@
+# Called from an onModify event trigger on a popup menu list in three places:
+  1. Page item IO Settings
+  2. List (Dynamic list creation)
+  3. Text variable creation
+
+Freeze Window
+
+# Type can be "Page item", "List" or "Text variable"
+Set Variable [ $type[1] ; GetScriptProperty ( "type" ) ]
+Set Variable [ $parent_id[1] ; GetScriptProperty ( "parent_id" ) ]
+Set Variable [ $input_field_id[1] ; FAT IO Field::gIOFieldId sort order ]
+
+Go to Layout [ Layout: "TABLE FAT IO Sort Order" ; Animation: None ]
+New Record/Request
+
+Set Field [ FAT IO Sort Order::IO Field id ; $input_field_id ]
+Set Field [ FAT IO Sort Order::Parent id ; $parent_id ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Set Field [ FAT IO Field::gIOFieldId sort order ; "" ]
+
+If [ $type = "Text variable" ]
+	Install OnTimer Script
+	Go to Object [ "TextVars" ; Repetition: 1 ]
+	Set Field [ FAT IO::gCurrentTextVariable ; $parent_id ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Go to Object [ "Input field settings popover" ; Repetition: 1 ]
+Else If [ $type = "Page item" ]
+	Install OnTimer Script
+	Set Field [ FAT Page item::gCurrentIOValue ; $parent_id ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Go to Object [ "Input field settings popover" ; Repetition: 1 ]
+End If
+
+
+
+

@@ -1,0 +1,39 @@
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+Set Variable [ $source_table[1] ; GetScriptProperty ( "source_table" ) ]
+Set Variable [ $numOfItems[1] ; GetAsNumber (GetScriptProperty ( "num_of_items" )) ]
+Set Variable [ $learningprogramme_id[1] ; GetScriptProperty ( "learningprogramme_id" ) ]
+
+
+If [ $numOfItems>0 And $numOfItems ≤12 ]
+	Set Variable [ $i[1] ; 1 ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+	Loop [ Flush: Always ]
+		New Record/Request
+		Set Field [ FAT List item @ Page item::Parent id ; $item_id ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $item_id ) &
+						SetProperty ( "source_table" ; $source_table ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item @ Page item::Text 1 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $item_id ) &
+						SetProperty ( "source_table" ; $source_table ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item @ Page item::Text 2 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $item_id ) &
+						SetProperty ( "source_table" ; $source_table ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item @ Page item::Text 3 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $item_id ) &
+						SetProperty ( "source_table" ; $source_table ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT List item @ Page item::Media 1 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $learningprogramme_id) ]
+		Set Variable [ $i[1] ; $i+1 ]
+		Exit Loop If [ $i > $numOfItems ]
+	End Loop
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+

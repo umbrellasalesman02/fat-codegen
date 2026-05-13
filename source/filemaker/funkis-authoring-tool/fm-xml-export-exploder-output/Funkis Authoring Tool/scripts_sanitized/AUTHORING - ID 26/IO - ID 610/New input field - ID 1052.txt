@@ -1,0 +1,61 @@
+# Called from a button in IO card for those IO Types that have Fields enabled
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $io_id[1] ; GetScriptProperty ( "io_id" ) ]
+Set Variable [ $new_io[1] ; GetAsBoolean (GetScriptProperty ( "new_io" )) ]
+Set Variable [ $tab[1] ; GetScriptProperty ( "tab" ) ]
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+New Record/Request
+Set Field [ FAT IO Field::Title id ; $title_id ]
+Set Field [ FAT IO Field::IO id ; $io_id ]
+Set Field [ FAT IO Field::Name ; "Untitled field" ]
+
+# id =8801EA00-3F42-442B-AC6E-F68C274090EB = Text field type
+Set Field [ FAT IO Field::Type ; "8801EA00-3F42-442B-AC6E-F68C274090EB" ]
+Set Field [ FAT IO Field::Input required ; "No" ]
+
+Set Variable [ $input_field_id[1] ; FAT IO Field::PrimaryKey ]
+
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT IO Field::PrimaryKey ) &
+				SetProperty ( "source_table" ; "field" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT IO Field::Label input ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) &
+				SetProperty ( "learningprogramme_id" ; $title_id) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT IO Field::PrimaryKey ) &
+				SetProperty ( "source_table" ; "field" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT IO Field::Label output ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) &
+				SetProperty ( "learningprogramme_id" ; $title_id) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT IO Field::PrimaryKey ) &
+				SetProperty ( "source_table" ; "field" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT IO Field::Hint ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) &
+				SetProperty ( "learningprogramme_id" ; $title_id) ]
+
+If [ Not $new_io ]
+	# Add input field values for all page items that uses this IO in IO Value and already has input field values
+	Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) > 0 ]
+		Loop [ Flush: Always ]
+			Set Variable [ $io_value_id[1] ; FAT IO Value @ Page item::PrimaryKey ]
+			Go to Layout [ Layout: "TABLE FAT IO Field Value" ; Animation: None ]
+			New Record/Request
+			Set Field [ FAT IO Field Value::IO Value id ; $io_value_id ]
+			Set Field [ FAT IO Field Value::IO Field id ; $input_field_id ]
+			Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+If [ $tab≠ "" ]
+	Go to Object [ $tab ; Repetition: 1 ]
+End If
+

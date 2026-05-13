@@ -1,0 +1,22 @@
+# Called from Building block list and more
+If [ isDeveloper ]
+	Set Variable [ $tab_name[1] ; Get(scriptParameter) ]
+	
+	Perform Script [ From list ; "Save Active Layout" ]
+	Go to Related Record [ Table: FAT Title ; Layout: "FAT Title Settings" ; Show related ]
+	
+	Set Variable [ $$lp_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $$localisation_code[1] ; FAT Title::Original localisation code ]
+	
+	# Set view levels for this user
+	Set Field [ FAT Title::gView hierarchy level Title ; Case ( IsEmpty (User X Title @ Title::View hierarchy level Title); 1;  User X Title @ Title::View hierarchy level Title) ]
+	Set Field [ FAT Title::gView Package group Title ; Case ( IsEmpty (User X Title @ Title::View Package group Title); ""; User X Title @ Title::View Package group Title) ]
+	
+	Set Variable [ $tab_name[1] ; Case ( IsEmpty ($tab_name) ; FAT Title::LastSettingTab ;$tab_name ) ]
+	
+	Perform Script [ From list ; "Go tab" ; Parameter: SetProperty ( "tab_name" ; $tab_name ) & 
+					SetProperty ( "field" ; GetFieldName ( FAT Title::LastSettingTab )) ]
+End If
+
+
+

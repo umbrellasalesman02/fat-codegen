@@ -1,0 +1,55 @@
+# Find original item of different modifier and value items
+# if no item find using orginal key from clone - the old id is returned
+# This script is called AFTER all Packages, Chapters, Page, and Page items have been cloned.
+
+Set Variable [ $old_item_id[1] ; GetScriptProperty("old_item_id") ]
+Set Variable [ $item_type[1] ; GetScriptProperty("item_type") ]
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+
+Set Variable [ $new_item_id[1] ; $old_item_id ]
+
+If [ $item_type = "Link" ]
+	Go to Layout [ Layout: "TABLE FAT Link" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) = 1 ]
+		Set Variable [ $new_item_id[1] ; FAT Link::PrimaryKey ]
+	End If
+Else If [ $item_type = "Package id" ]
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) = 1 ]
+		Set Variable [ $new_item_id[1] ; FAT Package::PrimaryKey ]
+	End If
+Else If [ $item_type = "Chapter id" ]
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) = 1 ]
+		Set Variable [ $new_item_id[1] ; FAT Chapter::PrimaryKey ]
+	End If
+Else If [ $item_type = "Page id" ]
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) = 1 ]
+		Set Variable [ $new_item_id[1] ; FAT Page::PrimaryKey ]
+	End If
+Else If [ $item_type = "Page item" ]
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) = 1 ]
+		Set Variable [ $new_item_id[1] ; FAT Page item::PrimaryKey ]
+	End If
+Else If [ $item_type = "Page friendly id" // an old legacy reference ]
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=1 ]
+		Set Variable [ $old_item_id[1] ; FAT Page::PrimaryKey ]
+		Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount) = 1 ]
+			Set Variable [ $new_item_id[1] ; FAT Page::PrimaryKey ]
+		End If
+	End If
+End If
+
+Exit Script [ $new_item_id ]
+

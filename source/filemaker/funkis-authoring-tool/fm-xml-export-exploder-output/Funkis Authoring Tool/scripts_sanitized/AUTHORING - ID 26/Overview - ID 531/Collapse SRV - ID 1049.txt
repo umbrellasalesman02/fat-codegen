@@ -1,0 +1,45 @@
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $item_id[1] ; GetScriptProperty("item_id") ]
+Set Variable [ $hierarchy_level[1] ; GetScriptProperty("hierarchy_level") ]
+Set Variable [ $collapse[1] ; GetAsNumber(GetScriptProperty("collapse")) ]
+Set Variable [ $collapse_mode[1] ; GetScriptProperty("collapse_mode") ]
+
+# Collapse mode is either "All" or "Item"
+
+# View all Overview items in Title
+Go to Layout [ Layout: "TABLE FAT Overview" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ $collapse_mode = "Item" ]
+	# Set all overview items below clicked item to either collapsed or not collapsed (expanded)
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Freeze Window
+	Set Error Capture [ ON ]
+	Go to Record/Request/Page [ First ]
+	Set Variable [ $item_hit[1] ; 0 ]
+	Loop [ Flush: Always ]
+		If [ FAT Overview::Item id = $item_id ]
+			Set Variable [ $item_hit[1] ; 1 ]
+			Set Field [ FAT Overview::Collapsed ; Not $collapse ]
+		Else If [ $item_hit And FAT Overview::Hierarchy Level ≤ $hierarchy_level ]
+			# Reached an item on the same level or higher
+			Set Variable [ $item_hit[1] ; 0 ]
+			Exit Loop If [ True ]
+		Else If [ $item_hit And $collapse = 0 And FAT Overview::Hierarchy Level = $hierarchy_level + 1 ]
+			# Reached an item on one step lower level
+			Set Field [ FAT Overview::Hidden ; $collapse ]
+		Else If [ $item_hit And $collapse = 1 And FAT Overview::Hierarchy Level ≥ $hierarchy_level + 1 ]
+			# Reached an item on one step lower level
+			Set Field [ FAT Overview::Hidden ; $collapse ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+Else
+	# Set all overview items to either collapsed or not collapsed (expanded)
+	Replace Field Contents [ FAT Overview::Collapsed ; Replace with calculation: $collapse ]
+	Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+	Replace Field Contents [ FAT Overview::Hidden ; Replace with calculation: $collapse ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

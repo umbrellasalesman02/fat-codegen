@@ -1,0 +1,41 @@
+# Called from a onModify script trigger
+# Called from a script trigger onObjectModify when selecting or changing List from popup menu in Page item
+
+Commit Records/Requests [ With dialog: OFF ]
+Freeze Window
+Set Error Capture [ ON ]
+
+# This fix is to help the author to connect the IO to the chosen tag filter list.
+  Otherwise tags will not work. 
+  When using the tags feature it is very easy to forget this and it is painful to fault trace. 
+If [ FAT List @ Page item::Usage type = "Tag filter" ]
+	Set Variable [ $tag_list_id[1] ; FAT Page item::List id ]
+	Set Variable [ $pageitem_id[1] ; FAT Page item::PrimaryKey ]
+	Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) > 0 ]
+		Loop [ Flush: Always ]
+			If [ FAT IO Value @ Page item::IO Type = "Select" And IO Block Template @ IO Value::Function = "write" ]
+				# This is the IO that should store the tag value
+				
+				If [ IsEmpty ( FAT IO @ Page item::List id ) ]
+					Set Field [ FAT IO @ Page item::List id ; $tag_list_id ]
+				Else
+					Go to Layout [ Layout: <original layout> ; Animation: None ]
+					Show Custom Dialog [ Title: "Information" ; Message: "The chosen List can be used to tag items. However, the current IO is connected to another list.¶¶
+									Do you want to connect the chosen List to the IO?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+					If [ Get(lastMessageChoice) = 1 ]
+						Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+						Set Field [ FAT IO @ Page item::List id ; $tag_list_id ]
+					Else
+						Exit Script []
+					End If
+				End If
+			End If
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+

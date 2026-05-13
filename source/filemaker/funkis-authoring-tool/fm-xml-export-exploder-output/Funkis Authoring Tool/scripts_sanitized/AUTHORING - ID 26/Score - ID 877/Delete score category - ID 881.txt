@@ -1,0 +1,22 @@
+# Called from portal in Gamification layout
+Show Custom Dialog [ Title: "Warning!" ; Message: "Deleting this score category will remove all references to the category in the Title and will also delete the corresponding IO. ¶¶Are you sure you want to delete this score category?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+Freeze Window
+Set Error Capture [ ON ]
+
+# A score category corrsponds to an IO of type Score - this will also be deleted. 
+Set Variable [ $io_id[1] ; FAT Score variable::IO id ]
+Delete Portal Row [ With dialog: OFF ]
+Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) = 1 ]
+	Delete Record/Request [ With dialog: OFF ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+

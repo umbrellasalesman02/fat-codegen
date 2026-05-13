@@ -1,0 +1,63 @@
+# Called from Clone Title Objects
+
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $new_tt_id[1] ; GetScriptProperty ( "new_tt_id" ) ]
+Set Error Capture [ ON ]
+
+Show Custom Dialog [ Title: "Legacy script" ; Message: "This dialog box should not appear when duplicating. Please contact Jens with information: \"Clone Title Score reward\"" ; Default Button: "OK" ]
+
+# Duplicate - preparing to link via Old PrimaryKey from clone
+# Duplicates two textfields and two media fields
+
+Go to Layout [ Layout: "TABLE FAT Score Reward" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		Set Variable [ $old_score_reward_id[1] ; FAT Score Reward::PrimaryKey ]
+		Set Variable [ $name[1] ; TF SR Name::Text ]
+		Set Variable [ $description[1] ; TF SR Description::Text ]
+		Set Variable [ $icon[1] ; Media SR Icon::Media container ]
+		Set Variable [ $animation[1] ; Media SR Animation::Media container ]
+		
+		Duplicate Record/Request
+		
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT Score Reward::Title id ; $new_tt_id ]
+		Set Field [ FAT Score Reward::Old PrimaryKey from clone ; $old_score_reward_id ]
+		Set Variable [ $new_sr_id[1] ; FAT Score Reward::PrimaryKey ]
+		
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_sr_id ) &
+						SetProperty ( "source_table" ; "score" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Score Reward::Name text id ) ) &
+						SetProperty ( "learningprogramme_id" ; $new_tt_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF SR Name::Text ; $name ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_sr_id ) &
+						SetProperty ( "source_table" ; "score" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Score Reward::Description text id ) ) &
+						SetProperty ( "learningprogramme_id" ; $new_tt_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF SR Description::Text ; $description ]
+		
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $new_sr_id ) &
+						SetProperty ( "source_table" ; "score" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT Score Reward::Reward icon media id) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $new_tt_id ) ]
+		Set Field [ Media SR Icon::Media container ; $icon ]
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $new_sr_id ) &
+						SetProperty ( "source_table" ; "score" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT Score Reward::Reward animation media id) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $new_tt_id ) ]
+		Set Field [ Media SR Animation::Media container ; $animation ]
+		
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+

@@ -1,0 +1,14 @@
+// fron Chat gpt
+Let ( 
+    [
+        // Remove "Z" at the end (optional, since it is not needed)
+        dateTime = Substitute ( isoDateString ; "Z" ; "" );
+
+        // Replace "T" with a space to separate the date and time
+        formattedDateTime = Substitute ( dateTime ; "T" ; " " );
+
+        // Extract the date and the first 5 characters of the time part (HH:MM)
+        readableDateTime = Left ( formattedDateTime ; Position ( formattedDateTime ; ":" ; 1 ; 2 ) - 1 )
+    ];
+    readableDateTime
+)

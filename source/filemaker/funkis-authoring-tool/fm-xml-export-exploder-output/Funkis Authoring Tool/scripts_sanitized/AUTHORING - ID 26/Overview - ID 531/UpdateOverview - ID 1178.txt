@@ -1,0 +1,24 @@
+# Designed for PSOS - wait for completion = OFF
+# Called from changeSortOrder
+# Updates all data fields with auto-enter
+
+Set Error Capture [ ON ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $chapter_id[1] ; GetScriptProperty ( "chapter_id" ) ]
+Set Variable [ $page_id[1] ; GetScriptProperty ( "page_id" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Overview" ; Animation: None ]
+
+If [ Not IsEmpty ( $title_id ) ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ Not IsEmpty ( $package_id ) ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+If [ Get(foundCount)> 0 ]
+	Replace Field Contents [ FAT Overview::Name ; Replace with calculation: FAT Overview::Name ]
+End If
+
+
+

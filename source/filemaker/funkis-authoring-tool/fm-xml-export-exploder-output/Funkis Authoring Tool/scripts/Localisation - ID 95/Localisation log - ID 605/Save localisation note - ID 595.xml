@@ -1,0 +1,302 @@
+<Script>
+	<ScriptReference id="595" name="Save localisation note"></ScriptReference>
+	<ObjectList membercount="24">
+		<Step hash="800B9F243F248CCB3CC1A4465E53D580" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Add event to log"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="17B6A04E617C7170658B26BF65D9394D" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called from both Title localisation and PAckage localisation"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="202133F1A10CE9B556AE6E47F534DB8E" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F21C515E78F10FA872F054EE3973DDA9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "caller" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$caller"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DD3A099C270DDA2EC4BB56ABFF893124" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "localisation_id" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$localisation_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3084AE55EBC2B2D7E56BB78A0FB1391B" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "localisation_stage" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$localisation_stage"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BFCB5AE479DA8A64A7395B72E1C439DE" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7A2F9729E8BDA1FBE4EDB6D8F9E5B400" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Localisation::gEvent Note]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$event_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E45CF2587A119617461F7A59F9CE23B3" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E42BA44722F0A8AA20EDC922EA65CA38" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="596" name="Add to localisation log"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_id" ; $localisation_id ) & SetProperty ( "localisation_stage" ; $localisation_stage ) &SetProperty ( "event_text" ; $event_text )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F9D85BA5810B762B5721A8B1833CA283" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A0A01BE9E315E0FC5D4B720F819242B2" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$caller = "Title localisation" And Count ( FAT Localisation @ Title::PrimaryKey ) > 0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8E40E8248CF20A08AA078A192BA43680" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="If Title localisation - add to all childrens event log"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B7C6515893AF0E57162A3ABBCFB73E2A" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Always use the Localisation @ Package layout when doing children operations"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6F84E62A64DFDEDB88F4CE1A1E1AEBA5" id="74" name="Go to Related Record" enable="True">
+			<Options>33554442</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065746" name="FAT Localisation @ Title"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="102" name="TABLE FAT Localisation @ Package"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3536747F0C6528F7FE6F86B33F596FDA" id="71" name="Loop" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="78BB1B08EC83C49EB27534CE8D7B9A59" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="596" name="Add to localisation log"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_id" ; FAT Localisation @ Package::PrimaryKey ) & SetProperty ( "localisation_stage" ; FAT Localisation @ Package::Localisation stage ) &SetProperty ( "event_text" ; $event_text )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="197DE601E7092E881D8369FAF5A10771" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>8194</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="True"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0033BF475327A5A5582B9DB3D79984E4" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="F591605003390ED3DCF9B9B1CE92A940" id="6" name="Go to Layout" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6ABF2B1FD4ACE61DFCE4890B0AB6E22A" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="16E8FA1E965DABFB4A355D82570A45BC" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0A8D1878EAB81FAFCD3B8F40A110E470" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="27" name="gEvent Note">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065181" name="FAT Localisation"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[""]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4C941A7645196F05539F1F43BB9EAC5E" id="145" name="Go to Object" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Object">
+					<Name>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA["Event log"]]></Text>
+							</Calculation>
+						</Calculation>
+					</Name>
+					<repetition>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

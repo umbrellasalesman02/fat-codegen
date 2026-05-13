@@ -1,0 +1,143 @@
+# Called from a button in Package Settings - Delivery - only for Funkis Cloud
+# This script triggers the TaskServer to copy all files from preview to delivery and does NOT export any files from FAT
+# Can also be called from script Deliver All Remote CL
+
+Set Variable [ $show_dialog[1] ; GetScriptProperty ( "show_dialog" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+
+# Save current data
+Commit Records/Requests [ With dialog: OFF ]
+If [ $show_dialog = "true" ]
+	Show Custom Dialog [ Title: "Deliver the preview version" ; Message: "When pressing the OK button, Funkis Authoring Tool will transfer the current preview version to the publish server.¶¶This might take a few minutes ." ; Default Button: "OK" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice) = 2 ]
+		Exit Script []
+	End If
+End If
+If [ IsEmpty ( Title Environment::Publish Server id ) ]
+	Show Custom Dialog [ Title: "Delivery publish server not available in environment" ; Message: "This title's delivery server is not configured in this environment. These settings are available in Title settings under the tab Main." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+# Call from the Code package overview
+Freeze Window
+
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $typeOfTask[1] ; "publish-funkis-cloud" ]
+Set Variable [ $delivery_milestone[1] ; Funkis WOW Delivery::Milestone name ]
+
+# Environment
+Set Variable [ $awsEnvironment[1] ; Title Environment::AWS Environment ]
+Set Variable [ $apiEndpoint[1] ; Title Environment::Environment API endpoint ]
+# Source
+Set Variable [ $remoteType[1] ; Title Server Preview::remoteType identifier ]
+Set Variable [ $s3bucketName[1] ; Title Server Preview::S3 bucket name ]
+Set Variable [ $awsCdnKey[1] ; Title Server Preview::AWS CDN Key ]
+Set Variable [ $resultTransferTarget[1] ; Title Server Preview::URL ]
+# Destination
+Set Variable [ $awsCdnKeyDestination[1] ; Title Server Publish::AWS CDN Key ]
+Set Variable [ $urlDestination[1] ; Title Server Publish::URL ]
+Set Variable [ $s3bucketNameDestination[1] ; Title Server Publish::S3 bucket name ]
+
+Set Variable [ $package_type[1] ; Case ( IsEmpty ( FAT Title::Base project ); "" ; FAT Package::Package type id) ]
+Set Variable [ $package_dir[1] ; FAT Package::Export Package Sub Path ]
+
+# URL to the server where we will upload content and code - i.e test.quiddity.se.
+
+Set Variable [ $title_header[1] ; FAT Title::Reference title & "  •  " & FAT Package::Reference name ]
+Set Variable [ $emailToNotifyWhenDone[1] ; User @ Title::email ]
+
+If [ Not PatternCount ( $emailToNotifyWhenDone ; "@" ) ]
+	Show Custom Dialog [ Title: "No email adress set" ; Message: "Please type an email address where the download link should be sent to." ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $emailToNotifyWhenDone ]
+	If [ Get(lastMessageChoice) = 2 ]
+		Exit Script [ "error" ]
+	Else
+		Set Field [ User @ Title 2::email ; $emailToNotifyWhenDone ]
+	End If
+End If
+
+# JSONSetElement ( "{}"; 
+  
+  ["resultTransferTarget"; $resultTransferTarget; JSONString];
+  ["originalTitle"; $title_header; JSONString];
+  ["remoteFolderPath"; $package_dir; JSONString];
+  ["delivery_milestone"; $delivery_milestone; JSONString];
+  ["version"; $publishType ; JSONString];
+  ["emailToNotifyWhenDone"; $emailToNotifyWhenDone ; JSONString];
+  ["s3BucketName"; $s3bucketName ; JSONString];
+  ["s3BucketNameDestination"; $s3bucketNameDestination ; JSONString];
+  ["awsCdnKey"; $awsCdnKey ; JSONString];
+  ["awsCdnKeyDestination"; $awsCdnKeyDestination ; JSONString];
+  ["urlDestination"; $urlDestination ; JSONString];
+  ["awsEnvironment"; $awsEnvironment ; JSONString];
+  ["apiEndpoint"; $apiEndpoint ; JSONString]
+  
+  
+  )
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $jobTypes[1] ; "FC_DELIVERY" ]
+
+// Perform Script [ From list ; "Add to build log" ; Parameter: SetProperty ( "jobTypes" ; FAT Package::Delivery format ) &
+				SetProperty ( "deliveryMilestone" ; Funkis WOW Delivery::Milestone name ) &
+				SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty ( "codebase_id" ; $codebase_id ) &
+				SetProperty ( "codebase_version_id" ; $codebase_version_id ) &
+				SetProperty ( "delivery_milestone" ; $delivery_milestone ) &
+				SetProperty ( "destination" ; $s3bucketNameDestination ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Set Variable [ $build_id[1] ; Get(ScriptResult) ]
+
+# Development export - uncomment for fault trace
+// Perform Script [ From list ; "Trigger PM2 Task Server" ; Parameter: SetProperty ( "s3bucketName" ; $s3bucketName ) &
+				SetProperty ( "s3bucketNameDestination" ; $s3bucketNameDestination ) &
+				SetProperty ( "awsEnvironment" ; $awsEnvironment ) &
+				SetProperty ( "awsCdnKey" ; $awsCdnKey ) &
+				SetProperty ( "awsCdnKeyDestination" ; $awsCdnKeyDestination ) &
+				SetProperty ( "urlDestination" ; $urlDestination ) &
+				SetProperty ( "apiEndpoint" ; $apiEndpoint ) &
+				SetProperty ( "emailToNotifyWhenDone" ; $emailToNotifyWhenDone )& 
+				SetProperty ( "title_header" ; $title_header ) &
+				SetProperty ( "package_dir" ; $package_dir )& 
+				SetProperty ( "resultTransferTarget" ; $resultTransferTarget )&
+				SetProperty ( "typeOfTask" ; $typeOfTask ) &
+				SetProperty ( "build_id" ; $build_id ) &
+				SetProperty ( "jobTypes" ; $jobTypes ) & 
+				SetProperty ( "delivery_milestone" ; $delivery_milestone ) ]
+# Developer can publish new versions and create packages
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+If [ Get(ScriptResult) ≠ "success" And Get(ScriptResult) ≠ "" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "Something went wrong during the publish." ; Message: "Error message: " & Get(ScriptResult) ; Default Button: "OK" ]
+	Exit Script [ "error" ]
+End If
+
+# ----------- Update upload log ------------------------------------------------------
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+
+# Set timestamp when last export was made
+Set Field [ FAT Package::Last Publish Timestamp ; Get(currentHostTimeStamp) ]
+
+Go to Related Record [ Table: FAT Export Log @ Package ; Layout: "TABLE FAT Export Log" ; Show related ]
+If [ Get(lastError) = 101 ]
+	Go to Layout [ Layout: "TABLE FAT Export Log" ; Animation: None ]
+End If
+Set Variable [ $lastCodebase[1] ; FAT Export Log::Codebase ]
+New Record/Request
+Set Field [ FAT Export Log::Title id ; $title_id ]
+Set Field [ FAT Export Log::Package id ; $package_id ]
+Set Field [ FAT Export Log::ExportMode ; $exportMode ]
+Set Field [ FAT Export Log::Job types ; $jobTypes ]
+Set Field [ FAT Export Log::Type of task ; $typeOfTask ]
+Set Field [ FAT Export Log::Destination ; $s3bucketNameDestination & Case ( $errorCode = "" ; "" ; " Error " & $errorCode ) ]
+Set Field [ FAT Export Log::Codebase ; Case ( IsEmpty ( $funkisCodeBaseShortName ) ; $lastCodebase; $funkisCodeBaseShortName & " " & $funkisCodeBaseVersion) ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Set Field [ FAT Package::Last Publish Timestamp ; Get(currentHostTimeStamp) ]
+
+
+
+

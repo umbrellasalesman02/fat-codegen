@@ -1,0 +1,44 @@
+# Called from button on Page item or from Login with no parameter
+If [ isEditor Or isTranslator ]
+	Show Custom Dialog [ Title: "Your privilige does not allow you to edit a sprig story" ; Message: "Since your role is Editor or Translator, you are not allowed to edit the sprig story. Please contact the administrator." ; Default Button: "OK" ]
+Else
+	If [ PatternCount (Get(layoutName); "Page item") ]
+		Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+		Set Variable [ $title_ref_title[1] ; FAT Title::Reference title ]
+		Set Variable [ $client_id[1] ; FAT Title::Client id ]
+		Set Variable [ $original_language[1] ; FAT Title::Original language code ]
+		Set Variable [ $original_country[1] ; FAT Title::Original country code ]
+		Set Variable [ $title_icon[1] ; Base64Encode ( FAT Title::Icon image ) ]
+		Set Variable [ $pageitem_id[1] ; FAT Page item::PrimaryKey ]
+		Set Variable [ $sprigblock_id[1] ; FAT Block @ Page item::BlockTemplate id ]
+		Set Variable [ $sprigstory_title[1] ; Case ( IsEmpty (TF PI Text 1::Text) ; "Untitled sprig story" ; TF PI Text 1::Text ) ]
+		Set Field [ TF PI Text 1::Text ; $sprigstory_title ]
+	End If
+	
+	If [ Platform = "WebDirect" ]
+		// Show Custom Dialog [ Title: "Web" ; Message: Platform ; Default Button: "OK" ]
+		Set Variable [ $parameters[1] ; "$title_id=" & $title_id & "&" &
+						"$title_ref_title=" & $title_ref_title & "&" &
+						"$client_id=" & $client_id & "&" &
+						"$original_language=" & $original_language & "&" &
+						"$original_country=" & $original_country & "&" &
+						"$pageitem_id=" & $pageitem_id & "&" &
+						"$sprigstory_title=" & $sprigstory_title &
+						"$sprigblock_id=" & $sprigblock_id ]
+		Open URL [ In external browser: OFF ; With dialog: OFF ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+	Else
+		Open File [ Open hidden: OFF ; "SprigStory" ]
+		If [ $pageitem_id ≠ "" ]
+			Set Variable [ $parameters[1] ; SetProperty ( "title_id" ; $title_id) & 
+							SetProperty ( "title_ref_title" ; $title_ref_title) & 
+							SetProperty ( "client_id" ; $client_id) & 
+							SetProperty ( "original_language" ; $original_language) & 
+							SetProperty ( "original_country" ; $original_country) & 
+							SetProperty ( "pageitem_id" ; $pageitem_id) & 
+							SetProperty ( "sprigstory_title" ; $sprigstory_title) & 
+							SetProperty ( "sprigblock_id" ; $sprigblock_id) ]
+			Perform Script [ From list ; "linkTriggeredOpenStory" ; File: "SprigStory" ; Parameter: $parameters ]
+		End If
+	End If
+End If
+

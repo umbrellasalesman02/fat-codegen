@@ -1,0 +1,105 @@
+# Called from Card window - FAT List
+# This script converts a Title List to a Page item List.
+  The purpose is to reduce the number of texts in the text export - when a translation agency calculate we always include Title Lists
+
+If [ FAT List::Number of List instances  ≠ 1 ]
+	# This script can ONLY be executed if List number of instances = 1
+	Show Custom Dialog [ Title: "Cannot convert list" ; Message: "This list is used in multiple instances in this title. To convert a Title list to a Page item list, it can only exist in instance. " ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+Show Custom Dialog [ Title: "Convert to Page item List" ; Message: "Are you sure you want to convert this list to a page item list that will only be available in the specific page item and package?¶¶
+				If your Title includes many Packages this will decrease the number of global texts in the text export when translating." ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+Freeze Window
+Commit Records/Requests [ With dialog: OFF ]
+
+Set Variable [ $list_id[1] ; FAT List::PrimaryKey ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+# Find the only page item that uses this list
+Go to Layout [ Layout: "TABLE FAT Page Item 2" ; Animation: None ]
+
+# Find the only page item that uses the list
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)≠1 ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "This list is not used by a page item" ; Message: "You cannot convert this list to a page item list, since it is not connected to a page item." ; Default Button: "OK" ]
+	Exit Script []
+End If
+If [ Not BlockTemplate @ Page item 2::Page item List enabled ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "Page item list is not allowed" ; Message: "The block used by the page item is not allowed to use a page item list." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+# Remove the reference to the list
+Set Field [ FAT Page item 2::List id ; "" ]
+Set Variable [ $pageitem_id[1] ; FAT Page item 2::PrimaryKey ]
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+
+# Go back to the list again
+Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+
+
+# Connect all list items to page item
+If [ Count(FAT List item::PrimaryKey) > 0 ]
+	
+	# Must add Package id on Text and Media fields connected to list.
+	Go to Related Record [ Table: FAT List item ; Layout: "TABLE FAT List item" ; Show related ]
+	
+	If [ Count ( TF LI 1::PrimaryKey ) > 0 ]
+		Go to Related Record [ Table: TF LI 1 ; Layout: "TABLE FAT Text" ; Show related ; Match found set ]
+		Replace Field Contents [ TF LI 1::Package id ; Replace with calculation: $package_id ]
+	End If
+	
+	Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+	If [ Count ( TF LI 2::PrimaryKey ) > 0 ]
+		Go to Related Record [ Table: TF LI 2 ; Layout: "TABLE FAT Text" ; Show related ; Match found set ]
+		Replace Field Contents [ TF LI 2::Package id ; Replace with calculation: $package_id ]
+	End If
+	
+	Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+	
+	If [ Count ( TF LI 3::PrimaryKey ) > 0 ]
+		Go to Related Record [ Table: TF LI 3 ; Layout: "TABLE FAT Text" ; Show related ; Match found set ]
+		Replace Field Contents [ TF LI 3::Package id ; Replace with calculation: $package_id ]
+	End If
+	
+	Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+	
+	If [ Count (Media LI 1::PrimaryKey ) > 0 ]
+		Go to Related Record [ Table: Media LI 1 ; Layout: "TABLE FAT Media" ; Show related ; Match found set ]
+		Replace Field Contents [ Media LI 1::Package id ; Replace with calculation: $package_id ]
+	End If
+	
+	Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+	
+	If [ Count ( Media LI 2::PrimaryKey ) > 0 ]
+		Go to Related Record [ Table: Media LI 2 ; Layout: "TABLE FAT Media" ; Show related ; Match found set ]
+		Replace Field Contents [ Media LI 2::Package id ; Replace with calculation: $package_id ]
+	End If
+	
+	# Replace all list item parents with the page item id
+	Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+	Replace Field Contents [ FAT List item::Parent id ; Replace with calculation: $pageitem_id ]
+	
+End If
+
+# Go back to the list again and delete it
+Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Delete Record/Request [ With dialog: OFF ]
+
+# Go to the page item and view the list items in the Page item list card
+Go to Layout [ Layout: "FAT PI List Card" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+
+
+
+
+

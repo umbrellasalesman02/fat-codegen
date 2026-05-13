@@ -1,0 +1,43 @@
+# This script is called from an OnTimer script initiadet in Translation MASTER script
+# It is used for Asynchronous translation APIs
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+
+Set Variable [ $$async_calls[1] ; $$async_calls + 1 ]
+
+# THe translation API
+
+Set Variable [ $original_localisation_code[1] ; FAT Title::Original localisation code ]
+Set Variable [ $target_localisation_code[1] ; $$localisation_code ]
+Set Variable [ $translation_api[1] ; FAT Text translated::gTranslation API ]
+
+Set Variable [ $translation_id[1] ; $$translation_suggestion_id ]
+
+Perform Script [ From list ; "Get text from API" ; Parameter: SetProperty( "translation_id" ; $translation_id ) &
+				SetProperty( "translation_api" ; $translation_api ) &
+				SetProperty( "get_api_url"; $get_api_url) &
+				SetProperty( "api_key"; $api_key) ]
+
+Set Variable [ $translation_text[1] ; Get(ScriptResult) ]
+
+If [ $translation_text = "--- NOT TRANSLATED YET ---" ]
+	# The text is not ready for translation yet - MUST FIX!!!!
+	Set Field [ FAT Text translated::Text ; "Translating..." ]
+Else
+	Set Field [ FAT Text translated::Text ; $translation_text ]
+	Perform Script [ From list ; "Change Translated Text Status" ; Parameter: "Not reviewed" ]
+	Install OnTimer Script
+End If
+
+If [ $$async_calls >5 ]
+	Set Field [ FAT Text translated::Text ; "Translation service timed out." ]
+	Install OnTimer Script
+End If
+
+

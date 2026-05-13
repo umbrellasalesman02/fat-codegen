@@ -1,0 +1,42 @@
+# Show localised version of media - called from both Media revew and Page item layout
+
+If [ Get(scriptParameter) = "Page item Media 1" ]
+	Set Variable [ $media_id[1] ; FAT Page item::Media 1 id ]
+	# This is the root-name for this media file
+	Set Field [ FAT Media::gRenameFile ; Media PI 1::Container exported filename no extension ]
+Else If [ Get(scriptParameter) = "Media" ]
+	If [ IsEmpty ( FAT Media::Original key ) ]
+		Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+	Else
+		Set Variable [ $media_id[1] ; FAT Media::Original key ]
+	End If
+	# This is the root-name for this media file
+	Set Field [ FAT Media::gRenameFile ; Let ( 
+					
+					[
+					
+					   container_orgname_no_ext = getChar ( FAT Media::Container original filename ; 1 ; Position(FAT Media::Container original filename; "."; 1 ; PatternCount ( FAT Media::Container original filename ; "." ))-1)
+					
+					
+					];
+					
+					   PrettifyDash ( container_orgname_no_ext)
+					
+					 ) ]
+	// Set Field [ FAT Media::gRenameFile ; FAT Media::Container exported filename no extension ]
+End If
+
+# If called from the Card - Page item Settings - close card first (cannot open card on card)
+If [ Get(WindowStyle) = 3 ]
+	Set Variable [ $$call_layout[1] ; "" ]
+	Perform Script [ From list ; "Close card Window" ]
+End If
+
+Perform Script [ From list ; "Save Active Layout" ]
+Go to Layout [ Layout: "FAT Translated Media" ; Animation: None ]
+Set Error Capture [ ON ]
+
+# Show all media, including localised versions if any exist
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+

@@ -1,0 +1,126 @@
+# This script will import subtitles to existing media from a JSON subtitle format. 
+Set Error Capture [ ON ]
+Freeze Window
+# import_mode can be "new" or "update"
+Set Variable [ $import_mode[1] ; Get (scriptParameter) ]
+Set Variable [ $learningprogramme_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $language_code[1] ; FAT Title::Original language code ]
+Set Variable [ $country_code[1] ; FAT Title::Original country code ]
+
+# Open file dialog box
+Set Variable [ $fileInfo[1] ; "" ]
+Insert File [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ; Target: $fileInfo ]
+# Example $fileInfo result:
+  file:3_3_quiz_test.en-global.vtt
+  filemac:/Macintosh HD/Users/jensthorsen/Desktop/CMT Tester/TMH filmer & subtitles/content/video/3_3_quiz_test.en-global.vtt
+
+If [ Get(lastError) = 1 ]
+	# User cancelled
+	Exit Script []
+End If
+
+Set Variable [ $filepath[1] ; GetValue ( $fileInfo ; 2 ) ]
+Set Variable [ $filename[1] ; GetFileNameFromPath ( $filepath ) ]
+
+# ----------------- Funkis Subtitle JSON -------------------------------------
+If [ PatternCount ( $filename ; FAT Title::Original localisation code & ".json" ) ]
+	
+	Set Variable [ $file_id[1] ; "cmt_subtitles_" & FAT Title::Original localisation code & ".json" ]
+	Open Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Target: $fileID ]
+	Read from Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ; Target: $$importedTextJSON ]
+	Close Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ]
+	Set Variable [ $relative_filepath[1] ; Left ( $filepath ; Position ( $filepath ; $filename ; 0 ; 1 )-1) ]
+	If [ $$importedTextJSON ≠ "?" ]
+		Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+		Set Variable [ $i[1] ; 0 ]
+		Set Variable [ $numOfMediaFiles[1] ; 0 ]
+		Set Variable [ $numOfMediaSubtitles[1] ; 0 ]
+		Loop [ Flush: Always ]
+			Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+			Exit Loop If [ JSONGetElement ( $$importedTextJSON ;"[" & $i & "]id") = "" ]
+			
+			Set Variable [ $old_src[1] ; $src ]
+			Set Variable [ $src[1] ; JSONGetElement ( $$importedTextJSON ;"[" & $i & "]src") ]
+			
+			# Check if media exist in LP - don't import subtitles to media that doesn't exist!!!!
+			If [ $old_src ≠ $src ]
+				Perform Script [ From list ; "Check Subtitle media" ; Parameter: SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) &
+								SetProperty ( "media_filename" ; $src ) ]
+				Set Variable [ $media_id[1] ; GetResultProperty( "media_id" ) ]
+				Set Variable [ $package_id[1] ; GetResultProperty ( "package_id" ) ]
+				Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+			End If
+			
+			# If media file exist in FAT
+			If [ $media_id ≠"" ]
+				
+				# Update import log
+				Set Variable [ $numOfMediaSubtitles[1] ; $numOfMediaSubtitles + 1 ]
+				If [ $old_src ≠ $src ]
+					Set Variable [ $numOfMediaFiles[1] ; $numOfMediaFiles + 1 ]
+				End If
+				
+				Set Variable [ $id[1] ; JSONGetElement ( $$importedTextJSON ;"[" & $i & "]id") ]
+				Set Variable [ $enter[1] ; JSONGetElement ( $$importedTextJSON ;"[" & $i & "]enter") ]
+				Set Variable [ $exit[1] ; JSONGetElement ( $$importedTextJSON ;"[" & $i & "]exit") ]
+				Set Variable [ $text[1] ; JSONGetElement ( $$importedTextJSON ;"[" & $i & "]text") ]
+				
+				# Check if imported text id exists already
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				
+				# If not - create new text
+				If [ Get(foundCount)= 0 ]
+					# If text doesn't exist and media exist - create a new record whether mode is new or update
+					New Record/Request
+					Set Field [ FAT Text::PrimaryKey ; $id ]
+					Set Field [ FAT Text::Title id ; $learningprogramme_id ]
+					Set Field [ FAT Text::Package id ; $package_id ]
+					Set Field [ FAT Text::Text ; $text ]
+					Set Field [ FAT Text::Enter time ; Time( 0 ;0 ; GetAsNumber( $enter ) ) ]
+					Set Field [ FAT Text::Exit time ; Time( 0 ;0 ; GetAsNumber( $exit ) ) ]
+					Set Field [ FAT Text::Parent id ; $media_id ]
+					Set Field [ FAT Text::Source item type ; "media" ]
+					Set Field [ FAT Text::Source reference ; "Subtitle FFSub" ]
+					Set Field [ FAT Text::Language code ; $language_code ]
+					Set Field [ FAT Text::Country code ; $country_code ]
+					Set Field [ FAT Text::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; "Not reviewed" ]
+					Commit Records/Requests [ With dialog: OFF ]
+					# Check if unique text id is used before in the whole CMT
+					If [ Get(lastError)=504 ]
+						Show Custom Dialog [ Title: "Warning!" ; Message: "This text is already imported" & ¶ & ¶ & "A text with an identical id is already imported to a Learning Programme in the Funkis Content Management Tool. Import will now stop." ; Default Button: "OK" ]
+						Go to Layout [ Layout: <original layout> ; Animation: None ]
+						Exit Script []
+					End If
+				Else If [ Get(foundCount)= 1 And $import_mode = "update" ]
+					# When there's already a text and the import mode is "update"
+					Set Field [ FAT Text::Package id ; $package_id ]
+					Set Field [ FAT Text::Text ; $text ]
+					Set Field [ FAT Text::Enter time ; GetAsTime ( $enter ) ]
+					Set Field [ FAT Text::Exit time ; GetAsTime( $exit) ]
+					Set Field [ FAT Text::Parent id ; $media_id ]
+					Set Field [ FAT Text::Source item type ; "media" ]
+					Set Field [ FAT Text::Source reference ; "Subtitle FFSub" ]
+					Set Field [ FAT Text::Language code ; $language_code ]
+					Set Field [ FAT Text::Country code ; $country_code ]
+					Set Field [ FAT Text::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; "Not reviewed" ]
+					
+				Else If [ Get(foundCount)=1 And $import_mode= "new" ]
+					# When there's already a text and the import mode is "new"
+					Show Custom Dialog [ Title: "Warning!" ; Message: "This text is already imported" & ¶ & ¶ & "A text with an identical id is already imported to a Learning Programme in the Funkis Content Management Tool. Import will now stop." ; Default Button: "OK" ]
+					Go to Layout [ Layout: <original layout> ; Animation: None ]
+					Exit Script []
+				End If
+			End If
+			Set Variable [ $i[1] ; $i+1 ]
+		End Loop
+		Show Custom Dialog [ Title: "Subtitle import result" ; Message: $numOfMediaSubtitles & " subtitles texts imported for " & ¶ &
+						$numOfMediaFiles & " media files." ; Default Button: "OK" ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Else
+		Show Custom Dialog [ Title: "Cannot parse content in file" ; Message: "Sorry but the content in the selected file does not seem to be a valid json object. Please validate the content at https://jsonlint.com/" ; Default Button: "OK" ]
+		Exit Script []
+	End If
+Else
+	Show Custom Dialog [ Title: "The selected file does not seem correctly named." ; Message: "The file should have a suffix and an extension as: " & FAT Title::Original localisation code & ¶ & ¶ & ".json" ; Default Button: "OK" ]
+End If
+

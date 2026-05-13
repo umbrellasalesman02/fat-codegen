@@ -1,0 +1,47 @@
+# This script is called from a button in the Settings window
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $target[1] ; Get(scriptParameter) ]
+Set Variable [ $setting_json[1] ; Variables::gCopySettingJSON ]
+# ModifierValues
+If [ $target = "package" ]
+	Go to Related Record [ Table: FAT ModifierValue @ Package ; Layout: "TABLE FAT ModifierValue" ; Show related ]
+Else If [ $target = "chapter" ]
+	Go to Related Record [ Table: FAT ModifierValue @ Chapter ; Layout: "TABLE FAT ModifierValue" ; Show related ]
+Else If [ $target = "page" ]
+	Go to Related Record [ Table: FAT ModifierValue @ Page ; Layout: "TABLE FAT ModifierValue" ; Show related ]
+Else If [ $target = "page item" ]
+	If [ FAT Page item::Block id ≠ JSONGetElement ( $setting_json ; "block_id" ) ]
+		Show Custom Dialog [ Title: "Not same type of building block" ; Message: "This page item is based on another kind of building block than the page item you copied your settings from. ¶¶
+						
+						Do you still want to paste the settings on to this page item?" ; Default Button: "Cancel" ; Button 2: "OK" ]
+		If [ Get(lastMessageChoice)=1 ]
+			Exit Script []
+		End If
+	End If
+	Go to Related Record [ Table: FAT ModifierValue @ Page item ; Layout: "TABLE FAT ModifierValue" ; Show related ]
+Else If [ $target = "page item 2" ]
+	If [ FAT Page item 2::Block id ≠ JSONGetElement ( $setting_json ; "block_id" ) ]
+		Show Custom Dialog [ Title: "Not same type of building block" ; Message: "This page item is based on another kind of building block than the page item you copied your settings from. ¶¶
+						
+						Do you still want to paste the settings on to this page item?" ; Default Button: "Cancel" ; Button 2: "OK" ]
+		If [ Get(lastMessageChoice)=1 ]
+			Exit Script []
+		End If
+	End If
+	Go to Related Record [ Table: FAT ModifierValue @ Page item 2 ; Layout: "TABLE FAT ModifierValue" ; Show related ]
+End If
+If [ Get(lastError)≠101 And Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		If [ FAT Modifier::Type ≠ "Text" And FAT Modifier::Type ≠ "Media" ]
+			Set Variable [ $key[1] ; FAT Modifier::Name ]
+			Set Variable [ $value[1] ; JSONGetElement ( $setting_json ; $key ) ]
+			Set Field [ FAT Modifier Value::Value ; $value ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

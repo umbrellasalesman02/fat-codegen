@@ -1,0 +1,26 @@
+/* FM_ReplaceWithCase ( text ; search ; replacement )
+   Replaces all occurrences of search (case-insensitive) with replacement,
+   but with per-character case mapped from the matched text.
+*/
+
+Let ( [
+  t  = text ;
+  s  = search ;
+  r  = replacement ;
+  n  = Length ( t ) ;
+  ns = Length ( s ) ;
+  pos = Position ( Lower ( t ) ; Lower ( s ) ; 1 ; 1 )
+] ;
+
+Case (
+
+  ns = 0 ; t ;                             // no-op if empty search
+
+  pos = 0 ; t ;                            // no more matches
+
+  // Build: left part + case-mapped replacement + recurse on the remainder
+  Left ( t ; pos - 1 ) &
+  FM_ApplyCase ( Middle ( t ; pos ; ns ) ; r ) &
+  FM_ReplaceWithCase ( Middle ( t ; pos + ns ; n ) ; s ; r )
+)
+)

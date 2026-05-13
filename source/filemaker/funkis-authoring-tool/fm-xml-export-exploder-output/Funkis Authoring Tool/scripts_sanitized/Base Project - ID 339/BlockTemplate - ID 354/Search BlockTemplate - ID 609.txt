@@ -1,0 +1,12 @@
+Set Variable [ $searchStr[1] ; Case (IsEmpty ( BlockTemplate::gSearch); "*"; BlockTemplate::gSearch) ]
+Set Variable [ $blockType[1] ; Case (IsEmpty(BlockTemplate::gFilterType) Or BlockTemplate::gFilterType="All"; "*"; BlockTemplate::gFilterType) ]
+Set Variable [ $blockStatus[1] ; Case (IsEmpty(BlockTemplate::gFilterStatus) Or BlockTemplate::gFilterStatus = "All"; "*"; BlockTemplate::gFilterStatus) ]
+Set Error Capture [ ON ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Length ( $searchStr )>0 ]
+	Go to Field [ BlockTemplate::gSearch ]
+Else If [ Code(Get(TriggerKeystroke)) = 8  Or Length (BlockTemplate::gSearch) < 1 ]
+	Set Field [ BlockTemplate::gSearch ; "" ]
+End If
+
+

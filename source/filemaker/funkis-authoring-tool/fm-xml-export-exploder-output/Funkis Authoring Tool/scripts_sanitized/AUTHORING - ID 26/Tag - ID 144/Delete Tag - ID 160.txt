@@ -1,0 +1,12 @@
+# This can only be made from the FAT Tag interface
+If [ Not IsEmpty ( FAT Tag::List id ) ]
+	Show Custom Dialog [ Title: "Tag based on List item" ; Message: "This tag cannot be removed, since it corresponds to a List item in this Title. If you are a developer and know what you're doing - go to the List and delete the List item." ; Default Button: "OK" ]
+	Exit Script []
+End If
+Show Custom Dialog [ Title: "Delete tag" ; Message: "Are you sure you want to delete this tag? The tag will also be removed from all packages, chapters, pages and page items.¶¶
+				You can't undo this operation" ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice) =1 ]
+	Delete Portal Row [ With dialog: OFF ]
+End If
+

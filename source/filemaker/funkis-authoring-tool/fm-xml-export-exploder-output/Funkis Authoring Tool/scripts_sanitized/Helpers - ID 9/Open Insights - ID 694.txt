@@ -1,0 +1,24 @@
+
+
+Set Variable [ $fat_title_id[1] ; GetScriptProperty ( "fat_title_id" ) ]
+Set Variable [ $funkis_cloud_title_id[1] ; GetScriptProperty ( "funkis_cloud_title_id" ) ]
+Set Variable [ $title_environment[1] ; GetScriptProperty ( "title_environment" ) ]
+
+
+If [ Platform = "WebDirect" ]
+	// Show Custom Dialog [ Title: "Web" ; Message: Platform ; Default Button: "OK" ]
+	Set Variable [ $parameters[1] ; "$fat_title_id=" & $fat_title_id & "&" &
+					"$funkis_cloud_title_id=" & $funkis_cloud_title_id & "&" &
+					"$title_environment=" & $title_environment ]
+	If [ $fat_title_id ≠ "" And $funkis_cloud_title_id≠"" ]
+		Open URL [ In external browser: OFF ; With dialog: OFF ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+	End If
+Else
+	Open File [ Open hidden: OFF ; "Funkis Insight" ]
+	If [ $fat_title_id ≠ "" And $funkis_cloud_title_id≠"" ]
+		Perform Script [ From list ; "LinkToInsightTitle" ; File: "Funkis Insight" ; Parameter: SetProperty ( "fat_title_id" ; $fat_title_id ) &
+						SetProperty ( "title_environment" ; $title_environment ) &
+						SetProperty ( "funkis_cloud_title_id" ; $funkis_cloud_title_id ) ]
+	End If
+End If
+

@@ -1,0 +1,91 @@
+# Sometimes modifiers will not add to the current FAT item.
+# Called from button on Package, Chapter, Page and Page item level
+# SetProperty ( "level" ; "title" ) &
+  SetProperty ( "item_id" ; FAT Title::PrimaryKey )
+
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+Set Variable [ $block_id[1] ; GetScriptProperty ( "block_id" ) ]
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+If [ $level ≠ "title" ]
+	Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	Set Variable [ $package_type[1] ; FAT Package::Package type id ]
+End If
+
+# First check if all modifier templates are imported - NOTE: will NOT import Block modifiers!
+# This script will NOT add any already existing modifiers
+Perform Script [ From list ; "Import BaseProject modifiers" ; Parameter: SetProperty ( "title_id" ; $title_id ) ]
+
+If [ $level = "Page item" ]
+	# Then check if all all modifiers for the block are imported
+	# This script will NOT add any already existing modifiers
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Set Variable [ $blocktemplate_id[1] ; BlockTemplate @ Page item::PrimaryKey ]
+	Perform Script [ From list ; "Import BlockTemplate modifiers" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "blocktemplate_id" ; $blocktemplate_id ) &
+					SetProperty ( "block_id" ; $block_id ) ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+# Then add modifierValues to the current item
+Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; $level ) & 
+				SetProperty ( "item_id" ; $item_id ) &
+				SetProperty ( "learningprogramme_id" ; $title_id ) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty ( "package_type" ; $package_type ) &
+				SetProperty ( "symbol_id" ; $block_id ) ]
+
+If [ $level = "Page item" ]
+	Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "Block" ) & 
+					SetProperty ( "item_id" ; $item_id ) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "package_type" ; $package_type )&
+					SetProperty ( "symbol_id" ; $block_id ) ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+Set Variable [ $modifier_list[1] ; "" ]
+
+# Remove duplicates of modifierValue
+If [ $level = "Title" ]
+	Go to Related Record [ Table: FAT ModifierValue @ Title ; Layout: "TABLE FAT ModifierValue" ; Show related ]
+Else If [ $level = "Package" ]
+	Go to Related Record [ Table: FAT ModifierValue @ Package ; Layout: "TABLE FAT ModifierValue" ; Show related ]
+Else If [ $level = "Chapter" ]
+	Go to Related Record [ Table: FAT ModifierValue @ Chapter ; Layout: "TABLE FAT ModifierValue" ; Show related ]
+Else If [ $level = "Page" ]
+	Go to Related Record [ Table: FAT ModifierValue @ Page ; Layout: "TABLE FAT ModifierValue" ; Show related ]
+Else If [ $level = "Page item" ]
+	Go to Related Record [ Table: FAT ModifierValue @ Page item ; Layout: "TABLE FAT ModifierValue" ; Show related ]
+End If
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $modifier_name[1] ; FAT Modifier::Name ]
+		If [ ValuePosition ( $modifier_list ; $modifier_name ) > 0 ]
+			# Modifier already in list - delete after loop
+			Set Field [ FAT Modifier Value::Modifier id ; "XXX" ]
+		Else
+			Set Variable [ $modifier_list[1] ; $modifier_list & $modifier_name  &  ¶ ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	# Search for modifier id "XXX" and $item_id as parent
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) >0 ]
+		# Remove duplicates of modifierValues
+		Delete All Records [ With dialog: OFF ]
+	End If
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+

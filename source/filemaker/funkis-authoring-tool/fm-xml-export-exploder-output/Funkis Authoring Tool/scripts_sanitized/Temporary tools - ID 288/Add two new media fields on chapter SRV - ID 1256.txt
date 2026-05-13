@@ -1,0 +1,33 @@
+
+Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+Freeze Window
+Set Error Capture [ ON ]
+
+# Find only chapters that are not proxy's + are BaseProject
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Go to Record/Request/Page [ First ]
+
+Loop [ Flush: Always ]
+	Set Variable [ $chapter_id[1] ; FAT Chapter::PrimaryKey ]
+	Set Variable [ $learningprogramme_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	If [ IsEmpty ( FAT Chapter::Main menu foreground image id ) ]
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Chapter::PrimaryKey ) &
+						SetProperty ( "source_table" ; "chapter" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT Chapter::Main menu foreground image id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "package_id" ; $package_id ) &
+						SetProperty ( "learningprogramme_id" ; $learningprogramme_id) ]
+	End If
+	If [ IsEmpty ( FAT Chapter::Main menu icon id ) ]
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Chapter::PrimaryKey ) &
+						SetProperty ( "source_table" ; "chapter" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT Chapter::Main menu icon id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "package_id" ; $package_id ) &
+						SetProperty ( "learningprogramme_id" ; $learningprogramme_id) ]
+	End If
+	
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+

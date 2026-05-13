@@ -1,0 +1,28 @@
+# Special Pages are created in script Create Chapter CL
+# When closing this card - the new Page is displayed both in card and in background
+If [ Get(WindowStyle) = 3
+				
+				// popup card ]
+	Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+	Close Window
+	Select Window [ Name: $$currentWindow ]
+End If
+
+Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ FAT Chapter::Proxy type = "page" ]
+	Set Variable [ $parent_id[1] ; FAT Page::Parent id ]
+	Delete Record/Request [ With dialog: OFF ]
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) = 1 ]
+		Delete Record/Request [ With dialog: OFF ]
+	End If
+	Go to Layout [ Layout: "FAT Package" ; Animation: None ]
+Else
+	Delete Record/Request [ With dialog: OFF ]
+	Go to Layout [ Layout: "FAT Chapter" ; Animation: None ]
+End If
+
+

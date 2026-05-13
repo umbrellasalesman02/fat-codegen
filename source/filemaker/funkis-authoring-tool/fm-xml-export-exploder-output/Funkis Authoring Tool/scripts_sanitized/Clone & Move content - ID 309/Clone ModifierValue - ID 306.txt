@@ -1,0 +1,77 @@
+# This script is called by Clone content SRV  for each item that can have an Modifier
+# Modifier values of type Link, Package id, Chapter id or Page id will be replaced as the last step in the clone process.
+
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $old_item_id[1] ; GetScriptProperty ( "old_item_id") ]
+Set Variable [ $new_item_id[1] ; GetScriptProperty ( "new_item_id") ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id") ]
+
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+# Find attributeValues for old item
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	
+	Loop [ Flush: Always ]
+		
+		Set Variable [ $attribute_type[1] ; FAT Modifier::Type ]
+		
+		If [ $attribute_type = "Media" ]
+			Set Variable [ $attributemedia[1] ; Media MV::Media container ]
+		Else If [ $attribute_type = "Text" ]
+			Set Variable [ $attributetext[1] ; TF MV::Text ]
+		End If
+		
+		Duplicate Record/Request
+		
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT Modifier Value::Parent id ; $new_item_id ]
+		Set Variable [ $attributevalue_id[1] ; FAT Modifier Value::PrimaryKey ]
+		
+		If [ $attribute_type = "Media" ]
+			Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+							SetProperty ( "source_table" ; "attribute" ) &
+							SetProperty ( "source_mediafield" ; GetFieldName ( FAT Modifier Value::Media id ) ) &
+							SetProperty ( "learningprogramme_id" ; $title_id) &
+							SetProperty ( "package_id" ; $package_id) &
+							SetProperty ( "caller_layout" ; Get(layoutName )) ]
+			Set Field [ Media MV::Media container ; $attributemedia ]
+		Else If [ $attribute_type = "Text" ]
+			Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+							SetProperty ( "source_table" ; "attribute" ) &
+							SetProperty ( "source_textfield" ; GetFieldName ( FAT Modifier Value::Text id ) ) &
+							SetProperty ( "learningprogramme_id" ; $title_id) &
+							SetProperty ( "package_id" ; $package_id) &
+							SetProperty ( "caller_layout" ; Get(layoutName )) ]
+			Set Field [ TF MV::Text ; $attributetext ]
+		End If
+		
+		If [ $isClonedTitle ]
+			# Point to the new attribute created earlier in Clone Title Objects
+			Set Variable [ $old_modifier_id[1] ; FAT Modifier Value::Modifier id ]
+			Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Set Variable [ $new_modifier_id[1] ; FAT Modifier::PrimaryKey ]
+			Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+			Set Field [ FAT Modifier Value::Modifier id ; $new_modifier_id ]
+		Else If [ $isMovedPackage ]
+			# Point to the modifier using the same modifier template in the "Move to Title"
+			Set Variable [ $old_modifier_template_id[1] ; FAT Modifier::ModifierTemplate id ]
+			Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Set Variable [ $new_modifier_id[1] ; FAT Modifier::PrimaryKey ]
+			Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+			Set Field [ FAT Modifier Value::Modifier id ; $new_modifier_id ]
+		End If
+		
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+

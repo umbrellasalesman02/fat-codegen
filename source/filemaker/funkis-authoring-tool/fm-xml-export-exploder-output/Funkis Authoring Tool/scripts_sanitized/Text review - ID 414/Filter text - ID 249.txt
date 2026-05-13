@@ -1,0 +1,204 @@
+Set Error Capture [ ON ]
+# Text source item types can be:
+  global baseproject
+  -
+  global
+  title
+  package
+  chapter
+  page
+  page-item
+  tag
+  media
+  attribute
+  list-item
+  alt-text
+  io
+  score
+  io-sprig-story
+  -
+  custom imported
+
+# Value list selection can be:
+  
+  All texts
+  -
+  Title - shared texts
+  Current Package
+  -
+  Media subtitles
+  Media alt texts
+  Sprig story
+  -
+  Tags
+  Global texts
+  List texts
+  IO texts
+  Link texts
+  -
+  Imported texts
+
+
+# User select can be either "Title", "Package" or "Filter" depending on which popup menu used for filtering.
+Set Variable [ $user_select[1] ; Get(scriptParameter) ]
+
+If [ $user_select = "Title" ]
+	# Always delete package when selecting Title
+	Set Field [ FAT Text::gPackage ; "" ]
+	Set Field [ FAT Text::gFilterType ; "" ]
+End If
+If [ $user_select = "Package" And FAT Text::gFilterType ≠ "Current Package" And FAT Text::gFilterType ≠ "All texts" ]
+	# Always delete filter when selecting a new package
+	Set Field [ FAT Text::gFilterType ; "" ]
+End If
+
+Set Variable [ $title_id[1] ; $$lp_id ]
+Set Variable [ $package_id[1] ; FAT Text::gPackage ]
+Set Variable [ $texttype[1] ; FAT Text::gFilterType ]
+
+Set Field [ FAT Text::gSearchStatus ; "Showing text with status: " & FAT Text::gStatusVersion ]
+Set Field [ FAT Text::gEditor ; "" ]
+Set Field [ FAT Text::gSearchText ; "" ]
+Set Field [ FAT Text::gReplaceText ; "" ]
+Set Field [ FAT Text::gSearchDate ; "" ]
+Set Field [ FAT Text::gSearchStatus ; "" ]
+
+// Perform Script [ From list ; "Refresh Localisation status" ; Parameter: "Title" ]
+
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ Not PatternCount (Get(layoutName); "translate") ]
+	
+	If [ (IsEmpty ( $package_id ) Or $user_select = "Title" ) And $user_select ≠ "Filter" ]
+		# Search for all texts in Title
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ IsEmpty ( $package_id) And $texttype = "All texts" ]
+		# Search for all texts in Title
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ Not IsEmpty ($package_id) And IsEmpty ( $texttype ) Or $texttype = "All texts" ]
+		# Search for all texts that will be sent to localisation
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	Else If [ Not IsEmpty ( $package_id) And $texttype = "Package texts only" ]
+		# Search only for texts with a package id
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ IsEmpty ( $package_id) And $texttype = "Package texts only" ]
+		# No package selected - show dialog
+		Show Custom Dialog [ Title: "No package selected" ; Message: "Select a package if you want to show texts included in this package.¶¶With this filter, texts that are shared between all packages will not be shown." ; Default Button: "OK" ]
+		Exit Script []
+	Else If [ Not IsEmpty ( $package_id) And $texttype = "Package texts only" ]
+		# Search only for texts with a package id
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ $texttype = "Title - shared texts" ]
+		# Search for texts without any package id
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Media subtitles" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Media alt texts" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Sprig story" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Tags" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Global texts" ]
+		# Search criteria find both "global" and "global baseproject"
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "List texts" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Link texts" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "IO texts" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Imported texts" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Attribute" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	End If
+	
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	Go to Field [ FAT Text::Text ]
+	
+Else
+	
+	# Translation view - other Find-criterias
+	If [ (IsEmpty ( $package_id ) Or $user_select = "Title" ) And $user_select ≠ "Filter" ]
+		# Search for all texts in Title
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ IsEmpty ( $package_id) And $texttype = "All texts" ]
+		# Search for all texts in Title
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ Not IsEmpty ($package_id) And IsEmpty ( $texttype ) Or $texttype = "All texts" ]
+		# Search for all texts that will be sent to localisation
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	Else If [ Not IsEmpty ( $package_id) And $texttype = "Package texts only" ]
+		# Search only for texts with a package id
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ IsEmpty ( $package_id) And $texttype = "Package texts only" ]
+		# No package selected - show dialog
+		Show Custom Dialog [ Title: "No package selected" ; Message: "Select a package if you want to show texts included in this package.¶¶With this filter, texts that are shared between all packages will not be shown." ; Default Button: "OK" ]
+		Exit Script []
+	Else If [ Not IsEmpty ( $package_id) And $texttype = "Package texts only" ]
+		# Search only for texts with a package id
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ $texttype = "Title - shared texts" ]
+		# Search for texts without any package id
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Media subtitles" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Media alt texts" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Sprig story" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Tags" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Global texts" ]
+		# Search criteria find both "global" and "global baseproject"
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "List texts" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Link texts" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "IO texts" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Imported texts" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	Else If [ $texttype = "Attribute" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Field [ FAT Text::gPackage ; "" ]
+	End If
+	
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	Go to Field [ FAT Text translated::Text ]
+	
+End If
+
+
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+
+
+
+

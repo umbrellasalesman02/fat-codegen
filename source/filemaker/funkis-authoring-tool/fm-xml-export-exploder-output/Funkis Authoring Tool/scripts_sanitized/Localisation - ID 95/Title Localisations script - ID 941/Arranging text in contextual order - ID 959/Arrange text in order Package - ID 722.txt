@@ -1,0 +1,262 @@
+# This script arrange all texts in a Package in a contextual order
+# Called from Start Localisation Package and Start Localisation Title script
+# It sets the field recordNumberReference in table FAT Text to serial numbers, based on context
+# This value is later use for easier reference when doing human translations (and perhaps machine translation in the future)
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $package_id[1] ; GetScriptProperty("package_id") ]
+Set Variable [ $localisation_id[1] ; GetScriptProperty("localisation_id") ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty("localisation_code") ]
+
+Set Variable [ $recordNumberReference[1] ; 1 ]
+
+# Set Title and Package right
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+# Package Texts
+If [ Not IsEmpty ( TF PK Header::Text ) ]
+	Set Field [ TF PK Header::RecordNumberReference ; $recordNumberReference ]
+	Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+End If
+If [ Not IsEmpty ( TF PK Sub header 1::Text ) ]
+	Set Field [ TF PK Sub header 1::RecordNumberReference ; $recordNumberReference ]
+	Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+End If
+If [ Not IsEmpty ( TF PK Sub header 2::Text ) ]
+	Set Field [ TF PK Sub header 2::RecordNumberReference ; $recordNumberReference ]
+	Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+End If
+
+# Package Attribute Texts
+Perform Script [ From list ; "Arrange ModifierText In order" ; Parameter: SetProperty ( "item_id" ; FAT Package::PrimaryKey ) &
+				SetProperty ( "recordNumberReference" ; $recordNumberReference ) ]
+Set Variable [ $recordNumberReference[1] ; GetAsNumber ( Get(ScriptResult)) ]
+
+# Find all chapters with the package as a parent
+Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	Set Variable [ $chapter_num[1] ; 0 ]
+	// Open Transaction [ Skip auto-enter options: OFF ; Skip data entry validation: ON ; Override ESS locking conflicts: OFF ]
+	Loop [ Flush: Defer ]
+		Set Variable [ $chapter_id[1] ; FAT Chapter::PrimaryKey ]
+		Set Variable [ $chapter_num[1] ; $chapter_num + 1 ]
+		
+		# Chapter Texts
+		If [ Not IsEmpty ( TF CH Header::Text ) ]
+			Set Field [ TF CH Header::RecordNumberReference ; $recordNumberReference ]
+			Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+		End If
+		If [ Not IsEmpty ( TF CH Sub header::Text ) ]
+			Set Field [ TF CH Sub header::RecordNumberReference ; $recordNumberReference ]
+			Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+		End If
+		If [ Not IsEmpty ( TF CH Sub header 2::Text ) ]
+			Set Field [ TF CH Sub header 2::RecordNumberReference ; $recordNumberReference ]
+			Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+		End If
+		
+		# Chapter Attribute Texts
+		Perform Script [ From list ; "Arrange ModifierText In order" ; Parameter: SetProperty ( "item_id" ; FAT Chapter::PrimaryKey ) &
+						SetProperty ( "recordNumberReference" ; $recordNumberReference ) ]
+		Set Variable [ $recordNumberReference[1] ; GetAsNumber ( Get(ScriptResult)) ]
+		
+		# Find all pages with the chapter as a parent
+		Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+			Go to Record/Request/Page [ First ]
+			Set Variable [ $page_num[1] ; 0 ]
+			Loop [ Flush: Defer ]
+				Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+				Set Variable [ $page_num[1] ; $page_num + 1 ]
+				
+				# Page Texts
+				If [ Not IsEmpty ( TF PG Header::Text ) ]
+					Set Field [ TF PG Header::RecordNumberReference ; $recordNumberReference ]
+					Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+				End If
+				If [ Not IsEmpty ( TF PG Sub header 1::Text ) ]
+					Set Field [ TF PG Sub header 1::RecordNumberReference ; $recordNumberReference ]
+					Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+				End If
+				If [ Not IsEmpty ( TF PG Sub header 2::Text ) ]
+					Set Field [ TF PG Sub header 2::RecordNumberReference ; $recordNumberReference ]
+					Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+				End If
+				
+				# Page Attribute Texts
+				Perform Script [ From list ; "Arrange ModifierText In order" ; Parameter: SetProperty ( "item_id" ; FAT Page::PrimaryKey ) &
+								SetProperty ( "recordNumberReference" ; $recordNumberReference ) ]
+				Set Variable [ $recordNumberReference[1] ; GetAsNumber ( Get(ScriptResult)) ]
+				
+				
+				# Find all page_items with the page as a parent
+				Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)>0 ]
+					Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+					Go to Record/Request/Page [ First ]
+					Set Variable [ $pageitem_num[1] ; 0 ]
+					Loop [ Flush: Defer ]
+						Set Variable [ $pageitem_id[1] ; FAT Page item::PrimaryKey ]
+						Set Variable [ $pageitem_num[1] ; $pageitem_num + 1 ]
+						
+						
+						# Page item Texts
+						If [ Not IsEmpty ( TF PI Text 1::Text ) ]
+							Set Field [ TF PI Text 1::RecordNumberReference ; $recordNumberReference ]
+							Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+						End If
+						If [ Not IsEmpty ( TF PI Text 2::Text ) ]
+							Set Field [ TF PI Text 2::RecordNumberReference ; $recordNumberReference ]
+							Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+						End If
+						If [ Not IsEmpty ( TF PI Text 3::Text ) ]
+							Set Field [ TF PI Text 3::RecordNumberReference ; $recordNumberReference ]
+							Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+						End If
+						If [ Not IsEmpty ( TF PI Text 4::Text ) ]
+							Set Field [ TF PI Text 4::RecordNumberReference ; $recordNumberReference ]
+							Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+						End If
+						If [ Not IsEmpty ( TF PI Text 5::Text ) ]
+							Set Field [ TF PI Text 5::RecordNumberReference ; $recordNumberReference ]
+							Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+						End If
+						If [ Not IsEmpty ( TF PI Text 6::Text ) ]
+							Set Field [ TF PI Text 6::RecordNumberReference ; $recordNumberReference ]
+							Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+						End If
+						If [ Not IsEmpty ( TF PI Text 7::Text ) ]
+							Set Field [ TF PI Text 7::RecordNumberReference ; $recordNumberReference ]
+							Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+						End If
+						
+						# Page item Attribute Texts
+						Perform Script [ From list ; "Arrange ModifierText In order" ; Parameter: SetProperty ( "item_id" ; FAT Page item::PrimaryKey ) &
+										SetProperty ( "recordNumberReference" ; $recordNumberReference ) ]
+						Set Variable [ $recordNumberReference[1] ; GetAsNumber ( Get(ScriptResult)) ]
+						
+						# List / Content Array
+						If [ FAT Block @ Page item::Page item List enabled = 1 ]
+							Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+							Perform Find [ ⚠️ RESTORE ⚠️ ]
+							If [ Get(foundCount)>0 ]
+								Loop [ Flush: Defer ]
+									
+									# Content Array Texts
+									If [ Not IsEmpty ( TF LI PI 1::Text ) ]
+										Set Field [ TF LI PI 1::RecordNumberReference ; $recordNumberReference ]
+										Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+									End If
+									If [ Not IsEmpty ( TF LI PI 2::Text ) ]
+										Set Field [ TF LI PI 2::RecordNumberReference ; $recordNumberReference ]
+										Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+									End If
+									If [ Not IsEmpty ( TF LI PI 3::Text ) ]
+										Set Field [ TF LI PI 3::RecordNumberReference ; $recordNumberReference ]
+										Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+									End If
+									
+									Go to Record/Request/Page [ Next ; Exit after last: ON ]
+								End Loop
+							End If
+							Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+						End If
+						# SprigStory
+						If [ PatternCount ( FAT Block @ Page item::Name; "sprig") ]
+							Set Variable [ $parent_id[1] ; FAT Page item::PrimaryKey ]
+							Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+							# This Find uses $localisation_code
+							Perform Find [ ⚠️ RESTORE ⚠️ ]
+							Go to Record/Request/Page [ First ]
+							If [ Get(foundCount)>0 ]
+								Loop [ Flush: Defer ]
+									Set Field [ FAT Text::RecordNumberReference ; $recordNumberReference ]
+									Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+									Go to Record/Request/Page [ Next ; Exit after last: ON ]
+								End Loop
+							End If
+						End If
+						Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+						Go to Record/Request/Page [ Next ; Exit after last: ON ]
+					End Loop
+				End If
+				Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+		Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	// Commit Transaction
+End If
+
+# Number all other package texts if any were missed - shouldn't be any but in case of.
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+# Find all package texts that are not numbered
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Defer ]
+		Set Field [ FAT Text::RecordNumberReference ; $recordNumberReference ]
+		Set Variable [ $recordNumberReference[1] ; $recordNumberReference + 1 ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# Global texts - shall come last in the exported file and have their own number - starting at 1 000 000 + 1
+# Find all title texts
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+# Keep only numbered texts to get the last global text
+Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount) > 0 ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ Last ]
+	# Start numbering from last text
+	Set Variable [ $startNumberGlobalTexts[1] ; FAT Text::RecordNumberReference ]
+Else
+	# Set global texts start number to 1 000 000
+	Set Variable [ $startNumberGlobalTexts[1] ; 1000000 ]
+End If
+
+# Find all title texts
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+# Keep only texts WITHOUT number
+Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Set Variable [ $recordReferenceNumberGlobalTexts[1] ; 1 ]
+	Loop [ Flush: Defer ]
+		Set Field [ FAT Text::RecordNumberReference ; $startNumberGlobalTexts + $recordReferenceNumberGlobalTexts ]
+		Set Variable [ $recordReferenceNumberGlobalTexts[1] ; $recordReferenceNumberGlobalTexts + 1 ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+If [ $localisation_id ≠ "" ]
+	# Add event to log
+	Set Variable [ $event_text[1] ; "Successfully set " & $recordNumberReference & " package texts in the contextual order and " & $recordReferenceNumberGlobalTexts & " global texts." ]
+	Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+					SetProperty ( "event_text" ; $event_text ) ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Set Field [ FAT Package::TextInContextualOrderTimeStamp ; Get(currentHostTimeStamp) ]
+Exit Script [ "success" ]
+
+
+
+
+
+

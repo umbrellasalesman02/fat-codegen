@@ -1,0 +1,55 @@
+# This script is called from a button in the localisation setting window
+# The purpose of the script is to fetch all translations that been created by an asynchronous translation API
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+Set Variable [ $localisation_id[1] ; FAT Localisation @ Package::PrimaryKey ]
+
+Set Variable [ $title_id[1] ; FAT Localisation @ Package::Title id ]
+Set Variable [ $package_id[1] ; FAT Localisation @ Package::Package id ]
+
+Set Variable [ $original_localisation_code[1] ; FAT Title::Original localisation code ]
+Set Variable [ $target_localisation_code[1] ; FAT Localisation @ Package::Localisation code ]
+
+# THe translation API
+Set Variable [ $translation_api[1] ; FAT Localisation @ Package::Translation API ]
+
+# If executed from card window - close window
+If [ PatternCount ( Get(windowName) ; "translation" ) ]
+	Close Window
+	Select Window [ Name: $$currentWindow ]
+End If
+Freeze Window
+
+Perform Script [ From list ; "Get all texts from API" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty( "original_localisation_code" ; $original_localisation_code) &
+				SetProperty( "target_localisation_code" ; $target_localisation_code) &
+				SetProperty( "translation_api"; $translation_api) &
+				SetProperty( "localisation_id"; $localisation_id) ]
+// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+Set Variable [ $async_translation_result[1] ; Get(ScriptResult) ]
+# All text translations have been successfully fetched.
+
+If [ PatternCount ( $async_translation_result ; "Success") ]
+	# Change stage to 4
+	Perform Script [ From list ; "Change Package localisation stage" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) &
+					SetProperty ( "stage" ; 4 ) ]
+	Set Variable [ $event_text[1] ; "Localisation set to stage 4." ]
+Else
+	# Log the result from the script
+	Set Variable [ $event_text[1] ; $async_translation_result ]
+End If
+# Add event to log
+Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+				SetProperty ( "event_text" ; $event_text ) ]
+
+Go to Layout [ Layout: "FAT Package Settings" ; Animation: None ]
+

@@ -1,0 +1,38 @@
+# Called from button in Tags layout
+# This script sets up Funkis Cloud tags
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $tag_category[1] ; "Funkis Cloud Member roles" ]
+Set Variable [ $list_id[1] ; "funkis-cloud-member-roles-v1" ]
+Set Variable [ $list_items_list[1] ; List ("no-role"; "group-organizer";  "session-admin") ]
+Set Variable [ $list_items_names[1] ; List ("No role"; "Group organiser";  "Session admin") ]
+
+Freeze Window
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Tag" ; Animation: None ]
+
+Set Variable [ $i[1] ; 1 ]
+Loop [ Flush: Always ]
+	Set Variable [ $list_item_id[1] ; GetValue ( $list_items_list ; $i ) ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	# If not exist
+	If [ Get(foundCount) = 0 ]
+		New Record/Request
+		Set Field [ FAT Tag::Title id ; $title_id ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Tag::PrimaryKey ) &
+						SetProperty ( "source_table" ; "tag" ) &
+						SetProperty ( "learningprogramme_id" ; $title_id ) &
+						SetProperty ( "source_textfield" ; GetFieldName (FAT Tag::Name text id) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ FAT Tag::Predefined list id ; $list_id ]
+	End If
+	Set Field [ FAT Tag::Tag category ; $tag_category ]
+	Set Field [ FAT Tag::Predefined list item id ; $list_item_id ]
+	Set Field [ TF TAG Name::Text ; GetValue ( $list_items_names ; $i ) ]
+	Set Variable [ $i[1] ; $i + 1 ]
+	Exit Loop If [ $i > ValueCount ( $list_items_list ) ]
+	
+End Loop
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

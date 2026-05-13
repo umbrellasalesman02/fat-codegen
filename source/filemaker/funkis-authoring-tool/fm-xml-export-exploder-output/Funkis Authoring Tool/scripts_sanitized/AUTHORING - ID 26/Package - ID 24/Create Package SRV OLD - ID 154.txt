@@ -1,0 +1,53 @@
+Set Variable [ $learningprogramme_id[1] ; GetScriptProperty ( "learningprogramme_id" ) ]
+Set Variable [ $proxy_type[1] ; GetScriptProperty ( "proxy_type" ) ]
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Package::Parent id ; $learningprogramme_id ]
+Set Variable [ $course_id[1] ; FAT Package::PrimaryKey ]
+
+If [ $proxy_type = "" ]
+	Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "Package" ) & 
+					SetProperty ( "item_id" ; $course_id ) &
+					SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) ]
+	Perform Script [ From list ; "" ; Parameter: SetProperty ( "level" ; "Package" ) & 
+					SetProperty ( "item_id" ; $course_id ) &
+					SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) ]
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Package::PrimaryKey ) &
+					SetProperty ( "source_table" ; "package" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT Package::Header txt id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Package::PrimaryKey ) &
+					SetProperty ( "source_table" ; "package" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT Package::Sub header 1 txt id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Package::PrimaryKey ) &
+					SetProperty ( "source_table" ; "package" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT Package::Sub header 2 txt id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	Exit Script [ $course_id ]
+Else If [ $proxy_type = "chapter" ]
+	Set Field [ FAT Package::Proxy type ; $proxy_type ]
+	Set Variable [ $sort_index[1] ; FAT Package::SortIndex ]
+	Perform Script [ From list ; "Create Chapter SRV" ; Parameter: SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) &
+					SetProperty ( "parent_id" ; $course_id ) ]
+	Set Variable [ $chapter_id[1] ; Get(ScriptResult) ]
+	Set Field [ FAT Chapter::SortIndex ; $sort_index ]
+	Exit Script [ $chapter_id ]
+Else If [ $proxy_type = "page" ]
+	Set Field [ FAT Package::Proxy type ; $proxy_type ]
+	Set Variable [ $sort_index[1] ; FAT Package::SortIndex ]
+	
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	New Record/Request
+	Set Field [ FAT Chapter::Parent id ; $course_id ]
+	Set Field [ FAT Chapter::Proxy type ; "page" ]
+	Set Variable [ $chapter_id[1] ; FAT Chapter::PrimaryKey ]
+	
+	Perform Script [ From list ; "Create Page SRV" ; Parameter: SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) &
+					SetProperty ( "parent_id" ; $chapter_id ) ]
+	Set Variable [ $page_id[1] ; Get(ScriptResult) ]
+	Set Field [ FAT Page::SortIndex ; $sort_index ]
+	Exit Script [ $page_id ]
+End If
+

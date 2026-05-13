@@ -1,0 +1,36 @@
+# If called from the Card - Page item Settings - close card first (cannot open card on card)
+# Also called from Text review interface
+
+Freeze Window
+Set Error Capture [ ON ]
+Set Variable [ $media_id[1] ; Get(scriptParameter) ]
+Set Variable [ $localisation_code[1] ; Case ( FAT Title::Original localisation code ≠ FAT Title::gCurrentLocalisationCode; FAT Title::gCurrentLocalisationCode; "") ]
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ Get(WindowStyle) = 3 ]
+	# Card window
+	If [ PatternCount ( Get(layoutName) ; "List Item" ) ]
+		# If editing media in list item card layout
+		Perform Script [ From list ; "Save Rich Text" ]
+	End If
+	Set Variable [ $$call_layout[1] ; Get(layoutName) ]
+	Go to Layout [ Layout: "FAT Media Card" ; Animation: Slide in from Right ]
+	// Perform Script [ From list ; "Close card Window" ]
+Else
+	# Open card
+	Set Variable [ $$currentWindow[1] ; Get(windowName) ]
+	New Window [ Style: Card ; Name: "Media settings" ; Layout: "FAT Media Card" ; Height: 682 * Get(WindowZoomLevel)/100 ; Width: 1140 * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+End If
+If [ $localisation_code = "" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) = 0 ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		// Perform Script [ From list ; "Close card Window" ]
+		// Show Custom Dialog [ Title: "Cannot find media" ; Message: "The localised media cannot be found. " ; Default Button: "OK" ]
+	End If
+End If
+# This is set in order to for IO popup list to only show IOs of type = Media upload.
+Set Field [ FAT Title::gIOFilter ; "Media upload" ]
+

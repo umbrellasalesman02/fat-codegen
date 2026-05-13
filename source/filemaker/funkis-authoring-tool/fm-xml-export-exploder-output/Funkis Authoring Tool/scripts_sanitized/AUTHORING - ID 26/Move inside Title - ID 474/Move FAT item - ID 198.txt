@@ -1,0 +1,186 @@
+# Called from the button Move in move layout. Button Move is only enabled for the allowed moves within FAT
+# Most variables used in this script are global and set by script Start Move FAT item
+
+# moveto_item = PrimaryKey of the Package, Chapter or Page that we will move our item
+Set Variable [ $moveto_item_id[1] ; GetScriptProperty ( "item_id" ) ]
+
+# moveto_item_original = ???
+Set Variable [ $moveto_item_id_original[1] ; GetScriptProperty ( "item_id" ) ]
+
+# moveto_item_type = Package, Chapter or Page
+Set Variable [ $moveto_item_type[1] ; GetScriptProperty ( "item_type" ) ]
+
+# moveto_item_level = the hierarchial level if the new item
+Set Variable [ $moveto_item_level[1] ; GetScriptProperty ( "item_level" ) ]
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Field [ FAT Title::gMove_to_item_id ; $moveto_item_id ]
+Set Field [ FAT Title::gMove_to_item_type ; $moveto_item_type ]
+Set Field [ FAT Title::gMove_to_item_level ; $moveto_item_level ]
+
+
+# Package types:
+  4C393C7E-B339-4BFA-ADE7-E59F47FBAC60 - Scroll
+  5F127BA8-1BC7-467B-93EF-7BE401615BAA - Slide
+  4B8AB81A-9C99-43AD-8C32-3325D98F688A - Mixed type
+  BB6DDA20-C6CE-441E-B99C-CE1F884DC7E5 - Site old
+  B6397ED6-1BA8-4444-BD51-65076EE684F9 - Site
+  C69777FA-7286-422C-9337-B722B10663B6 - Title info
+
+# First check if the package types corresponds - otherwise exit
+  This shpuld already be handled by the visibility of the Move button
+Perform Script [ From list ; "Check package type" ; Parameter: SetProperty ( "old_package_type" ; $$old_package_type) & 
+				SetProperty ( "moveto_item_id" ; $moveto_item_id) & 
+				SetProperty ( "moveto_item_type" ; $moveto_item_type) ]
+If [ Get(scriptParameter ) = "false" ]
+	Show Custom Dialog [ Title: "Wrong package type" ; Message: "You cannot move items between different types of packages. " ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+# If OK start with type of item
+If [ $$fat_item_type = "Chapter" ]
+	# A chapter can have a Package or a Title as a parent
+	If [ $moveto_item_type = "Title" ]
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		New Record/Request
+		Set Field [ FAT Package::Parent id ; $moveto_item_id ]
+		Set Variable [ $moveto_item_id[1] ; FAT Package::PrimaryKey ]
+		Set Field [ FAT Package::Proxy type ; "chapter" ]
+	End If
+	# Perform for both Title and Package
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT Chapter::Parent id ; $moveto_item_id ]
+	Set Field [ FAT Chapter::Hierarchy level ; $moveto_item_level + 1 ]
+	Set Variable [ $chapter_id[1] ; FAT Chapter::PrimaryKey ]
+	Commit Records/Requests [ With dialog: OFF ]
+	
+	# Check if the chapter is moved to a new package - then update all Text and Media
+	Set Variable [ $new_package_id[1] ; FAT Package::PrimaryKey ]
+	If [ $$old_package_id ≠ $new_package_id ]
+		Perform Script [ From list ; "Set Package Text Media" ; Parameter: SetProperty ( "old_package_id" ; $$old_package_id ) &
+						SetProperty ( "new_package_id" ; $new_package_id ) &
+						SetProperty ( "fat_item_id" ; $$fat_item_id ) &
+						SetProperty ( "fat_item_type" ; $$fat_item_type ) ]
+		// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	End If
+	
+	Perform Script [ From list ; "Fix Hierarchy levels" ; Parameter: SetProperty ( "type" ; "page" ) &
+					SetProperty ( "parent_id" ; $chapter_id ) &
+					SetProperty ( "level" ; $moveto_item_level + 2 ) ]
+	// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ Last ]
+	Set Variable [ $sortIndex[1] ; FAT Chapter::SortIndex + 1 ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT Chapter::SortIndex ; $sortIndex ]
+	
+Else If [ $$fat_item_type = "Page" ]
+	
+	# A page can have a chapter, package or a title as a parent
+	If [ $moveto_item_type = "Title" ]
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		New Record/Request
+		Set Field [ FAT Package::Parent id ; $moveto_item_id ]
+		Set Variable [ $moveto_item_id[1] ; FAT Package::PrimaryKey ]
+		Set Field [ FAT Package::Proxy type ; "page" ]
+	End If
+	If [ $moveto_item_type = "Title" Or $moveto_item_type = "Package" ]
+		Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+		New Record/Request
+		Set Field [ FAT Chapter::Parent id ; $moveto_item_id ]
+		Set Variable [ $moveto_item_id[1] ; FAT Chapter::PrimaryKey ]
+		Set Field [ FAT Chapter::Proxy type ; "page" ]
+	End If
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT Page::Parent id ; $moveto_item_id ]
+	Set Field [ FAT Page::Hierarchy level ; $moveto_item_level + 1 ]
+	
+	Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+	Commit Records/Requests [ With dialog: OFF ]
+	
+	# Check if the page is moved to a new package - then update all Text and Media
+	Set Variable [ $new_package_id[1] ; FAT Package::PrimaryKey ]
+	If [ $$old_package_id ≠ $new_package_id ]
+		Perform Script [ From list ; "Set Package Text Media" ; Parameter: SetProperty ( "old_package_id" ; $$old_package_id ) &
+						SetProperty ( "new_package_id" ; $new_package_id ) &
+						SetProperty ( "fat_item_id" ; $$fat_item_id ) &
+						SetProperty ( "fat_item_type" ; $$fat_item_type ) ]
+		// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	End If
+	
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ Last ]
+	Set Variable [ $sortIndex[1] ; FAT Page::SortIndex + 1 ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT Page::SortIndex ; $sortIndex ]
+	
+Else If [ $$fat_item_type = "Page item" ]
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT Page item::Parent id ; $moveto_item_id ]
+	Set Variable [ $pageitem_id[1] ; FAT Page item::PrimaryKey ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ Last ]
+	Set Variable [ $sortIndex[1] ; FAT Page item::SortIndex + 1 ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT Page item::SortIndex ; $sortIndex ]
+	
+	# Check if the page item is moved to a new package - then update all Text and Media
+	Set Variable [ $new_package_id[1] ; FAT Package::PrimaryKey ]
+	If [ $$old_package_id ≠ $new_package_id ]
+		Perform Script [ From list ; "Set Package Text Media" ; Parameter: SetProperty ( "old_package_id" ; $$old_package_id ) &
+						SetProperty ( "new_package_id" ; $new_package_id ) &
+						SetProperty ( "fat_item_id" ; $$fat_item_id ) &
+						SetProperty ( "fat_item_type" ; $$fat_item_type ) ]
+		// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	End If
+	
+End If
+
+Perform Script [ From list ; "Delete proxy parents" ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Show Custom Dialog [ Title: $$fat_item_type & " successfully moved" ; Message: "The " & $$fat_item_type & " was successfully moved to a new location. Do you want to go to the new location, the old location or the top of Title?" ; Default Button: "Go new" ; Button 2: "Go old" ; Button 3: "Go top" ]
+
+If [ Get(lastMessageChoice) = 1 ]
+	# Go NEW location
+	If [ $moveto_item_type = "Title" ]
+		Go to Layout [ Layout: "FAT Title" ; Animation: None ]
+	Else If [ $moveto_item_type = "Package" ]
+		Go to Layout [ Layout: "FAT Package" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ $moveto_item_type = "Chapter" ]
+		Go to Layout [ Layout: "FAT Chapter" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ $moveto_item_type = "Page" ]
+		Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+Else If [ Get(lastMessageChoice) = 2 ]
+	# Go OLD location
+	# Funkar kanske inte med proxy... 2022-02-12
+	Go to Layout [ Layoutname: $$fat_caller_layout ; Animation: None ]
+	If [ $$fat_item_type = "Package" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ $$fat_item_type = "Chapter" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ $$fat_item_type = "Page" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else If [ $$fat_item_type = "Page item" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+	
+Else If [ Get(lastMessageChoice) = 3 ]
+	# Go to TOP
+	Perform Script [ From list ; "Go previous layout" ]
+	Go to Layout [ Layout: "FAT Title" ; Animation: None ]
+End If
+

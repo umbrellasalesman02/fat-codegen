@@ -1,0 +1,21 @@
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $texteditor[1] ; FAT Text::gEditor ]
+
+Set Field [ FAT Text::gFilterType ; "" ]
+Set Field [ FAT Text::gPackage ; "" ]
+
+If [ PatternCount ( $texteditor ; "@" ) ≠ 0 ]
+	Set Variable [ $texteditor[1] ; Replace ( $texteditor ; Position ( $texteditor ; "@" ; 0 ; 1 ) ; 1 ; "\@" ) ]
+End If
+
+Set Field [ FAT Text::gSearchStatus ; "Showing text edited by: " & $texteditor ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) = 0 ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Show Custom Dialog [ Title: "No texts found" ; Message: "No texts modified by the selected user couldn't be found. " ; Default Button: "OK" ]
+	Set Field [ FAT Text::gEditor ; "" ]
+Else
+	Go to Field [ Select/perform ; FAT Text::Text ]
+End If
+

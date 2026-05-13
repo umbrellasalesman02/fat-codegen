@@ -1,0 +1,52 @@
+# Called from Create New Title Step 2 SRV - this script is PSOS
+# This script create the Title Information package and the first package. 
+
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $first_package_type_id[1] ; GetScriptProperty("first_package_type_id") ]
+Set Variable [ $backend[1] ; GetScriptProperty("backend") ]
+
+If [ $backend = "Funkis Cloud" ]
+	# Create a Title Information package
+	Set Variable [ $package_type[1] ; "C69777FA-7286-422C-9337-B722B10663B6" // Title information ]
+	
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	New Record/Request
+	Set Field [ FAT Package::Parent id ; $title_id ]
+	Set Field [ FAT Package::Package type id ; $package_type ]
+	Set Field [ FAT Package::Reference name ; "Title information" // Name is not allowed to change ]
+	
+	Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	# Only add modifiers that corresponds with the package type
+	Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "Package" ) & 
+					SetProperty ( "item_id" ; $package_id ) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "package_type" ; $package_type ) ]
+End If
+
+#  Create the start package for Funkis Cloud
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Package::Parent id ; $title_id ]
+Set Field [ FAT Package::Package type id ; $first_package_type_id ]
+Set Field [ FAT Package::Reference name ; "Start package" ]
+Set Field [ FAT Package::Hierarchy level ; 1 ]
+# Ids for Usage type id fetched from table Usage types
+Set Field [ FAT Package::Usage type id ; Case($first_package_type_id = "5F127BA8-1BC7-467B-93EF-7BE401615BAA"; "5D88B689-9885-4467-99CC-604E44F154D6"; "93488778-9DCE-498D-BAC7-B4762FA68A21") ]
+Commit Records/Requests [ With dialog: OFF ]
+
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+Set Variable [ $title_site_directory[1] ; FAT Package::FC Package directory ]
+
+# Add to content overview - NEW 2024-02-10
+Set Variable [ $item_type[1] ; "Package" ]
+Set Variable [ $item_id[1] ; FAT Package::PrimaryKey ]
+Perform Script [ From list ; "Add Overview item SRV" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "item_id" ; $item_id ) &
+				SetProperty ( "item_type" ; $item_type ) ]
+
+Perform Script [ From list ; "Create new Package Step 2" ; Parameter: $package_id ]
+
+Exit Script [ $title_site_directory ]
+
+

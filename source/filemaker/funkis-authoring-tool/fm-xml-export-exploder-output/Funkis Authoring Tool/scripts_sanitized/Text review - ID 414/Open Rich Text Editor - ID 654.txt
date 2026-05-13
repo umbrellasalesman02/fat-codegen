@@ -1,0 +1,14 @@
+# Called from a button in text review layout
+
+# editorMode = "Translate" or "Original"
+Set Variable [ $editorMode[1] ; Get(scriptParameter) ]
+Set Field [ FAT Text translated::gRecordNumberReference ; FAT Text translated::RecordNumberReference ]
+
+Commit Records/Requests [ With dialog: OFF ]
+Set Variable [ $$currentWindow[1] ; Get(windowName) ]
+
+New Window [ Style: Card ; Name: "Editing text " & FAT Text translated::RecordNumberReference ; Layout: "FAT Translated Text Editor" ; Height: 720 * Get(WindowZoomLevel)/100 ; Width: 1024 * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+
+Perform Script [ From list ; "Init Rich Text Editor" ; Parameter: $editorMode ]
+
+

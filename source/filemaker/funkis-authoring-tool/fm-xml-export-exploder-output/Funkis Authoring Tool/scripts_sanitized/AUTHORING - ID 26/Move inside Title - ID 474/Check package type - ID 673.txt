@@ -1,0 +1,46 @@
+# Called during move to check if package type is the same between items
+# Returns "true" if package types are the same
+
+Set Error Capture [ ON ]
+
+# Package types:
+  4C393C7E-B339-4BFA-ADE7-E59F47FBAC60 - Scroll
+  5F127BA8-1BC7-467B-93EF-7BE401615BAA - Slide
+  4B8AB81A-9C99-43AD-8C32-3325D98F688A - Mixed type
+  BB6DDA20-C6CE-441E-B99C-CE1F884DC7E5 - Site old
+  B6397ED6-1BA8-4444-BD51-65076EE684F9 - Site
+  C69777FA-7286-422C-9337-B722B10663B6 - Title info
+
+
+Set Variable [ $old_package_type[1] ; GetScriptProperty ( "old_package_type" ) ]
+Set Variable [ $moveto_item_id[1] ; GetScriptProperty ( "moveto_item_id" ) ]
+Set Variable [ $moveto_item_type[1] ; GetScriptProperty ( "moveto_item_type" ) ]
+
+If [ $moveto_item_type = "Package" ]
+	Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $moveto_item_type = "Chapter" ]
+	Go to Layout [ Layout: "TABLE FAT Chapter Alt" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $moveto_item_type = "Page" ]
+	Go to Layout [ Layout: "TABLE FAT Page Alt" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+If [ $old_package_type = FAT Package Alt::Package type id 
+				
+				Or
+				
+				   (
+				    PatternCount ( $old_package_type & " " & FAT Package Alt::Package type id ; "B6397ED6-1BA8-4444-BD51-65076EE684F9" ) // New Site
+				
+				     And 
+				
+				    PatternCount ( $old_package_type & " " & FAT Package Alt::Package type id ; "5F127BA8-1BC7-467B-93EF-7BE401615BAA") // Scroll
+				   ) ]
+	Exit Script [ "true" ]
+Else
+	Exit Script [ "false" ]
+End If
+
+

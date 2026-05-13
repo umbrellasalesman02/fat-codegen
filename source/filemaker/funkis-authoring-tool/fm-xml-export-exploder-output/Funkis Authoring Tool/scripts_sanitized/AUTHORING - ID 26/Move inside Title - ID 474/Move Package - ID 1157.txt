@@ -1,0 +1,43 @@
+# This is a power feature only for developers
+# The functionality relies on that the titles where package is moved between uses the same set of modifiers and blocks. 
+# If a block does not exist in the new title, the block will be imported
+# All IOs, Lists, Score etc will be duplicated and moved to the new Title.
+
+
+Set Variable [ $old_tt_id[1] ;  ]
+Set Variable [ $title_id[1] ;  ]
+Set Variable [ $package_id[1] ;  ]
+
+Set Variable [ $package_code_release_date[1] ;  ]
+Set Variable [ $old_tt_original_localisation_code[1] ;  ]
+Set Variable [ $title_original_localisation_code[1] ;  ]
+Set Variable [ $old_tt_baseproject[1] ;  ]
+Set Variable [ $title_baseproject[1] ;  ]
+
+If [ $package_code_release_date < Date ( 1 ; 1 ; 2023 ) ]
+End If
+
+
+Set Variable [ $error_message[1] ;  ]
+
+Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+# Find all page items in package
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $template_block_id[1] ; FAT Block @ Page item::BlockTemplate id ]
+		Set Variable [ $list_id[1] ; FAT Page item::List id ]
+		Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Set Variable [ $new_block_id[1] ; FAT Block::PrimaryKey ]
+		Else
+			
+		End If
+		Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+		
+		
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+

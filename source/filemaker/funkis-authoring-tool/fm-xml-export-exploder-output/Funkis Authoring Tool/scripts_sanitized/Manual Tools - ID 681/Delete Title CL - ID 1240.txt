@@ -1,0 +1,10 @@
+# Deletes current title 
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $title_name[1] ; FAT Title::Reference title ]
+Show Custom Dialog [ Title: "Delete title " & $title_name & "?" ; Message: "Are you sure you want to delete the title " & $title_name & "?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) = 1 ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+Go to Layout [ Layoutname: $$home_layout ; Animation: None ]
+

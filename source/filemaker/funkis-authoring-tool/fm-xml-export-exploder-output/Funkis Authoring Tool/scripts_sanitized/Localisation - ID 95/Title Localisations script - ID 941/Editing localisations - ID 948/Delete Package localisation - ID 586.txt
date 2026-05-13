@@ -1,0 +1,70 @@
+# Called from a button in the FAT Title Localisation card window
+# Called from a button in the FAT Package Localisation portal in Package settings
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translated
+  3.     Original text sent	              Not translated               Translation id: [id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+Show Custom Dialog [ Title: "Delete language version" ; Message: "Deleting the language version means that all translated texts in this language for this package will be deleted and cannot be recovered. ¶¶Are you sure you want to delete the language for this package?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice)=2 ]
+	Exit Script []
+End If
+
+Freeze Window
+
+#  Caller can be "Title localisation" or "Package setting"
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller") ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id") ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty ( "localisation_code") ]
+Set Variable [ $localisation_id[1] ; GetScriptProperty ( "localisation_id") ]
+Set Variable [ $localisation_stage[1] ; GetScriptProperty ( "localisation_stage") ]
+
+If [ FAT Localisation @ Package::Localisation stage > 3 ]
+	Show Custom Dialog [ Title: "Deleting localised text is not allowed " ; Message: "Since the stage of this localisation is higher than stage 3 you are not allowed to delete the translated texts." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+Set Error Capture [ ON ]
+// Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+// Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+// Set Variable [ $localisation_code[1] ; FAT Localisation @ Package::Localisation code ]
+// Set Variable [ $localisation_id[1] ; FAT Localisation @ Package::PrimaryKey ]
+
+Set Field [ FAT Title::gCurrentLocalisationCode ; "" ]
+# Delete this localisation
+Delete Portal Row [ With dialog: OFF ]
+
+# Check how many packages that are localised from this Title
+Go to Layout [ Layout: "TABLE FAT Localisation @ Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $num_localised_packages_left[1] ; Get(foundCount) ]
+
+Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+If [ $num_localised_packages_left = 0 ]
+	# If no packages - find and delete all texts connceted to the title
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	# If more than one package - find and delete only texts connceted to the package
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+If [ Get(foundCount)>0 ]
+	Delete All Records [ With dialog: OFF ]
+End If
+
+Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Delete All Records [ With dialog: OFF ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+

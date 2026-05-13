@@ -1,0 +1,37 @@
+# Called from dropdown menu - Content
+# If package is included - then view only package text + global
+
+Set Variable [ $package_id[1] ; Get(scriptParameter) ]
+
+Set Error Capture [ ON ]
+Freeze Window
+Perform Script [ From list ; "Save Active Layout" ]
+
+Set Variable [ $$lp_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $original_localisation_code[1] ; FAT Title::Original localisation code ]
+Set Variable [ $current_localisation_code[1] ; FAT Title::gCurrentLocalisationCode ]
+
+Set Variable [ $$localisation_code[1] ; Case ( $current_localisation_code = "" ; 
+				
+				
+				$original_localisation_code ; 
+				
+				
+				$current_localisation_code  ) ]
+
+# View text in original language
+If [ $current_localisation_code = "" ]
+	Go to Layout [ Layout: "FAT Texts" ; Animation: None ]
+Else
+	# View text in current translated language
+	Go to Layout [ Layout: "FAT Translated Texts" ; Animation: None ]
+	Perform Script [ From list ; "Refresh Localisation status" ; Parameter: "Title" ]
+End If
+
+If [ IsEmpty ( $package_id ) ]
+	Perform Script [ From list ; "Filter text" ; Parameter: "Title" ]
+Else
+	Set Field [ FAT Text::gPackage ; $package_id ]
+	Perform Script [ From list ; "Filter text" ; Parameter: "Package" ]
+End If
+

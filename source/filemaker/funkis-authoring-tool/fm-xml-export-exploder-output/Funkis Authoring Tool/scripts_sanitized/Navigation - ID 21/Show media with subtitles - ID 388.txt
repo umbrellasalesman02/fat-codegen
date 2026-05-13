@@ -1,0 +1,18 @@
+Freeze Window
+Set Error Capture [ ON ]
+Set Variable [ $lp_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $pk_id[1] ; Get(scriptParameter) ]
+Perform Script [ From list ; "Save Active Layout" ]
+Go to Layout [ Layout: "FAT Media Subtitle" ; Animation: None ]
+If [ IsEmpty ( $pk_id ) ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+If [ Get(foundCount) = 0 ]
+	Perform Script [ From list ; "Go previous layout" ]
+	Show Custom Dialog [ Title: "Nothing found" ; Message: "There's no video or audio files in this Title yet. " ; Default Button: "OK" ]
+Else
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+End If
+

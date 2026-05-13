@@ -1,0 +1,31 @@
+Set Variable [ $proxy_type[1] ; GetScriptProperty ( "proxy_type" ) ]
+Set Error Capture [ ON ]
+Freeze Window
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $learningprogramme_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $$lp_changed[1] ; True ]
+// Perform Script [ From list ; "Create Package SRV OLD" ; Parameter: SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) &
+				SetProperty ( "proxy_type" ; $proxy_type ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+If [ $proxy_type = "" ]
+	Set Variable [ $course_id[1] ; Get(ScriptResult) ]
+	Go to Layout [ Layout: "FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Perform Script [ From list ; "Init Package" ]
+	Set Field [ FAT Package::Hierarchy level ; 1 ]
+	Go to Field [ Select/perform ; TF PK Header::Text ]
+Else If [ $proxy_type= "chapter" ]
+	Set Variable [ $chapter_id[1] ; Get(ScriptResult) ]
+	Go to Layout [ Layout: "FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT Chapter::Hierarchy level ; 1 ]
+	Go to Field [ Select/perform ; TF CH Header::Text ]
+Else If [ $proxy_type= "page" ]
+	Set Variable [ $page_id[1] ; Get(ScriptResult) ]
+	Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT Page::Hierarchy level ; 1 ]
+	Go to Field [ Select/perform ; TF PG Header::Text ]
+End If
+

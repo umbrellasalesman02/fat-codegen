@@ -1,0 +1,19 @@
+// Set Variable [ $$gLayoutNavigationArrP[1] ; $$gLayoutNavigationArrP - 1 ]
+Commit Records/Requests [ With dialog: OFF ]
+// If [ $$gLayoutNavigationArrP >1 ]
+// Go to Layout [ Layoutname: $$gLayoutNavigationArr[$$gLayoutNavigationArrP] ; Animation: None ]
+// Else
+// Go to Layout [ Layoutname: $$home_layout ; Animation: None ]
+// End If
+
+# New navigation
+Set Variable [ $windowIndex[1] ; ValuePosition ( Variables::gWindowList ; Get(windowName )) ]
+Set Variable [ $layoutIndex[1] ; ValueCount ( Variables::gLayoutNavigationLists[$windowIndex] ) ]
+If [ $layoutIndex > 1 ]
+	Set Variable [ $layout[1] ; GetValue ( Variables::gLayoutNavigationLists[$windowIndex] ; $layoutIndex ) ]
+	Set Field [ Variables::gLayoutNavigationLists ; DeleteValue ( Variables::gLayoutNavigationLists ; $layoutIndex ) ]
+	Go to Layout [ Layoutname: $layout ; Animation: Slide in from Left ]
+Else
+	Go to Layout [ Layoutname: $$home_layout ; Animation: Slide in from Left ]
+End If
+

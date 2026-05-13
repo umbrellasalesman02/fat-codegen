@@ -1,0 +1,12 @@
+# Called from button in Page item layout
+
+Set Variable [ $list_name[1] ; "Understandable list name" ]
+Set Variable [ $caller[1] ; "Page item" ]
+Set Variable [ $list_template_id[1] ; BlockTemplate @ Page item::List template id ]
+Show Custom Dialog [ Title: "Create list" ; Message: "Give your list an understandable name based on list content. Example: Colors, Job roles, Rate values etc." ; Default Button: "Save" ; Button 2: "Cancel" ; Input 1: $list_name ; Label 1: "List name" ]
+If [ Get(lastMessageChoice) = 1 ]
+	Perform Script [ From list ; "Create new List" ; Parameter: SetProperty ( "list_name" ; $list_name ) &
+					SetProperty ( "caller" ; $caller ) &
+					SetProperty ( "list_template_id" ; $list_template_id ) ]
+End If
+

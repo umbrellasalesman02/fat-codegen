@@ -1,0 +1,154 @@
+<Script>
+	<ScriptReference id="769" name="View card Chapter duration"></ScriptReference>
+	<ObjectList membercount="8">
+		<Step hash="90154AF7BB91D4001EA9781E4B874B0B" id="79" name="Freeze Window" enable="False">
+		</Step>
+		<Step hash="0964AE9D8085884D3FE34F29019B183C" id="75" name="Commit Records/Requests" enable="False">
+			<Options>128</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="Skip data entry validation" id="256" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Force Commit" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9E8DCD8AD460A76E6236860BD8DBE785" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(scriptParameter)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$chapter_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="21B4ED7420A62663D0768CF1F0EECF88" id="141" name="Set Variable" enable="False">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(windowName)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$$currentWindow"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FD11B83AA61447CADBC1E57FD2807CBC" id="122" name="New Window" enable="False">
+			<Options>16394</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="WindowReference">
+					<WindowReference>
+						<Style name="Card" value="3222274064"></Style>
+						<Name>
+							<Calculation datatype="1" position="0">
+								<Calculation>
+									<Text><![CDATA["Chapter settings"]]></Text>
+								</Calculation>
+							</Calculation>
+						</Name>
+						<LayoutReferenceContainer value="5">
+							<LayoutReference id="364" name="FAT Slide Navigation Menu Card"></LayoutReference>
+						</LayoutReferenceContainer>
+						<Bounds>
+							<height>
+								<Calculation datatype="1" position="1">
+									<Calculation>
+										<Text><![CDATA[680 * Get(WindowZoomLevel)/100]]></Text>
+									</Calculation>
+								</Calculation>
+							</height>
+							<width>
+								<Calculation datatype="1" position="2">
+									<Calculation>
+										<Text><![CDATA[1140 * Get(WindowZoomLevel)/100]]></Text>
+									</Calculation>
+								</Calculation>
+							</width>
+							<top></top>
+							<left></left>
+						</Bounds>
+						<Options value="3222274064">
+							<Close>False</Close>
+							<Minimize>False</Minimize>
+							<Maximize>False</Maximize>
+							<Resize>False</Resize>
+							<MenuBar>False</MenuBar>
+							<Toolbar>False</Toolbar>
+							<DimParentWindow>True</DimParentWindow>
+						</Options>
+					</WindowReference>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="04BA9D2F1410EC2CE554AB896CD45E97" id="28" name="Perform Find" enable="False">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$chapter_id">
+								<FieldReference id="8" name="PrimaryKey">
+									<TableOccurrenceReference id="1065127" name="FAT Chapter"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="543F009C759B9121A612E589C4392C2A" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A9E43DFF4DAEB48BA7E9EAB7D7107BA7" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="906" name="Open card setting"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ("card_window_name" ; "Chapter navigation menu" ) &SetProperty ("card_window_layout" ; "FAT Slide Navigation Menu Card" ) &SetProperty ("card_window_width" ; "1140" ) &SetProperty ("card_window_height" ; "680" ) &SetProperty ("item_id" ; $chapter_id ) &SetProperty ("item_type" ; "Chapter" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

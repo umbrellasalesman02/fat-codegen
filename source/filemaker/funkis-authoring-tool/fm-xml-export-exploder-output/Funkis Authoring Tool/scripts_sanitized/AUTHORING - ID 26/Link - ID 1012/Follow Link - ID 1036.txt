@@ -1,0 +1,39 @@
+# Called from overview Links and from ModifierValues at Package, Chapter, Page and Page item
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $link_type[1] ; GetScriptProperty ( "link_type" ) ]
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+Set Variable [ $item_type[1] ; GetScriptProperty ( "item_type" ) ]
+Set Variable [ $link_url[1] ; GetScriptProperty ( "link_url" ) ]
+
+
+# SetProperty("title_id"; FAT Link::Title id) &
+  SetProperty("link_type"; FAT Link::Link type) & 
+  SetProperty("item_id"; FAT Link::Internal Item id) & 
+  SetProperty("item_type"; FAT Link::Internal item type) & 
+  SetProperty("link_url"; FAT Link::Link ModifierValue)
+
+If [ $link_type = "File" ]
+	Export Field Contents [ Create folders: OFF ; Media LK 2::Media container ]
+	Exit Script []
+End If
+
+Show Custom Dialog [ Title: "Navigate to target" ; Message: "This links leads to " & $item_type & " URL: " & $link_url & "¶¶"  & 
+				"Do you want to navigate to the link target?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice) = 1 ]
+	# If called from the Card - Page item Settings - close card first (cannot open card on card)
+	If [ Get(WindowStyle) = 3 And $link_type = "Internal" ]
+		Set Variable [ $$call_layout[1] ; "" ]
+		Perform Script [ From list ; "Close card Window" ]
+	End If
+	
+	If [ $link_type = "Internal" ]
+		Perform Script [ From list ; "Go FAT item ƒ Overview" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "item_id" ; $item_id ) &
+						SetProperty ( "item_type" ; $item_type ) ]
+	Else If [ $link_type = "External" ]
+		Open URL [ In external browser: OFF ; With dialog: OFF ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+	End If
+End If
+

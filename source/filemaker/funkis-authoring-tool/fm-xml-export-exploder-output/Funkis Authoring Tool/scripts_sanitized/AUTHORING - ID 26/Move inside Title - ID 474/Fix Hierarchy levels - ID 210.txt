@@ -1,0 +1,98 @@
+# Denna borde väl också fixa level på Page items? Det gör den inte nu...
+# Part of the Move FAT item scripts set. Also called from Title Tools with $type = "Title"
+
+Set Variable [ $type[1] ; GetScriptProperty ("type") ]
+Set Variable [ $parent_id[1] ; GetScriptProperty ("parent_id") ]
+Set Variable [ $level[1] ; GetScriptProperty ("level") ]
+
+Freeze Window
+
+
+Set Error Capture [ ON ]
+
+If [ $type = "Title" ]
+	If [ Count ( FAT Package::PrimaryKey )>0 ]
+		Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+		Replace Field Contents [ FAT Package::Hierarchy level ; Replace with calculation: 1 ]
+		Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ; Match found set ]
+		If [ Count ( FAT Chapter::PrimaryKey ) > 0 ]
+			# Omit proxies
+			Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+			Replace Field Contents [ FAT Chapter::Hierarchy level ; Replace with calculation: 2 ]
+			Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ; Match found set ]
+			If [ Count ( FAT Page::PrimaryKey ) > 0 ]
+				# Omit proxies
+				Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+				Replace Field Contents [ FAT Page::Hierarchy level ; Replace with calculation: 3 ]
+				Go to Related Record [ Table: FAT Page item ; Layout: "TABLE FAT Page Item" ; Show related ; Match found set ]
+				If [ Count ( FAT Page item::PrimaryKey )>0 ]
+					Replace Field Contents [ FAT Page item::Hierarchy level ; Replace with calculation: 4 ]
+				End If
+				# Page level
+			End If
+			# Chapter level
+		End If
+		# Package level
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+Else If [ $type = "Package" ]
+	
+	Show Custom Dialog [ Title: "This move is not allowed" ; Message: "Fix Hierarchy level script" ; Default Button: "OK" ]
+	Exit Script []
+	
+Else If [ $type = "Chapter" ]
+	# Find chapter parent
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Chapter::Hierarchy level ; Replace with calculation: $level ]
+	End If
+	
+	Set Variable [ $level[1] ; $level + 1 ]
+	# Find pages with chapter parent and omit page proxies
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Page::Hierarchy level ; Replace with calculation: $level ]
+	End If
+	# Find page items with chapter parent and include page proxies
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Page item::Hierarchy level ; Replace with calculation: $level ]
+	End If
+	
+	Set Variable [ $level[1] ; $level + 1 ]
+	# Find page items with chapter parent and omit page proxies
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Page item::Hierarchy level ; Replace with calculation: $level ]
+	End If
+	
+Else If [ $type = "Page" ]
+	
+	# Find pages with page parent and omit page proxies
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Page::Hierarchy level ; Replace with calculation: $level ]
+	End If
+	# Find page items with page parent and include page proxies
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Page item::Hierarchy level ; Replace with calculation: $level ]
+	End If
+	
+	Set Variable [ $level[1] ; $level + 1 ]
+	# Find page items with page parent and omit page proxies
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Page item::Hierarchy level ; Replace with calculation: $level ]
+	End If
+End If
+

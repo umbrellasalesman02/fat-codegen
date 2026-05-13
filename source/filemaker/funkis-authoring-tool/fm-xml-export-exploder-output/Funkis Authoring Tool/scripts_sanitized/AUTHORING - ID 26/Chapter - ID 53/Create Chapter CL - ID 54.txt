@@ -1,0 +1,65 @@
+# Called from a button in Package layout - used for both Create Chapter and Create Page using a proxy Chapter. 
+
+Set Variable [ $proxy_type[1] ; GetScriptProperty ( "proxy_type" ) ]
+Set Error Capture [ ON ]
+Freeze Window
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $learningprogramme_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $parent_id[1] ; FAT Package::PrimaryKey ]
+
+# Flag the Title structure as changed
+
+
+// Perform Script [ From list ; "Create Chapter SRV" ; Parameter: SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) &
+				SetProperty ( "parent_id" ; $parent_id ) &
+				SetProperty ( "proxy_type" ; $proxy_type ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+If [ $proxy_type = "" ]
+	Set Variable [ $chapter_id[1] ; Get(ScriptResult) ]
+	Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Chapter::List of PrimaryKey);
+					theDesiredRecordID = $chapter_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	Set Field [ FAT Chapter::Hierarchy level ; 2 ]
+	Go to Layout [ Layout: "FAT Chapter" ; Animation: None ]
+	Go to Field [ Select/perform ; TF CH Header::Text ]
+Else If [ $proxy_type= "page" ]
+	Set Variable [ $page_id[1] ; Get(ScriptResult) ]
+	Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Page::List of PrimaryKey);
+					theDesiredRecordID = $page_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	Set Field [ FAT Page::Hierarchy level ; 2 ]
+	Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+	Go to Field [ Select/perform ; TF PG Header::Text ]
+End If
+
+# ------------------ Special page creation -----------------------------------------------------------
+
+If [ $proxy_type = "page" And Not IsEmpty (FAT Title::Base project) ]
+	# Creating special page in the root of a BaseProject Package
+	Set Variable [ $$currentWindow[1] ; Get(windowName) ]
+	New Window [ Style: Card ; Name: "New page" ; Layout: "FAT New Page" ; Height: 586 * Get(WindowZoomLevel)/100 ; Width: 586 * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+	Set Field [ FAT Page::gPageMode ; Case ( 
+					
+					       FAT Package::Package type name = "Site"; "E0D473D5-C2FD-466D-BB72-26A07650A051";
+					
+					    "" ) ]
+End If
+
+

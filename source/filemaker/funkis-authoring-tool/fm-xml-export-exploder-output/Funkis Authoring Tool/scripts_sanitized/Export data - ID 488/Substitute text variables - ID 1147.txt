@@ -1,0 +1,37 @@
+# This script is not in use - only as a backup
+
+If [ PatternCount ( $exportDB ; "Text" ) Or PatternCount ( $exportDB ; "Subtitle" ) ]
+	# This must be done INSIDE this script since sending fileContent between functions did not work well.
+	Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+	# Find all text variables in title
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		# Build a Substitute string to evaluate
+		Set Variable [ $substitute[1] ; False ]
+		# POTENTIAL problem - Quote seems to add line breaks \n at some points.
+		Set Variable [ $evaluate_string[1] ; "Substitute ( " & Quote($fileContent) 
+						
+						
+						//eval_string = "Substitute ( " & a & " ; [" & b & ";" & c &  "];[" & d & ";" & e & "])" ]
+		Loop [ Flush: Always ]
+			# Create the evaluate string - only add when string and definition differs.
+			If [ FAT Text variable::Friendly string ≠ FAT Text variable::String source definition ]
+				Set Variable [ $evaluate_string[1] ; $evaluate_string & "; [" & Quote(FAT Text variable::Friendly string) & ";" & Quote(FAT Text variable::String source definition) &  "]"
+								
+								
+								//eval_string = "Substitute ( " & a & " ; [" & b & ";" & c &  "];[" & d & ";" & e & "])" ]
+				Set Variable [ $substitute[1] ; True ]
+			End If
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+		If [ $substitute ]
+			# Substitute prettified text variables with source definition
+			Set Variable [ $evaluate_string[1] ; $evaluate_string & ")"
+							
+							
+							//eval_string = "Substitute ( " & a & " ; [" & b & ";" & c &  "];[" & d & ";" & e & "])" ]
+			Set Variable [ $fileContent[1] ; Evaluate ( $evaluate_string ) ]
+		End If
+	End If
+End If
+

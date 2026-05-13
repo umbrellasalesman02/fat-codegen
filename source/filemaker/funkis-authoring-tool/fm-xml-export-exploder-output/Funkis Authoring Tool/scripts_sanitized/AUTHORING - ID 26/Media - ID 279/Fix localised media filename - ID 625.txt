@@ -1,0 +1,13 @@
+# Set the file name of localised media to the original filename + localisation code
+# This scipt is called from a script trigger when container is modified
+// Set Variable [ $new_filename[1] ; FAT Media @ Trans::gRenameFile & "_" & FAT Media @ Trans::Localisation code ]
+If [ IsEmpty ( FAT Media @ Trans::Media container ) ]
+	
+Else
+	Set Variable [ $new_filename[1] ; FAT Media @ Trans::gRenameFile ]
+	Set Variable [ $filename_extension[1] ; Lower ( FAT Media @ Trans::Container file extension ) ]
+	Set Variable [ $new_filename[1] ; $new_filename & "." &  $filename_extension ]
+	Set Field [ FAT Media @ Trans::Media container ; Base64Decode(Base64Encode(FAT Media @ Trans::Media container); $new_filename) ]
+End If
+Commit Records/Requests [ With dialog: OFF ]
+

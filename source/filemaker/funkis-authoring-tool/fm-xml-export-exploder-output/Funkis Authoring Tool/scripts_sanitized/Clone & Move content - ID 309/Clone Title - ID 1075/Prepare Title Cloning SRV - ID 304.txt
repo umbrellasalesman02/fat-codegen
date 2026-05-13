@@ -1,0 +1,90 @@
+# Called from Duplicate Title Step 2 CL
+# This script prepare all Title-unique objects and settings before cloning content.
+# Designed for PSOS
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $new_theme_template_id[1] ; GetScriptProperty ( "new_theme_template_id" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $language_code[1] ; FAT Title::Original language code ]
+Set Variable [ $country_code[1] ; FAT Title::Original country code ]
+
+Set Variable [ $reference_title[1] ; FAT Title::Reference title ]
+Set Variable [ $backend[1] ; FAT Title::Title Backend ]
+
+# Set BaseProject  - this is set in DB on creation - all Titles will use BaseProj = "432D61A4-618C-4579-A4E4-427A6B521FDD"
+Set Variable [ $base_project[1] ; FAT Title::Base project ]
+
+# Clean up and delete old primary keys
+Perform Script [ From list ; "Cleanup before cloning" ; Parameter: SetProperty("title_id"; $old_tt_id)  &
+				SetProperty("mode"; "object") &
+				SetProperty("clone_level"; "Title") ]
+
+# Clone Modifiers, Blocks, Global texts etc from old title
+# Clone groups of objects from old title
+
+Perform Script [ From list ; "Clone Title Objects" ; Parameter: SetProperty ( "old_tt_id" ; $old_tt_id ) &
+				SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "new_theme_template_id" ; $new_theme_template_id ) ]
+
+# Set texts
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Title::PrimaryKey ) &
+				SetProperty ( "source_table" ; "title" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Title::Header txt id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Title::PrimaryKey ) &
+				SetProperty ( "source_table" ; "title" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Title::Sub header txt id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Set Field [ TF TT Header::Text ; $reference_title ]
+
+
+# --------------- Set up backend-specific configuration ----------------------------------------
+# This must be DONE after creating all Modifiers
+
+# Always use the default environment - also for old titles
+Perform Script [ From list ; "Get default environment" ]
+Set Variable [ $title_environment[1] ; Get(ScriptResult) ]
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Set Field [ FAT Title::Title Environment ; $title_environment ]
+
+# Create title on Funkis Cloud and adding the start package as a launch url
+Set Variable [ $organization_id[1] ; Client::Funkis Cloud Client id ]
+Set Variable [ $title_directory[1] ; FAT Title::FC Title directory ]
+
+Set Variable [ $launchURL[1] ; "https://" & Title Server Publish::URL & "/" & FAT Title::Export Title Sub Path & $title_site_directory & "/" ]
+
+Perform Script [ From list ; "CreateTitleOnCloud" ; Parameter: SetProperty ( "title_environment" ; $title_environment ) &
+				SetProperty ( "organization_id" ; $organization_id )&
+				SetProperty ( "reference_title" ; $reference_title )&
+				SetProperty ( "title_directory" ; $title_directory ) &
+				SetProperty ( "launchURL" ; $launchURL ) ]
+
+Set Variable [ $funkis_cloud_title_id[1] ; Get(ScriptResult) ]
+If [ PatternCount ( $funkis_cloud_title_id ; "Error" ) ]
+	Set Variable [ $error_message[1] ; $funkis_cloud_title_id ]
+Else
+	Set Field [ FAT Title::Funkis Cloud Title id ; $funkis_cloud_title_id ]
+End If
+
+# Create the Title on Funkis Insight
+Commit Records/Requests [ With dialog: OFF ]
+If [ $backend = "Funkis Cloud" And Not PatternCount ( $funkis_cloud_title_id ; "Error" ) ]
+	# Create the title on Funkis Insight
+	Perform Script [ From list ; "CreateTitleOnInsight" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "title_environment" ; $title_environment ) &
+					SetProperty ( "reference_title" ; $reference_title ) &
+					SetProperty ( "funkis_cloud_title_id" ; $funkis_cloud_title_id ) ]
+End If
+
+
+
+

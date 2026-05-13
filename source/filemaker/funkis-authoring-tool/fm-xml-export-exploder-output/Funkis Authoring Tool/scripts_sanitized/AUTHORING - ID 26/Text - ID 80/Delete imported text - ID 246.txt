@@ -1,0 +1,28 @@
+# Delete from portal
+Freeze Window
+Set Error Capture [ ON ]
+Show Custom Dialog [ Title: "Delete imported texts" ; Message: "Deleting imported texts cannot be undone." & ¶ & ¶ & "Are you sure you want to delete all imported texts connected to this imported file?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice)=1 ]
+	Set Variable [ $learningprogramme_id[1] ; FAT Imported text files::Title id ]
+	Set Variable [ $package_id[1] ; FAT Imported text files::Package id ]
+	Set Variable [ $file_id[1] ; FAT Imported text files::File id ]
+	Set Variable [ $textLabel[1] ; FAT Imported text files::Imported document type ]
+	Set Variable [ $parent_id[1] ; FAT Imported text files::Parent id ]
+	Set Variable [ $source_reference[1] ; "Imported text - " & $textLabel ]
+	Delete Portal Row [ With dialog: OFF ]
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	If [ $package_id ≠ "" ]
+		If [ $parent_id ≠ "" ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Else
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+		End If
+	Else
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+	If [ Get(foundCount)>0 ]
+		Delete All Records [ With dialog: OFF ]
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+

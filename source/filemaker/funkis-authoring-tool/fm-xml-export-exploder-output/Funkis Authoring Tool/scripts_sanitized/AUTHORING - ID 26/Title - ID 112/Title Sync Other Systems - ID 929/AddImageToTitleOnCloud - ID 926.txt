@@ -1,0 +1,45 @@
+# Using Private Key to log in
+# Called when updating a thumbnail image of a Title on Funkis Cloud
+# Called from changeTitleImage
+# NOT READY YET!!!!! 
+
+Set Variable [ $funkis_cloud_title_id[1] ; GetScriptProperty ( "funkis_cloud_title_id" ) ]
+Set Variable [ $title_environment[1] ; GetScriptProperty ( "title_environment" ) ]
+Set Variable [ $image_path[1] ; GetScriptProperty ( "image_path" ) ]
+
+Set Error Capture [ ON ]
+Set Error Logging [ ON ]
+
+# Get environment info
+Go to Layout [ Layout: "TABLE Title Environment" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)= 0 ]
+	Exit Script [ "Error: Cannot create title on Funkis Cloud. Environment cannot be found." ]
+End If
+
+Set Variable [ $theURL[1] ; Title Environment::Root URL & "/api/admin/v1/titles" ]
+Set Variable [ $private_key[1] ; Title Environment::Private API Key ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+# Communicate with the API to create the title on Funkis Cloud
+Set Variable [ $body[1] ; JSONSetElement ( "{}" ; 
+				
+				    [ "_id"; $funkis_cloud_title_id; JSONString];
+				    [ "url"; $image_url; JSONString]
+				 ) ]
+Set Variable [ $cURL_options[1] ; _cURL_request ( "PUT" ) & 
+				_cURL_header ( "Authorization" ; "Bearer " & $private_key ) & 
+				_cURL_header ( "Content-Type" ; "application/json" ) & 
+				_cURL_header ( "Accept" ; "application/json" ) & 
+				_cURL_show_error & 
+				_cURL_data___string ( $body ) ]
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ; $cURL_options ]
+
+Set Variable [ $last_error[1] ; Get(lastError) ]
+If [ $last_error ≠ 0 ]
+	Show Custom Dialog [ Title: "Authentication to server " & IN Server::Name & " failed" ; Message: "Please check credentials for superAdmin" ; Default Button: "OK" ]
+	Exit Script [ "Error" ]
+Else
+	Exit Script [ "Success" ]
+End If
+

@@ -1,0 +1,389 @@
+<Script>
+	<ScriptReference id="831" name="CheckForCompletion"></ScriptReference>
+	<ObjectList membercount="31">
+		<Step hash="9BE9C4207AF4DBE280C8329156F1778E" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script will check that a Scroll package uses the &quot;Complete status&quot; block and&#13;that a Slide package has at least one page item set to report completion. "></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E42DDAF55921D357C204E9A1F3BBEAB6" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called from both Publish and Check"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="89AA529FFD2979B8117D189802639089" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="404231B892CE7888A70B97953D8FDB54" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(scriptParameter)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$package_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="42877CAFC079ABACF59AB273794AA665" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="37" name="TABLE FAT Package"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="72B7E6370FF7A5D13C4349E8D8FD27FC" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$package_id">
+								<FieldReference id="11" name="PrimaryKey">
+									<TableOccurrenceReference id="1065126" name="FAT Package"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BBDB8CA1AADC7CF034B556D56E36CCE8" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Package::Reference name]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$package_name"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A7DE94A36959E3A329C9EE624E072C53" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="008C2EAB3E0FBCC6641C114678E5A8D2" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Check if backend requires completion"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4920CB7B5BB449ED558EC69630CA669C" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[FAT Title::Title Backend ≠ "Other"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C353B842A9B33C1B0F378959E72FB68F" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Package type::Name = "Scroll"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BE5CBD2A1EA63CD0D8164EDB715E1734" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This is id for block &quot;Course status&quot;"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8D7BC7B5EBC678A37A0F6B0ABB70125A" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["34398F82-8BAF-41A0-AF1A-EC3ABB04EFEF"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$completion_block_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CF07789A6004A61EE304395C82245124" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="401" name="TABLE FAT Page Item Alt"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="19FB7C7AD79A23BBEA37EE4D0907F1ED" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find page items in Package using course status block and are included in export."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A84789C94B9F814F0ADFD4B3A96B0DD6" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="3" action="find">
+							<find criteria="$package_id">
+								<FieldReference id="11" name="PrimaryKey">
+									<TableOccurrenceReference id="1065506" name="FAT Package Alt"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="1">
+								<FieldReference id="102" name="Include in export">
+									<TableOccurrenceReference id="1065657" name="FAT Page item Alt"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$completion_block_id">
+								<FieldReference id="113" name="BlockTemplate id">
+									<TableOccurrenceReference id="1065658" name="FAT Block @ Page item Alt"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C49ABB70E8943F538197BFAD1AB23AB5" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)= 0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E10FD071689E094742D9E29CA8C2E260" id="103" name="Exit Script" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Warning. No Course status block added in scroll package " & $package_name & "." &¶ & ¶ & "To make this package report completed you need to add this block in the end of the final page."]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="485405775D2B4B54645B12F6BE6CB328" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="D7DCF270279762253278E19824A9C9A1" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Package type::Name = "Slide"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1D99CD30EDBA34943E4F28E22B511922" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This is id for stateToggleTemplate &quot;Course status&quot;"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BC1F85EC713AD25A7ABCB6DF617FF9BD" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["ABF2AE59-4EB8-48C6-92CB-0ECCA4F24D93"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$completion_stateToggle_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="99276345F3F9799FD0D975C6ED8EE468" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["completed"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$completion_stateToggle_value"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="15542B105DAE1B340373A774D3F7211C" id="6" name="Go to Layout" enable="True">
+			<Options>10</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="401" name="TABLE FAT Page Item Alt"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F7390F7A3BA0E629E3CDB71F0C76C3B2" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find page items in Package using course status block and are included in export."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="02606CEB0735C04EB2DCA10024FA3E3A" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="4" action="find">
+							<find criteria="$package_id">
+								<FieldReference id="11" name="PrimaryKey">
+									<TableOccurrenceReference id="1065506" name="FAT Package Alt"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="1">
+								<FieldReference id="102" name="Include in export">
+									<TableOccurrenceReference id="1065657" name="FAT Page item Alt"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$completion_stateToggle_value">
+								<FieldReference id="9" name="">
+									<TableOccurrenceReference id="-1" name="&lt;Table Missing&gt;"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$completion_stateToggle_id">
+								<FieldReference id="16" name="">
+									<TableOccurrenceReference id="-1" name="&lt;Table Missing&gt;"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F4A35D3AD24DAA8F1805761892B06E28" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)= 0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A5FA020FD7F83A7BA994A1BC443E9FCF" id="103" name="Exit Script" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Warning. No Course status stateToggle set to completed in slide package " & $package_name & "." &¶ & ¶ & "To make this package report completed you should set the last page item in the last chapter to course_status = completed."]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F7AD60604969EBC30D7390CA54DFF02C" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="E7603B847040DFFEE7549D04C856276A" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="35BA61086A31747D79DD1F6E747B203B" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

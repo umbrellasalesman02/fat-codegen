@@ -1,0 +1,33 @@
+Set Error Capture [ ON ]
+If [ User X Title @ Title::PrimaryKey ]
+	Get Folder Path [ Allow Folder Creation: ON ; ⚠️ PARAMETER "Variable" NOT PARSED ⚠️ ; Title: "Select your development folder" ]
+	If [ Get(lastError)=1 ]
+		Exit Script []
+	End If
+	Set Field [ FAT Title::gLogin ; $$login_id ]
+	Set Variable [ $MacFilepath[1] ; "file:" & $filepath ]
+	If [ $filepath ≠ "" ]
+		If [ Get(scriptParameter)≠ "Package" ]
+			Set Field [ User X Title @ Title::Title Filepath export ; $MacFilepath ]
+			Set Field [ User X Title @ Title::Title Filepath raw ; $filepath ]
+		Else
+			Set Variable [ $packagePathJSON[1] ; Case(
+							
+							IsEmpty ( User X Title @ Title::Package Filepath JSON );
+							"{}";
+							User X Title @ Title::Package Filepath JSON) ]
+			Set Variable [ $reference_name[1] ; FAT Package::JSON Friendly id ]
+			Set Variable [ $packagePathJSON[1] ; JSONSetElement ( $packagePathJSON ; $reference_name ; $filepath ; JSONString ) ]
+			If [ Left ( JSONFormatElements ( $packagePathJSON ) ; 1 ) <> "?" ]
+				Set Field [ User X Title @ Title::Package Filepath JSON ; $packagePathJSON ]
+				Commit Records/Requests [ With dialog: OFF ]
+			Else
+				Show Custom Dialog [ Title: "Forbidden characters used in file path" ; Message: "Please check your path. The path cannot be stored in a JSON format. " ; Default Button: "OK" ]
+			End If
+		End If
+		
+	End If
+Else
+	Show Custom Dialog [ Title: "Title not added to your user" ; Message: "To set a local development folder the title must first be added to your user. " ; Default Button: "OK" ]
+End If
+

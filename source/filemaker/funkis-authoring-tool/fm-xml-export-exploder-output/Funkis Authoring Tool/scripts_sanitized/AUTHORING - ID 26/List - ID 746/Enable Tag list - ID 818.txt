@@ -1,0 +1,56 @@
+# This is called from onObjectModify when choosing Tag filter on a list. 
+
+If [ PatternCount ( FAT List::Usage type ; "tag" ) ]
+	
+	# Creating tag filters will require level. For now - page item is only valid level
+	Set Variable [ $tags_levels[1] ; FAT Title::Tags levels ]
+	Set Variable [ $level[1] ; "Page item" ]
+	If [ Not PatternCount ( $tags_levels ; "Page item" ) ]
+		Set Variable [ $tags_levels[1] ; $tags_levels & ¶ & $level ]
+		Set Field [ FAT Title::Tags levels ; $tags_levels ]
+	End If
+	
+	Set Variable [ $tag_category[1] ; FAT List::Name ]
+	Set Variable [ $optionlist_id[1] ; FAT List::PrimaryKey ]
+	Set Variable [ $title_id[1] ; FAT List::Title id ]
+	
+	If [ Count ( FAT List item::PrimaryKey ) > 0 ]
+		
+		Freeze Window
+		Set Error Capture [ ON ]
+		
+		Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		
+		If [ Get(foundCount) > 0 ]
+			
+			Loop [ Flush: Always ]
+				# This is a hack - tag text uses the same text instance as the value list item
+				Set Variable [ $optionlist_item_id[1] ; FAT List item::PrimaryKey ]
+				Set Variable [ $text_id[1] ; FAT List item::Text 1 id ]
+				# If changing the text option for the value list, the tag text is also changed
+				# If deleting a tag, text for both tag and TCA will be deleted
+				
+				Go to Layout [ Layout: "TABLE FAT Tag" ; Animation: None ]
+				New Record/Request
+				Set Field [ FAT Tag::Title id ; $title_id ]
+				Set Field [ FAT Tag::Level ; $level ]
+				Set Field [ FAT Tag::Name text id ; $text_id ]
+				Set Field [ FAT Tag::List id ; $optionlist_id ]
+				Set Field [ FAT Tag::Tag category ; $tag_category ]
+				Set Field [ FAT Tag::List item id ; $optionlist_item_id ]
+				Commit Records/Requests [ With dialog: OFF ]
+				
+				Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+				
+			End Loop
+		End If
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+
+
+
+

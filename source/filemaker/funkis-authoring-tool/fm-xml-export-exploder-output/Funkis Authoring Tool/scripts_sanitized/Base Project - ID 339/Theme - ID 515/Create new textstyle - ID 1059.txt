@@ -1,0 +1,63 @@
+# Creates new textstyle
+# Used by BOTH Theme template and Theme
+
+Set Variable [ $mode[1] ; Get(scriptParameter) ]
+# Mode can be either "Theme" or "Theme template"
+
+If [ $mode = "Theme" ]
+	Set Variable [ $theme_id[1] ; FAT Theme::PrimaryKey ]
+Else
+	Set Variable [ $theme_id[1] ; Theme Template::PrimaryKey ]
+End If
+Set Variable [ $type[1] ; FAT Theme TextStyle::gTextStyleType ]
+Set Variable [ $predefined_name[1] ; FAT Theme TextStyle::gTextStylePredefined ]
+Set Variable [ $name[1] ; $predefined_name ]
+
+
+If [ IsEmpty($type) Or IsEmpty($predefined_name) ]
+	Show Custom Dialog [ Title: "Text style type or name missing" ; Message: "Select a type and name from the popup-menu before creating a new text style." ; Default Button: "OK" ]
+	Exit Script []
+Else
+	Show Custom Dialog [ Title: "Enter name" ; Message: "Enter a name for your text style. " ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $name ; Label 1: "Text style name" ]
+	If [ Get(lastMessageChoice)= 2 ]
+		Exit Script []
+	End If
+End If
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT Theme TextStyle" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Go to Object [ "TextStyle" ; Repetition: 1 ]
+	Show Custom Dialog [ Title: "Text style exist" ; Message: "It already exist a text style with this pre-defined name and type in the theme. ¶¶Please, select a new pre-defined name. " ; Default Button: "OK" ]
+	Exit Script []
+End If
+New Record/Request
+
+If [ $mode = "Theme" ]
+	Set Field [ FAT Theme TextStyle::Theme id ; $theme_id ]
+	Set Field [ FAT Theme TextStyle::Text Font family ; FAT Theme Font::Font family name ]
+Else
+	Set Field [ FAT Theme TextStyle::Theme template id ; $theme_id ]
+	Set Field [ FAT Theme TextStyle::Text Font family ; FAT Theme Font @ Template::Font family name ]
+End If
+Set Field [ FAT Theme TextStyle::Type ; $type ]
+Set Field [ FAT Theme TextStyle::Predefined Text style Name ; $predefined_name ]
+
+# Set default values - cannot do that in DB because cloning will not work then
+Set Field [ FAT Theme TextStyle::Custom Name ; $name ]
+Set Field [ FAT Theme TextStyle::Text color ; "black" ]
+Set Field [ FAT Theme TextStyle::Text Font size ; Case ( FAT Theme TextStyle::Type= "Heading"; 32; FAT Theme TextStyle::Type= "Body" ; 16; 24) ]
+Set Field [ FAT Theme TextStyle::Text Align ; "Left" ]
+Set Field [ FAT Theme TextStyle::Text line height ; Case ( FAT Theme TextStyle::Type = "Heading"; FAT Theme TextStyle::Text Font size ; Round (FAT Theme TextStyle::Text Font size * 1,2; 0)) ]
+Set Field [ FAT Theme TextStyle::Text letter spacing ; 0 ]
+Set Field [ FAT Theme TextStyle::Text Font weight ; Case ( FAT Theme TextStyle::Type = "Heading"; "Bold"; "Normal" ) ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Go to Object [ "TextStyle" ; Repetition: 1 ]
+
+
+

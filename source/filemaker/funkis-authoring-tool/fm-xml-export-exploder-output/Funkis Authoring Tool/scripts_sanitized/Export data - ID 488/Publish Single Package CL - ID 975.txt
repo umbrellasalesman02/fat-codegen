@@ -1,0 +1,14 @@
+# Called from the RED button. Package backend decides what to do
+
+If [ FAT Package::Package Backend = "LMS" ]
+	Perform Script [ From list ; "Publish Remote CL" ; Parameter: SetProperty ( "publish_mode" ; "DELIVERY" ) &
+					SetProperty ( "caller" ; "Package") &
+					SetProperty ( "show_dialog" ; "true") ]
+Else If [ FAT Package::Package Backend = "Funkis Cloud" ]
+	Perform Script [ From list ; "Publish Funkis Cloud CL" ; Parameter: SetProperty ( "package_id" ; FAT Package::PrimaryKey) &
+					SetProperty ( "show_dialog" ; "true") ]
+End If
+
+
+
+

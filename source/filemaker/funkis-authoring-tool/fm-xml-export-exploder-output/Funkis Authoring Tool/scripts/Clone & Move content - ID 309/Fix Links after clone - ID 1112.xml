@@ -1,0 +1,1401 @@
+<Script>
+	<ScriptReference id="1112" name="Fix Links after clone"></ScriptReference>
+	<ObjectList membercount="95">
+		<Step hash="EF2CEBFAC9ADADA91E7F111F5F70ECA6" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called from Start Cloning after all cloning is ready"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4A287C825576B83A78150120E17BC085" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Only called if PatternCount ( $clone_settings ; &quot;Links&quot; ) or $clone_level = &quot;Title&quot;"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D6EBA4B70FE48356C0AE87BBF0082094" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script also fix references to Packages, Chapters and Pages (Legacy links)"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8573FA389D47C17D49DA9A690C53B51C" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0E214E02506DDF7528D21D6F813BED73" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="SetProperty ( &quot;title_id&quot; ; $title_id ) &amp;&#13;SetProperty ( &quot;clone_level&quot; ; $clone_level ) &amp;&#13;SetProperty ( &quot;item_id&quot; ; $item_id )  &amp;&#13;SetProperty ( &quot;clone_start_timestamp&quot; ; $clone_start_timestamp ) "></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6A0700AC220CBF9EE54AD02394ADB12E" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DF19F351934430D2B5E4E393E669E04F" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty("title_id")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8E320FA6F17662E26EED1210ADABDD25" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty("clone_level")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$clone_level"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F18B9ABA7F7D45B4D53697157734798E" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty("item_id")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CF8BCE833EF54B895471C235180504E1" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetAsTimeStamp(GetScriptProperty("clone_start_timestamp"))]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$clone_start_timestamp"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9001341779CB5C2AB44B7E1A0B0F30A1" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FB6D6A3A17628F2E99EF433126C619C8" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(currentHostTimeStamp)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$clone_end_timestamp"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E7641686D949AC2364F19857264849C3" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A8B4B6FCF0CB4DE99B7D217FA0C073B7" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C323809B8ED785E5915595DCC5BB74AA" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1A26BED41FCF66331F5D424A0F68CACF" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="------------------- CHECK LINKS IN MODIFIER VALUES -------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C2334EDC92289A0D8858BD559F8D2B03" id="6" name="Go to Layout" breakpoint="True" enable="True">
+			<Options>1048586</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="95" name="TABLE FAT ModifierValue"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A831A82067357CDFBFAC3DDE713C6045" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F71088BEC204FAF750E4CBE2E427A13C" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find modifiervalues in title of type link, package id, chapter id or page id and is created in the time between start and stop cloning"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1AC06D1AC60BF681CE50DB0D5B79A3C9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Link"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$modifier_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5B794A11ADCDAA7214DEA495EA52E511" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="4" action="find">
+							<find criteria="$title_id">
+								<FieldReference id="6" name="Title id">
+									<TableOccurrenceReference id="1065177" name="FAT Modifier"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="==$modifier_type">
+								<FieldReference id="8" name="Type">
+									<TableOccurrenceReference id="1065177" name="FAT Modifier"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="≥$clone_start_timestamp  ≤$clone_end_timestamp">
+								<FieldReference id="2" name="CreationTimestamp">
+									<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="*">
+								<FieldReference id="6" name="Value">
+									<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="589517D22D7654B0B742BDA567BEA68B" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Package id"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$modifier_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="75CE081867952ADBC9805EEDD3619E02" id="127" name="Extend Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="4" action="find">
+							<find criteria="$title_id">
+								<FieldReference id="6" name="Title id">
+									<TableOccurrenceReference id="1065177" name="FAT Modifier"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="==$modifier_type">
+								<FieldReference id="8" name="Type">
+									<TableOccurrenceReference id="1065177" name="FAT Modifier"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="≥$clone_start_timestamp  ≤$clone_end_timestamp">
+								<FieldReference id="2" name="CreationTimestamp">
+									<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="*">
+								<FieldReference id="6" name="Value">
+									<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8725E770DEBEAA60F927FECBAC6093C9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Chapter id"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$modifier_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4C24A0E1F24C2365A18DFF54E4ACC77E" id="127" name="Extend Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="4" action="find">
+							<find criteria="$title_id">
+								<FieldReference id="6" name="Title id">
+									<TableOccurrenceReference id="1065177" name="FAT Modifier"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="==$modifier_type">
+								<FieldReference id="8" name="Type">
+									<TableOccurrenceReference id="1065177" name="FAT Modifier"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="≥$clone_start_timestamp  ≤$clone_end_timestamp">
+								<FieldReference id="2" name="CreationTimestamp">
+									<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="*">
+								<FieldReference id="6" name="Value">
+									<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="80B08445DAA12E172C35CFC8E648DD9D" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Page id"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$modifier_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7238D0CC3958ED5CB75D32353E84EB93" id="127" name="Extend Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="4" action="find">
+							<find criteria="$title_id">
+								<FieldReference id="6" name="Title id">
+									<TableOccurrenceReference id="1065177" name="FAT Modifier"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="==$modifier_type">
+								<FieldReference id="8" name="Type">
+									<TableOccurrenceReference id="1065177" name="FAT Modifier"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="≥$clone_start_timestamp  ≤$clone_end_timestamp">
+								<FieldReference id="2" name="CreationTimestamp">
+									<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="*">
+								<FieldReference id="6" name="Value">
+									<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9D0013C61342A5EFF1DC79D4EFD3C38E" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2A79F760FB1B922B8D0A6E69747D2C5E" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EE72354AFC35DD112FEBE63FCD1741E9" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E935193E6B425301B0001ABD207A7CE6" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Modifier Value::Value]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$old_item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D72473F03C8012CE130288F99B5EE9D9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Modifier::Type]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$item_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8D0EA8DE17514B47348F63B02A8413DB" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="51F16067A6355443C27E3F857CA92D08" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="1118" name="Find original item"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty("old_item_id"; $old_item_id) & SetProperty("item_type"; $item_type) & SetProperty("title_id"; $title_id)]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2C065404022E9CCD858DA017A8FE08C6" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(ScriptResult)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$new_item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A21C4CC31666C64FF09EA0CA99EF3C9D" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1A916CE012840EC751F6FEBE2B8F1B2A" id="6" name="Go to Layout" enable="True">
+			<Options>10</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="95" name="TABLE FAT ModifierValue"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BE6245FEF3F1DE2761F5FAA880DE7008" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="6" name="Value">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$new_item_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="57D79DF12BBA108A40DAD30CD2870174" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>8194</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="True"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="669F158220EBAB3F1EDC343069C8A0A1" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="1D1A038169CA0C5830EE7D1FD06D6985" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="E64BEE9FF603B066A635A757C00C7FF7" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CDF5476DA6CF3D9F366D3BE5F91E5DF9" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="------------------- CHECK LINKS IN LIST ITEM VALUES -------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C2168EA8BA8C23248D4499A113EA69B1" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8B95024282C79ADE8B934E398D978BA8" id="6" name="Go to Layout" enable="True">
+			<Options>10</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="322" name="TABLE FAT List item"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0D7D82845F3DAFDFBD8853F625341B97" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5AFB5B6BC0EAEE8A42ABF07CD82EBE5E" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find modifiervalues in title of type link, package id, chapter id or page id and is created in the time between start and stop cloning"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A1583617BBB5A454FEB637D52C3D4A4F" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Link"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$modifier_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E96C4A57A1956187875A7B22F8C02460" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="4" action="find">
+							<find criteria="≥$clone_start_timestamp  ≤$clone_end_timestamp">
+								<FieldReference id="2" name="CreationTimestamp">
+									<TableOccurrenceReference id="1065498" name="FAT List item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="*">
+								<FieldReference id="8" name="Value 1">
+									<TableOccurrenceReference id="1065498" name="FAT List item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$title_id">
+								<FieldReference id="44" name="Title id">
+									<TableOccurrenceReference id="1065525" name="FAT List"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="==$modifier_type">
+								<FieldReference id="12" name="Value 1 type">
+									<TableOccurrenceReference id="1065526" name="List template"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="718CBD66F3C38D4DC9126273718263E8" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Page item"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$modifier_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E362C5C592EF11CBC3DC57B8D3F41439" id="127" name="Extend Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="4" action="find">
+							<find criteria="≥$clone_start_timestamp  ≤$clone_end_timestamp">
+								<FieldReference id="2" name="CreationTimestamp">
+									<TableOccurrenceReference id="1065498" name="FAT List item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="*">
+								<FieldReference id="8" name="Value 1">
+									<TableOccurrenceReference id="1065498" name="FAT List item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$title_id">
+								<FieldReference id="44" name="Title id">
+									<TableOccurrenceReference id="1065525" name="FAT List"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="==$modifier_type">
+								<FieldReference id="12" name="Value 1 type">
+									<TableOccurrenceReference id="1065526" name="List template"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="587EC074D38C8AF2FD311063D33BDCC9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Page friendly id"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$modifier_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="91C3D51857D37EEDBE89D099F008B3D4" id="127" name="Extend Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="4" action="find">
+							<find criteria="$title_id">
+								<FieldReference id="9" name="PrimaryKey">
+									<TableOccurrenceReference id="1065132" name="FAT Title"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="≥$clone_start_timestamp  ≤$clone_end_timestamp">
+								<FieldReference id="2" name="CreationTimestamp">
+									<TableOccurrenceReference id="1065498" name="FAT List item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="*">
+								<FieldReference id="8" name="Value 1">
+									<TableOccurrenceReference id="1065498" name="FAT List item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="==$modifier_type">
+								<FieldReference id="12" name="Value 1 type">
+									<TableOccurrenceReference id="1065526" name="List template"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3D027046ADF76EEC516A8365F13B72D2" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D191180C6D2B922A219B218E3E31733E" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BE7F99E03DDEBBA423C0A5CE2C30D7FB" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5C804260CE34A50BC4402051D4179332" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT List item::Value 1]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$old_item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="288E40476AED9C5C922ADF23B29C36DF" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[List template::Value 1 type]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$item_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="51DDDC9BBCAD389CBA98243C260EBE21" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B609B2712B6F419E1DE8662B54602F10" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="1118" name="Find original item"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty("old_item_id"; $old_item_id) & SetProperty("item_type"; $item_type) & SetProperty("title_id"; $title_id)]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0037D3072EDEB19E804635E56CA1352F" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(ScriptResult)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$new_item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="16D3AE8FEC776C695DEC537A5430ED3A" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E6361CF2BD27E12EDBA708CAB2232396" id="6" name="Go to Layout" enable="True">
+			<Options>10</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="322" name="TABLE FAT List item"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AF4896E0A5F43D2C6BFE409FFDAE8B13" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="8" name="Value 1">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065498" name="FAT List item"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$new_item_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="197E332C9623347A4C2AB7AA7B5A0926" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>8194</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="True"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F107D06117A523DA3E7A0C3807B99DD5" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="5164319959F2AE0C589DDA6B3DEF0621" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="EDB1754A010063BB915755BABA3C7482" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8D87614D0D96A6206286F1A541E52090" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="------------------- CHECK LINKS IN PAGE LIST ITEM VALUES -------------------------"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5601FA1F717271B599CEC1DA6E51BE9A" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8EAFBE2232C8C0384FC4643446223BDC" id="6" name="Go to Layout" enable="True">
+			<Options>10</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="135" name="TABLE FAT List item PI"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="816361AFBAB9DF375AD59365D9F93F70" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6F03084D740A0C5FB161FA2FFFF2003A" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find modifiervalues in title of type link, package id, chapter id or page id and is created in the time between start and stop cloning"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2783A528EF9394F70A04C719E843AB9B" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Link"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$modifier_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="67406E11FC79EEFECAB15A926A99437D" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="4" action="find">
+							<find criteria="$title_id">
+								<FieldReference id="9" name="PrimaryKey">
+									<TableOccurrenceReference id="1065132" name="FAT Title"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="≥$clone_start_timestamp  ≤$clone_end_timestamp">
+								<FieldReference id="2" name="CreationTimestamp">
+									<TableOccurrenceReference id="1065246" name="FAT List item @ Page item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="*">
+								<FieldReference id="8" name="Value 1">
+									<TableOccurrenceReference id="1065246" name="FAT List item @ Page item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="==$modifier_type">
+								<FieldReference id="12" name="Value 1 type">
+									<TableOccurrenceReference id="1065577" name="List template @ Page item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="05B255D961974DFCC3FFE4372E77011E" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Page item"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$modifier_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="86862D1949192173ED9B5C529B6CA1CA" id="127" name="Extend Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="4" action="find">
+							<find criteria="$title_id">
+								<FieldReference id="9" name="PrimaryKey">
+									<TableOccurrenceReference id="1065132" name="FAT Title"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="≥$clone_start_timestamp  ≤$clone_end_timestamp">
+								<FieldReference id="2" name="CreationTimestamp">
+									<TableOccurrenceReference id="1065246" name="FAT List item @ Page item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="*">
+								<FieldReference id="8" name="Value 1">
+									<TableOccurrenceReference id="1065246" name="FAT List item @ Page item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="==$modifier_type">
+								<FieldReference id="12" name="Value 1 type">
+									<TableOccurrenceReference id="1065577" name="List template @ Page item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="944B1EA29DCF7D89A932379FE2342D24" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Page friendly id"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$modifier_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A15984E441F94A46ABF86C3AB409E8E3" id="127" name="Extend Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="4" action="find">
+							<find criteria="$title_id">
+								<FieldReference id="9" name="PrimaryKey">
+									<TableOccurrenceReference id="1065132" name="FAT Title"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="≥$clone_start_timestamp  ≤$clone_end_timestamp">
+								<FieldReference id="2" name="CreationTimestamp">
+									<TableOccurrenceReference id="1065246" name="FAT List item @ Page item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="*">
+								<FieldReference id="8" name="Value 1">
+									<TableOccurrenceReference id="1065246" name="FAT List item @ Page item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="==$modifier_type">
+								<FieldReference id="12" name="Value 1 type">
+									<TableOccurrenceReference id="1065577" name="List template @ Page item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="505DB14D84C0DD796FA7EB9BA163E9D2" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="17030F11211ACDB7AE95848DA5589A96" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="43CBD0F4027314D80E9BB6236F93127A" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5B85EC589B91F96D08588B4CD1C83628" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT List item @ Page item::Value 1]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$old_item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="658EABAAC19B76FD87AFB945F02326AB" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[List template @ Page item::Value 1 type]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$item_type"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="33FDA20B06E8A54971C9C08228960DA8" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4280B3CE4D30DA6133DD420A8E48EE4A" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="1118" name="Find original item"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty("old_item_id"; $old_item_id) & SetProperty("item_type"; $item_type) & SetProperty("title_id"; $title_id)]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3A4709F4539BB741FC3E730950D5B8BF" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(ScriptResult)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$new_item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D879B2E1DD32C6C919E81E950420360F" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="11BD4DA893446172F59AB0542DADE54E" id="6" name="Go to Layout" enable="True">
+			<Options>10</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="135" name="TABLE FAT List item PI"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B56EE2A6FB78B216AD4F9CF2712238D1" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="8" name="Value 1">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065246" name="FAT List item @ Page item"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$new_item_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E95E8EDB1FAA57B76774DDE2B48A2EFA" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>8194</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="True"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5980FF6DCB1D4F3532EF3D6DBE64B8CB" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="3B6F1498BCD135E7FD8BD83256DCBCFD" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="7B2691F354DD03AD2B20B35C94634A9C" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="13D1EF8CBC3395649FA2411400D6186D" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

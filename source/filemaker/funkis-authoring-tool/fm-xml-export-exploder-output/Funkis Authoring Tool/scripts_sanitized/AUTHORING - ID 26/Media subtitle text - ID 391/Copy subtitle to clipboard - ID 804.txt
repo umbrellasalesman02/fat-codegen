@@ -1,0 +1,24 @@
+# Launched from a button in Media Subtitle Layout
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		Set Variable [ $text[1] ; $text & " " & Substitute ( FAT Text::Text  ; ¶ ; " " ) ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Set Field [ FAT Text::gSearchText ; $text ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Copy [ Select: ON ; FAT Text::gSearchText ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "Subtitles copied" ; Message: "All subtitles to this media is now successfully copied to your clipboard. " ; Default Button: "OK" ]
+Else
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "No subtitles found" ; Message: "Sorry, there's no subtitles found for this media. " ; Default Button: "OK" ]
+End If
+

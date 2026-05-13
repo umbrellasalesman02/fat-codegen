@@ -1,0 +1,32 @@
+# Managing duplicate names in dropdown menus for objects with validated name fields
+  such as IO, List, Tag, Links, Score - max 32 characters
+
+# Example:
+  SetProperty ( "source_textfield" ; GetFieldName ( FAT IO::Name ) ) &
+  SetProperty ( "new_name" ; $new_name ) &
+  SetProperty ( "max_characters" ; 32 )
+
+Set Variable [ $source_textfield[1] ; GetScriptProperty ( "source_textfield" ) ]
+Set Variable [ $new_name[1] ; GetScriptProperty ( "new_name" ) ]
+Set Variable [ $max_characters[1] ; GetAsNumber ( GetScriptProperty ( "max_characters" )) ]
+
+Set Variable [ $i[1] ; 0 ]
+
+Loop [ Flush: Always ]
+	Set Field By Name [ Specify target field: ON ; $source_textfield ; $new_name ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Exit Loop If [ Get(lastError) = 0 ]
+	Set Variable [ $i[1] ; $i+1 ]
+	Set Variable [ $new_name[1] ; Case ( 
+					
+					   Length ( $new_name )  ≥  $max_characters-Length($i) - 1;
+					          
+					   TruncateText ( $new_name ; $max_characters-Length($i) - 1 ) & "_" & $i;
+					    
+					    $new_name & "_" & $i
+					
+					
+					 ) ]
+End Loop
+
+

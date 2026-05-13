@@ -1,0 +1,74 @@
+# Called from a button in IO Card window AND in Link Card window
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+
+If [ $caller = "Link" ]
+	Set Variable [ $title_id[1] ; FAT Text variable @ Link::Title id ]
+	Set Variable [ $text_variable_id[1] ; FAT Text variable @ Link::PrimaryKey ]
+	Set Variable [ $text_variable_name[1] ; FAT Text variable @ Link::Name ]
+	Set Variable [ $text_variable_string[1] ; FAT Text variable @ Link::Friendly string ]
+	Perform Script [ From list ; "Save Rich Text" ]
+Else If [ $caller = "IO" ]
+	Set Variable [ $title_id[1] ; FAT Text variable @ IO::Title id ]
+	Set Variable [ $text_variable_id[1] ; FAT Text variable @ IO::PrimaryKey ]
+	Set Variable [ $text_variable_name[1] ; FAT Text variable @ IO::Name ]
+	Set Variable [ $text_variable_string[1] ; FAT Text variable @ IO::Friendly string ]
+Else If [ $caller = "IO_in_list" ]
+	Set Variable [ $title_id[1] ; FAT Text variable @ IO LI::Title id ]
+	Set Variable [ $text_variable_id[1] ; FAT Text variable @ IO LI::PrimaryKey ]
+	Set Variable [ $text_variable_name[1] ; FAT Text variable @ IO LI::Name ]
+	Set Variable [ $text_variable_string[1] ; FAT Text variable @ IO LI::Friendly string ]
+End If
+
+Set Variable [ $new_text_variable_name[1] ; $text_variable_name ]
+
+Show Custom Dialog [ Title: "Change name on text variable" ; Message: "Please give your text variable a new name. All occurences in the title will be changed." ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $new_text_variable_name ; Label 1: "New name" ]
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+Set Error Capture [ ON ]
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Field [ FAT Text variable::Name ; $new_text_variable_name ]
+Set Field [ FAT Text variable::Compound index name ; $title_id & PrettifyDash ($new_text_variable_name) ]
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ Get(lastError)  ≠ 0 ]
+	# Duplicate name
+	Set Field [ FAT Text variable::Name ; $text_variable_name ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Go to Object [ "TextVars" ; Repetition: 1 ]
+	Show Custom Dialog [ Title: "Text variable name must be unique" ; Default Button: "OK" ]
+	Exit Script []
+Else
+	Set Variable [ $new_text_variable_string[1] ; FAT Text variable::Friendly string ]
+	# Find and replace all occurences in FAT Text
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Loop [ Flush: Always ]
+			Set Field [ FAT Text::Text ; Substitute ( FAT Text::Text ; $text_variable_string; $new_text_variable_string) ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+	# Find and replace all occurences in Link URL text
+	Go to Layout [ Layout: "TABLE FAT Link Alt" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Loop [ Flush: Always ]
+			Set Field [ FAT Link Alt::URL String ; Substitute ( FAT Link Alt::URL String ; $text_variable_string; $new_text_variable_string) ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Go to Object [ "TextVars" ; Repetition: 1 ]
+	
+	If [ $caller = "link" ]
+		Perform Script [ From list ; "Init Link Rich Text Editor" ]
+	End If
+End If
+
+
+

@@ -1,0 +1,304 @@
+<Script>
+	<ScriptReference id="1094" name="Create Unique Container name"></ScriptReference>
+	<ObjectList membercount="27">
+		<Step hash="344727AD695B06CA8D1AFE27F657B320" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called on ScriptTrigger onSave on all FAT Container fields"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="418731043291A1E52B8E252AEC4D9670" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Create a unique filename when exporting"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="48AA0911FFAB74D9571677FE4332F79C" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="2024-05-24 THIS APPROACH WITH RENAMING FILENAMES INCLUDED BUGS&#13;Need to find another solution where unique filenmae is exported but stays the same in DB."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2068901AFBD7914D9DE754DA1ACF8954" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AAEC15072312C0792408551CD3DD5B43" id="75" name="Commit Records/Requests" enable="False">
+			<Options>128</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="Skip data entry validation" id="256" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Force Commit" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="442DF28C1F253D7615AF0CCBA492947D" id="141" name="Set Variable" enable="False">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(scriptParameter)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$media_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="827ED8C5E9DEFB152D521BF7CA15D549" id="89" name="# (comment)" enable="False">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7816C0E18C5DF96B6FF9093DE54E7CA5" id="79" name="Freeze Window" enable="False">
+		</Step>
+		<Step hash="9D0C4777A8C980B107EA9AB7B19C4FDD" id="86" name="Set Error Capture" enable="False">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="08D631A2E8F23209F560B6BF82A5D6F8" id="89" name="# (comment)" enable="False">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CF7B9F48D687FE165C71912D87617A7E" id="6" name="Go to Layout" enable="False">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="220" name="TABLE FAT Media"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4B7A33F343235CF3814E610C6379730C" id="28" name="Perform Find" enable="False">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$media_id">
+								<FieldReference id="1" name="PrimaryKey">
+									<TableOccurrenceReference id="1065311" name="FAT Media"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9FD09508142C7ED20EE47E3CA02AF275" id="89" name="# (comment)" enable="False">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="03BCEADACA2DBAED69B7F56E5E5CB788" id="68" name="If" enable="False">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastError) = 0 And Not PatternCount ( FAT Media::Container exported filename no extension ; FAT Media::PrimaryKey ) And Not IsEmpty ( FAT Media::Media container )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3A53B427E23ED7D5A037086E02F67934" id="141" name="Set Variable" enable="False">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Media::Container exported filename no extension]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$filename"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7B3FE8C647BB313F82495C53D0808C7E" id="141" name="Set Variable" enable="False">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Lower ( FAT Media::Container file extension )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$filename_extension"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1E3AF93A3173AD70E78641ADAE344B7D" id="141" name="Set Variable" enable="False">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[PrettifyDash ($filename & "-" & FAT Media::PrimaryKey) & "." &  $filename_extension]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$filename"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="650786172312E4EA6EB76A431ED3C564" id="76" name="Set Field" enable="False">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="9" name="Media container">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065311" name="FAT Media"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[Base64Decode(Base64Encode(FAT Media::Media container); $filename)]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D766B54E99E77035AB7080268E8A8DBF" id="68" name="If" enable="False">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastError) = 0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="50AA29ED16BAFA1C547F742DDFA90976" id="75" name="Commit Records/Requests" enable="False">
+			<Options>128</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="Skip data entry validation" id="256" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Force Commit" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="27289BD9731F29B3CC20ABDE1ECC3683" id="70" name="End If" enable="False">
+		</Step>
+		<Step hash="1AB9C50DDAE122BF682CB1B86AEF128D" id="70" name="End If" enable="False">
+		</Step>
+		<Step hash="7256C431AABB87C8393149FE75FB4754" id="89" name="# (comment)" enable="False">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DD15F586339488AA843119AD4760944B" id="6" name="Go to Layout" enable="False">
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="74489A2280F6C75A47F2A8463C546414" id="89" name="# (comment)" enable="False">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="310A9848A378EB3EE2020E74570F3E74" id="89" name="# (comment)" enable="False">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2ADE9498D3D93526AB8603889F863F37" id="89" name="# (comment)" enable="False">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

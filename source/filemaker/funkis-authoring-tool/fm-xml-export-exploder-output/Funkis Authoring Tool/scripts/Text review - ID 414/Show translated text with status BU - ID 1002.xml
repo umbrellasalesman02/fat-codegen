@@ -1,0 +1,467 @@
+<Script>
+	<ScriptReference id="1002" name="Show translated text with status BU"></ScriptReference>
+	<ObjectList membercount="36">
+		<Step hash="0B5FA8727DEA60E56E6CDB521072C91D" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script is called from the Text translation layout - filtering texts with different status"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="691D938F7C124DD40A769B257B8E4724" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4DE7D37219F747A0F16DDB21E8D3B134" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="2B00A916EBD150F6EE5ACA4C52A2EE93" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "status" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$status"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1295ECB7304688D37BB6A17B63CECEC4" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetAsNumber ( GetScriptProperty ( "num_of_texts" ))]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$num_of_texts"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FF3A2B6C3CAB929C81DB50897566BE06" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Text translated::gPackage]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$package_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="612CCB4AE3636F6B2D662AD5783D2A50" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="82E9E6FBCD29A025EEEDA9E17CFE7DE9" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$num_of_texts > 0 Or $status = "All"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FBFBB61307C5139CA82F89C1193797B6" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$status = "All"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AE1B16D73E734246C5996FB4889A844A" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$package_id = ""]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D75864378C2338A75CFBDCF5F9BC92AE" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Search all texts in Title"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B1EE159CECBA2B1A0186F7D3DFD5F3AD" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="2" action="find">
+							<find criteria="$$lp_id">
+								<FieldReference id="11" name="Title id">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$$localisation_code">
+								<FieldReference id="22" name="Localisation code">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BA0CCA5EA429B0AEA474DAD30401557F" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="384B5875BFA8295A5B082D5DF2AD3057" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Search show Package text including global texts, tags"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="60BD9616D4C365D2A7966559003F3884" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="2">
+						<FindRequest membercount="2" action="find">
+							<find criteria="$$lp_id">
+								<FieldReference id="11" name="Title id">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$$localisation_code">
+								<FieldReference id="22" name="Localisation code">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+						<FindRequest membercount="1" action="omit">
+							<find criteria="*">
+								<FieldReference id="48" name="Package id">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C1CA35BEA1E119873447C31C2235A500" id="127" name="Extend Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="2" action="find">
+							<find criteria="$$localisation_code">
+								<FieldReference id="22" name="Localisation code">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$package_id">
+								<FieldReference id="48" name="Package id">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7E0D40CE68D8D9F7124D0633EEBA7F8B" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="2BB798B5CAD70C9341D2067B3B1C2786" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="49DC42C9119038E27451877D31FB0834" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$package_id = ""]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7AB7E943F807709B4D189A20A22F1FE2" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="3" action="find">
+							<find criteria="$$lp_id">
+								<FieldReference id="11" name="Title id">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$status">
+								<FieldReference id="15" name="Status">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$$localisation_code">
+								<FieldReference id="22" name="Localisation code">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2BCE6F487C3502D1DA20C23ECD67A2D7" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="370E6C033C5AD305980156654D5082EC" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Search show Package text including global texts, tags"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3DDD90A1EBE70BC6DD45F2F6FCAF5074" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="2">
+						<FindRequest membercount="3" action="find">
+							<find criteria="$$lp_id">
+								<FieldReference id="11" name="Title id">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$status">
+								<FieldReference id="15" name="Status">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$$localisation_code">
+								<FieldReference id="22" name="Localisation code">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+						<FindRequest membercount="1" action="omit">
+							<find criteria="*">
+								<FieldReference id="48" name="Package id">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0ABA3D4585A4E435A02C60DDDD10E873" id="127" name="Extend Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="3" action="find">
+							<find criteria="$status">
+								<FieldReference id="15" name="Status">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$$localisation_code">
+								<FieldReference id="22" name="Localisation code">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$package_id">
+								<FieldReference id="48" name="Package id">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FED090BCB81196B4D6E64F8914EBD3CF" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="FB6CE7334B2C5F87AB72D101EDF1CEBB" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="FC41EFFD26077EE4E5602163E43392EB" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="44" name="gViewTranslationStatus">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$status]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6D805A608578EE22295DA8962A5B59BB" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Omit empty original records. Do this as a last step since it is a related field to improve performance"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9B6430497F1D26A4BCFEAD19A116A500" id="126" name="Constrain Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="omit">
+							<find criteria="=">
+								<FieldReference id="6" name="Text">
+									<TableOccurrenceReference id="1065140" name="FAT Text @ Translation"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Find without indexes" id="256" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="95C222DC471C250FF543F4B005D659CC" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Gives the user an opportunity to cancel the sorting if it takes time."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3F7A4248558709E9FBA32F6AAAE30917" id="80" name="Refresh Window" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="Boolean">
+					<Boolean type="Flush cached join results" id="256" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Flush cached external data" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D81CCFD626D8BB0C375B9F5B2F5B9671" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="33E0276A96F71E1E1297AE284D22A02C" id="39" name="Sort Records" enable="True">
+			<Options>33587328</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Restore">
+					<Restore value="True"></Restore>
+				</Parameter>
+				<Parameter type="SortSpecification">
+					<SortSpecification value="True" maintain="True">
+						<SortList membercount="2">
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="23" name="SortIndex">
+										<TableOccurrenceReference id="1065430" name="FAT Package @ Translation"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="40" name="RecordNumberReference">
+										<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+						</SortList>
+					</SortSpecification>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FC1A8106031C35D1A66740E2FB0C38DA" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="First" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="478810D35E11C665B2B1C39A3CEE21A1" id="17" name="Go to Field" enable="True">
+			<Options>1</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="Boolean">
+					<Boolean type="Select/perform" id="4096" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="6" name="Text">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="711DF56F7FCE81D844037C3D4FA68D62" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

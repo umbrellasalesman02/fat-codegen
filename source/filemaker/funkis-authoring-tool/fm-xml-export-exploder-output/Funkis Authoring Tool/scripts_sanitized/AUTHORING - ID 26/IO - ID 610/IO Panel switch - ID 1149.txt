@@ -1,0 +1,14 @@
+Set Variable [ $clickedTab[1] ; Get(TriggerTargetPanel) ]
+Set Variable [ $clickedTabName[1] ; GetValue ( $clickedTab ; 2 ) ]
+
+Set Field [ FAT IO::LastSettingTab ; $clickedTabName ]
+
+If [ $clickedTabName = "Settings" ]
+	# In this view we only want to view list of type multiple choice from dropdown
+	Set Field [ FAT Title::gListTemplate ; "BAF6DADF-7209-4916-BD32-980F27F248EA" // Multiple choice ]
+Else If [ $clickedTabName = "Insight" ]
+	# In this view we only want to view list of type multiple choice from dropdown
+	Set Field [ FAT Title::gListTemplate ; "86C0C3A5-ECEE-4BCC-93C8-ED40635609D9" // Aspect list template ]
+End If
+Commit Records/Requests [ With dialog: OFF ]
+

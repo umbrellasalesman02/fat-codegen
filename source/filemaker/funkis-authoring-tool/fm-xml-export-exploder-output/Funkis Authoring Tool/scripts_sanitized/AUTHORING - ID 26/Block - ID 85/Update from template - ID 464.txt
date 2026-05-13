@@ -1,0 +1,17 @@
+# Update current block based on blocktemplate - fields, attributes, statetoggles, global texts...
+# Adds attributeValues and stateToggleValues on all existing items using the modifier.
+Set Variable [ $symbolTemplate_id[1] ; FAT Block::BlockTemplate id ]
+Set Variable [ $symbol_id[1] ; FAT Block::PrimaryKey ]
+Set Variable [ $currentglobalTextList[1] ; TF BL Text::PrimaryKey ]
+Go to Related Record [ Table: BlockTemplate ; Layout: "TABLE BlockTemplate" ; Show related ]
+# Check if any stateToggle
+Set Variable [ $symbolTemplateGlobalTextList[1] ; TF BT Text::PrimaryKey ]
+If [ ValueCount ($symbolTemplateGlobalTextList) >0 ]
+	Set Variable [ $i[1] ; 0 ]
+	Loop [ Flush: Always ]
+		
+	End Loop
+End If
+
+Set Variable [ $AttributeTemplateList[1] ; ModifierTemplate @ BlockTemplate::PrimaryKey ]
+

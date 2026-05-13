@@ -1,0 +1,66 @@
+Set Variable [ $searchString[1] ; FAT Text::gSearchText ]
+Set Variable [ $replaceString[1] ; FAT Text::gReplaceText ]
+Set Variable [ $replaceMode[1] ; Get(scriptParameter) ]
+Go to Record/Request/Page [ First ]
+Go to Object [ "TextPortal" ; Repetition: 1 ]
+Go to Portal Row [ Select: OFF ; First ]
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ $replaceMode = "all" ]
+	Show Custom Dialog [ Title: "Replace text in title" ; Message: "Are you sure you want to replace \"" & $searchString & "\" with \"" & $replaceString & "\" in the whole title?" &  ¶ & ¶ & "Only text in the current found set will be changed.  This cannot be undone." ; Default Button: "OK" ; Button 2: "Cancel" ]
+	Freeze Window
+End If
+
+If [ Get(lastMessageChoice) = 1 Or $replaceMode = "chunk" ]
+	Set Variable [ $numOfChanges[1] ; 0 ]
+	Set Variable [ $numOfFields[1] ; 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $numOfFields[1] ; $numOfFields + 1 ]
+		If [ FAT Title::gViewTranslatedLanguage ]
+			Set Variable [ $numOfChanges[1] ; $numOfChanges + PatternCount ( FAT Text translated::Text ; $searchString) ]
+			# May look overcomplicated but this approach works.
+			Set Variable [ $newText[1] ; Let ( 
+							[
+							
+							txt = FAT Text translated::Text;
+							newtext = FM_ReplaceWithCase ( txt ; $searchString ; $replaceString )
+							
+							
+							
+							];
+							
+							  
+							newtext
+							
+							 ) ]
+			Set Field [ FAT Text translated::Text ; $newText ]
+		Else
+			Set Variable [ $numOfChanges[1] ; $numOfChanges + PatternCount ( FAT Text::Text ; $searchString) ]
+			# May look overcomplicated but this approach works.
+			Set Variable [ $newText[1] ; Let ( 
+							[
+							
+							txt = FAT Text::Text;
+							newtext = FM_ReplaceWithCase ( txt ; $searchString ; $replaceString )
+							
+							
+							
+							];
+							
+							  
+							newtext
+							
+							 ) ]
+			Set Field [ FAT Text::Text ; $newText ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		If [ $replaceMode = "chunk" ]
+			Exit Script []
+		End If
+	End Loop
+	Go to Record/Request/Page [ First ]
+	Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+	// Set Field [ FAT Text::gReplaceText ; "" ]
+	Show Custom Dialog [ Title: "Replace text completed" ; Message: "Changed from \"" & $searchString & "\" to \"" & $replaceString & "\" in " & $numOfChanges & " occurences in " & $numOfFields & " different text fields." ; Default Button: "OK" ]
+End If
+

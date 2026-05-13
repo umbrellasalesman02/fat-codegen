@@ -1,0 +1,89 @@
+# Called from loop in Export Data MASTER - once for each file
+# Export Data MASTER loop sequence = 
+  1. Create data file
+  2. Get destination path
+  3. Save file
+
+Set Variable [ $exportDB[1] ; GetScriptProperty( "exportDB" ) ]
+Set Variable [ $exportMode[1] ; GetScriptProperty( "exportMode" ) ]
+Set Variable [ $exportDestination[1] ; GetScriptProperty( "exportDestination" ) ]
+Set Variable [ $destinationRootpath[1] ; GetScriptProperty( "destinationRootpath" ) ]
+Set Variable [ $localisationCode[1] ; GetScriptProperty( "localisationCode" ) ]
+
+# Should be changed to "fat_" when the baseproject approves that.
+Set Variable [ $filePrefix[1] ; "cmt_" ]
+
+If [ $exportDB = "Page" ]
+	Set Variable [ $dataFileName[1] ; $filePrefix & FilterC(Lower (Substitute ( $exportDB ; " " ; "-" )); "az09-") & ".json" ]
+	Set Variable [ $filePath[1] ; "content/json/" ]
+Else If [ $exportDB = "Page item" ]
+	Set Variable [ $dataFileName[1] ; $filePrefix & FilterC(Lower (Substitute ( $exportDB ; " " ; "-" )); "az09-") & ".json" ]
+	Set Variable [ $filePath[1] ; "content/json/" ]
+Else If [ PatternCount ($exportDB; "Text") ]
+	Set Variable [ $localisationCode[1] ; Case ( PatternCount ( RightWords ( $exportDB ; 2 ) ; "Text") ; 
+					
+					RightWords ( $exportDB ; 1 );
+					
+					RightWords ( $exportDB ; 2 )
+					
+					) ]
+	Set Variable [ $dataFileName[1] ; "cmt_text_" & $localisationCode & ".json" ]
+	If [ $exportMode = "Translation files" ]
+		Set Variable [ $filePath[1] ; $localisationCode & "/" ]
+	Else
+		Set Variable [ $filePath[1] ; "content/language/" & $localisationCode & "/" ]
+	End If
+Else If [ PatternCount ($exportDB; "Subtitle FFSub") ]
+	Set Variable [ $localisationCode[1] ; Case ( PatternCount ( RightWords ( $exportDB ; 2 ) ; "Subtitle FFSub") ; 
+					
+					RightWords ( $exportDB ; 1 );
+					
+					RightWords ( $exportDB ; 2 )
+					
+					) ]
+	Set Variable [ $dataFileName[1] ; "cmt_subtitles_" & $localisationCode & ".json" ]
+	If [ $exportMode = "Translation files" ]
+		Set Variable [ $filePath[1] ; $localisationCode & "/" ]
+	Else
+		Set Variable [ $filePath[1] ; "content/language/" & $localisationCode & "/" ]
+	End If
+Else If [ PatternCount ($exportDB; "Subtitle VTT") ]
+	Set Variable [ $localisationCode[1] ; Case ( PatternCount ( RightWords ( $exportDB ; 2 ) ; "Subtitle VTT") ; 
+					
+					Trim (RightWords ( $exportDB ; 1 ));
+					
+					Trim (RightWords ( $exportDB ; 2 ))
+					
+					) ]
+	# It exist two possible paths for VTT - one for not localised video and one for video in local language
+	# Which path to use is handled by Save file
+	Set Variable [ $filePath[1] ; "content/videos/" ]
+	Set Variable [ $filePath_VTTLocalisedMedia[1] ; "content/language/" & $localisationCode & "/videos/" ]
+	If [ $exportDestination = "Remote" Or $exportMode = "Translation files" ]
+		Set Variable [ $fullFilePath_VTTLocalisedMedia[1] ; $destinationRootpath & $filePath_VTTLocalisedMedia & $dataFileName ]
+	Else If [ $exportDestination = "Local" ]
+		Set Variable [ $fullFilePath_VTTLocalisedMedia[1] ; $destinationRootpath & "public/" & $filePath_VTTLocalisedMedia & $dataFileName ]
+	End If
+	
+Else If [ $exportDB = "Tag" Or $exportDB = "Link" Or $exportDB = "Txt variable" Or $exportDB = "Block" Or $exportDB = "Score category" Or $exportDB = "Score reward" ]
+	Set Variable [ $dataFileName[1] ; $filePrefix & FilterC(Lower (Substitute ( $exportDB ; " " ; "-" )); "az09-") & ".json" ]
+	Set Variable [ $filePath[1] ; "content/json/" ]
+Else If [ $exportDB = "Package list" ]
+	Set Variable [ $dataFileName[1] ; $filePrefix & FilterC(Lower (Substitute ( $exportDB ; " " ; "-" )); "az09-") & ".json" ]
+	Set Variable [ $filePath[1] ; "content/json/" ]
+Else If [ $exportDB = "Theme" ]
+	Set Variable [ $dataFileName[1] ; $filePrefix & FilterC(Lower (Substitute ( $exportDB ; " " ; "-" )); "az09-") & ".json" ]
+	Set Variable [ $filePath[1] ; "content/theme/" ]
+End If
+
+If [ $exportDestination = "Remote" Or $exportMode = "Translation files" ]
+	Set Variable [ $fullFilePath[1] ; $destinationRootpath & $filePath & $dataFileName ]
+Else If [ $exportDestination = "Local" ]
+	Set Variable [ $fullFilePath[1] ; $destinationRootpath & "public/" & $filePath & $dataFileName ]
+End If
+
+Exit Script [ SetProperty ( "fullFilePath" ; $fullFilePath ) &
+				SetProperty ( "fullFilePath_VTTLocalisedMedia" ; $fullFilePath_VTTLocalisedMedia ) ]
+
+
+

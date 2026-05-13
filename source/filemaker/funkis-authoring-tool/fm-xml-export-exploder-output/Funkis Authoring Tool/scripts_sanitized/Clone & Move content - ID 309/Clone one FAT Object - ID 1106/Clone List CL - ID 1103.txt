@@ -1,0 +1,26 @@
+# This script is called from the List Card interface when duplicating the current List
+
+Set Variable [ $old_list_id[1] ; FAT List::PrimaryKey ]
+Set Variable [ $isClonedTitle[1] ; False ]
+Set Variable [ $clone_level[1] ; "list" ]
+
+Set Variable [ $old_tt_id[1] ; "" ]
+# new_tt_id gets the current Title id if not explicitly set
+Set Variable [ $title_id[1] ; FAT List::Title id ]
+# Suffix is only needed when duplicating inside a Title
+Set Variable [ $suffix[1] ; "COPY" ]
+
+Perform Script [ From list ; "Clone List SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+				SetProperty ( "clone_level" ; $clone_level ) &
+				SetProperty ( "clone_settings" ; $clone_settings ) &
+				SetProperty ( "old_tt_id" ; $old_tt_id ) &
+				SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "suffix" ; $suffix ) &
+				SetProperty ( "old_list_id" ; $old_list_id ) ]
+// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+

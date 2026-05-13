@@ -1,0 +1,470 @@
+# This script exports all texts in a Title in a contextual order
+# Called from script Export texts to doc
+// Set Variable [ $html[1] ; "<!DOCTYPE html>
+				<html>
+				<body>
+				
+				<h1>My First Heading</h1>
+				<p>My first paragraph.</p>
+				
+				</body>
+				</html>" ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty ( "localisation_code" ) ]
+
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ IsEmpty($package_id) ]
+	Show Custom Dialog [ Title: "Export as text" ; Message: "All texts in title " & FAT Title::Reference title  & " will be exported to a Word document (HTML) on your desktop. Convert to a proper Word document by open it in Word and save in docx-format." ; Default Button: "OK" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice) = 2 ]
+		Exit Script []
+	End If
+	Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+Else
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Show Custom Dialog [ Title: "Export as text" ; Message: "All texts in package " & FAT Title::Reference title & " - " & FAT Package::Reference name & " will be exported to a Word document (HTML) on your desktop. " ; Default Button: "OK" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice) = 2 ]
+		Exit Script []
+	End If
+End If
+
+Set Error Capture [ ON ]
+
+Set Variable [ $ti_color[1] ; "#B2E0F0" ]
+Set Variable [ $pk_color[1] ; "#D5C1F2" ]
+Set Variable [ $ch_color[1] ; "#FF9B25" ]
+Set Variable [ $pg_color[1] ; "#A3DF2C" ]
+Set Variable [ $pi_color[1] ; "#FFACEB" ]
+
+Set Variable [ $localisation_code[1] ; Case ( IsEmpty($localisation_code); FAT Title::Original localisation code ; $localisation_code) ]
+Set Variable [ $localised_version[1] ; Case($localisation_code = FAT Title::Original localisation code; False; True) ]
+
+If [ $localised_version ]
+	Set Field [ FAT Title::gCurrentLocalisationCode ; $localisation_code ]
+	Commit Records/Requests [ With dialog: OFF ]
+End If
+
+Set Variable [ $html[1] ; "<!DOCTYPE html>
+				<html>
+				<head>
+				<meta charset=\"UTF-8\">
+				</head>
+				
+				<body style=\"font-family: 'Arial'\">" ]
+
+
+Set Variable [ $html[1] ; $html & "<p style=\"font-size:10px;color=grey\">" & "<em>Funkis Authoring Tool  © Funkis Multimedia AB " & $$currentyear & "</em><br>Title: " & FAT Title::Reference title & ", Client: " & FAT Title::Client name & ", Date: " & Get(currentDate) & ", Original localisation code: " & FAT Title::Original localisation code & "</p>" ]
+
+Set Variable [ $html[1] ; $html &  "<h1 style=\"border-bottom: 8px solid " & $ti_color & "\">" & Upper ( FAT Title::Reference title )  & "</h1>" & ¶ & "<br><br><br><br>" ]
+
+Loop [ Flush: Always ]
+	# Package
+	If [ Not $localised_version ]
+		Set Variable [ $html[1] ; $html &  "<section><h1 style=\"border-bottom: 5px solid " & $pk_color & "\">" & Upper ( TF PK Header::Text )  & "</h1>" & ¶ & 
+						
+						         TF PK Sub header 1::Text & "<br><br>" ]
+	Else
+		Set Variable [ $html[1] ; $html &  "<section><h1 style=\"border-bottom: 5px solid " & $pk_color & "\">" & Upper ( TF PK Header TRANS::Text )  & "</h1>" & ¶ & 
+						
+						         TF PK Sub header 1 TRANS::Text & "<br><br>" ]
+	End If
+	Set Variable [ $pk_id[1] ; FAT Package::PrimaryKey ]
+	# Find all chapters with the package as a parent
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+		Go to Record/Request/Page [ First ]
+		Set Variable [ $chapter_num[1] ; 0 ]
+		Loop [ Flush: Always ]
+			Set Variable [ $chapter_id[1] ; FAT Chapter::PrimaryKey ]
+			Set Variable [ $chapter_num[1] ; $chapter_num + 1 ]
+			If [ IsEmpty (FAT Chapter::Proxy type) ]
+				# Not a proxy
+				If [ Not $localised_version ]
+					Set Variable [ $html[1] ; $html & "<h1 style=\"border-bottom: 4px solid " & $ch_color & "\">" & $chapter_num & " " & TF CH Header::Text & "</h1>" & ¶ & TF CH Sub header::Text & ¶ & ¶ ]
+				Else
+					Set Variable [ $html[1] ; $html & "<h1 style=\"border-bottom: 4px solid " & $ch_color & "\">" & $chapter_num & " " & TF CH Header TRANS::Text & "</h1>" & ¶ & TF CH Sub header TRANS::Text & ¶ & ¶ ]
+				End If
+			End If
+			# Find all pages with the chapter as a parent
+			Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)>0 ]
+				Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+				Go to Record/Request/Page [ First ]
+				Set Variable [ $page_num[1] ; 0 ]
+				Loop [ Flush: Always ]
+					Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+					Set Variable [ $page_num[1] ; $page_num + 1 ]
+					If [ IsEmpty (FAT Page::Proxy type) ]
+						If [ Not $localised_version ]
+							Set Variable [ $html[1] ; $html & "<h2 style=\"border-bottom: 4px solid " & $pg_color & "\">" & $chapter_num & "." & $page_num & " "  & TF PG Header::Text & "</h2>" & ¶ & TF PG Sub header 1::Text & "<br><br>" ]
+						Else
+							Set Variable [ $html[1] ; $html & "<h2 style=\"border-bottom: 4px solid " & $pg_color & "\">" & $chapter_num & "." & $page_num & " "  & TF PG Header TRANS::Text & "</h2>" & ¶ & TF PG Sub header 1 TRANS::Text & "<br><br>" ]
+						End If
+					End If
+					# Find all page_items with the page as a parent
+					Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+					Perform Find [ ⚠️ RESTORE ⚠️ ]
+					If [ Get(foundCount)>0 ]
+						Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+						Go to Record/Request/Page [ First ]
+						Set Variable [ $pageitem_num[1] ; 0 ]
+						Loop [ Flush: Always ]
+							Set Variable [ $pageitem_id[1] ; FAT Page item::PrimaryKey ]
+							Set Variable [ $pageitem_num[1] ; $pageitem_num + 1 ]
+							
+							# Force update of field DisplayText
+							Set Field [ FAT Page item::ModificationTimestamp ; Get(currentHostTimeStamp) ]
+							Commit Records/Requests [ With dialog: OFF ]
+							
+							If [ Not $localised_version ]
+								Set Variable [ $html[1] ; Let ( 
+												[
+												
+												    order_num = Case ( IsEmpty ( FAT Page::Proxy type ) ; $chapter_num & "." & $page_num & "." & $pageitem_num ; $chapter_num & "." & $page_num);
+												    txt0 = "<h3 id=\"" & $pageitem_id  & "\" style=\"border-bottom: 4px solid " & $pi_color & "\">" & order_num & " " & FAT Page item::DisplayText & "<a style=\"text-decoration: none; color: white;\" href=\"fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenPageItem&param=" & $pageitem_id &  "\">   </a>" & "</h3>" & ¶;
+												    txt1  = Case ( TF PI Text 1::Text= "" ; ""; PatternCount ( TF PI Text 1::Text ; "<p>" ); TF PI Text 1::Text; TF PI Text 1::Text & "<br>");
+												    txt2  = Case ( TF PI Text 2::Text= "" ; ""; PatternCount ( TF PI Text 2::Text ; "<p>" ); TF PI Text 2::Text; TF PI Text 2::Text & "<br>");
+												    txt3  = Case ( TF PI Text 3::Text= "" ; ""; PatternCount ( TF PI Text 3::Text ; "<p>" ); TF PI Text 3::Text; TF PI Text 3::Text & "<br>");
+												    txt4  = Case ( TF PI Text 4::Text= "" ; ""; PatternCount ( TF PI Text 4::Text ; "<p>" ); TF PI Text 4::Text; TF PI Text 4::Text & "<br>");
+												    txt5  = Case ( TF PI Text 5::Text= "" ; ""; PatternCount ( TF PI Text 5::Text ; "<p>" ); TF PI Text 5::Text; TF PI Text 5::Text & "<br>");
+												    txt6  = Case ( TF PI Text 6::Text= "" ; ""; PatternCount ( TF PI Text 6::Text ; "<p>" ); TF PI Text 6::Text; TF PI Text 6::Text & "<br>");
+												    txt7  = Case ( TF PI Text 7::Text= "" ; ""; PatternCount ( TF PI Text 7::Text ; "<p>" ); TF PI Text 7::Text; TF PI Text 7::Text & "<br>")
+												
+												
+												
+												
+												];
+												
+												$html & txt0 & txt1 & txt2 & txt3 & txt4 & txt5 & txt6 & txt7  & "<br>"
+												
+												
+												 ) ]
+							Else
+								Set Variable [ $html[1] ; Let ( 
+												[
+												    order_num = Case ( IsEmpty ( FAT Page::Proxy type ) ; $chapter_num & "." & $page_num & "." & $pageitem_num ; $chapter_num & "." & $page_num);
+												    txt0 = "<h3 id=\"" & $pageitem_id  & "\" style=\"border-bottom: 4px solid " & $pi_color & "\">" & order_num & " " & FAT Page item::DisplayText & "<a style=\"text-decoration: none; color: white;\" href=\"fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenPageItem&param=" & $pageitem_id &  "\">   </a>" & "</h3>" & ¶;
+												    txt1  = Case ( TF PI Text 1 TRANS::Text= "" ; ""; PatternCount ( TF PI Text 1 TRANS::Text ; "<p>" ); TF PI Text 1 TRANS::Text; TF PI Text 1 TRANS::Text & "<br>");
+												    txt2  = Case ( TF PI Text 2 TRANS::Text= "" ; ""; PatternCount ( TF PI Text 2 TRANS::Text ; "<p>" ); TF PI Text 2 TRANS::Text; TF PI Text 2 TRANS::Text & "<br>");
+												    txt3  = Case ( TF PI Text 3 TRANS::Text= "" ; ""; PatternCount ( TF PI Text 3 TRANS::Text ; "<p>" ); TF PI Text 3 TRANS::Text; TF PI Text 3 TRANS::Text & "<br>");
+												    txt4  = Case ( TF PI Text 4 TRANS::Text= "" ; ""; PatternCount ( TF PI Text 4 TRANS::Text ; "<p>" ); TF PI Text 4 TRANS::Text; TF PI Text 4 TRANS::Text & "<br>");
+												    txt5  = Case ( TF PI Text 5 TRANS::Text= "" ; ""; PatternCount ( TF PI Text 5 TRANS::Text ; "<p>" ); TF PI Text 5 TRANS::Text; TF PI Text 5 TRANS::Text & "<br>");
+												    txt6  = Case ( TF PI Text 6 TRANS::Text= "" ; ""; PatternCount ( TF PI Text 6 TRANS::Text ; "<p>" ); TF PI Text 6 TRANS::Text; TF PI Text 6 TRANS::Text & "<br>");
+												    txt7  = Case ( TF PI Text 7 TRANS::Text= "" ; ""; PatternCount ( TF PI Text 7 TRANS::Text ; "<p>" ); TF PI Text 7 TRANS::Text; TF PI Text 7 TRANS::Text & "<br>")
+												
+												
+												
+												
+												];
+												
+												$html & txt0 & txt1 & txt2 & txt3 & txt4 & txt5 & txt6 & txt7  & "<br>"
+												
+												
+												 ) ]
+							End If
+							
+							# Video / Audio subtitles
+							If [ SubtitleMedia ( Media PI 1::Container file extension ) ]
+								Set Variable [ $media_id[1] ; FAT Page item::Media 1 id ]
+								Set Variable [ $media_filename[1] ; Media PI 1::Container original filename ]
+								Perform Script [ From list ; "Get Export text subtitle media" ; Parameter: SetProperty("media_id"; $media_id) &
+												SetProperty ( "media_filename" ; $media_filename ) &
+												SetProperty ( "localisation_code" ; $localisation_code ) ]
+								Set Variable [ $html[1] ; $html & Get(ScriptResult) ]
+								Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+							End If
+							
+							# Page item List
+							If [ FAT Block @ Page item::Page item List enabled = 1 ]
+								Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+								Perform Find [ ⚠️ RESTORE ⚠️ ]
+								If [ Get(foundCount)>0 ]
+									Set Variable [ $html[1] ; $html & "<b>" & FAT Block @ Page item::Label override List header & "</b><br>" ]
+									Loop [ Flush: Always ]
+										If [ Not $localised_version ]
+											Set Variable [ $html[1] ; Let ( 
+															[
+															    txt1  = Case ( TF LI PI 1::Text= "" ; ""; "<em>" & FAT Block @ Page item::Label override List Text 1 & "</em>: " & TF LI PI 1::Text & "   ");
+															    txt2  = Case ( TF LI PI 2::Text= "" ; ""; "<em>" & FAT Block @ Page item::Label override List Text 2 & "</em>: " & TF LI PI 2::Text & "   ");
+															    txt3  = Case ( TF LI PI 3::Text= "" ; ""; "<em>" & FAT Block @ Page item::Label override List Text 3 & "</em>: " & TF LI PI 3::Text & "   ")
+															
+															
+															
+															
+															
+															];
+															
+															$html & txt1 & txt2 & txt3  & "<br><br>"
+															
+															
+															 ) ]
+										Else
+											Set Variable [ $html[1] ; Let ( 
+															[
+															    txt1  = Case ( TF LI PI 1 TRANS::Text= "" ; ""; "<em>" & FAT Block @ Page item::Label override List Text 1 & "</em>: " & TF LI PI 1 TRANS::Text & "   ");
+															    txt2  = Case ( TF LI PI 2 TRANS::Text= "" ; ""; "<em>" & FAT Block @ Page item::Label override List Text 2 & "</em>: " & TF LI PI 2 TRANS::Text & "   ");
+															    txt3  = Case ( TF LI PI 3 TRANS::Text= "" ; ""; "<em>" & FAT Block @ Page item::Label override List Text 3 & "</em>: " & TF LI PI 3 TRANS::Text & "   ")
+															
+															
+															
+															
+															
+															];
+															
+															$html & txt1 & txt2 & txt3  & "<br><br>"
+															
+															
+															 ) ]
+										End If
+										# If list item contais video with subtitle
+										If [ SubtitleMedia ( Media LI PI 1::Container file extension ) ]
+											Set Variable [ $media_id[1] ; FAT List item @ Page item::Media 1 id ]
+											Set Variable [ $media_filename[1] ; Media LI PI 1::Container original filename ]
+											Perform Script [ From list ; "Get Export text subtitle media" ; Parameter: SetProperty("media_id"; $media_id) &
+															SetProperty ( "media_filename" ; $media_filename ) &
+															SetProperty ( "localisation_code" ; $localisation_code ) ]
+											Set Variable [ $html[1] ; $html & Get(ScriptResult) ]
+										End If
+										Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+										Go to Record/Request/Page [ Next ; Exit after last: ON ]
+									End Loop
+								End If
+								Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+							End If
+							
+							# List
+							If [ Not IsEmpty (FAT Page item::List id) ]
+								Set Variable [ $list_id[1] ; FAT Page item::List id ]
+								Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+								Perform Find [ ⚠️ RESTORE ⚠️ ]
+								If [ Get(foundCount)>0 ]
+									Set Variable [ $html[1] ; $html & "<b>" & FAT List::Name & " (" & List template::Name & ", Title list)</b><br>" ]
+									Loop [ Flush: Always ]
+										If [ Not $localised_version ]
+											// Set Variable [ $html[1] ; While ( 
+															
+															  [ 
+															    listitem = List(FAT List item::PrimaryKey );
+															    listitem1_l = List ( TF LI 1::Text ) ;
+															    listitem2_l = List ( TF LI 2::Text ) ;
+															    listitem3_l = List ( TF LI 3::Text ) ;
+															    label1 = "<em>" & List template::Text Label 1 & "</em>: ";
+															    label2 = "<em>" & List template::Text Label 2 & "</em>: ";
+															    label3 = "<em>" & List template::Text Label 3 & "</em>: ";
+															    label_row = label1 & " | " & label2 & " | " & label3;
+															    i = 0;
+															    str = ""
+															   ]; 
+															
+															    i < ValueCount ( listitem ) ; 
+															
+															    [
+															      i = i + 1;
+															      listitem_str = GetValue ( listitem1_l ; i ) & " | " & GetValue ( listitem2_l ; i ) & " | " & GetValue ( listitem3_l ; i );
+															      str = str & Case ( i < ValueCount ( listitem ) ; 
+															                         listitem_str & "<br>¶"; 
+															                         listitem_str
+															                        )
+															     ] ; 
+															
+															      $html & Case ( IsEmpty ( listitem ); ""; label_row & "<br>" & "¶" & str & "<br><br>" & "¶¶")
+															
+															) ]
+											Set Variable [ $html[1] ; Let ( 
+															[
+															    txt1  = Case ( TF LI 1::Text= "" ; ""; "<em>" & List template::Text Label 1 & "</em>: " & TF LI 1::Text & "   ");
+															    txt2  = Case ( TF LI 2::Text= "" ; ""; "<em>" & List template::Text Label 2 & "</em>: " & TF LI 2::Text & "   ");
+															    txt3  = Case ( TF LI 3::Text= "" ; ""; "<em>" & List template::Text Label 3 & "</em>: " & TF LI 3::Text & "   ")
+															
+															
+															
+															
+															
+															];
+															
+															$html & txt1 & txt2 & txt3  & "<br><br>"
+															
+															
+															 ) ]
+										Else
+											Set Variable [ $html[1] ; Let ( 
+															[
+															    txt1  = Case ( TF LI 1 TRANS::Text= "" ; ""; "<em>" & List template::Text Label 1 & "</em>: " & TF LI 1 TRANS::Text & "   ");
+															    txt2  = Case ( TF LI 2 TRANS::Text= "" ; ""; "<em>" & List template::Text Label 2 & "</em>: " & TF LI 2 TRANS::Text & "   ");
+															    txt3  = Case ( TF LI 3 TRANS::Text= "" ; ""; "<em>" & List template::Text Label 3 & "</em>: " & TF LI 3 TRANS::Text & "   ")
+															
+															
+															
+															
+															
+															];
+															
+															$html & txt1 & txt2 & txt3  & "<br><br>"
+															
+															
+															 ) ]
+										End If
+										# If list item contais video with subtitle
+										If [ SubtitleMedia ( Media LI PI 1::Container file extension ) ]
+											Set Variable [ $media_id[1] ; FAT List item @ Page item::Media 1 id ]
+											Set Variable [ $media_filename[1] ; Media LI PI 1::Container original filename ]
+											Perform Script [ From list ; "Get Export text subtitle media" ; Parameter: SetProperty("media_id"; $media_id) &
+															SetProperty ( "media_filename" ; $media_filename ) &
+															SetProperty ( "localisation_code" ; $localisation_code ) ]
+											Set Variable [ $html[1] ; $html & Get(ScriptResult) ]
+										End If
+										Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+										Go to Record/Request/Page [ Next ; Exit after last: ON ]
+									End Loop
+								End If
+								Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+							End If
+							
+							# SprigStory
+							If [ PatternCount ( FAT Block @ Page item::Name; "sprig") ]
+								Set Variable [ $parent_id[1] ; FAT Page item::PrimaryKey ]
+								Set Variable [ $source_item_type[1] ; "io-sprig-story" ]
+								Set Variable [ $sprigstory_name[1] ; TF PI Text 1::Text ]
+								Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+								Perform Find [ ⚠️ RESTORE ⚠️ ]
+								Go to Record/Request/Page [ First ]
+								If [ Get(foundCount)>0 ]
+									Set Variable [ $html[1] ; $html & "<p style=\"font-size:10px\">" & $sprigstory_name & " - Sprig story. <br><em>Please note, texts in a sprig story will appear in strange orders which is the nature of a branched narrative.</em)</p>" ]
+									Set Variable [ $sprigstory_text[1] ; "" ]
+									Loop [ Flush: Always ]
+										Set Variable [ $sprigstory_text[1] ; $sprigstory_text & FAT Text::Text & "<br><br>" ]
+										Go to Record/Request/Page [ Next ; Exit after last: ON ]
+									End Loop
+									Set Variable [ $html[1] ; $html  & "<em>" & $sprigstory_text & "</em><br><br>" ]
+								End If
+								
+								# Video sprigstory subtitles
+								Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+								Perform Find [ ⚠️ RESTORE ⚠️ ]
+								Loop [ Flush: Always ]
+									If [ SubtitleMedia ( FAT Media::Container file extension ) ]
+										Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+										Set Variable [ $media_filename[1] ; FAT Media::Container original filename ]
+										Perform Script [ From list ; "Get Export text subtitle media" ; Parameter: SetProperty("media_id"; $media_id) &
+														SetProperty ( "media_filename" ; $media_filename ) &
+														SetProperty ( "localisation_code" ; $localisation_code ) ]
+										Set Variable [ $html[1] ; $html & Get(ScriptResult) ]
+									End If
+									Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+									Go to Record/Request/Page [ Next ; Exit after last: ON ]
+								End Loop
+							End If
+							
+							Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+							If [ Not IsEmpty ( FAT IO @ Page item::PrimaryKey ) ]
+								Set Variable [ $html[1] ; While ( 
+												
+												  [ 
+												    name_l = List ( FAT IO @ Page item::Name ) ;
+												    type_l = List ( FAT IO @ Page item::IO type );
+												    i = 0;
+												    str = ""
+												   ]; 
+												
+												    i < ValueCount ( name_l ) ; 
+												
+												    [
+												      i = i + 1;
+												      name_str = GetValue ( name_l ; i );
+												      type_str = GetValue ( type_l ; i );
+												      str = str & Case ( i < ValueCount ( name_l ) ; 
+												                         name_str & " - " & type_str & ", "; 
+												                         name_str & " - " & type_str 
+												                        )
+												     ] ; 
+												
+												      $html & Case ( IsEmpty ( FAT IO @ Page item::PrimaryKey ); ""; "<b>IOs connected: </b>" & str & "<br><br>" & "¶¶")
+												
+												) ]
+							End If
+							Go to Record/Request/Page [ Next ; Exit after last: ON ]
+						End Loop
+					End If
+					Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+					Go to Record/Request/Page [ Next ; Exit after last: ON ]
+				End Loop
+			End If
+			Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+	Set Variable [ $html[1] ; $html & "<br><br>br><br><br><br></section>" ]
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+# Add a table of all IOs in the Title - Perfect for AI prompting
+Set Variable [ $html[1] ; $html &  "<section><h1 style=\"border-bottom: 5px solid " & $pk_color & "\">" & "IO Overview"  & "</h1>" & ¶ & 
+				
+				         "This section is for Insight generation only" & "<br><br>"  & ¶ & ¶ ]
+Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Set Variable [ $html[1] ; $html &  "<table border=\"1\" cellpadding=\"4\" cellspacing=\"0\" width=\"100%\" style=\"font-family: Arial; font-size: 12pt;\">
+					  <tr>
+					    <th align=\"left\">Name</th>
+					    <th align=\"left\">Description</th>
+					    <th align=\"left\">Type</th>
+					  </tr>"  & ¶ & ¶ ]
+	Loop [ Flush: Always ]
+		Set Variable [ $html[1] ; $html &  "<tr>
+						  <td><b>" & FAT IO::Name & "</b></td>
+						  <td>" & FAT IO::Author description & " - " & FAT IO::Insight description & "</td>
+						  <td>" & FAT IO::IO type & "</td>
+						</tr>" ]
+		If [ FAT IO::Number of fields > 0 ]
+			Go to Related Record [ Table: FAT IO Field @ IO ; Layout: "TABLE FAT IO Field" ; Show related ]
+			Set Variable [ $html[1] ; $html &  "<tr>
+							    <td colspan=\"3\">
+							
+							      <table border=\"1\" cellpadding=\"3\" cellspacing=\"0\" width=\"95%\" align=\"center\" style=\"font-family: Arial; font-size: 10pt;\">" & ¶ & ¶ &
+							
+							      "<tr>
+							          <th align=\"left\">Field name</th>
+							          <th align=\"left\">Field type</th>
+							          <th align=\"left\">List</th>
+							        </tr>" & ¶ & ¶ ]
+			Loop [ Flush: Always ]
+				Set Variable [ $html[1] ; $html &  "<tr>
+								  <td><b>" & FAT IO Field::Name & "</b></td>
+								  <td>" & IO Field Type::Name & " - " & IO Field Type::Value type & "</td>
+								  <td>" & FAT IO Field::List name & "</td>
+								</tr>" & ¶ & ¶ ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+			Set Variable [ $html[1] ; $html &  "</table>" & "¶¶" & "</td>" & "¶¶" & "</tr>" ]
+			Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Set Variable [ $html[1] ; $html &  "</table>" & "¶¶" & "<br><br><br></section>"  & ¶ & ¶ ]
+	
+End If
+
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+
+Set Variable [ $html[1] ; $html & "</body>
+				</html>" ]
+Set Field [ FAT Title::Latest Exported file ; TextEncode ( $html ; "utf-8" ; 1 ) ]
+Commit Records/Requests [ With dialog: OFF ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Exit Script [ Get(lastError) & " : " & Get(lastErrorDetail) ]
+
+
+
+
+

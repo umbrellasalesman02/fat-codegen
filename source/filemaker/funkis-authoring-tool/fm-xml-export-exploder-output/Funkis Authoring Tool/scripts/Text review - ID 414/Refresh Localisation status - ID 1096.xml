@@ -1,0 +1,550 @@
+<Script>
+	<ScriptReference id="1096" name="Refresh Localisation status"></ScriptReference>
+	<ObjectList membercount="40">
+		<Step hash="836369FB05C114D6A3E5ED1892828B1F" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8E91EFB4C5FA60180483EEABE7BB3293" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script uses SQL calculation in a loop for all 5 statuses for translated texts"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D8E6B1CCFECBB7AA28947D31F3FC7A24" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="154F40035D2F662CF9B9531D3D100A84" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Text status can be:&#13;1. Not translated&#13;2. Sent to API (only asynchronous machine translation)&#13;3. Not reviewed&#13;4. In progress&#13;5. Approved"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8543351FCAF3A918367F3AAC4ED0FF10" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3AF0E61AC755AB1787AE1D96BF5A9E34" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(scriptParameter)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$mode"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6C1870BA28C1127BD82F7D9ECBF030A9" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4E448DC2DA4BF526855CC93C7321FD44" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Not translated¶Sent to API¶Not reviewed¶In progress¶Approved"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$status_list"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8F56249B814B8D4DA0307AD62E109BF2" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$mode = "Title"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C6CCCAE17239C747601998B11E22B3BE" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetFieldName ( FAT Title::TFs Not_translated ) &"¶"&GetFieldName ( FAT Title::TFs Sent_to_api )&"¶"&GetFieldName ( FAT Title::TFs Not_reviewed )&"¶"&GetFieldName ( FAT Title::TFs In_progress )&"¶"&GetFieldName ( FAT Title::TFs Approved )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$field_list"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="726FFB6CDF47C0ABF6DD4B5C305963A6" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F204B65ADF0510376DD59FA7C34272B0" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$mode = "Title localisation"  // Localisation]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="06E4A4D1C3212181DED85034D47688F6" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetFieldName ( FAT Localisation::TFs Not_translated ) &"¶"&GetFieldName ( FAT Localisation::TFs Sent_to_api )&"¶"&GetFieldName ( FAT Localisation::TFs Not_reviewed )&"¶"&GetFieldName ( FAT Localisation::TFs In_progress )&"¶"&GetFieldName ( FAT Localisation::TFs Approved )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$field_list"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9FC40C6BA0E2AB158E894CBD9BF2E045" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$mode = "Package localisation"  //Localisation @ Title]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5DAE9727E428F5DF08D1CF53F302ABA2" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetFieldName ( FAT Localisation @ Title::TFs Not_translated ) &"¶"&GetFieldName ( FAT Localisation @ Title::TFs Sent_to_api )&"¶"&GetFieldName ( FAT Localisation @ Title::TFs Not_reviewed )&"¶"&GetFieldName ( FAT Localisation @ Title::TFs In_progress )&"¶"&GetFieldName ( FAT Localisation @ Title::TFs Approved )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$field_list"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="34EB3B0276C1F43FAE1BF6CE118571D5" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$mode = "Localisation"  //Localisation @ Package]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="763CD6A048CC82419C0588E3B928301C" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetFieldName ( FAT Localisation @ Package::TFs Not_translated ) &"¶"&GetFieldName ( FAT Localisation @ Package::TFs Sent_to_api )&"¶"&GetFieldName ( FAT Localisation @ Package::TFs Not_reviewed )&"¶"&GetFieldName ( FAT Localisation @ Package::TFs In_progress )&"¶"&GetFieldName ( FAT Localisation @ Package::TFs Approved )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$field_list"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="971E9BD1C5C8BCDE0D7AB32A1C282217" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="393696FAB19A72324308EC60F41E4641" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D02B4B8A26F7662F12D788336DE8359E" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$i"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0F3532E2B7A150936A71EBC8FF241601" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F326C986306C98A04DE4B45111B4004A" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F1F77A07B452876C117502014AC7C413" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetValue ( $status_list ; $i )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$status"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3DC4298BF233B21A8BF567C040EB0B64" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$mode = "Title"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7AA235717CDD10D2E7564A94B1B363E7" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Let ( [    //input    lc=FAT Title::gCurrentLocalisationCode;    title = FAT Title::PrimaryKey;    status = $status;    package = FAT Text::gPackage;    //count field    cf = #F ( FAT Text::PrimaryKey );        //from table    table = #T ( FAT Text::PrimaryKey);    //where fields    lc_f = #F ( FAT Text::Localisation code );    status_f = #F ( FAT Text::Status );    title_f = #F ( FAT Text::Title id );    package_f = #F ( FAT Text::Package id );    ~query = Case(package = "";        "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=?";       "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f=?"    );~sqlQuery = Substitute (  ~query ;             ["~cf"; cf];            ["~table"; table];            ["~lc_f"; lc_f];            ["~title_f"; title_f];            ["~package_f"; package_f];            ["~status_f"; status_f] )   ];Case(package = "";     ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status );    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status; package ))//~sqlQuery & ", " & lc & ", " & title & ", " & status )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$num_of_texts"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="828AAE9B38297F67A8DFB11C4A6027C1" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$mode = "Title localisation" // Localisation]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="285B05DF6373551C1CFB5C9C78A0912B" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Let ( [    //input    lc=FAT Localisation::Localisation code;    title = FAT Title::PrimaryKey;    status = $status;    package = "";    //count field    cf = #F ( FAT Text::PrimaryKey );        //from table    table = #T ( FAT Text::PrimaryKey);    //where fields    lc_f = #F ( FAT Text::Localisation code );    status_f = #F ( FAT Text::Status );    title_f = #F ( FAT Text::Title id );    package_f = #F ( FAT Text::Package id );    ~query = Case(package = "";        "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=?";       "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f=?"    );~sqlQuery = Substitute (  ~query ;             ["~cf"; cf];            ["~table"; table];            ["~lc_f"; lc_f];            ["~title_f"; title_f];            ["~package_f"; package_f];            ["~status_f"; status_f] )   ];Case(package = "";     ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status );    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status; package ))//~sqlQuery & ", " & lc & ", " & title & ", " & status )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$num_of_texts"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DFC922F387A3764C4C0E4A5930967C40" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$mode = "Package localisation" // Localisation @ Title]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="434E6D5EB6690BE1BF0334DE9C61B3D2" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Let ( [    //input    lc=FAT Localisation @ Title::Localisation code;    title = FAT Title::PrimaryKey;    status = $status;    package = FAT Localisation @ Title::Package id;    //count field    cf = #F ( FAT Text::PrimaryKey );        //from table    table = #T ( FAT Text::PrimaryKey);    //where fields    lc_f = #F ( FAT Text::Localisation code );    status_f = #F ( FAT Text::Status );    title_f = #F ( FAT Text::Title id );    package_f = #F ( FAT Text::Package id );    ~query = Case(package = "";        "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f IS NULL";       "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f=?"    );~sqlQuery = Substitute (  ~query ;             ["~cf"; cf];            ["~table"; table];            ["~lc_f"; lc_f];            ["~title_f"; title_f];            ["~package_f"; package_f];            ["~status_f"; status_f] )   ];Case(package = "";     ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status );    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status; package ))//~sqlQuery & ", " & lc & ", " & title & ", " & status )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$num_of_texts"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1B5FEAE35EC0FFD90B25BCE5A6E64B98" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$mode = "Localisation" // Localisation @ Package]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D315AD95DE52EE8231CBE2EED1B1DF15" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Let ( [    //input    lc=FAT Localisation @ Package::Localisation code;    title = FAT Localisation @ Package::Title id;    status = $status;    package = FAT Localisation @ Package::Package id;    shared_text = FAT Localisation @ Package::Shared text localisation;    //count field    cf = #F ( FAT Text::PrimaryKey );        //from table    table = #T ( FAT Text::PrimaryKey);    //where fields    lc_f = #F ( FAT Text::Localisation code );    status_f = #F ( FAT Text::Status );    title_f = #F ( FAT Text::Title id );    package_f = #F ( FAT Text::Package id );    ~query = Case(       package = "" And Not shared_text;           "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=?";       package = "" And shared_text;           "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f IS NULL";          "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f=?"    );/*~query = Case(          package = "";           "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f IS NULL";          "SELECT COUNT(~cf) FROM ~table WHERE ~lc_f=? AND ~title_f=? AND ~status_f=? AND ~package_f=?"    );*/~sqlQuery = Substitute (  ~query ;             ["~cf"; cf];            ["~table"; table];            ["~lc_f"; lc_f];            ["~title_f"; title_f];            ["~package_f"; package_f];            ["~status_f"; status_f] )   ];Case(package = "";     ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status );    ExecuteSQL (~sqlQuery ; "" ; "" ; lc; title; status; package ))//~sqlQuery & ", " & lc & ", " & title & ", " & status )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$num_of_texts"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="22B1CED26694CB10192037B6BA8A7EDB" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="85B5B7890ECFED73CBFE49685C0771B1" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetValue($field_list; $i)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$field_name"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6B6E0B0FF75BBE75A5369B4CA5A5FE16" id="147" name="Set Field By Name" enable="True">
+			<Options>134234112</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="Specify target field" id="134217728" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA[$field_name]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$num_of_texts]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2039EBDA1C928B7123B25F1EDFC39181" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$i + 1]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$i"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="04F3AA254B079ED1794177979A9BC496" id="72" name="Exit Loop If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$i > 5]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3CC182670B7916EDEF8E4EC75FB01F70" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="0012AE109504B9DF172E1062BE4EA6E2" id="75" name="Commit Records/Requests" enable="True">
+			<Options>128</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="Skip data entry validation" id="256" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Force Commit" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4463C70F7D8EC428FD2F6B0AE53AB73F" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B0DC29ED0DAA21F6387D0DA7BC021E39" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

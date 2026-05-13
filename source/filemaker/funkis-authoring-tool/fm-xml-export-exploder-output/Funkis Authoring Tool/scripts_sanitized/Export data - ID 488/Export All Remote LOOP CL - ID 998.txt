@@ -1,0 +1,60 @@
+# This script export content from FAT for all Packages included in Title to the preview server
+# When exported from Title Content layout - only package group will be exported.
+
+If [ Get(layoutName) = "FAT Title Settings" Or Count ( FAT Package Group::PrimaryKey ) = 0 Or IsEmpty ( FAT Title::gView Package group Title ) ]
+	Show Custom Dialog [ Title: "Export all to Preview" ; Message: "This operation will export all content in FAT for all packages to the preview server. 
+					
+					Do you want to proceed?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+	Set Variable [ $package_group_id[1] ; "" ]
+Else
+	Show Custom Dialog [ Title: "Export package group to Preview" ; Message: "This operation will export all content in FAT for packages in the selected package group to the preview server. 
+					
+					Do you want to proceed?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+	Set Variable [ $package_group_id[1] ; FAT Title::gView Package group Title ]
+End If
+
+If [ Get(lastMessageChoice) = 1 ]
+	Freeze Window
+	Set Error Capture [ ON ]
+	
+	If [ Not isSuperAdmin ]
+		Allow User Abort [ OFF ]
+	End If
+	
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	If [ $package_group_id = "" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		# And include Title information
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	End If
+	
+	Set Variable [ $success[1] ; 0 ]
+	
+	If [ Get(foundCount)>0 ]
+		Loop [ Flush: Defer ]
+			Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+			Perform Script [ From list ; "Export Remote CL" ; Parameter: SetProperty ( "exportMode" ; "Media all" ) &
+							SetProperty ( "level" ; 1 ) &
+							SetProperty ( "hideDialog" ; True ) ]
+			Exit Loop If [ PatternCount (Get(ScriptResult); "Error") ]
+			Set Variable [ $success[1] ; $success + 1 ]
+			Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+			Freeze Window
+		End Loop
+		
+		Show Custom Dialog [ Title: "Export summary" ; Message: "Successfully exported " & $success & " packages." ; Default Button: "OK" ]
+		
+		
+	End If
+	
+	# Go to wherever the user is
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+

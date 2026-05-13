@@ -1,0 +1,270 @@
+# This function can always be run from Server for best performance
+Set Variable [ $title_id[1] ; GetScriptProperty( "title_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty( "package_id" ) ]
+Set Variable [ $package_type[1] ; GetScriptProperty( "package_type" ) ]
+Set Variable [ $exportDB[1] ; GetScriptProperty( "exportDB" ) ]
+Set Variable [ $savePosition[1] ; GetAsNumber (GetScriptProperty( "savePosition" )) ]
+Set Variable [ $fileContent[1] ; "[" ]
+
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ $package_id ≠ "" ]
+	# For base projests - make package the root
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+If [ $exportDB = "Page" ]
+	#  putting title and all packages, chapters and pages in the same JSON
+	If [ $package_id ≠ "" ]
+		# If exporting from a base project - use the Package export JSON that includes more key values
+		Set Variable [ $fileContent[1] ; $fileContent & FAT Package::Package JSON & "," & ¶ ]
+	Else
+		
+		Set Variable [ $fileContent[1] ; $fileContent & FAT Title::Title JSON & "," & ¶ ]
+		# ------------------ Packages --------------------------------------------------------------------------
+		Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+		# Omit proxys
+		Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			# If exporting from a non-baseproject - use the "old" JSON
+			Set Variable [ $fieldname[1] ; GetFieldName ( FAT Package::Package JSON Old Export ) ]
+			Loop [ Flush: Always ]
+				Set Variable [ $fileContent[1] ; $fileContent & GetField ( $fieldname ) & "," & ¶ ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+		# Go back to the export root
+		If [ $package_id ≠ "" ]
+			Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		Else
+			Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+		End If
+	End If
+	# ------------------ Chapters --------------------------------------------------------------------------
+	Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+	# Omit items that are not included in export
+	Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+	# Omit proxys but not if Package type = Site
+	If [ Package type::Name ≠ "Site" ]
+		Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+	End If
+	If [ Get(foundCount)>0 ]
+		Set Variable [ $fieldname[1] ; GetFieldName ( FAT Chapter::Chapter JSON ) ]
+		Loop [ Flush: Always ]
+			Set Variable [ $fileContent[1] ; $fileContent & GetField ( $fieldname ) & "," & ¶ ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+	# Go back to the export root
+	If [ $package_id ≠ "" ]
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Else
+		Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+	End If
+	# ------------------ Page --------------------------------------------------------------------------
+	Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+	# Omit items that are not included in export
+	Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $fieldname[1] ; GetFieldName ( FAT Page::Page JSON ) ]
+	# ---------------- Page items ---------------------------------------------------------------------
+Else If [ $exportDB = "Page item" ]
+	Go to Related Record [ Table: FAT Page item ; Layout: "TABLE FAT Page Item" ; Show related ]
+	# Omit items that are not included in export
+	Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $fieldname[1] ; GetFieldName ( FAT Page item::Page item JSON ) ]
+	# ---------------- Text ---------------------------------------------------------------------
+Else If [ PatternCount ( $exportDB ; "Text" ) ]
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	Set Variable [ $localisationCode[1] ; Case ( PatternCount ( RightWords ( $exportDB ; 2 ) ; "Text") ; 
+					
+					Trim (RightWords ( $exportDB ; 1 ));
+					
+					Trim (RightWords ( $exportDB ; 2 ))
+					
+					) ]
+	If [ $package_id ≠ "" ]
+		If [ $package_type ≠ "C69777FA-7286-422C-9337-B722B10663B6" // Title info ]
+			# Find package texts but omit Subtitle FFSub and Subtitle VTT
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			# Extend with global, title and List texts (list-item), tags (tag), score (score) links (link) and IOs (io)
+			Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+			Set Variable [ $fieldname[1] ; GetFieldName ( FAT Text::FAT Text JSON) ]
+		Else
+			# Title info does not include subtitles in separate files - all texts in one file
+			# Find all texts
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			# Set a specific JSON field as the exported one
+			Set Variable [ $fieldname[1] ; GetFieldName ( FAT Text::Funkis Cloud Text JSON) ]
+		End If
+	Else
+		# OLD Export - Title level
+		# Find all texts but omit Subtitle FFSub and Subtitle VTT
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Variable [ $fieldname[1] ; GetFieldName ( FAT Text::FAT Text JSON) ]
+	End If
+	# Sort texts using recordNumberReference if exist
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	# ---------------- Subtitle FFSub ---------------------------------------------------------------------
+Else If [ PatternCount ( $exportDB ; "Subtitle FFSub" ) ]
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	Set Variable [ $localisationCode[1] ; Case ( PatternCount ( RightWords ( $exportDB ; 2 ) ; "Subtitle FFSub") ; 
+					
+					Trim (RightWords ( $exportDB ; 1 ));
+					
+					Trim (RightWords ( $exportDB ; 2 ))
+					
+					) ]
+	If [ $package_id ≠ "" ]
+		# Find package subtitles marked Subtitle FFSub but omit hidden
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		# Extend find with Subtitle texts in a Title Media List
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	Else
+		# Find all subtitles marked Subtitle FFSub but omit hidden
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+	# Sort text entries for media filename and enter time
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Set Variable [ $fieldname[1] ; GetFieldName ( FAT Text::FAT Subtitle JSON) ]
+	# ---------------- Subtitle VTT ---------------------------------------------------------------------
+Else If [ PatternCount ( $exportDB ; "Subtitle VTT" ) ]
+	Set Variable [ $fileContent[1] ; "" ]
+	Set Variable [ $vtt_style[1] ; JSONGetElement ( FAT Title::Title JSON ; "vtt_style" ) ]
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	Set Variable [ $localisationCode[1] ; Case ( PatternCount ( RightWords ( $exportDB ; 2 ) ; "Subtitle VTT") ; 
+					
+					Trim (RightWords ( $exportDB ; 1 ));
+					
+					Trim (RightWords ( $exportDB ; 2 ))
+					
+					) ]
+	If [ $package_id ≠ "" ]
+		# Find package subtitles marked Subtitle VTT omit hidden
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		# Extend find with Subtitle texts in a Title Media List
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	Else
+		# Find all subtitles marked Subtitle VTT
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+	# Sort text entries for media id:s and enter time since webvtt is not referenced by id
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Set Variable [ $fieldname[1] ; GetFieldName ( FAT Text::FAT WebVTT) ]
+	# ------------------ Block ---------------------------
+Else If [ $exportDB = "Block" ]
+	Go to Related Record [ Table: FAT Block ; Layout: "TABLE FAT Block" ; Show related ; Match found set ]
+	Set Variable [ $fieldname[1] ; GetFieldName (FAT Block::BlockJSON ) ]
+	# ------------------ Theme -  ---------------------------
+Else If [ $exportDB = "Theme" ]
+	Go to Related Record [ Table: FAT Theme ; Layout: "TABLE FAT Theme" ; Show related ]
+	# JSON in one record
+	Set Variable [ $fileContent[1] ; JSONFormatElements (FAT Theme::Theme JSON) ]
+	// Show Custom Dialog [ Title: "Theme" ; Message: $fileContent ; Default Button: "OK" ]
+	# ------------------ Tag ------------------------------------------------------------------------
+Else If [ $exportDB = "Tag" ]
+	Go to Related Record [ Table: FAT Tag ; Layout: "TABLE FAT Tag" ; Show related ]
+	Set Variable [ $fieldname[1] ; GetFieldName (FAT Tag::Tag JSON ) ]
+	# ------------------ Score Category  ---------------------------
+Else If [ $exportDB = "Score category" ]
+	Go to Related Record [ Table: FAT Score variable ; Layout: "TABLE FAT Score Category" ; Show related ]
+	Set Variable [ $fieldname[1] ; GetFieldName (FAT Score variable::Score category JSON ) ]
+	# ------------------ Score Reward  ---------------------------
+Else If [ $exportDB = "Score reward" ]
+	Go to Related Record [ Table: FAT Score Reward ; Layout: "TABLE FAT Score Reward" ; Show related ]
+	Set Variable [ $fieldname[1] ; GetFieldName (FAT Score Reward::Score reward JSON ) ]
+	# ------------------ Link  ---------------------------
+Else If [ $exportDB = "Link" ]
+	Go to Related Record [ Table: FAT Link ; Layout: "TABLE FAT Link" ; Show related ]
+	Set Variable [ $fieldname[1] ; GetFieldName (FAT Link::Link JSON ) ]
+	# ------------------ Text variable  ---------------------------
+Else If [ $exportDB = "Txt variable" ]
+	Go to Related Record [ Table: FAT Text variable ; Layout: "TABLE FAT Text variable" ; Show related ]
+	Set Variable [ $fieldname[1] ; GetFieldName (FAT Text variable::Text Variable JSON Formatted ) ]
+Else If [ $exportDB = "Package list" ]
+	# JSON in one record
+	Set Variable [ $fileContent[1] ; FAT Title::Package list JSON ]
+End If
+
+Go to Record/Request/Page [ First ]
+
+# Loop - exporting JSON
+# Variable $fileContent already set for Theme and Package list
+# Subtitle VTT are exported together with Media in Save Files script
+
+If [ Not PatternCount ( $exportDB; "Subtitle VTT" ) And $exportDB ≠ "Theme" And $exportDB ≠ "Package list" ]
+	Loop [ Flush: Defer ]
+		Set Variable [ $fileContent[1] ; $fileContent & GetField ( $fieldname ) ]
+		If [ Get(recordNumber) < Get(foundCount) ]
+			#  Close activity object + make room for next
+			Set Variable [ $fileContent[1] ; $fileContent & "," & ¶ ]
+		Else
+			Set Variable [ $fileContent[1] ; $fileContent & ¶ & "]" & ¶ ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+Else If [ PatternCount ( $exportDB; "Subtitle VTT" ) ]
+	# Loop - exporting VTT
+	Loop [ Flush: Defer ]
+		Set Variable [ $media_id[1] ; FAT Text::Parent id ]
+		If [ $old_media_id ≠ $media_id ]
+			#  Start each new entry with WEBVTT and media id. Media id will be used when finding media filenamn for export
+			Set Variable [ $fileContent[1] ; $fileContent & "WEBVTT   " & $media_id & ¶ & ¶ ]
+			If [ $vtt_style ≠ "" ]
+				#  Add specific styles to VTT subtitle. Fetched from LP attribute vtt_Style
+				Set Variable [ $fileContent[1] ; $fileContent & "STYLE" &  ¶ & "::cue " & $vtt_style & ¶ & ¶ ]
+			End If
+		End If
+		# Set VTT data
+		Set Variable [ $fileContent[1] ; $fileContent & GetField ( $fieldname ) & ¶ & ¶ ]
+		Set Variable [ $old_media_id[1] ; $media_id ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# Do a commit before saving - see if that helps
+Commit Records/Requests [ With dialog: OFF ]
+
+# ------- Substituting all text variables before export - included Aug 31 2024
+If [ PatternCount ( $exportDB ; "Text" ) Or PatternCount ( $exportDB ; "Subtitle" ) ]
+	# This must be done INSIDE this script since sending fileContent between functions did not work well.
+	Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+	# Find all text variables in title
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Loop [ Flush: Always ]
+			# Only substitute when string and definition differs.
+			If [ FAT Text variable::Friendly string ≠ FAT Text variable::String source definition ]
+				Set Variable [ $fileContent[1] ; Substitute ( $fileContent ; FAT Text variable::Friendly string; FAT Text variable::String source definition) ]
+			End If
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+End If
+# --------- End substituting
+
+
+If [ $package_id ≠ "" ]
+	# For base projests - make package the root
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	# Save fileContent in a container field
+	Set Field [ FAT Package::Latest Exported file ; TextEncode ( $fileContent ; "utf-8" ; 1 ) ]
+Else
+	Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+	# Save fileContent in a container field
+	Set Field [ FAT Title::Latest Exported file ; TextEncode ( $fileContent ; "utf-8" ; 1 ) ]
+End If
+
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ Get(lastError) ≠ 0 And Get(lastError)≠101 ]
+	# An error occured - file cannot be saved
+	# Record in use by another user - file cannot be saved
+	Exit Script [ "Error. Cannot export. " & Get( lastErrorDetail ) ]
+End If
+
+
+
+
+

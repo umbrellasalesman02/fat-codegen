@@ -1,0 +1,101 @@
+# In certain occassions, text fields can be missed for a Title, Package, Chapter, Page or Page item
+# Navigate to the fat item that misses text - it can be a Title, Package, Chapter or Page.
+# Can be called in any Settings layout
+
+Set Variable [ $fat_layout[1] ; Get(layoutName) ]
+
+If [ PatternCount ( $fat_layout ; "Title" ) ]
+	Set Variable [ $fat_item_type[1] ; "Title" ]
+Else If [ PatternCount ( $fat_layout ; "Package" ) ]
+	Set Variable [ $fat_item_type[1] ; "Package" ]
+Else If [ PatternCount ( $fat_layout ; "Chapter" ) ]
+	Set Variable [ $fat_item_type[1] ; "Chapter" ]
+Else If [ PatternCount ( $fat_layout ; "Page" ) And Not PatternCount ( $fat_layout ; "Page item" ) ]
+	Set Variable [ $fat_item_type[1] ; "Page" ]
+End If
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+
+If [ $fat_item_type = "Title" ]
+	# Can onl be called in Title
+	If [ IsEmpty (TF TT Header::PrimaryKey ) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Title::PrimaryKey ) &
+						SetProperty ( "source_table" ; "title" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Title::Header txt id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+	If [ IsEmpty ( TF TT Sub header::PrimaryKey ) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Title::PrimaryKey ) &
+						SetProperty ( "source_table" ; "title" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Title::Sub header txt id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+	Set Variable [ $title_text[1] ; FAT Title::Reference title ]
+	Set Field [ TF TT Header::Text ; $title_text ]
+Else If [ $fat_item_type = "Package" ]
+	If [ IsEmpty ( TF PK Header::PrimaryKey ) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Package::PrimaryKey ) &
+						SetProperty ( "source_table" ; "package" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Package::Header txt id ) ) &
+						SetProperty ( "learningprogramme_id" ; $title_id ) &
+						SetProperty ( "package_id" ; $package_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+	If [ IsEmpty ( TF PK Sub header 1::PrimaryKey ) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Package::PrimaryKey ) &
+						SetProperty ( "source_table" ; "package" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Package::Sub header 1 txt id ) ) &
+						SetProperty ( "learningprogramme_id" ; $title_id ) &
+						SetProperty ( "package_id" ; $package_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+	If [ IsEmpty(TF PK Sub header 2::PrimaryKey) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Package::PrimaryKey ) &
+						SetProperty ( "source_table" ; "package" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Package::Sub header 2 txt id ) ) &
+						SetProperty ( "learningprogramme_id" ; $title_id ) &
+						SetProperty ( "package_id" ; $package_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+Else If [ $fat_item_type = "Chapter" ]
+	If [ IsEmpty ( TF CH Header::PrimaryKey ) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Chapter::PrimaryKey ) &
+						SetProperty ( "source_table" ; "chapter" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Chapter::Header txt id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+	If [ IsEmpty ( TF CH Sub header::PrimaryKey ) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Chapter::PrimaryKey ) &
+						SetProperty ( "source_table" ; "chapter" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Chapter::Sub header txt id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+	If [ IsEmpty(TF CH Sub header 2::PrimaryKey) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Chapter::PrimaryKey ) &
+						SetProperty ( "source_table" ; "chapter" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Chapter::Sub header 2 txt id Legacy ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+Else If [ $fat_item_type = "Page" ]
+	If [ IsEmpty ( TF PG Header::PrimaryKey ) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Page::PrimaryKey ) &
+						SetProperty ( "source_table" ; "page" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Page::Header txt id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+	If [ IsEmpty ( TF PG Sub header 1::PrimaryKey ) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Page::PrimaryKey ) &
+						SetProperty ( "source_table" ; "page" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Page::Sub header 1 txt id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+	If [ IsEmpty(TF PG Sub header 2::PrimaryKey) ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Page::PrimaryKey ) &
+						SetProperty ( "source_table" ; "page" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Page::Sub header 2 txt id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+End If
+
+

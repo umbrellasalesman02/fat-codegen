@@ -1,0 +1,14 @@
+Set Variable [ $item_level[1] ; Get(scriptParameter) ]
+If [ $item_level = "Chapter" ]
+	Set Variable [ $item_title[1] ; FAT Chapter::JSON friendly id ]
+	Set Variable [ $title_field[1] ; GetFieldName ( TF CH Header::Text ) ]
+Else If [ $item_level = "Page" ]
+	Set Variable [ $item_title[1] ; FAT Page::JSON friendly id ]
+	Set Variable [ $title_field[1] ; GetFieldName ( TF PG Header::Text ) ]
+End If
+If [ reservedURLName ($item_title) ]
+	Show Custom Dialog [ Title: "This title is reserved" ; Message: "This name is reserved by the system and cannot be used. Please, change name. " ; Default Button: "OK" ]
+	Set Field By Name [ Specify target field: ON ; $title_field ; "Choose another title name" ]
+	Halt Script
+End If
+

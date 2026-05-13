@@ -1,0 +1,21 @@
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Show All Records
+Go to Record/Request/Page [ First ]
+Set Error Capture [ ON ]
+Freeze Window
+
+Loop [ Flush: Always ]
+	Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	Set Variable [ $title_id[1] ; FAT Package::Parent id ]
+	Go to Layout [ Layout: "TABLE FAT Overview" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)= 0 ]
+		New Record/Request
+		Set Field [ FAT Overview::Title id ; $title_id ]
+		Set Field [ FAT Overview::Item id ; $package_id ]
+	End If
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+

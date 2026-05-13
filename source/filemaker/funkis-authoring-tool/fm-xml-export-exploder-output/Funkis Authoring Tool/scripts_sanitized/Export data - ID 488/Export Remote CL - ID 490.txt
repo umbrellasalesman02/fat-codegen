@@ -1,0 +1,193 @@
+# Called from a button with two parameters - exportMode and level. Can be triggered by Developers, Authors and Editors 
+# Is also called from the Export All Remote CL script
+# Export content in FAT to the preview server
+
+Set Variable [ $exportMode[1] ; GetScriptProperty ( "exportMode" ) ]
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+Set Variable [ $hideDialog[1] ; GetAsBoolean(GetScriptProperty ( "hideDialog" )) ]
+
+# If level = 0 - no Package selected (Text and Media review layouts) -> STOP
+If [ $level = 0 ]
+	Show Custom Dialog [ Title: "Select a package to export" ; Message: "You are trying to export content in this title without selecting a package. Please select content belonging to a specific package before exporting." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+Freeze Window
+Set Error Capture [ ON ]
+
+# When called from Title Settings Portal or from Media or Text view - the package - caller = "Title".
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+
+If [ $caller = "Title" ]
+	# If caller = Title we need to arrange the packages.
+	Freeze Window
+	If [ PatternCount ( Get(layoutName) ; "Media" ) ]
+		# Media subtitles or media - package = current media package
+		Set Variable [ $package_id[1] ; FAT Media::Package id ]
+	Else If [ PatternCount ( Get(layoutName) ; "Text" ) ]
+		# Text layout - package = current text package
+		Set Variable [ $package_id[1] ; FAT Text::gPackage ]
+	Else
+		# Title settings
+		Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	End If
+	If [ $package_id = "" ]
+		Show Custom Dialog [ Title: "No package selected" ; Message: "Please select a package in the dropdown menu below before export." ; Default Button: "OK" ]
+		Exit Script []
+	End If
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+End If
+
+# Save current data
+Commit Records/Requests [ With dialog: OFF ]
+
+# Translators shall only export language specific text files
+If [ isTranslator Or ($$localisation_code ≠ FAT Title::Original localisation code) ]
+	Set Variable [ $exportMode[1] ; "Translation" ]
+	Set Variable [ $titleLocalisationCode[1] ; $$localisation_code ]
+Else
+	Set Variable [ $titleLocalisationCode[1] ; FAT Title::Original localisation code ]
+End If
+
+Set Variable [ $typeOfTask[1] ; "sync" ]
+# typeOfTask /*
+  sync - syncing new content from FAT to Preview server
+  publish - building a new package with both content from FAT and code from GitLab
+  */
+
+// Set Variable [ $exportMode[1] ; "json" ]
+// Set Variable [ $exportMode[1] ; "Media all" ]
+
+# exportMode /*
+  JSON = All JSON files
+  TEXT = JSON + all TEXT files
+  Media update = JSON + TEXT + updated media - This option is for Authors and Editors
+  Media all = JSON + TEXT + all media
+  Translation = TEXT and Subtitles for localised language (only remote export)
+  Translation files = TEXT and Subtitles for localised language (only local export)
+  */
+
+Set Variable [ $exportDestination[1] ; "Remote" ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; Case ( IsEmpty ( FAT Title::Base project ); "" ; FAT Package::PrimaryKey) ]
+Set Variable [ $package_type[1] ; Case ( IsEmpty ( FAT Title::Base project ); "" ; FAT Package::Package type id) ]
+Set Variable [ $package_dir[1] ; FAT Package::Export Package Sub Path ]
+Set Variable [ $package_friendly_id[1] ; FAT Package::JSON Friendly id ]
+Set Variable [ $package_type_name[1] ; FAT Package::Package type name ]
+
+# Environment
+Set Variable [ $awsEnvironment[1] ; Title Environment::AWS Environment ]
+Set Variable [ $apiEndpoint[1] ; Title Environment::Environment API endpoint ]
+# Preview Server
+Set Variable [ $remoteType[1] ; Title Server Preview::remoteType identifier ]
+Set Variable [ $s3bucketName[1] ; Title Server Preview::S3 bucket name ]
+Set Variable [ $awsCdnKey[1] ; Title Server Preview::AWS CDN Key ]
+Set Variable [ $resultTransferTarget[1] ; Title Server Preview::URL ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+# Development export - uncomment for fault trace
+// If [ Not notJens ]
+// Perform Script [ From list ; "Export Data MASTER" ; Parameter: SetProperty ( "exportDestination" ; $exportDestination ) &
+				SetProperty ( "remoteType" ; $remoteType ) &
+				SetProperty ( "s3bucketName" ; $s3bucketName ) &
+				SetProperty ( "awsCdnKey" ; $awsCdnKey ) &
+				SetProperty ( "awsEnvironment" ; $awsEnvironment ) &
+				SetProperty ( "apiEndpoint" ; $apiEndpoint ) &
+				SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty ( "package_type" ; $package_type ) &
+				SetProperty ( "titleLocalisationCode" ; $titleLocalisationCode ) &
+				SetProperty ( "package_dir" ; $package_dir ) & 
+				SetProperty ( "resultTransferTarget" ; $resultTransferTarget ) &
+				SetProperty ( "exportMode" ; $exportMode ) & 
+				SetProperty ( "typeOfTask" ; $typeOfTask ) ]
+// End If
+If [ $level = "" ]
+	# Developer publish or publish from Title root - don't wait for completion
+	If [ isPSOS ]
+		Perform Script [ From list ; "Export Data MASTER" ; Parameter: SetProperty ( "exportDestination" ; $exportDestination ) &
+						SetProperty ( "remoteType" ; $remoteType ) &
+						SetProperty ( "s3bucketName" ; $s3bucketName ) &
+						SetProperty ( "awsCdnKey" ; $awsCdnKey ) &
+						SetProperty ( "awsEnvironment" ; $awsEnvironment ) &
+						SetProperty ( "apiEndpoint" ; $apiEndpoint ) &
+						SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "package_id" ; $package_id ) &
+						SetProperty ( "package_type" ; $package_type ) &
+						SetProperty ( "titleLocalisationCode" ; $titleLocalisationCode ) &
+						SetProperty ( "package_dir" ; $package_dir ) & 
+						SetProperty ( "resultTransferTarget" ; $resultTransferTarget ) &
+						SetProperty ( "exportMode" ; $exportMode ) & 
+						SetProperty ( "typeOfTask" ; $typeOfTask ) ]
+	Else
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+	End If
+Else
+	# Author and editor export from a Package, Chapter or Page - Save, Sync and open in browser! 
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+	If [ Get(ScriptResult) ≠ "success" And Get(ScriptResult) ≠ "" ]
+		Show Custom Dialog [ Title: "Something went wrong during the export." ; Message: "Error message: " & Get(ScriptResult) ; Default Button: "OK" ]
+		Exit Script [ "Error" ]
+	End If
+	
+	If [ Not $hideDialog And Not isTitleInformation ( $package_type ) // Title information shall not be previewed ]
+		Perform Script [ From list ; "Preview on web" ; Parameter: SetProperty ( "level" ; $level ) &
+						SetProperty ( "package_dir" ; $package_dir ) &
+						SetProperty ( "package_friendly_id" ; $package_friendly_id ) &
+						SetProperty ( "package_type_name" ; $package_type_name ) ]
+		If [ Not isPSOS And FAT Title::Title Backend  = "Funkis Cloud" ]
+			# Exporting new Title information in the background
+			
+			Set Variable [ $package_type[1] ; "C69777FA-7286-422C-9337-B722B10663B6" // Title information ]
+			# Find package_id for title_information while using SQL and not change record in layout
+			
+			Set Variable [ $package_id[1] ; ExecuteSQL (
+							    "SELECT \"PrimaryKey\"
+							     FROM \"FAT Package\"
+							     WHERE \"Parent id\" = ?
+							     AND \"Package type id\" = ?" ;
+							    "" ;
+							    "" ;
+							    $title_id ;
+							    $package_type
+							) ]
+			Set Variable [ $package_dir[1] ; FAT Title::Export Title Sub Path & "title-information/" ]
+			Set Variable [ $package_friendly_id[1] ; "title-information" ]
+			Set Variable [ $package_type_name[1] ; "Title info" ]
+			
+			// Perform Script [ From list ; "Export Data MASTER" ; Parameter: SetProperty ( "exportDestination" ; $exportDestination ) &
+							SetProperty ( "remoteType" ; $remoteType ) &
+							SetProperty ( "s3bucketName" ; $s3bucketName ) &
+							SetProperty ( "awsEnvironment" ; $awsEnvironment ) &
+							SetProperty ( "awsCdnKey" ; $awsCdnKey ) &
+							SetProperty ( "apiEndpoint" ; $apiEndpoint ) &
+							SetProperty ( "title_id" ; $title_id ) &
+							SetProperty ( "package_id" ; $package_id ) &
+							SetProperty ( "package_type" ; $package_type ) &
+							SetProperty ( "titleLocalisationCode" ; $titleLocalisationCode ) &
+							SetProperty ( "package_dir" ; $package_dir ) & 
+							SetProperty ( "resultTransferTarget" ; $resultTransferTarget ) &
+							SetProperty ( "exportMode" ; $exportMode ) & 
+							SetProperty ( "typeOfTask" ; $typeOfTask ) ]
+			Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+			
+			If [ Get(ScriptResult) ≠ "success" And Get(ScriptResult) ≠ "" ]
+				Show Custom Dialog [ Title: "Something went wrong during the title information export." ; Message: "Error message: " & Get(ScriptResult) ; Default Button: "OK" ]
+				Exit Script [ "Error" ]
+			End If
+			
+		End If
+		If [ PatternCount ( Get(layoutName ); "Page item") ]
+			Perform Script [ From list ; "Setup current PageItem" ]
+		End If
+	End If
+End If
+
+
+
+
+

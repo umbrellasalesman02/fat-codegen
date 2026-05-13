@@ -1,0 +1,11 @@
+Go to Record/Request/Page [ First ]
+# Make sure you are on the original media record
+Set Variable [ $localisation_code[1] ; FAT Media @ Trans::gLocalisation ]
+Set Variable [ $org_media_id[1] ; FAT Media @ Trans::PrimaryKey ]
+Duplicate Record/Request
+Set Field [ FAT Media @ Trans::Original key ; $org_media_id ]
+Set Field [ FAT Media @ Trans::Language code ; getLanguageCode ( $localisation_code ) ]
+Set Field [ FAT Media @ Trans::Country code ; getCountryCode ( $localisation_code ) ]
+Clear [ Select: ON ; FAT Media @ Trans::Media container ]
+Clear [ Select: ON ; FAT Media @ Trans::Container exported ]
+

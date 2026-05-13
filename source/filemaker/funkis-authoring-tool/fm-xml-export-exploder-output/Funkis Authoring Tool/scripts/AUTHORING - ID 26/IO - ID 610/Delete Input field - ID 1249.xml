@@ -1,0 +1,86 @@
+<Script>
+	<ScriptReference id="1249" name="Delete Input field"></ScriptReference>
+	<ObjectList membercount="7">
+		<Step hash="7D055274DDB66D8B5A7AC9720F00E698" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Delete input field needs a warning if field is used by other IOs"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DC9C76C85F6E82F7E0ED31855D93A993" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT IO Field @ IO::Number of Linked fields]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$num_of_links"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="951BB475319CB5B1ED79CB4E965BF931" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$num_of_links > 0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FA97FFFFFD349A2FA685C3E44262BCB8" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Used as linked field"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["This field cannot be deleted since it is used by other IOs. Delete this field in the other IOs first, then delete the field in this IO. "]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="15356B4FA6A2E0595274ED81E0A10A85" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="4559EA0EB65B4777A874E792F5E53160" id="104" name="Delete Portal Row" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="ACC2E7888EF1D57166E570E479BD99F9" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

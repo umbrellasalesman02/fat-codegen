@@ -1,0 +1,17 @@
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $reference_title[1] ; FAT Title::Reference title ]
+Set Variable [ $funkis_cloud_title_id[1] ; FAT Title::Funkis Cloud Title id ]
+
+
+
+Perform Script [ From list ; "Get default environment" ]
+Set Variable [ $title_environment[1] ; Get(ScriptResult) ]
+
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+
+Perform Script [ From list ; "CreateTitleOnInsight" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "title_environment" ; $title_environment ) &
+				SetProperty ( "reference_title" ; $reference_title ) &
+				SetProperty ( "funkis_cloud_title_id" ; $funkis_cloud_title_id ) ]
+

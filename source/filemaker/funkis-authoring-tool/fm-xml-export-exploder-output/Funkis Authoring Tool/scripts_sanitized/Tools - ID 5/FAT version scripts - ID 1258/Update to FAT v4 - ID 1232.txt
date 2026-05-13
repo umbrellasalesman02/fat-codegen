@@ -1,0 +1,195 @@
+# This script transfers value for IO contexts to the new access rights, developed in March 2025.
+  IO contexts:
+  "current_group_member" -> "My Group" 
+  "group" -> "My Group"
+  "member" -> "My member"
+
+# Gå igenom alla IOs i en titel
+  För varje IO:
+  Nolla access rights i IO:n
+  Kolla IO Value - skapa upp Read filter och Write as enligt ovan
+  Kolla blocket om det är write eller read (input eller output) Om det är Post output - kolla även write field där.
+  Klick i access right i IO:n baserat på findings i punkten ovan.
+
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	// Replace Field Contents [ FAT IO::IO Read Permissions ; Replace with calculation: "" ]
+	// Replace Field Contents [ FAT IO::IO Write Permissions ; Replace with calculation: "" ]
+	Loop [ Flush: Always ]
+		Set Variable [ $io_id[1] ; FAT IO::PrimaryKey ]
+		Set Variable [ $io_type[1] ; FAT IO::IO type ]
+		
+		If [ $io_type ≠ "Score" ]
+			# Score is not visible through IO values
+			
+			Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+			# Search for IOs that are connected as a value to a list item
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) > 0 ]
+				Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+				Set Field [ FAT IO::IO Write Permissions ; "My Member¶My Group¶My Session" ]
+				Set Field [ FAT IO::IO Read Permissions ; "My Member¶My Group¶My Session" ]
+			Else
+				
+				Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+				
+				# Find all IO Values using this IO
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount) > 0 ]
+					Loop [ Flush: Always ]
+						Set Variable [ $io_context[1] ; FAT IO Value @ Page item::IO Context ]
+						If [ IsEmpty ( $io_context ) ]
+							# Some contexts are still set by a modifier value, IO Rate Output v2 for example 
+							Set Variable [ $io_context[1] ; Case( 
+											
+											    PatternCount(List(FAT ModifierValue @ Page item::Value); "current"); "current_group_members";
+											
+											    PatternCount(List(FAT ModifierValue @ Page item::Value); "member"); "member";
+											
+											    PatternCount(List(FAT ModifierValue @ Page item::Value); "group"); "group";
+											
+											    PatternCount(List(FAT ModifierValue @ Page item::Value); "session"); "session"
+											
+											) ]
+						End If
+						Set Variable [ $read_filter[1] ; "" ]
+						Set Variable [ $write_as[1] ; "" ]
+						If [ $io_type ≠ "Post" ]
+							# IO function "Read" or "Write"
+							Set Variable [ $io_function[1] ; IO Block Template @ IO Value::Function ]
+						Else
+							# IO function "Write" if any field mode = "Write", "Read" if no field = "Write" and any field mode "Read"
+							Set Variable [ $io_function[1] ; Case(
+											
+											      PatternCount(List ( FAT IO Field Value @ IO Value PI::Field mode ); "Write"); "Write" ;
+											      "Read" 
+											) ]
+						End If
+						If [ $io_function = "Read" ]
+							If [ $io_context = "member" ]
+								Set Variable [ $read_filter[1] ; "My Member" ]
+							Else If [ $io_context = "group" Or PatternCount ( $io_context ; "current" ) // current group memnbers can be spelled differently ]
+								Set Variable [ $read_filter[1] ; "My Group" ]
+							Else If [ $io_context = "session" ]
+								Set Variable [ $read_filter[1] ; "My Session" ]
+							End If
+						Else If [ $io_function = "Write" ]
+							If [ $io_context = "member" ]
+								Set Variable [ $read_filter[1] ; "My Member" ]
+								Set Variable [ $write_as[1] ; "My Member" ]
+							Else If [ $io_context = "group" Or PatternCount ( $io_context ; "current" ) // current group memnbers can be spelled differently ]
+								Set Variable [ $read_filter[1] ; "My Group" ]
+								Set Variable [ $write_as[1] ; "My Group" ]
+							Else If [ $io_context = "session" ]
+								# Session writes as group for a reason I do not understand
+								Set Variable [ $read_filter[1] ; "My Session" ]
+								Set Variable [ $write_as[1] ; "My Group" ]
+							End If
+						End If
+						If [ Not isValidFAT4IOcontext( FAT IO Value @ Page item::IO Read filter ) ]
+							Set Field [ FAT IO Value @ Page item::IO Read filter ; $read_filter ]
+						End If
+						If [ Not isValidFAT4IOcontext( FAT IO Value @ Page item::IO Write as ) ]
+							Set Field [ FAT IO Value @ Page item::IO Write as ; $write_as ]
+						End If
+						Perform Script [ From list ; "UpdateIOAccessRights" ; Parameter: SetProperty("io_type" ; $io_type) & 
+										SetProperty("io_id" ; $io_id) & 
+										SetProperty("read_filter" ; $read_filter) & 
+										SetProperty("write_as" ; $write_as) ]
+						Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+						Go to Record/Request/Page [ Next ; Exit after last: ON ]
+					End Loop
+				End If
+			End If
+			Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+		Else If [ $io_type = "Score" ]
+			# Score is invisible in the IO value interface
+			Set Field [ FAT IO::IO Write Permissions ; "My Member¶My Group¶My Session" ]
+			Set Field [ FAT IO::IO Read Permissions ; "My Member¶My Group¶My Session" ]
+		End If
+		
+		# Find all Text variables using this IO
+		Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		
+		If [ Get(foundCount) > 0 ]
+			Loop [ Flush: Always ]
+				
+				# Translate the legacy context to a new context
+				If [ IsEmpty ( FAT Text variable::IO Context ) ]
+					Set Variable [ $fat4_context[1] ; Case ( FAT Text variable::IO Context legacy = "Member"; "Member";
+									      FAT Text variable::IO Context legacy = "Group" Or FAT Text variable::IO Context legacy = "Current group members"; "Group";
+									      FAT Text variable::IO Context legacy = "Session" ; "Session";
+									      FAT Text variable::IO Context legacy = "Auto" ; ""
+									     ) ]
+					Set Field [ FAT Text variable::IO Context ; $fat4_context ]
+				End If
+				
+				Set Variable [ $read_filter[1] ; Case ( FAT Text variable::IO Context legacy = "Member"; "My Member";
+								      FAT Text variable::IO Context legacy = "Group" Or FAT Text variable::IO Context legacy = "Current group members"; "My Group";
+								      FAT Text variable::IO Context legacy = "Session" ; "My Session";
+								      FAT Text variable::IO Context legacy = "Auto" ; "My Member¶My Group"
+								     ) ]
+				Set Variable [ $write_as[1] ; "" ]
+				
+				Perform Script [ From list ; "UpdateIOAccessRights" ; Parameter: SetProperty("io_type" ; $io_type) & 
+								SetProperty("io_id" ; $io_id) & 
+								SetProperty("read_filter" ; $read_filter) & 
+								SetProperty("write_as" ; $write_as) ]
+				
+				Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+		
+		# Find all Dynamic lists using this IO
+		Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		
+		If [ Get(foundCount) > 0 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $read_filter[1] ; "My " & FAT List::Dynamic List IO context ]
+				Set Variable [ $write_as[1] ; "" ]
+				
+				Perform Script [ From list ; "UpdateIOAccessRights" ; Parameter: SetProperty("io_type" ; $io_type) & 
+								SetProperty("io_id" ; $io_id) & 
+								SetProperty("read_filter" ; $read_filter) & 
+								SetProperty("write_as" ; $write_as) ]
+				
+				Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+		
+		# Find all Tag values
+		Go to Layout [ Layout: "TABLE FAT Tag Value" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		
+		If [ Get(foundCount) > 0 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $read_filter[1] ; "My " & FAT Tag Value::IO Context ]
+				Set Variable [ $write_as[1] ; "" ]
+				
+				Perform Script [ From list ; "UpdateIOAccessRights" ; Parameter: SetProperty("io_type" ; $io_type) & 
+								SetProperty("io_id" ; $io_id) & 
+								SetProperty("read_filter" ; $read_filter) & 
+								SetProperty("write_as" ; $write_as) ]
+				
+				Go to Layout [ Layout: "TABLE FAT Tag Value" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+		
+		Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+

@@ -1,0 +1,12 @@
+Set Error Capture [ ON ]
+Set Variable [ $searchStr[1] ; User @ User::gSearchName ]
+If [ Length ( $searchStr )>0 ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	Go to Field [ User @ User::gSearchName ]
+Else If [ Code(Get(TriggerKeystroke)) = 8 Or Length (User @ User::gSearchName) < 1 ]
+	Set Field [ User @ User::gSearchName ; "" ]
+	Show All Records
+End If
+
+

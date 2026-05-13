@@ -1,0 +1,55 @@
+# This script is called fron the Login layout for all user roles - Developer, Author, Editor and Translator
+# It can view a Title in both original language or a translation language
+# It is called for all kind of devices
+
+Set Variable [ $event_log_text[1] ; "Viewed " & FAT Title::Reference title ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+Perform Script [ From list ; "Save Active Layout" ]
+
+
+# The variable below is to restrict access for users with privilige Author, Editor and Translator.
+Set Variable [ $$record_access_lp_id[1] ; User X Title::Title id ]
+
+Set Variable [ $$lp_id[1] ; User X Title::Title id ]
+Set Variable [ $$localisation_code[1] ; User X Title::Localisation code ]
+
+# Go to Login X Title for Record Access Security Reason
+Go to Related Record [ Table: User X Title ; Layout: "TABLE User X Title" ; Show related ]
+If [ GetDevice = "Phone" ]
+	Go to Related Record [ Table: FAT Title ; Layout: "FAT Packages Phone" ; Show related ]
+Else
+	Go to Related Record [ Table: FAT Title ; Layout: "FAT Title" ; Show related ]
+End If
+
+# Modify to make it occur on top in login title list
+Set Field [ User X Title @ Title::ModificationTimeStamp ; Get(currentTimeStamp) ]
+
+# Set view levels for this user
+Set Field [ FAT Title::gView hierarchy level Title ; Case ( IsEmpty (User X Title @ Title::View hierarchy level Title); 1;  User X Title @ Title::View hierarchy level Title) ]
+Set Field [ FAT Title::gView Package group Title ; Case ( IsEmpty (User X Title @ Title::View Package group Title); ""; User X Title @ Title::View Package group Title) ]
+
+If [ FAT Title::Original localisation code = $$localisation_code ]
+	Set Field [ FAT Title::gViewTranslatedLanguage ; False ]
+	Set Field [ FAT Title::gCurrentLocalisationCode ; "" ]
+Else
+	Set Field [ FAT Title::gViewTranslatedLanguage ; 1 ]
+	Set Field [ FAT Title::gCurrentLocalisationCode ; $$localisation_code ]
+End If
+
+# Reset search fields
+Set Field [ FAT Media::gSearchText ; "" ]
+Set Field [ FAT Media::gPackage ; "" ]
+Set Field [ FAT Text::gPackage ; "" ]
+Set Field [ FAT Text::gFilterType ; "" ]
+Set Field [ FAT Text::gEditor ; "" ]
+Set Field [ FAT Text::gViewTranslationStatus ; "" ]
+Set Field [ FAT Text::gReplaceText ; "" ]
+Set Field [ FAT Title::gThemeTemplate ; "" ]
+Set Field [ FAT Title::gSelectedLocalisation ; "" ]
+Set Field [ FAT Title::gTranslationMethod ; "" ]
+Set Field [ FAT Title::gPackage id ; "" ]
+Set Field [ FAT Title::gTextVariable ; "" ]
+Set Field [ FAT Title::gObjectGroup ; "" ]
+
+Set Field [ FAT Title::gLogin ; $$login_id ]
+

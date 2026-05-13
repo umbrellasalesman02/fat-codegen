@@ -1,0 +1,306 @@
+<Script>
+	<ScriptReference id="844" name="Change Privilege Set"></ScriptReference>
+	<ObjectList membercount="23">
+		<Step hash="1368F93A10F7A70AF1931BFE0624DB44" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[User @ User::email]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$user_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C9869882C6899ABEAC090910C52F1444" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[User @ User::Privilege set]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$privilege_set"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6A6C5464DABBD9632E738C0112D19DCB" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7A57EEA9314B9B7AEE13F45E53C5CF56" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="27D8E82F2F197BAF6461534D73AA672F" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DF41270C486A1F73401600641ECAA093" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Warning!"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["You are about to change the privilege set for the user " & $user_id & ". ¶¶Are you absolutely sure?"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Cancel">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0A95224B7D06AB56073D977658995225" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D8636661F00A14BEDD65B523EE77632F" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastMessageChoice) = 1]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="178C9CD00D2D9C38A07962F6B1DB1ABC" id="135" name="Delete Account" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$user_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3B10AE803C527D4A3F84389018F0CC53" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8629DF8B07786349ADEB7B319379E8D9" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$privilege_set = "Developer"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FC631DC4028CAC5A8723F63C08003B53" id="134" name="Add Account" enable="True">
+			<Options>16386</Options>
+			<ParameterValues membercount="4">
+				<Parameter type="Name">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$user_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Password">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA[$password]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="PrivilegeSetReference">
+					<PrivilegeSetReference id="7" name="Developer"></PrivilegeSetReference>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Expire password" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BD94CAD7F3703B867150DC613EBD69D4" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$privilege_set = "Author"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7ACC5FB1224D72699FD065AA90A74C7F" id="134" name="Add Account" enable="True">
+			<Options>16386</Options>
+			<ParameterValues membercount="4">
+				<Parameter type="Name">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$user_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Password">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA[$password]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="PrivilegeSetReference">
+					<PrivilegeSetReference id="4" name="Author"></PrivilegeSetReference>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Expire password" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="790205A98BD5831A748EEA970063123A" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$privilege_set = "Editor"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9F1323CD6418F2A713EB9E22B85455C1" id="134" name="Add Account" enable="True">
+			<Options>16386</Options>
+			<ParameterValues membercount="4">
+				<Parameter type="Name">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$user_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Password">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA[$password]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="PrivilegeSetReference">
+					<PrivilegeSetReference id="5" name="Editor"></PrivilegeSetReference>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Expire password" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B1E15BEA12A73B6661582815FA097F76" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$privilege_set = "Translator"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5F4979449AB10E9427A628F0BC0F415A" id="134" name="Add Account" enable="True">
+			<Options>16386</Options>
+			<ParameterValues membercount="4">
+				<Parameter type="Name">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$user_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Password">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA[$password]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="PrivilegeSetReference">
+					<PrivilegeSetReference id="6" name="Translator"></PrivilegeSetReference>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Expire password" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7C6F52DA5B709495BF7F0AE60C20A45D" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="99212184F4D3D0E499A2223AC5683D24" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B4C3A40795C1B9C18508F6E340A531D3" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="D87C0013ADFC70A309DB3B3655B7A8C5" id="51" name="Revert Record/Request" enable="True">
+			<Options>128</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4E493780F1BBFEEB2C5743D6E0F945D2" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

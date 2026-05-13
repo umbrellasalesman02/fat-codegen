@@ -1,0 +1,24 @@
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $item_id[1] ; GetScriptProperty("item_id") ]
+Set Variable [ $hierarchy_level[1] ; GetScriptProperty("hierarchy_level") ]
+Set Variable [ $collapse[1] ; GetScriptProperty("collapse") ]
+Set Variable [ $collapse_mode[1] ; GetScriptProperty("collapse_mode") ]
+
+
+# Collapse mode is either "All" or "Item"
+
+If [ $collapse_mode = "All" ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Set Variable [ $hierarchy_level[1] ; FAT Title::gView hierarchy level Title ]
+End If
+
+Freeze Window
+// Perform Script [ From list ; "Collapse SRV" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "item_id" ; $item_id ) &
+				SetProperty ( "hierarchy_level" ; $hierarchy_level ) &
+				SetProperty ( "collapse" ; $collapse ) &
+				SetProperty ( "collapse_mode" ; $collapse_mode ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+

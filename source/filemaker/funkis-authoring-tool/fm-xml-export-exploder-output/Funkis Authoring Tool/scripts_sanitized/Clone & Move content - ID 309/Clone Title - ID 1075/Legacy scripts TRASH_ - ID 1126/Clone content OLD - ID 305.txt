@@ -1,0 +1,413 @@
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $old_lp_id[1] ; GetScriptProperty ( "old_lp_id") ]
+Set Variable [ $new_lp_id[1] ; GetScriptProperty ( "new_lp_id") ]
+Set Variable [ $clone_level[1] ; GetScriptProperty ( "clone_level") ]
+
+# Stand on the right Title
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# Duplicate the tags
+Go to Layout [ Layout: "TABLE FAT Tag" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		Set Variable [ $old_tag_id[1] ; FAT Tag::PrimaryKey ]
+		Set Variable [ $tag_text[1] ; TF TAG Name::Text ]
+		Duplicate Record/Request
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Variable [ $new_tag_id[1] ; FAT Tag::PrimaryKey ]
+		Set Field [ FAT Tag::Title id ; $new_lp_id ]
+		Set Field [ FAT Tag::Old PrimaryKey from clone ; $old_tag_id ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_tag_id ) &
+						SetProperty ( "source_table" ; "tag" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Tag::Name text id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF TAG Name::Text ; $tag_text ]
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+# Duplicate page templates
+Go to Layout [ Layout: "🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		Set Variable [ $old_pagetemplate_id[1] ; <Table Missing>::<Field Missing> ]
+		Set Variable [ $pagetemplate_name[1] ; <Table Missing>::<Field Missing> ]
+		Duplicate Record/Request
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Variable [ $new_pagetemplate_id[1] ; <Table Missing>::<Field Missing> ]
+		Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $new_lp_id ]
+		Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $old_pagetemplate_id ]
+		Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $pagetemplate_name ]
+		# Duplicate block X page templates
+		Go to Layout [ Layout: "🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Set Variable [ $foundCount_spt[1] ; Get(foundCount) ]
+			Set Variable [ $recordPosn_spt[1] ; 1 ]
+			Go to Record/Request/Page [ First ]
+			Loop [ Flush: Always ]
+				Set Variable [ $old_symbol_id[1] ; <Table Missing>::<Field Missing> ]
+				Set Variable [ $sortindex[1] ; <Table Missing>::<Field Missing> ]
+				Duplicate Record/Request
+				Set Variable [ $recordPosn_spt[1] ; $recordPosn_spt  + 1 ]
+				Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $new_pagetemplate_id ]
+				Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $sortindex ]
+				Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				Set Variable [ $new_symbol_id[1] ; FAT Block::PrimaryKey ]
+				Go to Layout [ Layout: "🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨" ; Animation: None ]
+				Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $new_symbol_id ]
+				Exit Loop If [ $recordPosn_spt > $foundCount_spt ]
+				Go to Record/Request/Page [ With dialog: OFF ; $recordPosn_spt ]
+			End Loop
+		End If
+		Go to Layout [ Layout: "🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨" ; Animation: None ]
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+# Go through the content
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount_PK[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn_PK[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		# Package loop
+		Set Variable [ $old_pk_id[1] ; FAT Package::PrimaryKey ]
+		Set Variable [ $pk_title_text[1] ; TF PK Header::Text ]
+		Set Variable [ $pk_subtitle1_text[1] ; TF PK Sub header 1::Text ]
+		Set Variable [ $pk_subtitle2_text[1] ; TF PK Sub header 2::Text ]
+		Set Variable [ $pk_sortindex[1] ; FAT Package::SortIndex ]
+		Duplicate Record/Request
+		Set Field [ FAT Package::Parent id ; $new_lp_id ]
+		Set Field [ FAT Package::SortIndex ; $pk_sortindex ]
+		Set Variable [ $recordPosn_CS[1] ; $recordPosn_CS  + 1 ]
+		Set Variable [ $new_pk_id[1] ; FAT Package::PrimaryKey ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pk_id ) &
+						SetProperty ( "source_table" ; "package" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Package::Header txt id ) ) &
+						SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+						SetProperty ( "package_id" ; $new_pk_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF PK Header::Text ; $pk_title_text ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pk_id ) &
+						SetProperty ( "source_table" ; "package" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Package::Sub header 1 txt id ) ) &
+						SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+						SetProperty ( "package_id" ; $new_pk_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF PK Sub header 1::Text ; $pk_subtitle1_text ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pk_id ) &
+						SetProperty ( "source_table" ; "package" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Package::Sub header 2 txt id ) ) &
+						SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+						SetProperty ( "package_id" ; $new_pk_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF PK Sub header 2::Text ; $pk_subtitle2_text ]
+		Perform Script [ From list ; "Clone ModifierValue" ; Parameter: SetProperty ( "old_item_id" ; $old_pk_id ) & 
+						SetProperty ( "new_item_id" ; $new_pk_id ) & 
+						SetProperty ( "new_lp_id" ; $new_lp_id ) & 
+						SetProperty ( "new_pk_id" ; $new_pk_id ) ]
+		Perform Script [ From list ; "" ; Parameter: SetProperty ( "old_item_id" ; $old_pk_id ) & 
+						SetProperty ( "new_item_id" ; $new_pk_id ) & 
+						SetProperty ( "new_lp_id" ; $new_lp_id ) ]
+		Perform Script [ From list ; "Clone Tag values" ; Parameter: SetProperty ( "old_item_id" ; $old_pk_id ) & 
+						SetProperty ( "new_item_id" ; $new_pk_id ) & 
+						SetProperty ( "new_lp_id" ; $new_lp_id ) ]
+		# Go to chapters
+		Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Set Variable [ $foundCount_CH[1] ; Get(foundCount) ]
+			Set Variable [ $recordPosn_CH[1] ; 1 ]
+			Go to Record/Request/Page [ First ]
+			Loop [ Flush: Always ]
+				# Chapter loop
+				Set Variable [ $old_ch_id[1] ; FAT Chapter::PrimaryKey ]
+				Set Variable [ $ch_title_text[1] ; TF CH Header::Text ]
+				Set Variable [ $ch_subtitle1_text[1] ; TF CH Sub header::Text ]
+				Set Variable [ $ch_subtitle2_text[1] ; TF CH Sub header 2::Text ]
+				Set Variable [ $cs_sortindex[1] ; FAT Chapter::SortIndex ]
+				Duplicate Record/Request
+				Set Field [ FAT Chapter::Parent id ; $new_cs_id ]
+				Set Field [ FAT Chapter::SortIndex ; $ch_sortindex ]
+				Set Variable [ $recordPosn_CH[1] ; $recordPosn_CH  + 1 ]
+				Set Variable [ $new_ch_id[1] ; FAT Chapter::PrimaryKey ]
+				Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ch_id ) &
+								SetProperty ( "source_table" ; "chapter" ) &
+								SetProperty ( "source_textfield" ; GetFieldName ( FAT Chapter::Header txt id ) ) &
+								SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+								SetProperty ( "package_id" ; $new_pk_id ) &
+								SetProperty ( "caller_layout" ; Get(layoutName )) ]
+				Set Field [ TF CH Header::Text ; $ch_title_text ]
+				Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ch_id ) &
+								SetProperty ( "source_table" ; "chapter" ) &
+								SetProperty ( "source_textfield" ; GetFieldName ( FAT Chapter::Sub header txt id ) ) &
+								SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+								SetProperty ( "package_id" ; $new_pk_id ) &
+								SetProperty ( "caller_layout" ; Get(layoutName )) ]
+				Set Field [ TF CH Sub header::Text ; $ch_subtitle1_text ]
+				Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ch_id ) &
+								SetProperty ( "source_table" ; "chapter" ) &
+								SetProperty ( "source_textfield" ; GetFieldName ( FAT Chapter::Sub header 2 txt id Legacy ) ) &
+								SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+								SetProperty ( "package_id" ; $new_pk_id ) &
+								SetProperty ( "caller_layout" ; Get(layoutName )) ]
+				Set Field [ TF CH Sub header 2::Text ; $ch_subtitle2_text ]
+				Perform Script [ From list ; "Clone ModifierValue" ; Parameter: SetProperty ( "old_item_id" ; $old_ch_id ) & 
+								SetProperty ( "new_item_id" ; $new_ch_id ) & 
+								SetProperty ( "new_lp_id" ; $new_lp_id ) & 
+								SetProperty ( "new_pk_id" ; $new_pk_id ) ]
+				Perform Script [ From list ; "" ; Parameter: SetProperty ( "old_item_id" ; $old_ch_id ) & 
+								SetProperty ( "new_item_id" ; $new_ch_id ) & 
+								SetProperty ( "new_lp_id" ; $new_lp_id ) ]
+				Perform Script [ From list ; "Clone Tag values" ; Parameter: SetProperty ( "old_item_id" ; $old_ch_id ) & 
+								SetProperty ( "new_item_id" ; $new_ch_id ) & 
+								SetProperty ( "new_lp_id" ; $new_lp_id ) ]
+				# Go to pages
+				Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)>0 ]
+					Set Variable [ $foundCount_PG[1] ; Get(foundCount) ]
+					Set Variable [ $recordPosn_PG[1] ; 1 ]
+					Go to Record/Request/Page [ First ]
+					Loop [ Flush: Always ]
+						# Page loop
+						Set Variable [ $old_pg_id[1] ; FAT Page::PrimaryKey ]
+						Set Variable [ $pg_title_text[1] ; TF PG Header::Text ]
+						Set Variable [ $pg_subtitle1_text[1] ; TF PG Sub header 1::Text ]
+						Set Variable [ $pg_subtitle2_text[1] ; TF PG Sub header 2::Text ]
+						Set Variable [ $pg_sortindex[1] ; FAT Page::SortIndex ]
+						Duplicate Record/Request
+						Set Field [ FAT Page::Parent id ; $new_ch_id ]
+						Set Field [ FAT Page::SortIndex ; $pg_sortindex ]
+						Set Variable [ $recordPosn_PG[1] ; $recordPosn_PG  + 1 ]
+						Set Variable [ $new_pg_id[1] ; FAT Page::PrimaryKey ]
+						Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pg_id ) &
+										SetProperty ( "source_table" ; "page" ) &
+										SetProperty ( "source_textfield" ; GetFieldName ( FAT Page::Header txt id ) ) &
+										SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+										SetProperty ( "package_id" ; $new_pk_id ) &
+										SetProperty ( "caller_layout" ; Get(layoutName )) ]
+						Set Field [ TF PG Header::Text ; $pg_title_text ]
+						Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pg_id ) &
+										SetProperty ( "source_table" ; "page" ) &
+										SetProperty ( "source_textfield" ; GetFieldName ( FAT Page::Sub header 1 txt id ) ) &
+										SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+										SetProperty ( "package_id" ; $new_pk_id ) &
+										SetProperty ( "caller_layout" ; Get(layoutName )) ]
+						Set Field [ TF PG Sub header 1::Text ; $pg_subtitle1_text ]
+						Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pg_id ) &
+										SetProperty ( "source_table" ; "page" ) &
+										SetProperty ( "source_textfield" ; GetFieldName ( FAT Page::Sub header 2 txt id ) ) &
+										SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+										SetProperty ( "package_id" ; $new_pk_id ) &
+										SetProperty ( "caller_layout" ; Get(layoutName )) ]
+						Set Field [ TF PG Sub header 2::Text ; $pg_subtitle2_text ]
+						Perform Script [ From list ; "Clone ModifierValue" ; Parameter: SetProperty ( "old_item_id" ; $old_pg_id ) & 
+										SetProperty ( "new_item_id" ; $new_pg_id ) & 
+										SetProperty ( "new_lp_id" ; $new_lp_id ) & 
+										SetProperty ( "new_pk_id" ; $new_pk_id ) ]
+						Perform Script [ From list ; "" ; Parameter: SetProperty ( "old_item_id" ; $old_pg_id ) & 
+										SetProperty ( "new_item_id" ; $new_pg_id ) & 
+										SetProperty ( "new_lp_id" ; $new_lp_id ) ]
+						Perform Script [ From list ; "Clone Tag values" ; Parameter: SetProperty ( "old_item_id" ; $old_pg_id ) & 
+										SetProperty ( "new_item_id" ; $new_pg_id ) & 
+										SetProperty ( "new_lp_id" ; $new_lp_id ) ]
+						# Go to page items
+						Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+						Perform Find [ ⚠️ RESTORE ⚠️ ]
+						If [ Get(foundCount)>0 ]
+							Set Variable [ $foundCount_PI[1] ; Get(foundCount) ]
+							Set Variable [ $recordPosn_PI[1] ; 1 ]
+							Go to Record/Request/Page [ First ]
+							Loop [ Flush: Always ]
+								# Page item loop
+								Set Variable [ $old_pi_id[1] ; FAT Page item::PrimaryKey ]
+								Set Variable [ $pi_text1[1] ; TF PI Text 1::Text ]
+								Set Variable [ $pi_text2[1] ; TF PI Text 2::Text ]
+								Set Variable [ $pi_text3[1] ; TF PI Text 3::Text ]
+								Set Variable [ $pi_text4[1] ; TF PI Text 4::Text ]
+								Set Variable [ $pi_text5[1] ; TF PI Text 5::Text ]
+								Set Variable [ $pi_text6[1] ; TF PI Text 6::Text ]
+								Set Variable [ $pi_text7[1] ; TF PI Text 7::Text ]
+								Set Variable [ $pi_media1[1] ; Media PI 1::Media container ]
+								Set Variable [ $pi_media2[1] ; Media PI 2::Media container ]
+								Set Variable [ $pi_sortindex[1] ; FAT Page item::SortIndex ]
+								Duplicate Record/Request
+								Set Field [ FAT Page item::Parent id ; $new_pg_id ]
+								Set Field [ FAT Page item::SortIndex ; $pi_sortindex ]
+								Set Variable [ $recordPosn_PI[1] ; $recordPosn_PI  + 1 ]
+								Set Variable [ $new_pi_id[1] ; FAT Page item::PrimaryKey ]
+								Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pi_id ) &
+												SetProperty ( "source_table" ; "page-item" ) &
+												SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 1 id ) ) &
+												SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+												SetProperty ( "package_id" ; $new_pk_id ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) ]
+								Set Field [ TF PI Text 1::Text ; $pi_text1 ]
+								Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pi_id ) &
+												SetProperty ( "source_table" ; "page-item" ) &
+												SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 2 id ) ) &
+												SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+												SetProperty ( "package_id" ; $new_pk_id ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) ]
+								Set Field [ TF PI Text 2::Text ; $pi_text2 ]
+								Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pi_id ) &
+												SetProperty ( "source_table" ; "page-item" ) &
+												SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 3 id ) ) &
+												SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+												SetProperty ( "package_id" ; $new_pk_id ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) ]
+								Set Field [ TF PI Text 3::Text ; $pi_text3 ]
+								Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pi_id ) &
+												SetProperty ( "source_table" ; "page-item" ) &
+												SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 4 id ) ) &
+												SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+												SetProperty ( "package_id" ; $new_pk_id ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) ]
+								Set Field [ TF PI Text 4::Text ; $pi_text4 ]
+								Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pi_id ) &
+												SetProperty ( "source_table" ; "page-item" ) &
+												SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 5 id ) ) &
+												SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+												SetProperty ( "package_id" ; $new_pk_id ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) ]
+								Set Field [ TF PI Text 5::Text ; $pi_text5 ]
+								Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pi_id ) &
+												SetProperty ( "source_table" ; "page-item" ) &
+												SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 6 id ) ) &
+												SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+												SetProperty ( "package_id" ; $new_pk_id ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) ]
+								Set Field [ TF PI Text 6::Text ; $pi_text6 ]
+								Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pi_id ) &
+												SetProperty ( "source_table" ; "page-item" ) &
+												SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 7 id ) ) &
+												SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+												SetProperty ( "package_id" ; $new_pk_id ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) ]
+								Set Field [ TF PI Text 7::Text ; $pi_text7 ]
+								Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Page item::PrimaryKey ) &
+												SetProperty ( "source_table" ; "page-item" ) &
+												SetProperty ( "source_mediafield" ; GetFieldName ( FAT Page item::Media 1 id ) ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) &
+												SetProperty ( "learningprogramme_id" ; $new_lp_id) &
+												SetProperty ( "package_id" ; $new_pk_id ) ]
+								Set Field [ Media PI 1::Media container ; $pi_media1 ]
+								Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Page item::PrimaryKey ) &
+												SetProperty ( "source_table" ; "page-item" ) &
+												SetProperty ( "source_mediafield" ; GetFieldName ( FAT Page item::Media 2 id ) ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) &
+												SetProperty ( "learningprogramme_id" ; $new_lp_id) &
+												SetProperty ( "package_id" ; $new_pk_id ) ]
+								Set Field [ Media PI 2::Media container ; $pi_media2 ]
+								Perform Script [ From list ; "Clone ModifierValue" ; Parameter: SetProperty ( "old_item_id" ; $old_pi_id ) & 
+												SetProperty ( "new_item_id" ; $new_pi_id ) & 
+												SetProperty ( "new_lp_id" ; $new_lp_id ) & 
+												SetProperty ( "new_pk_id" ; $new_pk_id ) ]
+								Perform Script [ From list ; "" ; Parameter: SetProperty ( "old_item_id" ; $old_pi_id ) & 
+												SetProperty ( "new_item_id" ; $new_pi_id ) & 
+												SetProperty ( "new_lp_id" ; $new_lp_id ) ]
+								Perform Script [ From list ; "Clone Tag values" ; Parameter: SetProperty ( "old_item_id" ; $old_pi_id ) & 
+												SetProperty ( "new_item_id" ; $new_pi_id ) & 
+												SetProperty ( "new_lp_id" ; $new_lp_id ) ]
+								Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+								# Point to the new symbol created earlier in Make an empty copy
+								Set Variable [ $old_symbol_id[1] ; FAT Page item::Block id ]
+								Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+								Perform Find [ ⚠️ RESTORE ⚠️ ]
+								Set Variable [ $new_symbol_id[1] ; FAT Block::PrimaryKey ]
+								Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+								Set Field [ FAT Page item::Block id ; $new_symbol_id ]
+								
+								# Go to content arrays
+								Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+								Perform Find [ ⚠️ RESTORE ⚠️ ]
+								If [ Get(foundCount)>0 ]
+									Set Variable [ $foundCount_CA[1] ; Get(foundCount) ]
+									Set Variable [ $recordPosn_CA[1] ; 1 ]
+									Go to Record/Request/Page [ First ]
+									Loop [ Flush: Always ]
+										# Content array loop
+										Set Variable [ $old_ca_id[1] ; FAT Block @ Page item::PrimaryKey ]
+										Set Variable [ $ca_text1[1] ; TF LI PI 1::Text ]
+										Set Variable [ $ca_text2[1] ; TF LI PI 2::Text ]
+										Set Variable [ $ca_text3[1] ; TF LI PI 3::Text ]
+										Set Variable [ $ca_media[1] ; Media LI PI 1::Media container ]
+										Duplicate Record/Request
+										Set Field [ FAT List item @ Page item::Parent id ; $new_pi_id ]
+										Set Variable [ $recordPosn_CA[1] ; $recordPosn_CA  + 1 ]
+										Set Variable [ $new_ca_id[1] ; FAT List item @ Page item::PrimaryKey ]
+										
+										Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ca_id ) &
+														SetProperty ( "source_table" ; "page-item" ) &
+														SetProperty ( "source_textfield" ; GetFieldName ( FAT List item @ Page item::Text 1 id ) ) &
+														SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+														SetProperty ( "package_id" ; $new_pk_id ) &
+														SetProperty ( "caller_layout" ; Get(layoutName )) ]
+										Set Field [ TF LI PI 1::Text ; $ca_text1 ]
+										Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ca_id ) &
+														SetProperty ( "source_table" ; "page-item" ) &
+														SetProperty ( "source_textfield" ; GetFieldName ( FAT List item @ Page item::Text 2 id ) ) &
+														SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+														SetProperty ( "package_id" ; $new_pk_id ) &
+														SetProperty ( "caller_layout" ; Get(layoutName )) ]
+										Set Field [ TF LI PI 2::Text ; $ca_text2 ]
+										Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ca_id ) &
+														SetProperty ( "source_table" ; "page-item" ) &
+														SetProperty ( "source_textfield" ; GetFieldName ( FAT List item @ Page item::Text 3 id ) ) &
+														SetProperty ( "learningprogramme_id" ; $new_lp_id ) &
+														SetProperty ( "package_id" ; $new_pk_id ) &
+														SetProperty ( "caller_layout" ; Get(layoutName )) ]
+										Set Field [ TF LI PI 3::Text ; $ca_text3 ]
+										Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $new_ca_id ) &
+														SetProperty ( "source_table" ; "page-item" ) &
+														SetProperty ( "source_mediafield" ; GetFieldName ( FAT List item @ Page item::Media 1 id ) ) &
+														SetProperty ( "caller_layout" ; Get(layoutName )) &
+														SetProperty ( "learningprogramme_id" ; $new_lp_id) &
+														SetProperty ( "package_id" ; $new_pk_id ) ]
+										Set Field [ Media LI PI 1::Media container ; $ca_media ]
+										Exit Loop If [ $recordPosn_CA > $foundCount_CA ]
+										Go to Record/Request/Page [ With dialog: OFF ; $recordPosn_CA ]
+									End Loop
+								End If
+								Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+								Exit Loop If [ $recordPosn_PI > $foundCount_PI ]
+								Go to Record/Request/Page [ With dialog: OFF ; $recordPosn_PI ]
+							End Loop
+						End If
+						
+						Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+						Exit Loop If [ $recordPosn_PG > $foundCount_PG ]
+						Go to Record/Request/Page [ With dialog: OFF ; $recordPosn_PG ]
+					End Loop
+				End If
+				
+				Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+				Exit Loop If [ $recordPosn_CH > $foundCount_CH ]
+				Go to Record/Request/Page [ With dialog: OFF ; $recordPosn_CH ]
+			End Loop
+		End If
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		Exit Loop If [ $recordPosn_PK > $foundCount_PK ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn_PK ]
+	End Loop
+End If
+
+

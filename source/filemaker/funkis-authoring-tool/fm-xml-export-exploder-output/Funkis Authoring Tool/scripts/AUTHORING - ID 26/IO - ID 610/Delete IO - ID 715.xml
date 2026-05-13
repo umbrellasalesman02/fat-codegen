@@ -1,0 +1,306 @@
+<Script>
+	<ScriptReference id="715" name="Delete IO"></ScriptReference>
+	<ObjectList membercount="32">
+		<Step hash="D8733A3D0EA957FEABF56FFC2CF91B4D" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called from IO review overview"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B63AFF87A1ACD35DE163700D6F999542" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="FDF18FA8365FB90A2A8C2E7B0E972D09" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[FAT IO::Number of instances > 0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6CDF4FFDEA4EAC518853AEFC1F3FE60C" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Cannot delete IO"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["There are several page items connected to this IO. Please remove these connections before deleting the IO by pressing the button View instances."]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="849A85BCDE2D9A1DBCE2B04D62A6017D" id="103" name="Exit Script" enable="True">
+		</Step>
+		<Step hash="A5BAAC94A552EF001E24427463BC6C0B" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="B4C9BB25840FB77145F54CD9CE91D7B4" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="If IO is included in an array, number of instances will not detect that"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C3522DFD79C8D64F38D916435832BE94" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="IO type score corresponds to a score category"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="10A6BFD84A049033F82D9C0F163CF2D9" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[FAT IO::IO type = "Score"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4599CAE11A7BF0689D34CF2D41421BBD" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Delete Score IO"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["The Score IO type corresponds to a score category. Deleting this IO will also delete the score categoy and all its occurences in the Title. ¶¶Are you sure you want to delete this IO?"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Cancel">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4EB7CF89EB0784B84285181F2E71A485" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastMessageChoice) = 2]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5D2579064A658F5271E6DD2DF01F4CFA" id="103" name="Exit Script" enable="True">
+		</Step>
+		<Step hash="E844CB2BAB762F5A5ED11A8A165509ED" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="35F123FC5A271BCE6A1DBA90BD1B0EC3" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT IO::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$io_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D7F8561C6B5C672277AD704FDED0111A" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="D972A5C42EF72014D4C587937D2A014D" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B0CFA5721C885BA5623E1DC8C6CD670E" id="104" name="Delete Portal Row" enable="True">
+			<Options>128</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="09AEBB9F9158761525A2C80B200C0794" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find and delete the corresponding score category - if it exist"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BB61FF38A55CE9A0E1DDF3070CDAB20E" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="414" name="TABLE FAT Score Category"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="290D6EC867B644D9CFCA7DBE98841732" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$io_id">
+								<FieldReference id="19" name="IO id">
+									<TableOccurrenceReference id="1065684" name="FAT Score variable"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7C94C012DCD9BE562B3E645A99FA8276" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get ( foundCount )=1]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C95354D09050991030D74B2750118B07" id="9" name="Delete Record/Request" enable="True">
+			<Options>128</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7E046909B07B72B1139CAB2713314695" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="A4D3E834AD872889450FDF32645B5249" id="6" name="Go to Layout" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F922F393A01541976821B183A7A09F00" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="887E844762BA2546E57E96F61C57CD32" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Standard delete of an unused IO"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A9B8E3E2B25819652FF1F9D4A9B4098A" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16389</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Delete IO"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["This IO is not in use. You can safely delete this IO without losing any data."]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="Delete">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2" value="Cancel">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C8AB7DCE18D5B0040921BB22451DB688" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastMessageChoice) = 1]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="46CB10E3039247952794434AE1B5632E" id="104" name="Delete Portal Row" enable="True">
+			<Options>128</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0F7E5680F0C6084615C1462B8502EEC5" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="445042CEA8D7766B4042D60F02E5DFB5" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="7180336AFFC38A66A5F673CF1BBEC02C" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

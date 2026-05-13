@@ -1,0 +1,24 @@
+# Script called from button in Title List item and Page item list item
+# Creates a comma-separated list of IO ids. VERY Legacy
+
+If [ Get(scriptParameter) = "Title" ]
+	Set Variable [ $io_id[1] ; FAT List item::Value 1 ]
+	If [ IsEmpty(FAT List item::IO id array) ]
+		Set Field [ FAT List item::IO id array ; "\"" & $io_id & "\"" ]
+	Else
+		Set Variable [ $io_array[1] ; FAT List item::IO id array ]
+		Set Field [ FAT List item::IO id array ; $io_array & "," & "\"" & $io_id & "\"" ]
+	End If
+Else If [ Get(scriptParameter)= "Page item" ]
+	Set Variable [ $io_id[1] ; FAT List item @ Page item::Value 1 ]
+	If [ IsEmpty(FAT List item @ Page item::IO id array) ]
+		Set Field [ FAT List item @ Page item::IO id array ; "\"" & $io_id & "\"" ]
+	Else
+		Set Variable [ $io_array[1] ; FAT List item @ Page item::IO id array ]
+		Set Field [ FAT List item @ Page item::IO id array ; $io_array & "," & "\"" & $io_id & "\"" ]
+	End If
+End If
+
+
+// Set Field [ FAT Page item::IO id Legacy ; "" ]
+

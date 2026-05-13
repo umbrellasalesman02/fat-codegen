@@ -1,0 +1,13 @@
+# Called from Block Template
+Freeze Window
+Set Error Capture [ ON ]
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $block_template_id[1] ; BlockTemplate::PrimaryKey ]
+Go to Layout [ Layout: "FAT Block" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+If [ Get(foundCount)=0 ]
+	Show Custom Dialog [ Title: "No blocks found" ; Message: "It seems there's no Title using this Block yet. " ; Default Button: "OK" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+

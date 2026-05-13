@@ -1,0 +1,36 @@
+# Publish all new packages on Funkis Cloud
+#  Called via PSOS
+# Called from Clone Content MASTER - checks for packages with oldPrimaryKey
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+
+# Find all packages with oldPrimaryKey
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $package_id[1] ; FAT Package Alt::PrimaryKey ]
+		Set Variable [ $package_type[1] ; FAT Package Alt::Package type id ]
+		Set Variable [ $package_type_name[1] ; FAT Package Alt::Package type name ]
+		
+		If [ $package_type_name = "Site" Or $package_type_name = "Slide"  Or $package_type_name = "Scroll" ]
+			# If neither a Title information nor a Mixed type package
+			# Instruct Task Server to perform the first build
+			Perform Script [ From list ; "Publish Remote CL" ; Parameter: SetProperty ( "publish_mode" ; "CODE_UPDATE" ) &
+							SetProperty ( "caller" ; "Package") &
+							SetProperty ( "show_dialog" ; "false") &
+							SetProperty ( "first_build" ; "true") &
+							SetProperty ( "package_id" ; $package_id) ]
+		End If
+		
+		Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		
+	End Loop
+	
+End If
+
+
+

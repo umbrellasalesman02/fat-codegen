@@ -1,0 +1,72 @@
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+# Stage 1
+  Called from both Human and Machine translation tool
+# For Human translation - localisation will be in STAGE 3 after this script
+# For Machine translation - localisation will be in STAGE 4 after this script
+
+# First check that all export paths are in order for human translation
+If [ User X Title @ Title::Title Filepath export="" And FAT Localisation @ Package::Translation method = "Human translation" ]
+	Show Custom Dialog [ Title: "No file path found!" ; Message: "Export path is missing, so FAT doesn't know where to save the files. This setting can be found in the sidebar on the Title content view." ; Default Button: "OK" ]
+	Exit Script []
+End If
+# Then - ensure that all texts in original language are numbered in contextual order
+If [ IsEmpty (FAT Package::TextInContextualOrderTimeStamp) ]
+	Show Custom Dialog [ Title: "Sort text in order" ; Message: "This is your first translation for this package. Before starting the translation, FAT will arrange all texts in the right contextual order. If adding new texts they will not be included in the order." & ¶ & ¶ & 
+					"This will take some time. Please be patient." ; Default Button: "OK" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice) = 1 ]
+		
+		Perform Script [ From list ; "Arrange text in order Package" ; Parameter: SetProperty ( "title_id" ; FAT Localisation::Title id) &
+						SetProperty ( "package_id" ; FAT Localisation::Package id ) &
+						SetProperty ( "localisation_id" ; FAT Localisation::PrimaryKey) &
+						SetProperty ( "localisation_code" ; FAT Localisation::Original Localisation code) ]
+		# It seems that PSOS did not improve any performance
+		// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		If [ Get(ScriptResult) = "success" ]
+			# Indicate that Package texts now are in contextual order
+			Set Field [ FAT Package::TextInContextualOrderTimeStamp ; Get(currentHostTimeStamp) ]
+			Show Custom Dialog [ Title: "Text sorted" ; Message: "The original texts are now sorted in the contextual order. Please continue with the translation." ; Default Button: "OK" ]
+			Go to Layout [ Layout: "FAT Package Settings" ; Animation: None ]
+		Else
+			Show Custom Dialog [ Title: "Error when sorting text" ; Message: "Something went wrong when sorting the original texts in contextual order. Translation process cannot continue." ; Default Button: "OK" ]
+		End If
+	Else
+		Exit Script [ Get(ScriptResult) ]
+	End If
+	
+End If
+
+If [ FAT Localisation @ Package::Translation method = "Human translation" ]
+	If [ IsEmpty ( FAT Localisation @ Package::Translation provider ) ]
+		Show Custom Dialog [ Title: "Translation provider" ; Message: "Please, enter the name of the translation provider that will be used for this translation. ¶¶This will make it easier to backtrack the translation later. " ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $translation_provider ; Label 1: "Name of provider" ]
+		If [ Get(lastMessageChoice) = 2 ]
+			Exit Script []
+		End If
+		Set Field [ FAT Localisation @ Package::Translation provider ; $translation_provider ]
+	End If
+	Show Custom Dialog [ Title: "Sit back and relax" ; Message: "Funkis Authoring Tool will now create new text fields in the database, if they haven't already been created. This operation will take up to 20 min depending on the number of text chunks in the package. ¶¶Please be patient." ; Default Button: "OK" ; Button 2: "Cancel" ]
+Else If [ FAT Localisation @ Package::Translation method = "Machine translation" ]
+	Set Field [ FAT Localisation @ Package::Translation provider ; Translation API @ Package::API Name ]
+	Show Custom Dialog [ Title: "Sit back and relax" ; Message: "This operation will take up to 20 min depending on the number of text chunks in the package.¶¶If you are re-translating an existing translation please note: Texts that haven't been modified since last translation and texts marked as Approved will NOT be sent again to translation.¶¶Please be patient." ; Default Button: "OK" ; Button 2: "Cancel" ]
+End If
+
+If [ Get(lastMessageChoice) = 1 ]
+	Set Variable [ $translation_provider[1] ; FAT Localisation @ Package::Translation provider ]
+	
+	# Add event to log
+	Set Variable [ $localisation_id[1] ; FAT Localisation @ Package::PrimaryKey ]
+	Set Variable [ $event_text[1] ; $translation_provider & " chosen as the translation provider." ]
+	Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+					SetProperty ( "event_text" ; $event_text ) ]
+	
+	Perform Script [ From list ; "Package localisation MASTER" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+

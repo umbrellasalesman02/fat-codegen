@@ -1,0 +1,34 @@
+
+Freeze Window
+Set Variable [ $list_item_id[1] ; GetScriptProperty ( "list_item_id" ) ]
+# Caller can be "Title List" or "Page item List"
+Set Variable [ $caller[1] ; GetScriptProperty("caller") ]
+
+
+# Open card
+Set Variable [ $$currentWindow[1] ; Get(windowName) ]
+If [ $caller = "Title List" ]
+	# If called from the Card - Title List
+	If [ Get(WindowStyle) = 3 ]
+		Set Variable [ $$call_layout[1] ; Get(layoutName) ]
+		Go to Layout [ Layout: "FAT TT List Item Card" ; Animation: Slide in from Right ]
+	Else
+		New Window [ Style: Card ; Name: "List item" ; Layout: "FAT TT List Item Card" ; Height: 680 * Get(WindowZoomLevel)/100 ; Width: 1140 * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+	End If
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Go to Object [ FAT List item::LastAdaptiveSettingsTab ; Repetition: 1 ]
+Else If [ $caller = "Page item List" ]
+	# If called from the Sub page item Card - Title List
+	If [ Get(WindowStyle) = 3 ]
+		Set Variable [ $$call_layout[1] ; Get(layoutName) ]
+		Go to Layout [ Layout: "FAT PI List Item Card" ; Animation: Slide in from Right ]
+	Else
+		New Window [ Style: Card ; Name: "List item" ; Layout: "FAT PI List Item Card" ; Height: 680 * Get(WindowZoomLevel)/100 ; Width: 1140 * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+	End If
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Go to Object [ FAT List item @ Page item::LastAdaptiveSettingsTab ; Repetition: 1 ]
+End If
+
+Perform Script [ From list ; "Init List item Rich Text Editor" ; Parameter: $caller ]
+
+

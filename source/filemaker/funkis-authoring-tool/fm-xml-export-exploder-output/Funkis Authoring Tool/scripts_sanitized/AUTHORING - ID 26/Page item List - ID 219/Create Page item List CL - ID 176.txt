@@ -1,0 +1,19 @@
+# Page item Lists can only be created on Page item level
+
+Freeze Window
+
+Set Variable [ $source_table[1] ; "page-item" ]
+Set Variable [ $item_id[1] ; FAT Page item::PrimaryKey ]
+Set Variable [ $numOfItems[1] ; GetAsNumber (FAT Page item::gCreateNumOfTextFields ) ]
+Set Variable [ $learningprogramme_id[1] ; FAT Title::PrimaryKey ]
+
+// Perform Script [ From list ; "Create Page item List SRV" ; Parameter: SetProperty ( "item_id" ; $item_id ) &
+				SetProperty ( "source_table" ; $source_table ) &
+				SetProperty ( "num_of_items" ; $numOfItems  ) &
+				SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Commit Records/Requests [ With dialog: OFF ]
+Refresh Object [ Name: "Page item List" ]
+
+
+

@@ -1,0 +1,21 @@
+Set Error Capture [ ON ]
+If [ Get(layoutName) = "FAT Texts" ]
+	Set Variable [ $searchDate[1] ; Timestamp (FAT Text::gSearchDate; Get(currentTime)) ]
+	If [ IsEmpty (FAT Text::Package id) ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else
+		# Search show Package text including global texts, tags
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	End If
+Else
+	Set Variable [ $searchDate[1] ; Timestamp (FAT Text translated::gSearchDate; Get(currentTime)) ]
+	If [ IsEmpty (FAT Text translated::Package id) ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else
+		# Search show Package text including global texts, tags
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	End If
+End If
+

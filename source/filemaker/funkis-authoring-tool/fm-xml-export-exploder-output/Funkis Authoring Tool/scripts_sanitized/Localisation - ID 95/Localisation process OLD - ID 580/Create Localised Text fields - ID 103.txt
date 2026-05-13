@@ -1,0 +1,71 @@
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+# This script is used for:
+  Creating new text fields labeled with language and country - prepared to be translated
+  If a text field with the localisation code already exists, it is left as it is
+
+# This script is called for both Human translation and Machine translation
+
+# This script is normally performed on the server
+
+Set Error Capture [ ON ]
+Set Variable [ $title_id[1] ; GetScriptProperty ("title_id") ]
+Set Variable [ $package_id[1] ; GetScriptProperty ("package_id") ]
+
+Set Variable [ $original_localisation_code[1] ; GetScriptProperty ( "original_localisation_code" ) ]
+Set Variable [ $target_localisation_code[1] ; GetScriptProperty ( "target_localisation_code" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+
+# Find all texts in title in orignal localisation code - omit empty and omit specific package texts!
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+# Extend with all texts in package in orignal localisation code - omit empty!
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+# Sort texts using recordNumberReference if exist
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Go to Record/Request/Page [ First ]
+
+Set Variable [ $num_of_created[1] ; 0 ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		# Get the original text
+		Set Variable [ $original_key[1] ; FAT Text::PrimaryKey ]
+		Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+		# Check if text is created earlier - Search for original key and localisation code
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)=0 ]
+			# Translated version of text does not exist
+			# New approach 20220523: Use tranlate as a layout if duplicate of unnumbered texts creates unexpected effects
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			// # Since records are sorted - duplicates appears immediately below current record
+			Duplicate Record/Request
+			
+			If [ Get(lastError) ≠0 And Get(lastError)≠401 ]
+				# Record in use by another user - field cannot be duplicated
+				Exit Script [ "Error. Cannot duplicate. Field is in use by another user." & ¶ & Get( lastErrorDetail ) ]
+			End If
+			
+			Set Variable [ $num_of_created[1] ; $num_of_created + 1 ]
+			
+			# 220523 - Now using table FAT Text Translated
+			Set Field [ FAT Text translated::OriginalKey ; $original_key ]
+			Set Field [ FAT Text translated::Language code ; getLanguageCode ( $target_localisation_code ) ]
+			Set Field [ FAT Text translated::Country code ; getCountryCode ( $target_localisation_code ) ]
+			Set Field [ FAT Text translated::Status ; "Not translated" ]
+			Set Field [ FAT Text translated::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; "Not translated" ]
+		End If
+		Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Exit Script [ $num_of_created ]
+
+
+

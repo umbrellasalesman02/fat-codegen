@@ -1,0 +1,45 @@
+
+Set Variable [ $send_api_url[1] ; "https://funkiscloud.com/api/admin/v1/translation-apis/650062ae6dee014e754096bc/translation-request" ]
+Set Variable [ $api_key[1] ; "REDACTED_JWT_TOKEN" ]
+Set Variable [ $textJSON_for_translation[1] ; Let ( [
+				
+				     j1 = JSONSetElement ("{}" ; 
+				          ["value" ; "\”Hej\”" ; JSONString ];
+				          ["id" ; "T1" ; JSONString ]
+				      );
+				
+				     j2 = JSONSetElement ("{}" ; 
+				          ["value" ; "På" ; JSONString ];
+				          ["id" ; "T2" ; JSONString ]
+				      );
+				
+				     j3 = JSONSetElement ("{}" ; 
+				          ["value" ; "Dig" ; JSONString ];
+				          ["id" ; "T3" ; JSONString ]
+				      )
+				
+				];
+				
+				"[" & j1 & ",¶" & j2 & ",¶" & j3 & "]"
+				
+				
+				
+				 ) ]
+
+Set Variable [ $body[1] ; JSONSetElement ( "{}" ; 
+				
+				    [ "values"; $textJSON_for_translation; JSONArray];
+				    [ "from"; "sv"; JSONString];
+				    [ "to"; "en"; JSONString]
+				 ) ]
+Set Variable [ $cURL_options[1] ; _cURL_request ( "POST" ) & 
+				_cURL_header ( "Authorization" ; "Bearer " & $api_key ) & 
+				_cURL_header ( "Content-Type" ; "application/json" ) & 
+				_cURL_header ( "Accept" ; "application/json" ) & 
+				_cURL_show_error & 
+				_cURL_data___string ( $body ) ]
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ; $cURL_options ]
+Set Variable [ $last_error[1] ; Get(lastError) ]
+Set Variable [ $last_error_detail[1] ; Get(lastErrorDetail) ]
+Set Variable [ $translationJSON[1] ; JSONGetElement ( $resultJSON ; "translations" ) ]
+Show Custom Dialog [ Title: "Result" ; Message: $resultJSON ; Default Button: "OK" ]

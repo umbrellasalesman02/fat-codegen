@@ -1,0 +1,169 @@
+# Launched from button for each text chunk in text review layout.
+
+# Text source item types can be:
+  global baseproject
+  -
+  global
+  title
+  package
+  chapter
+  page
+  page-item
+  tag
+  media
+  attribute
+  list-item
+  alt-text
+  io
+  score
+  io-sprig-story
+  -
+  custom imported
+
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $language_mode[1] ; Get(scriptParameter) ]
+
+# Keep track where user left off
+Set Variable [ $recordNumRef[1] ; FAT Text translated::RecordNumberReference ]
+Set Field [ FAT Text::gRecordNumberReference ; $recordNumRef ]
+
+
+
+If [ $language_mode = "original_language" ]
+	If [ IsEmpty ( FAT Text::Package id) ]
+		Show Custom Dialog [ Title: "Shared text" ; Message: Case (  
+						
+						   FAT Block @ Text::PrimaryKey;
+						   
+						   "This text is shared in the Title and belongs to the building block " & FAT Block @ Text::Name & ".";
+						   
+						   IsEmpty (FAT Text::Label);
+						    
+						   "This text is shared in the Title and belongs to the Funkis Player code.";
+						    
+						   "This text is shared in the Title and belongs to the Funkis Player code. Usage is defined as: " & FAT Text::Label & "."
+						   
+						
+						
+						
+						 ) ; Default Button: "OK" ]
+		Exit Script []
+	End If
+	Set Variable [ $location[1] ; FAT Text::Parent id ]
+	Set Variable [ $item_type[1] ; FAT Text::Source item type ]
+	Set Variable [ $table_textfield[1] ; FAT Text::Source reference ]
+Else
+	If [ IsEmpty ( FAT Text translated::Package id) ]
+		Show Custom Dialog [ Title: "Shared text" ; Message: Case (  
+						
+						   FAT Block @ Text translated::PrimaryKey;
+						   
+						   "This text is shared in the Title and belongs to the building block " & FAT Block @ Text translated::Name & ".";
+						   
+						   IsEmpty (FAT Text @ Translation::Label);
+						    
+						   "This text is shared in the title and belongs to the Funkis Player code.";
+						    
+						   "This text is shared in the title and belongs to the Funkis Player code. Usage is defined as: " & FAT Text @ Translation::Label & "."
+						   
+						
+						
+						
+						 ) ; Default Button: "OK" ]
+		Exit Script []
+	End If
+	Set Variable [ $location[1] ; FAT Text translated::Parent id ]
+	Set Variable [ $item_type[1] ; FAT Text translated::Source item type ]
+	Set Variable [ $table_textfield[1] ; FAT Text translated::Source reference ]
+End If
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $success[1] ; True ]
+# Check if imported text.
+If [ PatternCount($table_textfield; "Imported text") And Not PatternCount ( $item_type ; "io-sprig-story" ) ]
+	Show Custom Dialog [ Title: "Imported text" ; Message: "The selected text is imported from an external file (" & $item_type & ") and cannot be displayed in Funkis Authoring Tool. Sorry!" ; Default Button: "OK" ]
+	Perform Script [ From list ; "Go previous layout" ]
+	Exit Script []
+End If
+
+If [ $location = FAT Title::PrimaryKey And Not $item_type = "global" ]
+	Go to Layout [ Layout: "FAT Title" ; Animation: None ]
+	Exit Script []
+End If
+If [ $item_type = "package" ]
+	Go to Layout [ Layout: "FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=0 ]
+		Set Variable [ $success[1] ; False ]
+	End If
+Else If [ $item_type = "chapter" ]
+	# Look in CMT Chapter
+	Go to Layout [ Layout: "FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=0 ]
+		Set Variable [ $success[1] ; False ]
+	End If
+Else If [ $item_type="page" ]
+	# Look in CMT Page
+	Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=0 ]
+		Set Variable [ $success[1] ; False ]
+	End If
+Else If [ $item_type = "page-item" ]
+	# Look in CMT Page item
+	Set Variable [ $$pageItemRecordLoadTrigger[1] ; False ]
+	Go to Layout [ Layout: "FAT Page item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=0 ]
+		Set Variable [ $success[1] ; False ]
+	End If
+	Freeze Window
+	Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "page_id" ; FAT Page item::Parent id) & 
+					SetProperty ( "pageitem_id" ; FAT Page item::PrimaryKey ) ]
+Else If [ $item_type = "list-item" ]
+	// Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+	// Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Perform Script [ From list ; "View Card List Setting" ; Parameter: SetProperty ( "list_id" ; $location ) ]
+Else If [ $item_type = "global" ]
+	# Look in FAT Block
+	If [ isDeveloper ]
+		Go to Layout [ Layout: "FAT Block settings" ; Animation: None ]
+		Go to Object [ "Global text" ; Repetition: 1 ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)=0 ]
+			Set Variable [ $success[1] ; False ]
+		End If
+	Else
+		# No access to Blocks
+		Set Variable [ $success[1] ; False ]
+	End If
+Else If [ $item_type = "io-sprig-story" ]
+	# Look in CMT Page item Special
+	Freeze Window
+	Go to Layout [ Layout: "FAT Page item Special" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=0 ]
+		Set Variable [ $success[1] ; False ]
+	End If
+	Freeze Window
+Else If [ $item_type = "media" ]
+	# Look in FAT Media
+	Go to Layout [ Layout: "FAT Media Subtitle" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=0 ]
+		Set Variable [ $success[1] ; False ]
+	End If
+Else If [ $item_type = "alt-text" ]
+	# Look in FAT Media
+	Perform Script [ From list ; "View Card Media Setting" ; Parameter: $location ]
+End If
+
+If [ $success = False ]
+	Perform Script [ From list ; "Go previous layout" ]
+	Show Custom Dialog [ Title: "Cannot find text in title" ; Message: "The text couldn't be found in a viewable part of the title. It can be a global text or a block text." ; Default Button: "OK" ]
+End If
+
+
+
+

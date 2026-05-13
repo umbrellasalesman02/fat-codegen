@@ -1,0 +1,74 @@
+# Import deleted items from backup - normal case
+# 1. Move a copy of source DB from FileMaker Server to a local or network disk. This is the backup to restore from.
+  2. Perform a find in source DB to show only items that should be imported
+  3. From target DB - select Import records and select source DB
+  4. If only update existing records - select Update and match PrimaryKey
+  5. Unselect all automated generated data
+
+# Cherry-pick deleted items: Import localised text from backup that have been deleted
+# 1. Move a copy of source DB from FileMaker Server to a local or network disk
+  2. In target DB - Manage Database relationships and add a new table from an external source.
+  3. Grant access to the source DB
+  4. Add the table/tables from source DB that you want to fetch data from
+  5. Create new layout/layouts for the new table/tables in target DB
+  6. Create a script that copy from source to target (example below)
+  7. Run script and verify it went OK
+  8. Remove all references to backups in relationship graph
+  9. Delete backup layouts
+
+
+# In this case the localised texts were deleted by mistake and new was created
+# We created new text fields from localisation tool and this script import the backup texts into the new text fields
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $title_id[1] ; "628039FB-04CE-4EF7-8578-CFBE99519784" ]
+Set Variable [ $package_id[1] ; "94C1CF49-AFDF-4E05-B956-984D2F8661D0" ]
+Set Variable [ $localisation_code[1] ; "fr-FR" ]
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $original_key[1] ; FAT Text::OriginalKey ]
+		Set Variable [ $old_key_from_clone[1] ; FAT Text::PrimaryKey Override ]
+		Go to Layout [ Layout: "TABLE FAT Text Translated OLD" ; Animation: None ]
+		# Find text from Title id  + Original key + Localisation code
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)=1 ]
+			Set Variable [ $text[1] ; <Table Missing>::<Field Missing> ]
+			Set Variable [ $enter_time[1] ; <Table Missing>::<Field Missing> ]
+			Set Variable [ $exit_time[1] ; <Table Missing>::<Field Missing> ]
+			Set Variable [ $status[1] ; <Table Missing>::<Field Missing> ]
+			Set Variable [ $change_status[1] ; <Table Missing>::<Field Missing> ]
+			Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+			Set Field [ FAT Text::Text ; $text ]
+			Set Field [ FAT Text::Enter time ; $enter_time ]
+			Set Field [ FAT Text::Exit time ; $exit_time ]
+			Set Field [ FAT Text::Status ; $status ]
+			Set Field [ FAT Text::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $change_status ]
+		Else If [ Get(foundCount)=0 ]
+			# Find text from Title id  + Old Key from clone + Localisation code
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)=1 ]
+				Set Variable [ $text[1] ; <Table Missing>::<Field Missing> ]
+				Set Variable [ $enter_time[1] ; <Table Missing>::<Field Missing> ]
+				Set Variable [ $exit_time[1] ; <Table Missing>::<Field Missing> ]
+				Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+				Set Field [ FAT Text::Text ; $text ]
+				Set Field [ FAT Text::Enter time ; $enter_time ]
+				Set Field [ FAT Text::Exit time ; $exit_time ]
+				Set Field [ FAT Text::Status ; $status ]
+				Set Field [ FAT Text::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $change_status ]
+			Else
+				// Show Custom Dialog [ Title: "No text found in source DB" ; Message: "Original key " & $original_key & "       Old key from clone: " & $old_key_from_clone ; Default Button: "OK" ]
+			End If
+		Else
+			Show Custom Dialog [ Title: "More than one text found in source DB" ; Message: "Original key " & $original_key & "       Old key from clone: " & $old_key_from_clone ; Default Button: "OK" ]
+		End If
+		Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+		
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+

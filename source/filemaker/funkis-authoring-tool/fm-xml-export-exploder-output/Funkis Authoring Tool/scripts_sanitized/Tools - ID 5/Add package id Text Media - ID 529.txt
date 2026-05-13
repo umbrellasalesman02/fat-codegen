@@ -1,0 +1,87 @@
+# This script set the package id reference for all text and media the package where you stand package. It uses the parent id to find texts 
+Set Error Capture [ ON ]
+
+Set Variable [ $title_id[1] ; Case( GetScriptProperty ( "title_id" )= ""; FAT Title::PrimaryKey; GetScriptProperty ( "title_id" )) ]
+Set Variable [ $package_id[1] ; Case( GetScriptProperty ( "package_id" )= ""; FAT Package::PrimaryKey; GetScriptProperty ( "package_id" )) ]
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Replace Field Contents [ FAT Text::Package id ; Replace with calculation: $package_id ]
+Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Replace Field Contents [ FAT Media::Package id ; Replace with calculation: $package_id ]
+
+Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+# Find all chapters in package
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $item_id[1] ; FAT Chapter::PrimaryKey ]
+		Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Replace Field Contents [ FAT Text::Package id ; Replace with calculation: $package_id ]
+		Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Replace Field Contents [ FAT Media::Package id ; Replace with calculation: $package_id ]
+		Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+# Find all pages in package
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $item_id[1] ; FAT Page::PrimaryKey ]
+		Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Replace Field Contents [ FAT Text::Package id ; Replace with calculation: $package_id ]
+		Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Replace Field Contents [ FAT Media::Package id ; Replace with calculation: $package_id ]
+		Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+# Find all page-items in package
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $item_id[1] ; FAT Page item::PrimaryKey ]
+		Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Replace Field Contents [ FAT Text::Package id ; Replace with calculation: $package_id ]
+		Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Replace Field Contents [ FAT Media::Package id ; Replace with calculation: $package_id ]
+		Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+# Find all content Arrays in package
+Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $item_id[1] ; FAT List item @ Page item::PrimaryKey ]
+		Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Replace Field Contents [ FAT Text::Package id ; Replace with calculation: $package_id ]
+		Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Replace Field Contents [ FAT Media::Package id ; Replace with calculation: $package_id ]
+		Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+

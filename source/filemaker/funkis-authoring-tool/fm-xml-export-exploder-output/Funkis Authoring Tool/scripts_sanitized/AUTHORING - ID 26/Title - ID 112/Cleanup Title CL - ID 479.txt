@@ -1,0 +1,18 @@
+# This script is called from LP settings on the language TAB
+# Mode can be "cleanup" - deleting unused blocks or "optimise" also deleting unsed texts and media fields
+
+Set Variable [ $mode[1] ; Get(scriptParameter) ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+If [ $mode="cleanup" ]
+	Show Custom Dialog [ Title: "Delete unused blocks" ; Message: "Clicking OK means that all unused blocks will be removed from this title.  These blocks can be added one by one if needed.¶¶Are you sure you want to delete unused blocks?¶" ; Default Button: "OK" ; Button 2: "Cancel" ]
+Else If [ $mode = "optimise" ]
+	Show Custom Dialog [ Title: "Cleanup Title" ; Message: "Clicking OK means that all unused blocks will be removed from this title and the database will be optimised. This is a good thing to do when a project is delivered in origial language. ¶¶Are you sure you want to cleanup title?¶" ; Default Button: "OK" ; Button 2: "Cancel" ]
+End If
+If [ Get(lastMessageChoice)= 1 ]
+	Perform Script [ From list ; "Cleanup Title SRV" ; Parameter: SetProperty ( "title_id"; $title_id ) &
+					SetProperty ( "mode" ; $mode ) ]
+	// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	Show Custom Dialog [ Title: "Cleanup completed" ; Message: Get(ScriptResult) ; Default Button: "OK" ]
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

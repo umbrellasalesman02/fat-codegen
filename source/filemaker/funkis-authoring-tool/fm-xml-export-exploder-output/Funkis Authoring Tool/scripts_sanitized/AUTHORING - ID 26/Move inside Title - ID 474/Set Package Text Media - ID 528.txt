@@ -1,0 +1,115 @@
+# Change package id on text and media when moving chapters and pages between packages
+# Called from Move FAT item
+  Called from Change package id on text-media
+
+Set Variable [ $old_package_id[1] ; GetScriptProperty ("old_package_id") ]
+Set Variable [ $new_package_id[1] ; GetScriptProperty ("new_package_id") ]
+Set Variable [ $fat_item_id[1] ; GetScriptProperty ("fat_item_id") ]
+Set Variable [ $fat_item_type[1] ; GetScriptProperty ("fat_item_type") ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty ("localisation_code") ]
+
+Set Error Capture [ ON ]
+
+If [ $fat_item_type = "Chapter" ]
+	Set Variable [ $chapter_id[1] ; $fat_item_id ]
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Set Variable [ $title_id[1] ; FAT Package::Parent id ]
+	
+	# Update Chapter text and media
+	Set Field [ TF CH Header::Title id ; $title_id ]
+	Set Field [ TF CH Header::Package id ; $new_package_id ]
+	Set Field [ TF CH Sub header::Package id ; $new_package_id ]
+	Set Field [ TF CH Sub header 2::Package id ; $new_package_id ]
+	Set Field [ Media Main Menu BG CH::Package id ; $new_package_id ]
+	If [ Not IsEmpty ( $localisation_code ) ]
+		Set Field [ TF CH Header TRANS::Title id ; $title_id ]
+		Set Field [ TF CH Header TRANS::Package id ; $new_package_id ]
+		Set Field [ TF CH Sub header TRANS::Package id ; $new_package_id ]
+		Set Field [ TF CH Sub header 2 TRANS::Package id ; $new_package_id ]
+	End If
+	Perform Script [ From list ; "Set ModifierValue Text Media Package" ; Parameter: SetProperty ( "new_package_id" ; $new_package_id ) &
+					SetProperty ( "fat_item_id" ; $chapter_id ) ]
+	# All texts at chapter level fixed
+	# Find pages with chapter as parent
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	
+Else If [ $fat_item_type = "Page" ]
+	
+	# If only moving a Page - find the page
+	Set Variable [ $page_id[1] ; $fat_item_id ]
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Set Variable [ $title_id[1] ; FAT Package::Parent id ]
+	Go to Record/Request/Page [ First ]
+	
+Else If [ $fat_item_type = "Page item" ]
+	
+	Set Variable [ $pageitem_id[1] ; $fat_item_id ]
+	
+End If
+
+# --------- Go to pages ---------------------------------------------------------
+# Use the same script below for moving both Page and Chapter
+If [ Get(foundCount)>0 And $fat_item_type ≠ "Page item" ]
+	Loop [ Flush: Always ]
+		Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+		# Update Page text and media
+		Set Field [ TF PG Header::Title id ; $title_id ]
+		Set Field [ TF PG Header::Package id ; $new_package_id ]
+		Set Field [ TF PG Sub header 1::Package id ; $new_package_id ]
+		Set Field [ TF PG Sub header 2::Package id ; $new_package_id ]
+		Set Field [ Media Main Menu Image PG::Package id ; $new_package_id ]
+		If [ Not IsEmpty ( $localisation_code ) ]
+			Set Field [ TF PG Header TRANS::Title id ; $title_id ]
+			Set Field [ TF PG Header TRANS::Package id ; $new_package_id ]
+			Set Field [ TF PG Sub header 1 TRANS::Package id ; $new_package_id ]
+			Set Field [ TF PG Sub header 2 TRANS::Package id ; $new_package_id ]
+		End If
+		Perform Script [ From list ; "Set ModifierValue Text Media Package" ; Parameter: SetProperty ( "new_package_id" ; $new_package_id ) &
+						SetProperty ( "fat_item_id" ; $page_id ) ]
+		# All texts at page level fixed
+		
+		#  -------------- Find page items with page as parent ----------------------------
+		Go to Layout [ Layout: "TABLE FAT Page Item Alt" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+		Go to Record/Request/Page [ First ]
+		
+		If [ Get(foundCount)>0 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $pageitem_id[1] ; FAT Page item Alt::PrimaryKey ]
+				Perform Script [ From list ; "Change Package PI Text Media" ; Parameter: SetProperty ( "old_package_id" ; $old_package_id ) &
+								SetProperty ( "title_id" ; $title_id ) &
+								SetProperty ( "new_package_id" ; $new_package_id ) &
+								SetProperty ( "pageitem_id" ; $pageitem_id ) &
+								SetProperty ( "localisation_code" ; $localisation_code ) ]
+				
+				Go to Layout [ Layout: "TABLE FAT Page Item Alt" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+		
+		Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	
+Else If [ $fat_item_type = "Page item" ]
+	
+	Set Variable [ $title_id[1] ; FAT Package::Parent id ]
+	Perform Script [ From list ; "Change Package PI Text Media" ; Parameter: SetProperty ( "old_package_id" ; $old_package_id ) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "new_package_id" ; $new_package_id ) &
+					SetProperty ( "pageitem_id" ; $pageitem_id ) &
+					SetProperty ( "localisation_code" ; $localisation_code ) ]
+	
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+

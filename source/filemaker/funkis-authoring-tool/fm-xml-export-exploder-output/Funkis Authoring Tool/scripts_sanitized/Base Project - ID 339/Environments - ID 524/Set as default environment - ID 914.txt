@@ -1,0 +1,12 @@
+# called from a button in Title Environment layout
+Freeze Window
+Set Variable [ $recnum[1] ; Get(recordNumber) ]
+Go to Record/Request/Page [ First ]
+Loop [ Flush: Always ]
+	Set Field [ Title Environment::Default environment ; 0 ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+Go to Record/Request/Page [ With dialog: OFF ; $recnum ]
+Set Field [ Title Environment::Default environment ; 1 ]
+
+

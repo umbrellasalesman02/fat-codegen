@@ -1,0 +1,164 @@
+# Called from published button
+# Can be called everywhere in the Title
+
+# Level = 1,2 or 3 = hierarchyLevel
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+
+# Package id is sent from Text Translate review layout
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package" ) ]
+
+# Server mode = "preview" or "publish" from Title Environment. If empty - set to preview for compatibility
+Set Variable [ $server_mode[1] ; Case ( GetScriptProperty ( "server_mode" ) = ""; "preview"; GetScriptProperty ( "server_mode" )) ]
+
+# When called from Title Settings Portal an additional caller property is added to make sure we're previewing the right Package
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+Freeze Window
+
+If [ $caller = "Title" ]
+	Freeze Window
+	If [ IsEmpty ( $package_id ) ]
+		Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+	Else
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+End If
+
+# Setting up URL variables
+# Always starts with the language variable which does not include a "&" in the beginning.
+
+# Language code for preview in a specific language
+Set Variable [ $language[1] ; "language=" & Case($$localisation_code ≠ FAT Title::Original localisation code;  
+				
+				$$localisation_code ; 
+				
+				FAT Title::Original localisation code
+				
+				) ]
+
+# Email adress for login to right session if using Quiddity as backend
+Set Variable [ $login_email[1] ; Case ( 
+				
+				   FAT Title::Title Backend="Quiddity" Or FAT Title::Title Backend="Funkis Cloud" And Not IsEmpty (User @ Title::email) ; 
+				
+				   "&email=" & User @ Title::email ;
+				
+				    ""
+				) ]
+
+# Funkis Cloud Titles can have a user specific Session key that will override Funkis Cloud behaviour. 
+  If no session key is included - Funkis Cloud will decide which session to start in. 
+  This value is user specific
+Set Variable [ $funkisCloudSessionKey[1] ; Case ( 
+				
+				   Not IsEmpty ( User X Title @ Title::User Session Key); 
+				    "&sessionKey=" & User X Title @ Title::User Session Key;
+				    ""
+				) ]
+
+# Clear storage is default false - this value is user specific
+Set Variable [ $clearStorage[1] ; Case ( 
+				
+				   User X Title @ Title::User ClearStorage = 1; 
+				    "&clearStorage=true";
+				    "&clearStorage=false"
+				) ]
+
+# Chapter completion is default false  - this value is user specific
+Set Variable [ $chaptersStatusCompleted[1] ; Case ( 
+				
+				   User X Title @ Title::User ChapterCompleted = 1; 
+				    "&chaptersStatus=completed";
+				    ""
+				) ]
+
+# Show inspector is default  - this value is user specific
+Set Variable [ $showInspector[1] ; Case ( 
+				
+				   User X Title @ Title::User ShowInspector in preview = 1; 
+				    "&showInspector=true";
+				    "&showInspector=false"
+				)
+				
+				
+				/*
+				
+				
+				Case ( 
+				
+				   FAT Title::showInspector in preview = 0; 
+				    "&showInspector=false";
+				    "&showInspector=true"
+				)
+				*/ ]
+
+# Show review mode (default = false)  - this value is user specific
+Set Variable [ $showReviewMode[1] ; Case ( 
+				
+				   User X Title @ Title::User ShowReviewMode = 1; 
+				    "&showReviewMode=true";
+				    "&showReviewMode=false"
+				)
+				
+				
+				/*
+				
+				
+				Case ( 
+				
+				   FAT Title::showInspector in preview = 0; 
+				    "&showInspector=false";
+				    "&showInspector=true"
+				)
+				*/ ]
+
+
+Set Variable [ $url_variable[1] ; "?" & $language & $login_email & $funkisCloudSessionKey & $clearStorage & $chaptersStatusCompleted & $showInspector & $showReviewMode ]
+
+# URL based on Publish server, Client, Title and Package directories and a #
+If [ $server_mode = "preview" ]
+	Set Variable [ $URL[1] ; "https://" & Title Server Preview::URL & "/" &
+					
+					Case ( IsEmpty ( FAT Title::FC Client directory ) ; ""; FAT Title::FC Client directory & "/" ) &
+					
+					
+					Case ( IsEmpty ( FAT Title::FC Title directory ) ; ""; FAT Title::FC Title directory & "/" ) &
+					
+					
+					Case ( IsEmpty ( FAT Package::JSON Friendly id ) ; ""; FAT Package::FC Package directory & "/" ) & "#" ]
+Else If [ $server_mode = "publish" ]
+	Set Variable [ $URL[1] ; "https://" & Title Server Publish::URL & "/" &
+					
+					Case ( IsEmpty ( FAT Title::FC Client directory ) ; ""; FAT Title::FC Client directory & "/" ) &
+					
+					
+					Case ( IsEmpty ( FAT Title::FC Title directory ) ; ""; FAT Title::FC Title directory & "/" ) &
+					
+					
+					Case ( IsEmpty ( FAT Package::JSON Friendly id ) ; ""; FAT Package::FC Package directory & "/" ) & "#" ]
+End If
+
+If [ $level = 1 ]
+	# Almost OK as it is
+	// Set Variable [ $URL[1] ; $URL & "/" ]
+Else If [ $level = 2 And Package type::Program type ≠ "slide" ]
+	// If [ JSONGetElement ( FAT Package::Package JSON ; "skip_menu" ) ]
+	// End If
+	// Set Variable [ $URL[1] ; $URL & FAT Package::JSON Friendly id & "/" & FAT Chapter::JSON friendly id ]
+	Set Variable [ $URL[1] ; $URL & FAT Package::JSON Friendly id & "/menu" ]
+Else If [ $level = 2 And Package type::Program type = "slide" ]
+	Set Variable [ $URL[1] ; $URL & FAT Package::JSON Friendly id & "/" & FAT Chapter::JSON friendly id & "/" & FAT Page::JSON friendly id ]
+	
+Else If [ $level = 3 ]
+	Set Variable [ $URL[1] ; $URL & FAT Package::JSON Friendly id & "/" & FAT Chapter::JSON friendly id & "/" & FAT Page::JSON friendly id ]
+End If
+
+Set Variable [ $URL[1] ; $URL & $url_variable ]
+Open URL [ In external browser: OFF ; With dialog: OFF ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+
+If [ $caller = "Title" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+
+

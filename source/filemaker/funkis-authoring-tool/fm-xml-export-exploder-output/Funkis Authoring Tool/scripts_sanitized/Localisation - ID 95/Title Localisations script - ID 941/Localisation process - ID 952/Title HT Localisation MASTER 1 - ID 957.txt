@@ -1,0 +1,184 @@
+# This translation flow is designed for Title Translations
+# Script is called from Trasnlate button in Title Localisation Card Window when translation method = "Human"
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translated
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+# For Human translation - localisation will be in STAGE 3 after this script if STAGE < 3 when triggered
+
+Freeze Window
+Set Error Capture [ ON ]
+
+# ----------------- Intitiate all variables from Localisation that will be used in process ----------------------------------
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $title_reference_title[1] ; FAT Title::JSON friendly id ]
+Set Variable [ $title_localisation_id[1] ; FAT Localisation::PrimaryKey ]
+Set Variable [ $localisation_stage[1] ; FAT Localisation::Localisation stage ]
+Set Variable [ $last_sorted_timestamp[1] ; FAT Title::TextInContextualOrderTimeStamp ]
+Set Variable [ $last_localised_textfield_creation_timestamp[1] ; Case ( 
+				
+				   IsEmpty ( FAT Localisation::TextfieldsCreationTimestamp );
+				
+				   GetAsTimeStamp ( "2000-01-01" );
+				
+				   FAT Localisation::TextfieldsCreationTimestamp
+				
+				 ) ]
+Set Variable [ $original_localisation_code[1] ; FAT Localisation::Original Localisation code ]
+Set Variable [ $target_localisation_code[1] ; FAT Localisation::Localisation code ]
+
+# ------------------ Check that all export paths are in order for human translation -------------------------------------
+If [ User X Title @ Title::Title Filepath export="" And FAT Localisation @ Package::Translation method = "Human translation" ]
+	Show Custom Dialog [ Title: "No file path found!" ; Message: "You haven't defined an export path. Go to Title settings, select an output folder and redo the export." ; Default Button: "OK" ]
+	Exit Script []
+Else
+	Set Variable [ $export_path[1] ; User X Title @ Title::Title Filepath export ]
+End If
+
+# ------------- Check if texts needs to be arranged in a new sort order ---------------------------------
+# ------------- Returns a boolean AND timestamp when last original text field was created ---------------------------------
+// Perform Script [ From list ; "Check if arrange texts needed" ; Parameter: SetProperty ( "title_id" ; $title_id ) & 
+				SetProperty ( "original_localisation_code" ; $original_localisation_code ) & 
+				SetProperty ( "last_sorted_timestamp" ; $last_sorted_timestamp ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Set Variable [ $new_arrange_needed[1] ; GetAsBoolean ( GetResultProperty ( "new_arrange_needed" )) ]
+Set Variable [ $last_original_textfield_creation_timestamp[1] ; GetAsTimeStamp ( GetResultProperty ( "last_original_textfield_creation_timestamp" )) ]
+
+# ------------- If texts needs to be arranged in a new sort order - Arrange text ---------------------------------
+If [ $new_arrange_needed ]
+	
+	Show Custom Dialog [ Title: "Text needs to be arranged in order" ; Message: "Before starting the translation, texts needs to be arranged in the right contextual order for the reviewers. This might take some time." ; Default Button: "Arrange" ; Button 2: "Skip" ; Button 3: "Stop" ]
+	If [ Get(lastMessageChoice) = 3 ]
+		# User pressed Stop - Add event to log
+		Set Variable [ $event_text[1] ; "Texts needed new arrangement. User stopped. Last text created " & $last_original_textfield_creation_timestamp & "." ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		Exit Script []
+	Else If [ Get(lastMessageChoice) = 1 ]
+		
+		// Perform Script [ From list ; "Arrange text in order Title" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "title_localisation_id" ; $title_localisation_id ) ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		
+		Set Variable [ $last_sorted_timestamp[1] ; Get(currentHostTimeStamp) ]
+		If [ Not PatternCount ( Get(ScriptResult) ; "error" ) ]
+			# Title and Package texts now are in contextual order
+			# If no errors - save the timestamp when finding new texts
+			Set Field [ FAT Title::TextInContextualOrderTimeStamp ; $last_sorted_timestamp ]
+			Set Variable [ $event_text[1] ; "Texts were successfully arranged in contextual order." ]
+			Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		Else
+			# Something went wrong when arranging texts. Maybe a record is busy.
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+			Show Custom Dialog [ Title: "Error when sorting text" ; Message: "Something went wrong when sorting the original texts in contextual order.¶Probably there's someone else working with the title right now.¶¶Do you want to stop the process or continue?" ; Default Button: "Stop" ; Button 2: "Continue" ]
+			If [ Get(lastMessageChoice) = 1 ]
+				Set Variable [ $event_text[1] ; "User stopped because an error occured when arranging texts in contextual order. " & Get(ScriptResult) ]
+				Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+				Exit Script []
+			End If
+		End If
+	Else If [ Get(lastMessageChoice) = 2 ]
+		# User pressed Skip - Add event to log
+		Set Variable [ $event_text[1] ; "Texts needed new arrangement but user skipped. Last text created " & $last_original_textfield_creation_timestamp & "." ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	End If
+End If
+
+# --------------------------- Set translation provider ------------------------------------------------------
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Show Custom Dialog [ Title: "Translation provider" ; Message: "Please, enter the name of the translation provider that will be used for this translation. ¶¶This will make it easier to backtrack the translation later. " ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $translation_provider ; Label 1: "Name of provider" ]
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+Set Field [ FAT Localisation::Translation provider ; $translation_provider ]
+If [ Count(FAT Localisation @ Title::PrimaryKey) > 0 ]
+	Go to Related Record [ Table: FAT Localisation @ Title ; Layout: "TABLE FAT Localisation @ Package" ; Show related ]
+	Replace Field Contents [ FAT Localisation @ Package::Translation provider ; Replace with calculation: $translation_provider ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	
+	Set Variable [ $event_text[1] ; $translation_provider & " selected as translation provider." ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+
+# ---------------------- Stage 1 - Localise text fields - Duplicate new texts ---------------------------------
+
+# New strategy opening a separate FAT Text file to increase performance
+# For 40 text fields time reduced from 9 sec to 3 sec using FM Server 20.3.1 with Loop Flush: Defer setting
+# With previous server version with Loop Flush: Always - time was probably longer. 
+
+// Perform Script [ From list ; "Localise Text fields" ; File: "FAT Text" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "original_localisation_code" ; $original_localisation_code ) &
+				SetProperty ( "target_localisation_code" ; $target_localisation_code ) &
+				SetProperty ( "last_localised_textfield_creation_timestamp" ; $last_localised_textfield_creation_timestamp ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Set Variable [ $num_of_created[1] ; GetResultProperty ( "num_of_created") ]
+Set Variable [ $num_of_errors[1] ; GetResultProperty ( "num_of_errors") ]
+Set Variable [ $last_localised_textfield_creation_timestamp[1] ; GetAsTimeStamp (GetResultProperty ( "last_localised_textfield_creation_timestamp")) ]
+// Close File [ "FAT Text" ]
+
+If [ $num_of_errors > 0 ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "Error when creating new text fields for localisation" ; Message: "Something went wrong when creating new localised text fields.¶Probably there's someone else working with the title right now.¶¶Do you want to stop the process or continue?" ; Default Button: "Stop" ; Button 2: "Continue" ]
+	If [ Get(lastMessageChoice) = 1 ]
+		Set Variable [ $event_text[1] ; "User stopped because error when creating new localised text fields. " ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		Exit Script []
+	End If
+	Set Variable [ $event_text[1] ; "Error when creating new localised text fields but user continued process. " ]
+Else
+	Set Variable [ $event_text[1] ; "Successfully created " & $num_of_created & " new localised text fields." ]
+	# Update Localisation with date when localised text fields were created.
+	Set Field [ FAT Localisation::TextfieldsCreationTimestamp ; $last_localised_textfield_creation_timestamp ]
+	# The commit below is needed for allowing PSOS to make changes
+	Commit Records/Requests [ With dialog: OFF ]
+End If
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+# ------------------------ Stage 2 - Text fields prepared for translation --------------------------------------------------------
+
+Set Variable [ $localisation_stage[1] ; 2 ]
+Perform Script [ From list ; "Change Title localisation stage" ; Parameter: SetProperty ( "title_localisation_id" ; $title_localisation_id ) &
+				SetProperty ( "localisation_stage" ; $localisation_stage ) &
+				SetProperty ( "force_stage" ; "" ) ]
+// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+# ------------------------ Stage 3 - Export Text fields for translators --------------------------------------------------------
+# Send all texts in Title in one bunch
+
+// Perform Script [ From list ; "Title Export HT files SRV" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "title_localisation_id" ; $title_localisation_id ) &
+				SetProperty ( "title_reference_title" ; $title_reference_title ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+# Write JSON file
+Set Variable [ $export_path[1] ; $export_path & GetContainerAttribute ( FAT Title::Latest Exported file ; "filename" ) & ".json" ]
+Create Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Create folders: ON ]
+Open Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Target: $fileID ]
+Write to Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ; Target: FAT Title::Latest Exported file ; Append line feed: OFF ]
+Close Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ]
+
+
+Set Variable [ $localisation_stage[1] ; 3 ]
+Set Variable [ $event_text[1] ; "Successfully created new localised text file." ]
+
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Perform Script [ From list ; "Log translation status CL" ; Parameter: SetProperty ( "caller" ; "Title localisation" ) &
+				SetProperty ( "localisation_id" ; $title_localisation_id ) &
+				SetProperty ( "localisation_stage" ; $localisation_stage ) &
+				SetProperty ( "status_type" ; "status" ) ]
+
+# Make sure all PSOS changes are viewed in window
+Refresh Window
+
+
+

@@ -1,0 +1,146 @@
+# Called from Clone Page item SRV
+
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $package_id[1] ; GetScriptProperty("package_id") ]
+Set Variable [ $old_pi_id[1] ; GetScriptProperty("old_pi_id") ]
+Set Variable [ $new_pi_id[1] ; GetScriptProperty("new_pi_id") ]
+
+Set Error Capture [ ON ]
+
+
+# -------------------- Clone Page item Lists -------------------------------------------------------
+Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount_CA[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn_CA[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Minimum ]
+		
+		# List item loop
+		Set Variable [ $old_ca_id[1] ; FAT List item @ Page item::PrimaryKey ]
+		Set Variable [ $ca_text1[1] ; TF LI PI 1::Text ]
+		Set Variable [ $ca_text2[1] ; TF LI PI 2::Text ]
+		Set Variable [ $ca_text3[1] ; TF LI PI 3::Text ]
+		Set Variable [ $ca_media1[1] ; Media LI PI 1::Media container ]
+		Set Variable [ $ca_media2[1] ; Media LI PI 2::Media container ]
+		
+		Duplicate Record/Request
+		
+		# Save the current found set - used to recreate later
+		Set Variable [ $current_found_set[1] ; FAT List item::List of List items ]
+		Set Variable [ $record_num[1] ; Get(recordNumber) ]
+		
+		Set Field [ FAT List item @ Page item::Parent id ; $new_pi_id ]
+		Set Variable [ $recordPosn_CA[1] ; $recordPosn_CA  + 1 ]
+		Set Variable [ $new_ca_id[1] ; FAT List item @ Page item::PrimaryKey ]
+		
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ca_id ) &
+						SetProperty ( "source_table" ; "page-item" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item @ Page item::Text 1 id ) ) &
+						SetProperty ( "learningprogramme_id" ; $title_id ) &
+						SetProperty ( "package_id" ; $package_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF LI PI 1::Text ; $ca_text1 ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ca_id ) &
+						SetProperty ( "source_table" ; "page-item" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item @ Page item::Text 2 id ) ) &
+						SetProperty ( "learningprogramme_id" ; $title_id ) &
+						SetProperty ( "package_id" ; $package_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF LI PI 2::Text ; $ca_text2 ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ca_id ) &
+						SetProperty ( "source_table" ; "page-item" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT List item @ Page item::Text 3 id ) ) &
+						SetProperty ( "learningprogramme_id" ; $title_id ) &
+						SetProperty ( "package_id" ; $package_id ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+		Set Field [ TF LI PI 3::Text ; $ca_text3 ]
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $new_ca_id ) &
+						SetProperty ( "source_table" ; "page-item" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT List item @ Page item::Media 1 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) &
+						SetProperty ( "package_id" ; $package_id ) ]
+		Set Field [ Media LI PI 1::Media container ; $ca_media1 ]
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $new_ca_id ) &
+						SetProperty ( "source_table" ; "page-item" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT List item @ Page item::Media 2 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) &
+						SetProperty ( "package_id" ; $package_id ) ]
+		Set Field [ Media LI PI 2::Media container ; $ca_media2 ]
+		
+		// Perform Script [ From list ; "Clone Media Unique Filename" ; Parameter: SetProperty ( "location_id" ; $new_ca_id ) &
+						SetProperty ( "source_table" ; "page-item" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT List item @ Page item::Media 1 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "title_id" ; $title_id) &
+						SetProperty ( "package_id" ; $package_id ) ]
+		// Perform Script [ From list ; "Clone Media Unique Filename" ; Parameter: SetProperty ( "location_id" ; $new_ca_id ) &
+						SetProperty ( "source_table" ; "page-item" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT List item @ Page item::Media 2 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "title_id" ; $title_id) &
+						SetProperty ( "package_id" ; $package_id ) ]
+		
+		# A Tag filter list cannot have tags on list items + it corrupts the script sequence when cloning
+		Perform Script [ From list ; "Clone Tag values" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) & 
+						SetProperty ( "old_item_id" ; $old_ca_id ) & 
+						SetProperty ( "new_item_id" ; $new_ca_id ) & 
+						SetProperty ( "title_id" ; $title_id ) ]
+		
+		Go to Layout [ Layout: "TABLE FAT List item PI" ; Animation: None ]
+		# List item values of type Link, Package id, Chapter id or Page id will be replaced as the last step in the clone process.
+		
+		If [ List template @ Page item::Value 1 type = "IO" And Not IsEmpty (FAT List item @ Page item::Value 1) And (PatternCount ( $clone_settings ; "IOs" ) Or $isClonedTitle) ]
+			# Value type IO  - clone check
+			Set Variable [ $old_io_id[1] ; FAT List item @ Page item::Value 1 ]
+			# Using a unique TO since this script also can be called from Clone IO
+			Go to Layout [ Layout: "TABLE FAT IO @ List item" ; Animation: None ]
+			# Search for IO in oldPrimary if it is created earlier in clone process
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 0 ]
+				Perform Script [ From list ; "Clone IO SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+								SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+								SetProperty ( "clone_level" ; $clone_level ) &
+								SetProperty ( "clone_settings" ; $clone_settings ) &
+								SetProperty ( "old_tt_id" ; $old_tt_id ) &
+								SetProperty ( "title_id" ; $title_id ) &
+								SetProperty ( "suffix" ; $suffix) &
+								SetProperty ( "old_io_id" ; $old_io_id) ]
+				Set Variable [ $new_io_id[1] ; Get(ScriptResult) ]
+			Else
+				Set Variable [ $new_io_id[1] ; FAT IO @ List Item::PrimaryKey ]
+			End If
+			
+			# Recreate score values
+			Perform Script [ From list ; "Clone Score values" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+							SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+							SetProperty ( "clone_settings" ; $clone_settings ) &
+							SetProperty ( "clone_level" ; $clone_level ) &
+							SetProperty ( "suffix" ; $suffix ) &
+							SetProperty ( "old_tt_id" ; $old_tt_id ) & 
+							SetProperty ( "title_id" ; $title_id ) &
+							SetProperty ( "old_item_id" ; $old_ca_id ) & 
+							SetProperty ( "new_item_id" ; $new_ca_id ) ]
+			
+			# Make sure to recreate the found set and go to right record
+			Perform Script [ From list ; "Recreate List item found set" ; Parameter: SetProperty ( "current_found_set" ; $current_found_set ) &
+							SetProperty ( "record_num" ; $record_num ) &
+							SetProperty ( "table" ; "list_item_page_item" ) ]
+			
+			Set Field [ FAT List item @ Page item::Value 1 ; $new_io_id ]
+		End If
+		
+		Exit Loop If [ $recordPosn_CA > $foundCount_CA ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn_CA ]
+	End Loop
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+

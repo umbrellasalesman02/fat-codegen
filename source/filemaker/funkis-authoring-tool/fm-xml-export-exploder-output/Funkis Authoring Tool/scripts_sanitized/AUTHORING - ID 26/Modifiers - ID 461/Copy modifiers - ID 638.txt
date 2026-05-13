@@ -1,0 +1,91 @@
+# This script is called from a button in the setting window.
+Set Variable [ $target[1] ; Get(scriptParameter) ]
+If [ $target = "package" ]
+	Set Variable [ $json[1] ; Let([
+					
+					  jsonModifiers = Case ( ValueCount ( FAT ModifierValue @ Package::Value JSON ) = 0 ; "" ;
+					
+					                           "{" & Substitute ( List ( FAT ModifierValue @ Package::Value JSON ) ; ¶ ; ", " ) & "}" )
+					
+					];
+					
+					
+					   JSONFormatElements ( jsonModifiers)
+					
+					
+					
+					
+					 ) ]
+Else If [ $target= "chapter" ]
+	Set Variable [ $json[1] ; Let([
+					
+					  jsonModifiers = Case ( ValueCount ( FAT ModifierValue @ Chapter::Value JSON ) = 0 ; "" ;
+					
+					                           "{" & Substitute ( List ( FAT ModifierValue @ Chapter::Value JSON ) ; ¶ ; ", " ) & "}" )
+					
+					];
+					
+					
+					   JSONFormatElements ( jsonModifiers)
+					
+					
+					
+					
+					 ) ]
+Else If [ $target= "page" ]
+	Set Variable [ $json[1] ; Let([
+					
+					  jsonModifiers = Case ( ValueCount ( FAT ModifierValue @ Page::Value JSON ) = 0 ; "" ;
+					
+					                           "{" & Substitute ( List ( FAT ModifierValue @ Page::Value JSON ) ; ¶ ; ", " ) & "}" )
+					
+					];
+					
+					
+					   JSONFormatElements ( jsonModifiers)
+					
+					
+					
+					
+					 ) ]
+Else If [ $target= "page item" ]
+	Set Variable [ $json[1] ; Let([
+					
+					  jsonModifiers = Case ( ValueCount ( FAT ModifierValue @ Page item::Value JSON ) = 0 ; "" ;
+					
+					                           "{" & Substitute ( List ( FAT ModifierValue @ Page item::Value JSON ) ; ¶ ; ", " ) & "}" );
+					
+					   jsonModifiers = JSONSetElement ( jsonModifiers ; "block_id" ; FAT Page item::Block id ; JSONString )
+					
+					];
+					
+					
+					   JSONFormatElements ( jsonModifiers)
+					
+					
+					
+					
+					 ) ]
+Else If [ $target= "page item 2" ]
+	Set Variable [ $json[1] ; Let([
+					
+					  jsonModifiers = Case ( ValueCount ( FAT ModifierValue @ Page item 2::Value JSON ) = 0 ; "" ;
+					
+					                           "{" & Substitute ( List ( FAT ModifierValue @ Page item 2::Value JSON ) ; ¶ ; ", " ) & "}" );
+					
+					   jsonModifiers = JSONSetElement ( jsonModifiers ; "block_id" ; FAT Page item 2::Block id ; JSONString )
+					
+					];
+					
+					
+					   JSONFormatElements ( jsonModifiers)
+					
+					
+					
+					
+					 ) ]
+End If
+Set Field [ Variables::gCopySettingJSON ; $json ]
+Set Field [ Variables::gCopyItemType ; $target ]
+Show Custom Dialog [ Title: "Settings copied successfully" ; Message: "The settings for this " & $target & " are copied successfully. You can now paste them on to any other " & $target & "." ; Default Button: "OK" ]
+

@@ -1,0 +1,16 @@
+# Called from a script trigger onObjectModify when selecting or changing Aspect List id from popup menu in IO Value PI setting
+
+Set Variable [ $io_value_id[1] ; Get(scriptParameter) ]
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount) = 1 ]
+	Set Field [ FAT IO Value @ Page item::IO Insight Selected Aspect List items ; "" ]
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+

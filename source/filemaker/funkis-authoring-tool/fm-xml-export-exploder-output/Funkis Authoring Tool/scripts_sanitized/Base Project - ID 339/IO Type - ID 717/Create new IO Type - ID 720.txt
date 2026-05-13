@@ -1,0 +1,15 @@
+# Called from a button in IO Type List
+If [ FAT Title::gBaseProject = "" ]
+	Show Custom Dialog [ Title: "Select BaseProject" ; Message: "You must select a BaseProject before creating a new IO type. " ; Default Button: "OK" ]
+	Exit Script []
+End If
+Set Variable [ $baseproject_id[1] ; FAT Title::gBaseProject ]
+Show Custom Dialog [ Title: "Creating a new IO Type" ; Message: "You must enter IO Type for both FAT and Funkis Cloud backend. Both are case-sensitive. " ; Default Button: "OK" ; Input 1: $cmt_type ; Label 1: "CMT IO type" ; Input 2: $quid_type ; Label 2: "Quid type" ]
+If [ Get(lastMessageChoice) = 1 ]
+	New Record/Request
+	Set Field [ IO Type::Base Project ; $baseproject_id ]
+	Set Field [ IO Type::FATType ; $cmt_type ]
+	Set Field [ IO Type::QuidType ; $quid_type ]
+	
+End If
+

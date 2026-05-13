@@ -1,0 +1,34 @@
+# Special Pages are created in script Create Chapter CL
+# When closing this card - the new Page is displayed both in card and in background
+
+Set Variable [ $page_type_template_id[1] ; FAT Page::gPageMode ]
+# Orkade inte komma på ngt bättre sätt att eliminera default
+If [ $page_type_template_id= "9205F7C0-8D23-4C9B-B91D-9B0A535F36E8" Or $page_type_template_id = "EE58D454-29AA-4321-B779-2486E955A7BF" ]
+	# Default template
+	Show Custom Dialog [ Title: "Cannot create default page" ; Message: "You cannot create a page of default type outside the Package-Chapter-structure. 
+					
+					
+					Please choose another page type." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+If [ Get(WindowStyle) = 3
+				
+				// popup card ]
+	Close Window
+	Select Window [ Name: $$currentWindow ]
+End If
+Freeze Window
+Go to Layout [ Layout: "TABLE Page type template" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $page_type[1] ; Page type template::Page type JSON ]
+Set Variable [ $page_title[1] ; Page type template::Page type & " - Title" ]
+Set Variable [ $block_type[1] ; Page type template::Block type ]
+Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+
+Set Field [ FAT Page::Page type ; $page_type ]
+Set Field [ FAT Page::Allowed Block type ; $block_type ]
+Set Field [ TF PG Header::Text ; $page_title ]
+
+Go to Field [ TF PG Header::Text ]
+

@@ -1,0 +1,16 @@
+Set Variable [ $theme_template_id[1] ; Theme Template::PrimaryKey ]
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT Theme Font" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Theme Font::Theme template id ; $theme_template_id ]
+Insert File [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ; Target: FAT Theme Font::Font File Container ]
+
+If [ Get(lastError)≠0 ]
+	Delete Record/Request [ With dialog: OFF ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Go to Object [ "Font" ; Repetition: 1 ]
+

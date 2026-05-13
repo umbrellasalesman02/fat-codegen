@@ -1,0 +1,33 @@
+# Called from button in Blocktemplate layout
+
+Set Error Capture [ ON ]
+Set Variable [ $blocktemplate_id[1] ; BlockTemplate::PrimaryKey ]
+Set Variable [ $source_item_type[1] ; "global baseproject" ]
+Set Variable [ $source_reference[1] ; "Block template text" ]
+
+# Localisation code is ALWAYS "en-global" for the original template text
+Set Variable [ $primary_language_code[1] ; Base project @ Block Template::Primary language ]
+Set Variable [ $primary_country_code[1] ; Base project @ Block Template::Primary country ]
+Set Variable [ $secondary_language_code[1] ; Base project @ Block Template::Secondary language ]
+Set Variable [ $secondary_country_code[1] ; Base project @ Block Template::Secondary country ]
+
+# Creating both Primary and Secondary texts
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+New Record/Request
+Set Variable [ $original_key[1] ; FAT Text::PrimaryKey ]
+Set Field [ FAT Text::Title id ; "" ]
+Set Field [ FAT Text::Parent id ; $blocktemplate_id ]
+Set Field [ FAT Text::Source item type ; $source_item_type ]
+Set Field [ FAT Text::Source reference ; $source_reference ]
+Set Field [ FAT Text::Language code ; $primary_language_code ]
+Set Field [ FAT Text::Country code ; $primary_country_code ]
+# Secondary language
+Duplicate Record/Request
+Set Field [ FAT Text::OriginalKey ; $original_key ]
+Set Field [ FAT Text::Language code ; $secondary_language_code ]
+Set Field [ FAT Text::Country code ; $secondary_country_code ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+# Symbols using the template will NOT have global text
+Go to Field [ TF BT Text::Text ]
+

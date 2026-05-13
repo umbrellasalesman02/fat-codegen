@@ -1,0 +1,64 @@
+# #Launched from a button either in 1. FAT List or 2. Page item layout
+
+# SetProperty ( "list_name" ; $list_name ) &
+  SetProperty ( "caller" ; $caller ) &
+  SetProperty ( "list_template_id" ; $list_template_id )
+
+# $caller = "Page item" or "Title" or "Tag"
+# If caller = Page item - set list template based on block template
+# If caller = Tag - list template will always be multiple choice
+
+Set Variable [ $list_name[1] ; GetScriptProperty ( "list_name" ) ]
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+Set Variable [ $list_template_id[1] ; GetScriptProperty ( "list_template_id" ) ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+New Record/Request
+
+Set Variable [ $list_id[1] ; FAT List::PrimaryKey ]
+Set Field [ FAT List::Title id ; $title_id ]
+Set Field [ FAT List::Name ; $list_name ]
+Set Field [ FAT List::Description ; $list_name ]
+Set Field [ FAT List::List backend ; "FAT" ]
+Set Field [ FAT List::List template id ; $list_template_id ]
+
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ List template::List has modifiers ]
+	Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "List" ) & 
+					SetProperty ( "item_id" ; $list_id ) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "symbol_id" ; $list_template_id ) ]
+End If
+
+
+If [ $caller = "Tag" ]
+	Set Field [ FAT List::Usage type ; "Tag filter" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "What kind of list do you want for your tags?" ; Message: "In October 2025, a new list type - Choice - was introduced for tags. If you select New, you can use the new Choice building blocks for tag selection. If you select Old, you can use the old multiple choice block for tag selection. ¶¶Do you want to use the new list type or the old?" ; Default Button: "New" ; Button 2: "Old" ; Button 3: "Cancel" ]
+	Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+	If [ Get (lastMessageChoice)= 1 ]
+		# New
+		Set Variable [ $list_template_id[1] ; "554F3879-AC78-4DB2-8BCB-CEEBDC579C74" ]
+		Set Field [ FAT List::List template id ; $list_template_id ]
+	Else If [ Get (lastMessageChoice)= 2 ]
+		# Old
+		Set Variable [ $list_template_id[1] ; "BAF6DADF-7209-4916-BD32-980F27F248EA" ]
+		Set Field [ FAT List::List template id ; $list_template_id ]
+	Else
+		Delete Record/Request [ With dialog: OFF ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Exit Script []
+	End If
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+If [ $caller = "Page item" ]
+	Set Field [ FAT Page item::List id ; $list_id ]
+End If
+
+Perform Script [ From list ; "View Card List Setting" ; Parameter: SetProperty ( "list_id" ; $list_id ) ]
+
+

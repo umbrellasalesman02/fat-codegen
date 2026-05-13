@@ -1,0 +1,301 @@
+# THis script is called from the following locations
+# 1. Button: Create new modifierTemplate in modifierTemplate List
+# 2. Button: Create new modifierTemplate in Block template 
+# 3. Button: Create new modifierTemplate in IO Type (template id = FATtype!)
+# 4. Button: Create new modifierTemplate in List template (template id = PrimaryKey)
+
+Freeze Window
+Set Error Capture [ ON ]
+Commit Records/Requests [ With dialog: OFF ]
+Set Variable [ $level[1] ; Get(scriptParameter) ]
+Set Variable [ $attribute_type[1] ; FAT Title::gModifierType ]
+Set Variable [ $attribute_name[1] ; FAT Title::gModifierName ]
+Set Variable [ $modifier_values[1] ; FAT Title::gModifierValues ]
+Set Variable [ $attribute_default_value[1] ; FAT Title::gModifierDefaultValue ]
+Set Variable [ $attribute_description[1] ; FAT Title::gModifierDescription ]
+Set Variable [ $baseproject_id[1] ; FAT Title::gBaseProject ]
+Set Variable [ $modifier_package_type[1] ; FAT Title::gPackageType ]
+Set Variable [ $modifier_privilege[1] ; FAT Title::gModifierPrivilege ]
+Set Variable [ $modifier_importance[1] ; FAT Title::gModifierImportance ]
+Set Variable [ $modifier_group[1] ; FAT Title::gModifierGroup ]
+
+If [ $level = "Block" ]
+	Set Variable [ $template_id[1] ; BlockTemplate::PrimaryKey ]
+	Set Variable [ $baseproject_id[1] ; BlockTemplate::Base Project ]
+Else If [ $level = "IO" ]
+	Set Variable [ $template_id[1] ; IO Type::FATType ]
+	Set Variable [ $baseproject_id[1] ; IO Type::Base Project ]
+Else If [ $level = "List" ]
+	Set Variable [ $template_id[1] ; List template::PrimaryKey ]
+	Set Variable [ $baseproject_id[1] ; List template::Base Project ]
+Else
+	If [ $baseproject_id = "" ]
+		Show Custom Dialog [ Title: "Select base project" ; Message: "You must select a base project for the new modifier template." ; Default Button: "OK" ]
+		Exit Script []
+	End If
+End If
+
+Perform Script [ From list ; "Check duplicate name template" ; Parameter: SetProperty ( "level" ; $level ) &
+				SetProperty ( "template_id" ; $template_id ) &
+				SetProperty ( "name" ; $attribute_name ) &
+				SetProperty ( "baseproject_id" ; $baseproject_id ) &
+				SetProperty ( "modifier_package_type" ; $modifier_package_type ) ]
+If [ Get(ScriptResult)=True ]
+	Exit Script []
+	# Message - duplicate name
+End If
+
+Show Custom Dialog [ Title: "Creating a modifier template" ; Message: "You are about to create a modifier template. When doing this - all existing items affected by this template will add the modifier."   & ¶ & ¶ & 
+				"Are you sure you want to do this?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice) = 1 ]
+	Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+	New Record/Request
+	Set Variable [ $attributeTemplate_id[1] ; ModifierTemplate::PrimaryKey ]
+	Set Field [ ModifierTemplate::Name ; $attribute_name ]
+	Set Field [ ModifierTemplate::Template parent id ; $template_id ]
+	Set Field [ ModifierTemplate::Level ; $level ]
+	Set Field [ ModifierTemplate::Type ; $attribute_type ]
+	Set Field [ ModifierTemplate::Values ; $modifier_values ]
+	Set Field [ ModifierTemplate::DefaultValue ; $attribute_default_value ]
+	Set Field [ ModifierTemplate::Description ; $attribute_description ]
+	Set Field [ ModifierTemplate::Base Project ; $baseproject_id ]
+	Set Field [ ModifierTemplate::Package type id ; $modifier_package_type ]
+	Set Field [ ModifierTemplate::Privilege ; $modifier_privilege ]
+	Set Field [ ModifierTemplate::Importance ; $modifier_importance ]
+	Set Field [ ModifierTemplate::Modifier group ; $modifier_group ]
+	Commit Records/Requests [ With dialog: OFF ]
+	
+	
+	If [ $level ≠ "Block" And $level ≠ "IO" And $level ≠ "List" ]
+		# Find items in the whole FAT created with the selected base project - Title, Package, Chapter, Page, Page item
+		Go to Layout [ Layout: "TABLE FAT Title Alt" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		# --------------- DEVELOPING ------------------------------------------------
+		// Perform Find [ ⚠️ RESTORE ⚠️ ]
+		# --------------- DEVELOPING ------------------------------------------------
+		If [ Get(foundCount) > 0 ]
+			Loop [ Flush: Always ]
+				# Create new modifier the ordinary way for all learning programmes using this Base Project
+				Set Variable [ $title_id[1] ; FAT Title Alt::PrimaryKey ]
+				Perform Script [ From list ; "Create new Modifier" ; Parameter: SetProperty ( "learningprogramme_id" ; $title_id) &
+								SetProperty ( "level" ; $level) &
+								SetProperty ( "reset-global-fields" ; False) &
+								SetProperty ( "attributeTemplate_id" ; $attributeTemplate_id) ]
+				Go to Layout [ Layout: "TABLE FAT Title Alt" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Show All Records
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+	
+	If [ $level = "Block" ]
+		
+		# Update all FAT Blocks using the template
+		Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+				Set Variable [ $block_id[1] ; FAT Block::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+				New Record/Request
+				Set Variable [ $attribute_id[1] ; FAT Modifier::PrimaryKey ]
+				Set Field [ FAT Modifier::Title id ; $title_id ]
+				Set Field [ FAT Modifier::ModifierTemplate id ; $attributeTemplate_id ]
+				Set Field [ FAT Modifier::Name ; $attribute_name ]
+				Set Field [ FAT Modifier::Parent id ; $block_id ]
+				Set Field [ FAT Modifier::Level ; $level ]
+				Set Field [ FAT Modifier::Type ; $attribute_type ]
+				Set Field [ FAT Modifier::Values ; $modifier_values ]
+				Set Field [ FAT Modifier::DefaultValue ; $attribute_default_value ]
+				Set Field [ FAT Modifier::Description ; $attribute_description ]
+				
+				# Add Modifier value to all existing page items using the symbol
+				
+				Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)>0 ]
+					Loop [ Flush: Always ]
+						Set Variable [ $item_id[1] ; FAT Page item::PrimaryKey ]
+						Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+						Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+						
+						# Check for existing duplicates - identical attribute name and parent id
+						# If a duplicate exist - do nothing
+						Perform Find [ ⚠️ RESTORE ⚠️ ]
+						If [ Get(foundCount)= 0 ]
+							
+							New Record/Request
+							Set Field [ FAT Modifier Value::Modifier id ; $attribute_id ]
+							Set Field [ FAT Modifier Value::Parent id ; $item_id ]
+							Set Field [ FAT Modifier Value::Value ; $attribute_default_value ]
+							Set Variable [ $attributevalue_id[1] ; FAT Modifier Value::PrimaryKey ]
+							If [ $attribute_type = "Media" ]
+								Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+												SetProperty ( "source_table" ; "attribute" ) &
+												SetProperty ( "source_mediafield" ; GetFieldName ( FAT Modifier Value::Media id ) ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) &
+												SetProperty ( "learningprogramme_id" ; $title_id) &
+												SetProperty ( "package_id" ; $package_id) ]
+							Else If [ $attribute_type = "Text" ]
+								Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+												SetProperty ( "source_table" ; "attribute" ) &
+												SetProperty ( "source_textfield" ; GetFieldName ( FAT Modifier Value::Text id ) ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) &
+												SetProperty ( "learningprogramme_id" ; $title_id) &
+												SetProperty ( "package_id" ; $package_id) ]
+							End If
+						End If
+						Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+						Go to Record/Request/Page [ Next ; Exit after last: ON ]
+					End Loop
+				End If
+				Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+		# If block
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Go to Object [ "Modifier" ; Repetition: 1 ]
+		
+	Else If [ $level = "IO" ]
+		
+		Go to Layout [ Layout: "TABLE FAT Title Alt" ; Animation: None ]
+		Set Variable [ $item_layout[1] ; Get(layoutName) ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		
+		# Update all FAT Titles so they "own" the attribute
+		If [ Get(foundCount)>0 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $title_id[1] ; FAT Title Alt::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+				New Record/Request
+				Set Variable [ $attribute_id[1] ; FAT Modifier::PrimaryKey ]
+				Set Field [ FAT Modifier::Title id ; $title_id ]
+				Set Field [ FAT Modifier::ModifierTemplate id ; $attributeTemplate_id ]
+				Set Field [ FAT Modifier::Name ; $attribute_name ]
+				Set Field [ FAT Modifier::Parent id ; $template_id ]
+				Set Field [ FAT Modifier::Level ; $level ]
+				Set Field [ FAT Modifier::Type ; $attribute_type ]
+				Set Field [ FAT Modifier::Values ; $modifier_values ]
+				Set Field [ FAT Modifier::DefaultValue ; $attribute_default_value ]
+				Set Field [ FAT Modifier::Description ; $attribute_description ]
+				# Add Attribute value to all existing IOs using the IO Type
+				Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)>0 ]
+					Loop [ Flush: Always ]
+						Set Variable [ $io_id[1] ; FAT IO::PrimaryKey ]
+						Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+						# Check for existing duplicates - identical attribute name and parent id
+						# If a duplicate exist - do nothing
+						Perform Find [ ⚠️ RESTORE ⚠️ ]
+						If [ Get(foundCount) = 0 ]
+							New Record/Request
+							Set Field [ FAT Modifier Value::Modifier id ; $attribute_id ]
+							Set Field [ FAT Modifier Value::Parent id ; $io_id ]
+							Set Field [ FAT Modifier Value::Value ; $attribute_default_value ]
+							Set Variable [ $attributevalue_id[1] ; FAT Modifier Value::PrimaryKey ]
+							If [ $attribute_type = "Media" ]
+								Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+												SetProperty ( "source_table" ; "attribute" ) &
+												SetProperty ( "source_mediafield" ; GetFieldName ( FAT Modifier Value::Media id ) ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) &
+												SetProperty ( "learningprogramme_id" ; $title_id) ]
+							Else If [ $attribute_type = "Text" ]
+								Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+												SetProperty ( "source_table" ; "attribute" ) &
+												SetProperty ( "source_textfield" ; GetFieldName ( FAT Modifier Value::Text id ) ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) &
+												SetProperty ( "learningprogramme_id" ; $title_id) ]
+							End If
+						End If
+						Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+						Go to Record/Request/Page [ Next ; Exit after last: ON ]
+					End Loop
+				End If
+				Go to Layout [ Layout: "TABLE FAT Title Alt" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+	Else If [ $level = "List" ]
+		
+		Go to Layout [ Layout: "TABLE FAT Title Alt" ; Animation: None ]
+		Set Variable [ $item_layout[1] ; Get(layoutName) ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		
+		# Update all FAT Titles so they "own" the attribute
+		If [ Get(foundCount)>0 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $title_id[1] ; FAT Title Alt::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+				New Record/Request
+				Set Variable [ $attribute_id[1] ; FAT Modifier::PrimaryKey ]
+				Set Field [ FAT Modifier::Title id ; $title_id ]
+				Set Field [ FAT Modifier::ModifierTemplate id ; $attributeTemplate_id ]
+				Set Field [ FAT Modifier::Name ; $attribute_name ]
+				Set Field [ FAT Modifier::Parent id ; $template_id ]
+				Set Field [ FAT Modifier::Level ; $level ]
+				Set Field [ FAT Modifier::Type ; $attribute_type ]
+				Set Field [ FAT Modifier::Values ; $modifier_values ]
+				Set Field [ FAT Modifier::DefaultValue ; $attribute_default_value ]
+				Set Field [ FAT Modifier::Description ; $attribute_description ]
+				# Add Attribute value to all existing IOs using the IO Type
+				Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)>0 ]
+					Loop [ Flush: Always ]
+						Set Variable [ $list_id[1] ; FAT List::PrimaryKey ]
+						Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+						# Check for existing duplicates - identical attribute name and parent id
+						# If a duplicate exist - do nothing
+						Perform Find [ ⚠️ RESTORE ⚠️ ]
+						If [ Get(foundCount) = 0 ]
+							New Record/Request
+							Set Field [ FAT Modifier Value::Modifier id ; $attribute_id ]
+							Set Field [ FAT Modifier Value::Parent id ; $list_id ]
+							Set Field [ FAT Modifier Value::Value ; $attribute_default_value ]
+							Set Variable [ $attributevalue_id[1] ; FAT Modifier Value::PrimaryKey ]
+							If [ $attribute_type = "Media" ]
+								Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+												SetProperty ( "source_table" ; "attribute" ) &
+												SetProperty ( "source_mediafield" ; GetFieldName ( FAT Modifier Value::Media id ) ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) &
+												SetProperty ( "learningprogramme_id" ; $title_id) ]
+							Else If [ $attribute_type = "Text" ]
+								Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+												SetProperty ( "source_table" ; "attribute" ) &
+												SetProperty ( "source_textfield" ; GetFieldName ( FAT Modifier Value::Text id ) ) &
+												SetProperty ( "caller_layout" ; Get(layoutName )) &
+												SetProperty ( "learningprogramme_id" ; $title_id) ]
+							End If
+						End If
+						Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+						Go to Record/Request/Page [ Next ; Exit after last: ON ]
+					End Loop
+				End If
+				Go to Layout [ Layout: "TABLE FAT Title Alt" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+		# If IO
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Go to Object [ "Settings" ; Repetition: 1 ]
+	End If
+	
+	Set Field [ FAT Title::gModifierName ; "" ]
+	Set Field [ FAT Title::gModifierType ; "" ]
+	Set Field [ FAT Title::gModifierLevel ; "" ]
+	Set Field [ FAT Title::gModifierValues ; "" ]
+	Set Field [ FAT Title::gModifierDefaultValue ; "" ]
+	Set Field [ FAT Title::gModifierDescription ; "" ]
+	Set Field [ FAT Title::gModifierPrivilege ; "" ]
+	Set Field [ FAT Title::gModifierImportance ; "" ]
+	Set Field [ FAT Title::gModifierGroup ; "" ]
+	Set Field [ FAT Title::gPackageType ; "" ]
+	Set Field [ FAT Title::gBaseProject ; "" ]
+End If
+

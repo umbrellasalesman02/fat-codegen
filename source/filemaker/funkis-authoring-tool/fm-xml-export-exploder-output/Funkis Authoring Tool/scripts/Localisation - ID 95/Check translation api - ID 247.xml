@@ -1,0 +1,222 @@
+<Script>
+	<ScriptReference id="247" name="Check translation api"></ScriptReference>
+	<ObjectList membercount="15">
+		<Step hash="D271CE5D1F297236873142D59A554CFF" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Checks if we have custom translation model for a specific client domain registered in Funkis CMT"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8CA20A91372AA3A9ABE845ADFE09E02A" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "client_id" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$client_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F07C9276DACC7E39ED07B57ADFB7C1AF" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "target_language_code" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$target_language_code"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="53EB89E78A52F0FA8BDF621ED8C4A39F" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "original_language_code" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$original_language_code"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1F660AED6142AE1FB56AF9F4DA687808" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="195" name="TABLE Client X Language model"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B44DDFC9B84A2C86CBE87E2FE5E8D8B7" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A20F2A4508CE68D60BC644D1BE7BAF81" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="3" action="find">
+							<find criteria="$target_language_code">
+								<FieldReference id="7" name="Target language code">
+									<TableOccurrenceReference id="1065271" name="Client X Language model"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$original_language_code">
+								<FieldReference id="10" name="Original language code">
+									<TableOccurrenceReference id="1065271" name="Client X Language model"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+							<find criteria="$client_id">
+								<FieldReference id="18" name="Client id">
+									<TableOccurrenceReference id="1065271" name="Client X Language model"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C275C45D0427B59BC33C2004E87B1412" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount) >0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F14BDFFFD53EDA267B79567A11AD87E7" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Client X Language model::Model name]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$model_name"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D423582F4E986E3A91130F8EB00894A8" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Client X Language model::Model URL]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$model_URL"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="23A41D4102742A3325DE036DEE3E7123" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Client X Language model::Translation provider]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$translation_provider"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F99F98FD1B82B6CD201A869DFD6BD2E0" id="103" name="Exit Script" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[SetProperty ( "model_name" ; $model_name ) &SetProperty ( "model_URL" ; $model_URL ) &SetProperty ( "translation_provider" ; $translation_provider )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="289A9523C62C4A4A10748EA9E6FD29A2" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="275FA0CAF69997D9810638E16739AC6E" id="103" name="Exit Script" enable="True">
+		</Step>
+		<Step hash="0B94E463E6F59022D8BB85FFEFCB125C" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

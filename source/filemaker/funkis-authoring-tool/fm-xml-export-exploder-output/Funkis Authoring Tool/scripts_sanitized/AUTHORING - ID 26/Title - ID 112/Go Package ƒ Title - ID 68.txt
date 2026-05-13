@@ -1,0 +1,12 @@
+# Called from standradr relation FAT Title - FAT PAckage if no script parameter is used.
+# If called from another relation - scriptparameter
+
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $relation[1] ; Get(scriptParameter) ]
+If [ $relation = "Active package group" ]
+	Go to Related Record [ Table: FAT Package @ Active Package Group ; Layout: "FAT Package" ; Show related ]
+Else
+	Go to Related Record [ Table: FAT Package ; Layout: "FAT Package" ; Show related ]
+End If
+Set Variable [ $$currentPackage[1] ; FAT Package::JSON Friendly id ]
+

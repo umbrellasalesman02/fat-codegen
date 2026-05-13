@@ -1,0 +1,28 @@
+# delete proxy parents
+Set Error Capture [ ON ]
+If [ $$fat_item_type = "Page" ]
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $chapter_parent[1] ; FAT Chapter::Parent id ]
+	If [ Get(foundCount)>0 ]
+		If [ FAT Chapter::Proxy type = "page" ]
+			Delete Record/Request [ With dialog: OFF ]
+		End If
+	End If
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		If [ FAT Package::Proxy type = "page" ]
+			Delete Record/Request [ With dialog: OFF ]
+		End If
+	End If
+Else If [ $$fat_item_type = "Chapter" ]
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		If [ FAT Package::Proxy type = "chapter" ]
+			Delete Record/Request [ With dialog: OFF ]
+		End If
+	End If
+End If
+

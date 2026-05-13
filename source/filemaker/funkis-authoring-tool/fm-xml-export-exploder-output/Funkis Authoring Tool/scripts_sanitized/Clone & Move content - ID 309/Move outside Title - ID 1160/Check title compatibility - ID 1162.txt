@@ -1,0 +1,71 @@
+# This script compares Blocks and Modifiers between two titles to ensure a move is possible.
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $package_type_id[1] ; GetScriptProperty ( "package_type_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+
+Set Error Capture [ ON ]
+Freeze Window
+
+# Find blocks in "old" title that are used in the package
+Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) = 0 ]
+	Set Variable [ $result[1] ; "Error. No page items found in package. Nothing to move, really." ]
+	Exit Script [ $result ]
+End If
+Go to Related Record [ Table: FAT Block @ Page item ; Layout: "TABLE FAT Block" ; Show related ; Match found set ]
+
+Set Variable [ $error[1] ; "MISSING BLOCKS¶" ]
+Loop [ Flush: Always ]
+	Set Variable [ $block_template_id[1] ; FAT Block::BlockTemplate id ]
+	Set Variable [ $block_name[1] ; FAT Block::Name ]
+	Go to Layout [ Layout: "TABLE FAT Block 2" ; Animation: None ]
+	# Check if the block exist in the new title
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=0 ]
+		Set Variable [ $error[1] ; $error & "¶" & $block_name ]
+	End If
+	Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+Set Variable [ $error[1] ; $error & "¶¶" & "MISSING MODIFIERS" & "¶" ]
+# Find modifiers for package type in "old" title
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $modifier_template_id[1] ; FAT Modifier::ModifierTemplate id ]
+		Set Variable [ $modifier_name[1] ; FAT Modifier::Name & " - " & FAT Modifier::Level ]
+		Go to Layout [ Layout: "TABLE FAT Modifier 2" ; Animation: None ]
+		# Check if the modifier exist in the new title
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)=0 ]
+			Set Variable [ $error[1] ; $error & "¶" & $modifier_name ]
+		End If
+		Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+# If errors - stop
+If [ ValueCount ( $error )>4 ]
+	Set Variable [ $result[1] ; "Error. These blocks and modifiers do not exist in the title you want to move the package to. Please fix before moving your package¶¶"  & $error ]
+	Exit Script [ $result ]
+End If
+
+
+
+
+
+
+
+
+
+
+
+

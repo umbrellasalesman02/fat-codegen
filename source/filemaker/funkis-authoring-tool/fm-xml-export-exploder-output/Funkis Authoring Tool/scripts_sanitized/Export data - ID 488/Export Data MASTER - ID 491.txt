@@ -1,0 +1,238 @@
+Freeze Window
+# ---------- This script can be executed by both clients ("local") and server ("remote")
+
+# Export destination: "Local" (local dev folder) or "Remote" (Quiddity or other hosting, SCORM packaging)
+Set Variable [ $exportDestination[1] ; GetScriptProperty ( "exportDestination" ) ]
+
+# Remote type identifier: Preview or Publish server idenifier i.e "web.funkiscloud.com"
+Set Variable [ $remoteType[1] ; GetScriptProperty ( "remoteType" ) ]
+
+# s3BucketName
+Set Variable [ $s3BucketName[1] ; GetScriptProperty ( "s3BucketName" ) ]
+
+# awsCdnKey - a key that is different between environemtns and forces the delete cache
+Set Variable [ $awsCdnKey[1] ; GetScriptProperty ( "awsCdnKey" ) ]
+
+# awsEnvironment - PROD or TEST_ENV
+Set Variable [ $awsEnvironment[1] ; GetScriptProperty ( "awsEnvironment" ) ]
+
+# apiEndpoint
+Set Variable [ $apiEndpoint[1] ; GetScriptProperty ( "apiEndpoint" ) ]
+
+# Title id - current Title
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+
+# Package id - current Package
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+
+# Package type - current Package.
+  
+# Specific content will be exported depending on package type
+  
+  PrimaryKey							Name			JSON name
+  4C393C7E-B339-4BFA-ADE7-E59F47FBAC60	Scroll		scroll
+  5F127BA8-1BC7-467B-93EF-7BE401615BAA	Slide		slide
+  4B8AB81A-9C99-43AD-8C32-3325D98F688A	Mixed type	mixed type
+  BB6DDA20-C6CE-441E-B99C-CE1F884DC7E5	Site	 old		site
+  B6397ED6-1BA8-4444-BD51-65076EE684F9	Site			scroll
+  C69777FA-7286-422C-9337-B722B10663B6  Title info   title-information
+Set Variable [ $package_type[1] ; GetScriptProperty ( "package_type" ) ]
+
+# TitleLocalisationCode - the original localisation code is not included in the Title X Language table.
+Set Variable [ $titleLocalisationCode[1] ; GetScriptProperty ( "titleLocalisationCode") ]
+
+# Package directory -  identifier for exporting to publish server - url + client_dir/title_dir/package_dir/
+Set Variable [ $package_dir[1] ; GetScriptProperty ( "package_dir" ) ]
+
+# Export mode - deicides which files to export - JSON, Media update, Media all or Translation (old process)
+Set Variable [ $exportMode[1] ; GetScriptProperty ( "exportMode" ) ]
+
+# Destination root path - where to export the files - FMServer exports to a temp path
+If [ $exportDestination = "Local" ]
+	Set Variable [ $destinationRootpath[1] ; GetScriptProperty ( "destinationRootpath" ) ]
+Else If [ $exportDestination = "Remote" ]
+	Set Variable [ $destinationRootpath[1] ; Get(temporaryPath) & $package_dir ]
+End If
+
+# For taskServer - "sync" or "publish"
+Set Variable [ $typeOfTask[1] ; GetScriptProperty ( "typeOfTask" ) ]
+
+# For taskServer - SCORM_12, SCORM_2004, WEB_LINK, XAPI
+Set Variable [ $jobTypes[1] ; GetScriptProperty ( "jobTypes" ) ]
+
+# For Publish: GitLabURL = URL to project on Funkis GitLab. PM2 Task server will fetch.
+Set Variable [ $GitLabURL[1] ; GetScriptProperty ( "GitLabURL" ) ]
+
+# For Publish:: emailToNotifyWhenDone = Email adress to notify when package is ready for download.
+Set Variable [ $emailToNotifyWhenDone[1] ; GetScriptProperty ( "emailToNotifyWhenDone" ) ]
+Set Variable [ $title_header[1] ; GetScriptProperty ( "title_header" ) ]
+
+# For Publish: resultTransferTarget = URL to a server - i.e test.quiddity.se.
+Set Variable [ $resultTransferTarget[1] ; GetScriptProperty ( "resultTransferTarget" ) ]
+
+# For Publish:: Set codebase for task server
+Set Variable [ $funkisCodeBase[1] ; GetScriptProperty ( "funkisCodeBase" ) ]
+
+# For Publish:: Set codebase version for task server
+Set Variable [ $funkisCodeBaseVersion[1] ; GetScriptProperty ( "funkisCodeBaseVersion" ) ]
+
+# For Publish:: Set codebase short name for log
+Set Variable [ $funkisCodeBaseShortName[1] ; GetScriptProperty ( "funkisCodeBaseShortName" ) ]
+
+# For Publish:: Set branch settings
+Set Variable [ $branchSettings[1] ; GetScriptProperty ( "branchSettings" ) ]
+
+# For Publish:: Pass the name of the delivery milestone
+Set Variable [ $delivery_milestone[1] ; GetScriptProperty ( "delivery_milestone" ) ]
+
+# For Publish - Build:: Pass the id of the build log item
+Set Variable [ $build_id[1] ; GetScriptProperty ( "build_id" ) ]
+
+# --------------------------------------------------------------------------------
+# ----------------- START --------------------------------------------------------
+
+# -----------  Create a list of DBs to export ------------------------------------ 
+Perform Script [ From list ; "Get ExportDB List" ; Parameter: SetProperty ("title_id"; $title_id) & 
+				SetProperty ("package_id"; $package_id) &
+				SetProperty ("package_type" ; $package_type) & 
+				SetProperty ("titleLocalisationCode"; $titleLocalisationCode) & 
+				SetProperty ("exportMode"; $exportMode) ]
+Set Variable [ $exportDBList[1] ; Get(ScriptResult) ]
+
+# -----------  Go through all media to markup texts with Subtitle FFSub and Subtitle VTT ------------------------------------ 
+
+If [ $exportDestination = "Remote" ]
+	Perform Script [ From list ; "Set Text Subtitle Format" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) & 
+					SetProperty ("exportMode"; $exportMode) ]
+Else If [ $exportDestination = "Local" ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	// Perform Script [ From list ; "Set Text Subtitle Format" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id )& 
+					SetProperty ("exportMode"; $exportMode) ]
+End If
+
+# ------------------- EXPORT DB LIST LOOP --------------------------------------------------------------------
+Set Variable [ $i[1] ; 1 ]
+Loop [ Flush: Always ]
+	Set Variable [ $exportDB[1] ; GetValue ( $exportDBList ; $i ) ]
+	
+	If [ Not PatternCount ( $exportDB ; "Media" ) ]
+		
+		# -------------------- CREATE THE DATA TO EXPORT ---------------------------------------------------------------
+		If [ $exportDestination = "Remote" ]
+			Perform Script [ From list ; "Create Data File" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+							SetProperty ( "package_id" ; $package_id ) & 
+							SetProperty ( "package_type" ; $package_type ) & 
+							SetProperty ( "exportDB" ; $exportDB ) & 
+							SetProperty ( "savePosition" ; $i ) ]
+		Else If [ $exportDestination = "Local" ]
+			Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+			// Perform Script [ From list ; "Create Data File" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+							SetProperty ( "package_id" ; $package_id ) & 
+							SetProperty ( "exportDB" ; $exportDB ) & 
+							SetProperty ( "savePosition" ; $i ) ]
+		End If
+		
+		Set Variable [ $last_operation_message[1] ; Get(ScriptResult) ]
+		If [ PatternCount ( $last_operation_message ; "error" ) ]
+			Exit Script [ $last_operation_message ]
+		End If
+		
+		# -------------------- GET THE EXPORT PATH -------------------------------------------------------------------------
+		
+		If [ $exportDestination = "Remote" ]
+			Perform Script [ From list ; "Get DestinationPath" ; Parameter: SetProperty ( "exportDB" ; $exportDB ) & 
+							SetProperty ( "exportDestination" ; $exportDestination ) &
+							SetProperty ("destinationRootpath" ; $destinationRootpath) & 
+							SetProperty ("exportMode"; $exportMode) ]
+		Else If [ $exportDestination = "Local" ]
+			Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+			// Perform Script [ From list ; "Get DestinationPath" ; Parameter: SetProperty ( "exportDB" ; $exportDB ) & 
+							SetProperty ( "exportDestination" ; $exportDestination ) &
+							SetProperty ("destinationRootpath" ; $destinationRootpath) & 
+							SetProperty ("exportMode"; $exportMode) ]
+		End If
+		Set Variable [ $fullFilePath[1] ; GetResultProperty ( "fullFilePath" ) ]
+		Set Variable [ $fullFilePath_VTTLocalisedMedia[1] ; GetResultProperty ( "fullFilePath_VTTLocalisedMedia" ) ]
+		
+	End If
+	# -------------------- SAVE THE FILE --------------------------------------------------------------------------------
+	
+	Perform Script [ From list ; "Save Files" ; Parameter: SetProperty ( "exportDestination" ; $exportDestination ) & 
+					SetProperty ( "fullFilePath" ; $fullFilePath ) & 
+					SetProperty ( "fullFilePath_VTTLocalisedMedia" ; $fullFilePath_VTTLocalisedMedia ) & 
+					SetProperty ( "destinationRootpath" ; $destinationRootpath ) &
+					SetProperty ( "title_id" ; $title_id) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "exportDB" ; $exportDB) & 
+					SetProperty ( "savePosition" ; $i ) ]
+	
+	Set Variable [ $last_operation_message[1] ; Get(ScriptResult) ]
+	If [ PatternCount ( $last_operation_message ; "error" ) ]
+		Exit Script [ $last_operation_message ]
+	End If
+	
+	# ------------------ END THE LOOP -------------------------------------------------------------------------------
+	
+	Set Variable [ $i[1] ; $i+1 ]
+	Exit Loop If [ GetValue ( $exportDBList ; $i ) = "" ]
+End Loop
+
+# -------------- All files exported - Trigger PM2 Task Server on Server if destination = Remote -------------------
+If [ $exportDestination = "Remote" ]
+	Perform Script [ From list ; "Trigger PM2 Task Server" ; Parameter: SetProperty ( "destinationRootPath" ; $destinationRootPath ) &
+					SetProperty ( "remoteType" ; $remoteType ) &
+					SetProperty ( "s3bucketName" ; $s3bucketName ) &
+					SetProperty ( "awsCdnKey" ; $awsCdnKey ) &
+					SetProperty ( "awsEnvironment" ; $awsEnvironment ) &
+					SetProperty ( "apiEndpoint" ; $apiEndpoint ) &
+					SetProperty ( "package_dir" ; $package_dir ) &
+					SetProperty ( "typeOfTask" ; $typeOfTask ) & 
+					SetProperty ( "jobTypes" ; $jobTypes ) & 
+					SetProperty ( "GitLabURL" ; $GitLabURL )& 
+					SetProperty ( "emailToNotifyWhenDone" ; $emailToNotifyWhenDone ) & 
+					SetProperty ( "title_header" ; $title_header ) &
+					SetProperty ( "resultTransferTarget" ; $resultTransferTarget )& 
+					SetProperty ( "funkisCodeBase" ; $funkisCodeBase ) & 
+					SetProperty ( "funkisCodeBaseVersion" ; $funkisCodeBaseVersion ) & 
+					SetProperty ( "branchSettings" ; $branchSettings ) & 
+					SetProperty ( "delivery_milestone" ; $delivery_milestone ) & 
+					SetProperty ( "build_id" ; $build_id ) ]
+	Set Variable [ $errorCode[1] ; Get(ScriptResult) ]
+	
+	# ----------- Update upload log ------------------------------------------------------
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	# Set timestamp when last export was made
+	Set Field [ FAT Package::Last Export Timestamp ; Get(currentHostTimeStamp) ]
+	Go to Related Record [ Table: FAT Export Log @ Package ; Layout: "TABLE FAT Export Log" ; Show related ]
+	If [ Get(lastError) = 101 ]
+		Go to Layout [ Layout: "TABLE FAT Export Log" ; Animation: None ]
+	End If
+	Set Variable [ $lastCodebase[1] ; FAT Export Log::Codebase ]
+	New Record/Request
+	Set Field [ FAT Export Log::Title id ; $title_id ]
+	Set Field [ FAT Export Log::Package id ; $package_id ]
+	Set Field [ FAT Export Log::ExportMode ; $exportMode ]
+	Set Field [ FAT Export Log::Job types ; $jobTypes ]
+	Set Field [ FAT Export Log::Type of task ; $typeOfTask ]
+	Set Field [ FAT Export Log::Destination ; $remoteType & Case ( $errorCode = "" ; "" ; " Error " & $errorCode ) ]
+	Set Field [ FAT Export Log::Codebase ; Case ( IsEmpty ( $funkisCodeBaseShortName ) ; $lastCodebase; $funkisCodeBaseShortName & " " & $funkisCodeBaseVersion) ]
+End If
+# ------------------------------------------------------------------------------------------------------------
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+# ---------------- Cleanup of exported text files ------------------------------
+Set Variable [ $j[1] ; 0 ]
+Loop [ Flush: Always ]
+	Set Variable [ $j[1] ; $j + 1 ]
+	If [ $package_id ≠ "" ]
+		Set Field [ FAT Package::Latest Exported file ; "" ]
+	Else
+		Set Field [ FAT Title::Latest Exported file ; "" ]
+	End If
+	Exit Loop If [ $j = $i ]
+End Loop
+
+

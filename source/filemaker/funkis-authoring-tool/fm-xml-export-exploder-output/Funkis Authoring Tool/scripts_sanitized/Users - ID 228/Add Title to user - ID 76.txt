@@ -1,0 +1,64 @@
+Set Error Capture [ ON ]
+Freeze Window
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty ( "localisation_code" ) ]
+Set Variable [ $localised_version[1] ; GetScriptProperty ( "localised_version" ) ]
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+Set Variable [ $user_id[1] ; GetScriptProperty ( "user_id" ) ]
+Set Variable [ $portal[1] ; GetScriptProperty ( "portal" ) ]
+
+If [ IsEmpty ( $user_id ) ]
+	Set Variable [ $user_id[1] ; $$login_id ]
+End If
+# Caller = title_list or fat_user
+If [ $portal = "all_titles" ]
+	Show Custom Dialog [ Title: "Warning!" ; Message: "You are about to give a user access to a Title that don't belong to the user's organisation. Are you absolutely sure you want to do this? " ; Default Button: "OK" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice) = 1 ]
+		Show Custom Dialog [ Title: "Second warning!" ; Message: "Do you have all confidentiality agreements in place for this user to view and edit this Title? If you are insecure - press Cancel and check with super admin." ; Default Button: "Cancel" ; Button 2: "OK" ]
+		If [ Get(lastMessageChoice) = 1 ]
+			Exit Script []
+		End If
+	Else
+		Exit Script []
+	End If
+End If
+
+If [ PatternCount ( $user_id ; "@" ) > 0 ]
+	Set Variable [ $user_id_searchstring[1] ; Replace ($user_id ; Position ( $user_id ; "@" ; 0 ; 1 ) ; 1 ; "\@" ) ]
+Else
+	Set Variable [ $user_id_searchstring[1] ; $user_id ]
+End If
+
+Set Variable [ $not_added[1] ; False ]
+Go to Layout [ Layout: "TABLE User X Title" ; Animation: None ]
+If [ $localised_version = "false" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=0 ]
+		Set Variable [ $not_added[1] ; True ]
+	End If
+Else
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=0 ]
+		Set Variable [ $not_added[1] ; True ]
+	End If
+End If
+If [ $not_added ]
+	New Record/Request
+	Set Field [ User X Title::Title id ; $title_id ]
+	Set Field [ User X Title::User id ; $user_id ]
+	Set Field [ User X Title::Localisation code ; $localisation_code ]
+	Commit Records/Requests [ With dialog: OFF ]
+	# Update modification timestamp since it is used to decide if an user is inactive and can be deleted by maintenance scripts
+	Set Field [ User::ModificationTimeStamp ; Get(currentTimeStamp) ]
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+If [ $not_added ]
+	If [ $caller = "title_list" ]
+		Perform Script [ From list ; "Go previous layout" ]
+	End If
+	Show Custom Dialog [ Title: "Title added" ; Message: "The Title was successfully added to the user. " ; Default Button: "OK" ]
+Else
+	Show Custom Dialog [ Title: "Title already added" ; Message: "This Title was already added to the user. " ; Default Button: "OK" ]
+End If
+

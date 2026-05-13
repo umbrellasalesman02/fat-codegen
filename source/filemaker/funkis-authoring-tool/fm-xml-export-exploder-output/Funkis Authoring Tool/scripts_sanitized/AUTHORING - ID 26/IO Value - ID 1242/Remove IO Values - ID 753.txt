@@ -1,0 +1,30 @@
+# Called from button in Page Item Setting and Media Card
+Freeze Window
+Set Error Capture [ ON ]
+Set Variable [ $io_parent[1] ; Get(scriptParameter) ]
+
+If [ $io_parent = "Page item" ]
+	# Called from IO page item setting
+	
+	Show Custom Dialog [ Title: "Remove all IOs" ; Message: "Are you sure you want to remove all IOs for this page item? " ; Default Button: "OK" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice) = 1 ]
+		Go to Related Record [ Table: FAT IO Value @ Page item ; Layout: "TABLE FAT IO Value @ Page item" ; Show related ]
+		If [ Get(foundCount)>0 ]
+			Delete All Records [ With dialog: OFF ]
+		End If
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	End If
+Else If [ $io_parent = "Media" ]
+	# Called from media card
+	
+	Show Custom Dialog [ Title: "Remove media IO" ; Message: "Are you sure you want to remove the IO for this media? " ; Default Button: "OK" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice) = 1 ]
+		Go to Related Record [ Table: FAT IO Value @ Media ; Layout: "TABLE FAT IO Value @ Page item" ; Show related ]
+		If [ Get(foundCount)>0 ]
+			Delete Record/Request [ With dialog: OFF ]
+		End If
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	End If
+	
+End If
+

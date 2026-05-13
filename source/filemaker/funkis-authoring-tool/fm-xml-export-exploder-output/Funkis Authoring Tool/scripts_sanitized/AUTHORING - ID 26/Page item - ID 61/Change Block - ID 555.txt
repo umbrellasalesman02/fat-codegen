@@ -1,0 +1,115 @@
+# This script is called from a button on the page item layout
+
+
+Set Variable [ $block_id[1] ; FAT Page Block VL::PrimaryKey ]
+Set Variable [ $block_name[1] ; FAT Page Block VL::Name ]
+Set Field [ FAT Page item::gBlock ; $block_id ]
+Close Popover
+
+Show Custom Dialog [ Title: "Change Block type to " & $block_name ; Message: "Are you sure you want to change the block type for this page item? Content and modifiers will be kept if possible but IOs and List have to be added again." ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice) = 1 ]
+	Set Variable [ $$pageItemRecordLoadTrigger[1] ; False ]
+	Freeze Window
+	Set Error Capture [ ON ]
+	
+	# Set all data before creating attributes and stateToggles
+	Set Variable [ $old_block_id[1] ; FAT Page item::Block id ]
+	Set Variable [ $new_block_id[1] ; FAT Page item::gBlock ]
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	Set Variable [ $package_type[1] ; FAT Package::Package type id ]
+	Set Variable [ $item_id[1] ; FAT Page item::PrimaryKey ]
+	
+	# Set the page item to the new block
+	Set Field [ FAT Page item::Block id ; $new_block_id ]
+	
+	# Delete list and IOs
+	Set Field [ FAT Page item::IO id Legacy ; "" ]
+	Set Field [ FAT Page item::IO id array Legacy ; "" ]
+	Set Field [ FAT Page item::List id ; "" ]
+	
+	If [ List ( FAT IO Value @ Page item::PrimaryKey ) ≠ "" ]
+		Go to Related Record [ Table: FAT IO Value @ Page item ; Layout: "TABLE FAT IO Value @ Page item" ; Show related ]
+		Delete All Records [ With dialog: OFF ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	End If
+	
+	Commit Records/Requests [ With dialog: OFF ]
+	
+	# --------------------------------------------------------------------------------------
+	# Fix Attributes
+	Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+	# Find attribute values to this page items
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $attributeList[1] ; "" ]
+	Set Variable [ $attributeTypeList[1] ; "" ]
+	Set Variable [ $attributeValueArray[1] ;  ]
+	Set Variable [ $i[1] ; 1 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $attributeList[1] ; $attributeList & FAT Modifier::Name & ¶ ]
+		Set Variable [ $attributeTypeList[1] ; $attributeTypeList & FAT Modifier::Type & ¶ ]
+		# Use an array for mix of values - String, Number, Containers
+		Set Variable [ $attributeValueArray[$i] ; Case ( FAT Modifier::Type = "Text"; TF MV::Text; 
+						       FAT Modifier::Type = "Media"; Media MV::Media container; 
+						       FAT Modifier Value::Value) ]
+		Set Variable [ $i[1] ; $i + 1 ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	# Delete all current attributeValues - relations also deletes media and text fields
+	Delete All Records [ With dialog: OFF ]
+	
+	# Add new attributes
+	Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "Block" ) &
+					SetProperty ( "item_id" ; $item_id )  &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "symbol_id" ; $new_block_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "package_type" ; $package_type ) ]
+	Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "Page item" ) &
+					SetProperty ( "item_id" ; $item_id )  &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "symbol_id" ; $new_block_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "package_type" ; $package_type ) ]
+	
+	# Set new attribute values with old ones if no match - then skip value
+	Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+	# Find NEW attribute values to this page items
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Loop [ Flush: Always ]
+		Set Variable [ $attribute_name[1] ; FAT Modifier::Name ]
+		Set Variable [ $attribute_type[1] ; FAT Modifier::Type ]
+		Set Variable [ $i[1] ; 1 ]
+		Set Variable [ $found[1] ; False ]
+		Loop [ Flush: Always ]
+			# Go through the value list created from old AttributeValues
+			Set Variable [ $found[1] ; $attribute_name = GetValue ( $attributeList ; $i )
+							
+							And
+							
+							$attribute_type = GetValue ( $attributeTypeList ; $i ) ]
+			Set Variable [ $i[1] ; $i + 1 ]
+			Exit Loop If [ $i > (ValueCount ( $attributeList )) Or $found ]
+		End Loop
+		If [ $found ]
+			# If name and type of attribute corresponds - then copy value to the right field
+			If [ $attribute_type = "Media" ]
+				# Copy media from array
+				Set Field [ Media MV::Media container ; $attributeValueArray[$i-1] ]
+			Else If [ $attribute_type = "Text" ]
+				# Copy text from array
+				Set Field [ TF MV::Text ; $attributeValueArray[$i-1] ]
+			Else
+				# Copy value from array
+				Set Field [ FAT Modifier Value::Value ; $attributeValueArray[$i-1] ]
+			End If
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	
+	# --------------------------------------------------------------------------------------------------
+	Set Variable [ $$pageItemRecordLoadTrigger[1] ; True ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+

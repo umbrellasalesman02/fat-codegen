@@ -1,0 +1,9 @@
+Set Variable [ $package_ref[1] ; FAT Package::JSON Friendly id ]
+Set Variable [ $package_filepath_JSON[1] ; User X Title @ Title::Package Filepath JSON ]
+Set Variable [ $package_filepath_JSON[1] ; JSONDeleteElement ( $package_filepath_JSON ; $package_ref ) ]
+If [ Left ( JSONFormatElements ( $package_filepath_JSON ) ; 1 ) <> "?" ]
+	Set Field [ User X Title @ Title::Package Filepath JSON ; $package_filepath_JSON ]
+Else
+	Set Field [ User X Title @ Title::Package Filepath JSON ; "" ]
+End If
+

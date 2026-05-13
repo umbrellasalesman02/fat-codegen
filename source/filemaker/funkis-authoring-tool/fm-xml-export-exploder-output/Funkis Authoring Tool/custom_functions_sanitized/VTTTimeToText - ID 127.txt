@@ -1,0 +1,22 @@
+Let([
+
+
+t1 = GetAsText(cueTime);
+
+t2 = Substitute ( t1 ; "," ; "." );
+
+t3 = PatternCount ( t2 ; "." );
+
+t4 = If ( t3 = 0  ; "" ; Right ( t2 ; Length(t2) - Position( t2 ; "." ; 0 ; 1 ) ));
+
+t5 = Case ( 
+        Length (t4) = 0;  t2 & ".000";
+        Length (t4) = 1 ; t2 & "00";
+        Length (t4) = 2 ; t2 & "0 ";
+        Length (t4) = 3; t2
+)
+
+];
+t5
+
+)

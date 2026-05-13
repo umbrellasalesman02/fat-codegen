@@ -1,0 +1,516 @@
+<FieldCatalog>
+	<UUID modifications="50" userName="jensthorsen" accountName="jensthorsen" timestamp="2026-03-06T16:38:16">CEC1EE8A-80C9-45D1-8B04-EADAAD1144B7</UUID>
+	<BaseTableReference id="242" name="FAT Overview"></BaseTableReference>
+	<ObjectList membercount="45">
+		<Field id="6" name="Item id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="4" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-13T12:26:50">AFDF8D65-8901-49AE-A9C9-41EB944E4189</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="True" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="7" name="Title id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-10-29T19:23:45">17DC621E-3D2E-4046-99CC-34E49C065309</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="9" name="Item type" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="7" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T16:00:31">9E8A97CE-CAEF-42A7-B02C-CDA02D8943D0</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False">
+				<ValueListReference id="14" name="Hierarchy levels"></ValueListReference>
+			</Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="10" name="Name" fieldtype="Normal" datatype="Text" comment="Only one has text.">
+			<UUID modifications="10" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-12-19T16:58:26">C313900C-BDD3-4706-8581-92DB38D20B42</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065762" name="FAT Overview"></TableOccurrenceReference>
+						<Text><![CDATA[Let ( a = ModifiedTimeStamp;  // a hack to force recalculation of the data fieldCase (       Item type = "Package" ; Item Package Name;      Item type = "Chapter" ; Item Chapter Name;       Item type = "Page" ; Item Page Name;      Item type = "Page item" ; Item Page item Name))]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="20" name="Item Package Name" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="7" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T20:11:16">F9738ABE-DD88-4C8A-96E1-749A363BFC1F</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065782" name="FAT Overview @ Package"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Reference name]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="22" name="Item Chapter Name" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="8" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T15:54:30">091BC000-120A-4915-8A22-F3D0C3EBC37E</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065783" name="FAT Overview @ Chapter"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Chapter::DisplayText]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="23" name="Item Page Name" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="10" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T15:55:16">A0F4408D-B686-4CEE-959B-DA82B3DC79CD</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065784" name="FAT Overview @ Page"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Page::DisplayText]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="24" name="Item Page item Name" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="12" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T15:55:42">5958B88A-688F-41EF-887A-45744B99DBE2</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065785" name="FAT Overview @ Page item"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Page item::DisplayText]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="25" name="Item Package Sort index" fieldtype="Calculated" datatype="Number" comment="">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T16:49:51">6C5A0C28-CA0F-474C-BF76-4CDC45B47CF6</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065782" name="FAT Overview @ Package"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::SortIndex]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="26" name="Item Chapter Sort index" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="5" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T18:50:52">EFA43868-594F-4B60-ADAD-84C8A815DC54</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065783" name="FAT Overview @ Chapter"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::SortIndex & " " & FAT Chapter::SortIndex]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="27" name="Item Page Sort index" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="8" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T18:51:03">26C6955D-755C-4599-BFDB-38DAD8AAA1C9</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065784" name="FAT Overview @ Page"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::SortIndex & " " & FAT Chapter::SortIndex & " " & FAT Page::SortIndex]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="28" name="Item Page item Sort index" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="8" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T18:51:17">D4C4EFE6-E575-40FF-B13B-6C85D9841317</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065785" name="FAT Overview @ Page item"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::SortIndex & " " & FAT Chapter::SortIndex & " " & FAT Page::SortIndex & " " & FAT Page item::SortIndex]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="30" name="Sort index" fieldtype="Normal" datatype="Text" comment="Only one has index.">
+			<UUID modifications="13" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-12-19T16:59:36">F9953F86-571F-4F9E-AD8C-61AC63FEF34F</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065762" name="FAT Overview"></TableOccurrenceReference>
+						<Text><![CDATA[Let ( a = ModifiedTimeStamp;  // a hack to force recalculation of the data fieldCase (       Item type = "Package" ; Item Package Sort index;      Item type = "Chapter" ; Item Chapter Sort index;       Item type = "Page" ; Item Page Sort index;      Item type = "Page item" ; Item Page item Sort index))]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="31" name="Item Page item Hierarchy Level" fieldtype="Calculated" datatype="Number" comment="">
+			<UUID modifications="7" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T17:04:28">B1FB29A3-2EA6-45A5-9B40-BA29A97CFAAF</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065785" name="FAT Overview @ Page item"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Page item::Hierarchy level]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="32" name="Item Page Hierarchy Level" fieldtype="Calculated" datatype="Number" comment="">
+			<UUID modifications="7" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T17:04:53">771B73EE-1EE8-4793-966F-AD60D3FF2F70</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065784" name="FAT Overview @ Page"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Page::Hierarchy level]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="33" name="Item Chapter Hierarchy Level" fieldtype="Calculated" datatype="Number" comment="">
+			<UUID modifications="5" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T17:05:11">97B76CAF-0883-431A-AB40-BA37F57F6983</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065783" name="FAT Overview @ Chapter"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Chapter::Hierarchy level]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="34" name="Hierarchy Level" fieldtype="Normal" datatype="Number" comment="Only one has index.">
+			<UUID modifications="16" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-12-19T17:00:07">BAF302F3-B594-432B-B1B1-6C56A221B3AD</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065762" name="FAT Overview"></TableOccurrenceReference>
+						<Text><![CDATA[Let ( a = ModifiedTimeStamp;  // a hack to force recalculation of the data fieldCase (       Item type = "Package" ; Item Package Hierarchy Level;      Item type = "Chapter" ; Item Chapter Hierarchy Level;       Item type = "Page" ; Item Page Hierarchy Level;      Item type = "Page item" ; Item Page item Hierarchy Level))]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="35" name="Item Package Hierarchy Level" fieldtype="Calculated" datatype="Number" comment="">
+			<UUID modifications="4" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T17:06:19">E9BCFDBC-E666-46B9-B73E-48487EA6B0BC</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065782" name="FAT Overview @ Package"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Hierarchy level]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="37" name="Item Page item Package id" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="14" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T19:58:53">BA39398A-5F9B-4913-87E2-942947FB2134</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065785" name="FAT Overview @ Page item"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::PrimaryKey]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="38" name="Item Page Package id" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="12" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T19:59:36">16A2F760-702C-413E-97B8-0C68B41F9253</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065784" name="FAT Overview @ Page"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::PrimaryKey]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="39" name="Item Chapter Package id" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="10" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T20:00:18">0C810643-5EB3-4685-8237-D15FB83837E6</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065783" name="FAT Overview @ Chapter"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::PrimaryKey]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="40" name="Package id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="13" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-12-19T17:00:38">3693E2F4-A74C-49FA-83B3-2957D0281776</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065762" name="FAT Overview"></TableOccurrenceReference>
+						<Text><![CDATA[Let ( a = ModifiedTimeStamp;  // a hack to force recalculation of the data fieldCase (       Item type = "Package" ; Item id;      Item type = "Chapter" ; Item Chapter Package id;       Item type = "Page" ; Item Page Package id;      Item type = "Page item" ; Item Page item Package id))]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="41" name="Item Package Type" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="9" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T20:25:25">1CB223B3-6246-4F67-A174-4B4283530181</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065782" name="FAT Overview @ Package"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Package type name]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="42" name="Item Chapter Package type" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="12" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T20:25:52">63655A0E-CCAE-4F54-9F1A-721E47EC0E23</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065783" name="FAT Overview @ Chapter"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Package type name]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="43" name="Item Page Package type" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="14" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T20:26:19">963E5B9E-3B6E-4B1B-A56A-50AF5A511240</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065784" name="FAT Overview @ Page"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Package type name]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="44" name="Package type" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="16" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-12-19T17:01:11">BC47B056-DBC5-407C-B7C3-F7599BF2BCA0</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065762" name="FAT Overview"></TableOccurrenceReference>
+						<Text><![CDATA[Let ( a = ModifiedTimeStamp;  // a hack to force recalculation of the data fieldCase (       Item type = "Package" ; Item Package Type;      Item type = "Chapter" ; Item Chapter Package type;       Item type = "Page" ; Item Page Package type;      Item type = "Page item" ; Item Page item Package type))]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="45" name="Item Page item Package type" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="16" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-10T20:27:12">2EB38DD1-7083-43A0-AFDA-DAF66FC8F0B4</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065785" name="FAT Overview @ Page item"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Package type name]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="46" name="URL path" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="22" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2025-06-25T08:59:30">7ED6F1C8-3BAE-4519-91E0-B68BE6DF900E</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065762" name="FAT Overview"></TableOccurrenceReference>
+				<Text><![CDATA[Let ( a = ModifiedTimeStamp;  // a hack to force recalculation of the data fieldCase (       Item type = "Package" ; Item Package URL path;      Item type = "Chapter" ; Item Chapter URL path;       Item type = "Page" ; Item Page URL path;      Item type = "Page item" ; Item Page item URL path))]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="47" name="Item Chapter URL path" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="18" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-11T19:25:04">CFDDE03D-E0FA-49A4-B378-65E6EA827756</UUID>
+			<AutoEnter alwaysEvaluate="True"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065783" name="FAT Overview @ Chapter"></TableOccurrenceReference>
+				<Text><![CDATA[Case (     Item Chapter Hierarchy Level= 2 And Package type::Program type ≠ "slide";       FAT Package::FC Package directory & "/#" & FAT Package::FC Package directory & "/menu";       Item Chapter Hierarchy Level= 2 And Package type::Program type = "slide";       FAT Package::FC Package directory & "/#" & FAT Package::JSON Friendly id & "/" & FAT Chapter::JSON friendly id & "/" & FAT Page::JSON friendly id; )]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="48" name="Item Package URL path" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="11" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-11T19:18:07">4D215918-6015-4251-BF99-AFC4AA24038E</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065782" name="FAT Overview @ Package"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::FC Package directory]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="49" name="Item Page URL path" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="21" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-08-26T15:38:16">6BCE6A0E-51B5-4D4B-B07B-A0DEC667498A</UUID>
+			<AutoEnter alwaysEvaluate="True"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065784" name="FAT Overview @ Page"></TableOccurrenceReference>
+				<Text><![CDATA[Case (     Item Page Hierarchy Level= 2 And FAT Page::Page type = "menu";       FAT Package::FC Package directory & "/#" & FAT Package::FC Package directory & "/menu";       Item Page Hierarchy Level= 2 And FAT Page::Page type ≠ "menu" And FAT Package::Package type name = "Site";       FAT Package::FC Package directory & "/#/pages/" & FAT Page::JSON friendly id;    Item Page Hierarchy Level= 2 And FAT Page::Page type ≠ "menu" And FAT Package::Package type name ≠ "Site";       FAT Package::FC Package directory & "/#" & FAT Package::JSON Friendly id & "/" & FAT Page::JSON friendly id;    Item Page Hierarchy Level = 3;       FAT Package::FC Package directory & "/#" & FAT Package::JSON Friendly id & "/" & FAT Chapter::JSON friendly id & "/" & FAT Page::JSON friendly id; )]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="50" name="Item Page item URL path" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="23" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-11T19:37:38">E4E5CD73-1762-4701-9E7C-ED5F062245C6</UUID>
+			<AutoEnter alwaysEvaluate="True"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065785" name="FAT Overview @ Page item"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::FC Package directory & "/#" & FAT Package::JSON Friendly id & "/" & FAT Chapter::JSON friendly id & "/" & FAT Page::JSON friendly id]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="51" name="ValueList name" fieldtype="Normal" datatype="Text" comment="As shown in value list">
+			<UUID modifications="9" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-12-19T16:59:00">FC6483AC-2BBB-4279-95F0-EFE4C4DB698C</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065762" name="FAT Overview"></TableOccurrenceReference>
+						<Text><![CDATA[Let ( a = ModifiedTimeStamp;  // a hack to force recalculation of the data fieldCase (       Item type = "Package" ; Item Package Name & ": " & Item type;      Item type = "Chapter" ; Item Chapter Package Name & ": " & Item type  & " - " & Item Chapter Name;       Item type = "Page" ; Item Page Package Name & ": " & Item type  & " - " & Item Page Name;      Item type = "Page item" ; Item Page item Package Name & ": " & Item type  & " - " & Item Page item Name;))]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="52" name="Item Chapter Package Name" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="10" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-13T17:11:44">CC8FAEB3-AB1D-45CF-AC20-9D84778648C3</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065783" name="FAT Overview @ Chapter"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Reference name]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="53" name="Item Page Package Name" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="12" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-13T17:12:45">0B035A0C-BBFE-417D-93AC-946F6789A09F</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065784" name="FAT Overview @ Page"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Reference name]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="54" name="Item Page item Package Name" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="15" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-13T17:13:28">52FBBF8A-E57C-4F1A-ABE1-F075480D72EF</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065785" name="FAT Overview @ Page item"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Reference name]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="56" name="Hidden" fieldtype="Normal" datatype="Number" comment="Decides if item is hidden or visible in portals">
+			<UUID modifications="4" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-03-09T09:45:33">D174E44E-7119-4B7D-885D-2AEE37645ABF</UUID>
+			<AutoEnter type="ConstantData" prohibitModification="False">
+				<ConstantData>0</ConstantData>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="57" name="Collapsed" fieldtype="Normal" datatype="Number" comment="Decides if item is collapsed or expanded in portals">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-03-09T09:46:43">9EB08975-11DD-4C6F-BD66-9DF824688838</UUID>
+			<AutoEnter type="ConstantData" prohibitModification="False">
+				<ConstantData>0</ConstantData>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="58" name="Package group" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="19" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-12-19T17:01:53">9342D577-1CF6-461B-960C-FF6D12A08D17</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065762" name="FAT Overview"></TableOccurrenceReference>
+						<Text><![CDATA[Let ( a = ModifiedTimeStamp;  // a hack to force recalculation of the data fieldCase (       Item type = "Package" ; Item Package Package group;      Item type = "Chapter" ; Item Chapter Package Group;       Item type = "Page" ; Item Page Package Group;      Item type = "Page item" ; Item Page item Package Group))]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="59" name="Item Package Package group" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="13" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-04-14T16:35:18">473C12D1-AE1D-487E-B93E-500D2F06033B</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065782" name="FAT Overview @ Package"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Package Group]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="60" name="Item Chapter Package Group" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="12" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-04-14T16:35:25">4D08AC23-2EA8-4F0B-BAE7-9BFBD11DA629</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065783" name="FAT Overview @ Chapter"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Package Group]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="61" name="Item Page Package Group" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="14" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-04-14T16:35:30">B0173AFB-0080-402E-94E1-F91C31A76C41</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065784" name="FAT Overview @ Page"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Package Group]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="62" name="Item Page item Package Group" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="17" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-04-14T16:35:35">CB9C6CDB-C4DD-407F-B0C8-2A42B017E9B5</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065785" name="FAT Overview @ Page item"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Package::Package Group]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="64" name="ModifiedTimeStamp" fieldtype="Normal" datatype="Timestamp" comment="">
+			<UUID modifications="3" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-12-19T16:46:16">1C59838B-91C2-4A65-B018-973FDF3E0013</UUID>
+			<AutoEnter type="ModificationTimestamp" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="65" name="Include in export" fieldtype="Normal" datatype="Number" comment="Decides if item will be included in export or not. ">
+			<UUID modifications="3" userName="jensthorsen" accountName="jensthorsen" timestamp="2026-03-06T16:38:07">AE397873-7E96-47B8-B572-2797A0927BFA</UUID>
+			<AutoEnter type="ConstantData" prohibitModification="False">
+				<ConstantData>1</ConstantData>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+	</ObjectList>
+</FieldCatalog>

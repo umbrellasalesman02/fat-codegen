@@ -1,0 +1,117 @@
+# This script is called by Clone content SRV  for each item that can have a Input field 
+
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $old_item_id[1] ; GetScriptProperty ( "old_item_id") ]
+Set Variable [ $new_item_id[1] ; GetScriptProperty ( "new_item_id") ]
+# old_tt_id can be empty - when duplicated inside a Title.
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+# new_tt_id gets the current Title id if not explicitly set
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+# Suffix is only needed when duplicating inside a Title
+Set Variable [ $suffix[1] ; GetScriptProperty ( "suffix") ]
+
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+
+# Find fields for old item
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		
+		Set Variable [ $old_primary_key[1] ; FAT IO Field::PrimaryKey ]
+		Set Variable [ $input_text[1] ; TF IOF Input::Text ]
+		Set Variable [ $output_text[1] ; TF IOF Output::Text ]
+		Set Variable [ $hint_text[1] ; TF IOF Hint::Text ]
+		Set Variable [ $sort_index[1] ; FAT IO Field::SortIndex ]
+		
+		Duplicate Record/Request
+		
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT IO Field::IO id ; $new_item_id ]
+		Set Field [ FAT IO Field::Title id ; $title_id ]
+		Set Field [ FAT IO Field::Old PrimaryKey from clone ; $old_primary_key ]
+		Set Field [ FAT IO Field::SortIndex ; $sort_index ]
+		
+		Set Variable [ $new_field_id[1] ; FAT IO Field::PrimaryKey ]
+		
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT IO Field::PrimaryKey ) &
+						SetProperty ( "source_table" ; "field" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT IO Field::Label input ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) ]
+		Set Field [ TF IOF Input::Text ; $input_text ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT IO Field::PrimaryKey ) &
+						SetProperty ( "source_table" ; "field" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT IO Field::Label output ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) ]
+		Set Field [ TF IOF Output::Text ; $output_text ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT IO Field::PrimaryKey ) &
+						SetProperty ( "source_table" ; "field" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT IO Field::Hint) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) ]
+		Set Field [ TF IOF Hint::Text ; $hint_text ]
+		
+		# Field List cloning
+		If [ Not IsEmpty ( FAT IO Field::List id) ]
+			If [ $isClonedTitle Or PatternCount ( $clone_settings ; "Lists" ) ]
+				# Point to the new List created earlier
+				Set Variable [ $old_list_id[1] ; FAT IO Field::List id ]
+				Go to Layout [ Layout: "TABLE FAT List Alt" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount) = 1 ]
+					Set Variable [ $new_list_id[1] ; FAT List Alt::PrimaryKey ]
+				Else If [ Get(foundCount) = 0 ]
+					Perform Script [ From list ; "Clone List SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+									SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+									SetProperty ( "clone_level" ; $clone_level ) &
+									SetProperty ( "clone_settings" ; $clone_settings ) &
+									SetProperty ( "suffix" ; $suffix ) & 
+									SetProperty ( "old_tt_id" ; $old_tt_id ) &
+									SetProperty ( "title_id" ; $title_id ) &
+									SetProperty ( "old_list_id" ; $old_list_id ) ]
+					Set Variable [ $new_list_id[1] ; Get(ScriptResult) ]
+				End If
+				Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+				Set Field [ FAT IO Field::List id ; $new_list_id ]
+			End If
+		End If
+		
+		# Linked Field ids
+		# 11 May 2025 implementation - What if shared IO fields are not created yet? No fix fr this as it is now. 
+		If [ $isClonedTitle And Not IsEmpty ( FAT IO Field::Linked IO id ) And Not IsEmpty ( FAT IO Field::Linked IO Field id ) ]
+			# Point to the new IO and IO field created earlier
+			Set Variable [ $old_io_id[1] ; FAT IO Field::Linked IO id ]
+			Set Variable [ $old_io_field_id[1] ; FAT IO Field::Linked IO Field id ]
+			
+			Go to Layout [ Layout: "TABLE FAT IO Alt" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 1 ]
+				Set Variable [ $new_io_id[1] ; FAT IO Alt::PrimaryKey ]
+				# What to do else?
+			End If
+			Go to Layout [ Layout: "TABLE FAT IO Field Alt" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 1 ]
+				Set Variable [ $new_io_field_id[1] ; FAT IO Field Alt::PrimaryKey ]
+				# What to do else?
+			End If
+			Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+			Set Field [ FAT IO Field::Linked IO id ; $new_io_id ]
+			Set Field [ FAT IO Field::Linked IO Field id ; $new_io_field_id ]
+		End If
+		
+		
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+

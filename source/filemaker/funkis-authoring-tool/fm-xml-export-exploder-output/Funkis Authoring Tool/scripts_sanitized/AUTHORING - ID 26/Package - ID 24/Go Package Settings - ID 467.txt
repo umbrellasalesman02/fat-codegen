@@ -1,0 +1,22 @@
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $package_id[1] ; Get(scriptParameter) ]
+If [ PatternCount ( Get(layoutName) ; "Title" ) ]
+	Go to Related Record [ Table: FAT Package ; Layout: "FAT Package Settings" ; Show related ]
+	Loop [ Flush: Always ]
+		Exit Loop If [ $package_id = FAT Package::PrimaryKey ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+Else
+	Freeze Window
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Go to Related Record [ Table: FAT Title ; Layout: "TABLE FAT Title" ; Show related ]
+	Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+	Loop [ Flush: Always ]
+		Exit Loop If [ $package_id = FAT Package::PrimaryKey ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Go to Layout [ Layout: "FAT Package Settings" ; Animation: None ]
+End If
+Set Variable [ $$currentPackage[1] ; FAT Package::JSON Friendly id ]
+

@@ -1,0 +1,53 @@
+# Adjust time on subtitles. Called from a button in the media subtitle layout - one button for each text chunk
+# This script can only be called when Media and Text have the same language!
+
+Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+Set Variable [ $localisation_code[1] ; FAT Media::Localisation code ]
+Set Variable [ $current_enter_time[1] ; TF Subtitle::Enter time ]
+
+Show Custom Dialog [ Title: "Offset time on subtitles" ; Message: "Type the number of seconds that you want to offset this chunk's " & $time_point & "-time and the following subtitles. Both positive and negative values are accepted." ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $time_diff ; Label 1: "Time difference in seconds" ]
+
+If [ Get(lastMessageChoice) = 1 And Abs (GetAsNumber ( $time_diff ))>0 ]
+	Freeze Window
+	Set Error Capture [ ON ]
+	
+	
+	Set Variable [ $time_diff[1] ; GetAsNumber ( Substitute ( $time_diff ; "." ; "," ) ) ]
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	
+	# Find all texts in original language that needs adjusment
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+	
+	If [ Get(foundCount)>0 ]
+		
+		# Does the text have localised field connected - True
+		Set Variable [ $localisation[1] ; Case (List ( FAT Text All translations::PrimaryKey ) = ""; False; True) ]
+		
+		If [ $localisation = True ]
+			# Check if user wants to adjust localised texts or not
+			Show Custom Dialog [ Title: "Warning! This text is localised" ; Message: "This text is localised and several language versions may exist. Do you want to perform the same operation on all localised texts or only on current language?" ; Default Button: "All" ; Button 2: "Only " & $localisation_code ; Button 3: "Cancel" ]
+			If [ Get(lastMessageChoice) = 1 ]
+				# User press All languages - find all texts both original and localised
+				Set Variable [ $adjust_localised_versions[1] ; True ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Else If [ Get(lastMessageChoice) = 2 ]
+				# User press current language only - keep current found set
+				Set Variable [ $adjust_localised_versions[1] ; False ]
+			Else If [ Get(lastMessageChoice) = 3 ]
+				# User press Cancel
+				Go to Layout [ Layout: <original layout> ; Animation: None ]
+				Exit Script []
+			End If
+		End If
+		# Sort texts on Enter time
+		Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+		Replace Field Contents [ FAT Text::Enter time ; Replace with calculation: GetAsTime(FAT Text::Enter time + GetAsNumber ( $time_diff )) ]
+		Replace Field Contents [ FAT Text::Exit time ; Replace with calculation: GetAsTime(FAT Text::Exit time + GetAsNumber ( $time_diff )) ]
+		
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+
+

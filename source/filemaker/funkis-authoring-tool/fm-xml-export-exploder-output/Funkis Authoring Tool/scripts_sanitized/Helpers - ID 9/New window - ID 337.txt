@@ -1,0 +1,38 @@
+
+# Called on File ScriptTrigger OnWindowOpen
+# Close windows are handled in close window script
+
+// If [ Get(WindowStyle) ≠ 3 ]
+// # Card windows (Windowstyle = 3) does not have the same navigation abilitites
+
+Allow User Abort [ OFF ]
+Freeze Window
+
+Set Variable [ $new_window_name[1] ; Get(windowName) ]
+
+
+# Make sure Home layout is set up with the authenticated user
+Go to Layout [ Layout: "TABLE User" ; Animation: None ]
+Set Variable [ $$login_id[1] ; Get(accountName) ]
+If [ PatternCount ( Get(accountName) ; "@" ) = 0 ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	Set Variable [ $searchstring[1] ; Replace ( Get(accountName) ; Position ( Get(accountName) ; "@" ; 0 ; 1 ) ; 1 ; "\@" ) ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+# ------- Set up window list ---------------------------------------------------
+Set Variable [ $windowIndex[1] ; ValueCount ( Variables::gWindowList) + 1 ]
+Set Field [ Variables::gWindowList ; Case ( IsEmpty ( Variables::gWindowList ) ; 
+				
+				    $new_window_name;  
+				
+				    Variables::gWindowList & ¶ & $new_window_name
+				
+				) ]
+Set Field [ Variables::gLayoutNavigationLists ; $$home_layout ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+// End If
+

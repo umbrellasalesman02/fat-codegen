@@ -1,0 +1,39 @@
+# This script is called from a button on layout Base Project Text
+
+Set Variable [ $baseproject_id[1] ; Base Project::PrimaryKey ]
+Set Variable [ $source_item_type[1] ; "global baseproject" ]
+Set Variable [ $source_reference[1] ; "Global text baseproject" ]
+Freeze Window
+
+If [ $baseproject_id= "" ]
+	Show Custom Dialog [ Title: "Select base project" ; Message: "You must select a base project for the new template text." ; Default Button: "OK" ]
+	Exit Script []
+End If
+Go to Layout [ Layout: "TABLE Base Project" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+# Localisation code is ALWAYS "en-global" for the original template text
+Set Variable [ $primary_language_code[1] ; Base Project::Primary language ]
+Set Variable [ $primary_country_code[1] ; Base Project::Primary country ]
+Set Variable [ $secondary_language_code[1] ; Base Project::Secondary language ]
+Set Variable [ $secondary_country_code[1] ; Base Project::Secondary country ]
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+# Primary language
+New Record/Request
+Set Variable [ $original_key[1] ; FAT Text::PrimaryKey ]
+Set Field [ FAT Text::Title id ; "" ]
+Set Field [ FAT Text::Parent id ; $baseproject_id ]
+Set Field [ FAT Text::Source item type ; $source_item_type ]
+Set Field [ FAT Text::Source reference ; $source_reference ]
+Set Field [ FAT Text::Language code ; $primary_language_code ]
+Set Field [ FAT Text::Country code ; $primary_country_code ]
+Set Field [ FAT Text::Text ; "New base project text" ]
+# Secondary language
+Duplicate Record/Request
+Set Field [ FAT Text::OriginalKey ; $original_key ]
+Set Field [ FAT Text::Language code ; $secondary_language_code ]
+Set Field [ FAT Text::Country code ; $secondary_country_code ]
+
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

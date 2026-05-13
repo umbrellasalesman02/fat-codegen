@@ -1,0 +1,39 @@
+Set Variable [ $level[1] ; Get(scriptParameter) ]
+Show Custom Dialog [ Title: "Delete ModifierTemplate" ; Message: "Are you sure you want to delete this ModifierTemplate? ¶All blocks / IOs using this modifier will be affected and all values added to items in the whole FAT will be deleted.¶This operation cannot be undone. " ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice)=1 ]
+	Set Error Capture [ ON ]
+	Freeze Window
+	# Regardless of level, there's a relation to CMT Learning programme table
+	Set Variable [ $listOfLPs[1] ; Substitute ( List(FAT Title::Reference title); ¶ ; ", ") ]
+	If [ $level = "Block" ]
+		Set Variable [ $attribute_template_id[1] ; ModifierTemplate @ BlockTemplate::PrimaryKey ]
+	Else If [ $level = "IO" ]
+		Set Variable [ $attribute_template_id[1] ; ModifierTemplate @ IO Type::PrimaryKey ]
+	Else
+		Set Variable [ $attribute_template_id[1] ; ModifierTemplate::PrimaryKey ]
+	End If
+	# Find all attributes using the attribute template
+	Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Show Custom Dialog [ Title: "Final confirmation" ; Message: "Found  " & Get(foundCount) & " items using this ModifierTemplate in titles: " & $listOfLPs & "." & ¶ & ¶ &   "Are you OK to delete this ModifierTemplate? All values will also be deleted and this will affect all these titles. This cannot be undone." ; Default Button: "Cancel" ; Button 2: "OK" ]
+		If [ Get(lastMessageChoice) = 2 ]
+			# Deleting Attributes also deletes all values thanks to relation.
+			Delete All Records [ With dialog: OFF ]
+			Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Delete Record/Request [ With dialog: OFF ]
+		End If
+	Else
+		Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Delete Record/Request [ With dialog: OFF ]
+	End If
+	If [ $level = "Block" Or $level = "IO" ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Go to Object [ "Attribute" ; Repetition: 1 ]
+	Else
+		Perform Script [ From list ; "Go ModifierTemplates" ]
+	End If
+End If
+

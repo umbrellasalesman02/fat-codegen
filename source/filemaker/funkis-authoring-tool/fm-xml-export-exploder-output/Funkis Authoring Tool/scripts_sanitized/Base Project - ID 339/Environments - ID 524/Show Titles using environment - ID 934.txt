@@ -1,0 +1,16 @@
+# Called from a button in Environment interface
+Freeze Window
+Set Error Capture [ ON ]
+Set Variable [ $environment_id[1] ; Title Environment::PrimaryKey ]
+Perform Script [ From list ; "Save Active Layout" ]
+
+Go to Layout [ Layout: "Title list" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)= 0 ]
+	Perform Script [ From list ; "Go previous layout" ]
+	Show Custom Dialog [ Title: "No titles found" ; Message: "Cannot find any titles in FAT using this environment." ; Default Button: "OK" ]
+End If
+
+
+
+

@@ -1,0 +1,32 @@
+# Called from all deliveries
+
+# Same as jobTypes
+Set Variable [ $delivery_format[1] ; GetScriptProperty ( "delivery_format" ) ]
+
+# Funkis WOW Delivery - Milestone name
+Set Variable [ $delivery_milestone[1] ; GetScriptProperty ( "delivery_milestone" ) ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $codebase_id[1] ; GetScriptProperty ( "codebase_id" ) ]
+Set Variable [ $codebase_version_id[1] ; GetScriptProperty ( "codebase_version_id" ) ]
+Set Variable [ $destination[1] ; GetScriptProperty ( "destination" ) ]
+
+# Add a new Build log item
+Go to Layout [ Layout: "TABLE FAT Build Log" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Build Log::Title id ; $title_id ]
+Set Field [ FAT Build Log::Package id ; $package_id ]
+Set Field [ FAT Build Log::Codebase id ; $codebase_id ]
+Set Field [ FAT Build Log::Codebase version id ; $codebase_version_id ]
+Set Field [ FAT Build Log::Delivery milestone ; $delivery_milestone ]
+Set Field [ FAT Build Log::Destination ; $destination ]
+#  Set original status to "Queued". Task server will set it to "Started", then "Completed" or "Failed"
+Set Field [ FAT Build Log::Status ; "Queued" ]
+Set Variable [ $build_id[1] ; FAT Build Log::PrimaryKey ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+Exit Script [ $build_id ]
+
+
+

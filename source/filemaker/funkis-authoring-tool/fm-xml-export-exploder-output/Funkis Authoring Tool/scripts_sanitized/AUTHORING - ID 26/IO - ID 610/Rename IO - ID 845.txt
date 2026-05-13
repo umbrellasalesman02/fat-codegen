@@ -1,0 +1,24 @@
+# Called from a Pen-button in the IO Page item setting
+Set Variable [ $legacy[1] ; Case ( IsEmpty (Get(scriptParameter)) ; 0; 1 ) ]
+If [ $legacy ]
+	Set Variable [ $io_id[1] ; FAT Page item::IO id Legacy ]
+	Set Variable [ $io_name[1] ; FAT IO @ Page item Legacy::Name ]
+	Set Variable [ $io_type[1] ; IO Type @ Page item Legacy::FATType ]
+Else
+	Set Variable [ $io_id[1] ; FAT IO Value @ Page item::IO id ]
+	Set Variable [ $io_name[1] ; FAT IO @ Page item::Name ]
+	Set Variable [ $io_type[1] ; IO Type @ IO Value::FATType ]
+End If
+
+Show Custom Dialog [ Title: "Change IO name" ; Message: "Enter a new name for this IO" ; Default Button: "Save" ; Button 2: "Cancel" ; Input 1: $io_name ; Label 1: "IO " & $io_type ]
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+If [ $legacy ]
+	Set Field [ FAT IO @ Page item Legacy::Name ; $io_name ]
+Else
+	Set Field [ FAT IO @ Page item::Name ; $io_name ]
+End If
+
+

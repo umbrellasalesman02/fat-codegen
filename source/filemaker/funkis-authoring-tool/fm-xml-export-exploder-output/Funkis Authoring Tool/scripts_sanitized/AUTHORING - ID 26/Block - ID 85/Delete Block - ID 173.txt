@@ -1,0 +1,9 @@
+If [ FAT Block::Number of page item instances = 0 ]
+	Show Custom Dialog [ Title: "Delete building block" ; Message: "Are you sure you want to delete the building block " & FAT Block::Name & " from this Title?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+	If [ Get(lastMessageChoice)=1 ]
+		Delete Portal Row [ With dialog: OFF ]
+	End If
+Else
+	Show Custom Dialog [ Title: "Cannot delete building block" ; Message: "You have page items using this block. Please change  the building block for these page items or delete the page items before deleting the building block." ; Default Button: "OK" ]
+End If
+

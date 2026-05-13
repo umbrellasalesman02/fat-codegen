@@ -1,0 +1,8 @@
+# Delete input field needs a warning if field is used by other IOs
+Set Variable [ $num_of_links[1] ; FAT IO Field @ IO::Number of Linked fields ]
+If [ $num_of_links > 0 ]
+	Show Custom Dialog [ Title: "Used as linked field" ; Message: "This field cannot be deleted since it is used by other IOs. Delete this field in the other IOs first, then delete the field in this IO. " ; Default Button: "OK" ]
+Else
+	Delete Portal Row [ With dialog: ON ]
+End If
+

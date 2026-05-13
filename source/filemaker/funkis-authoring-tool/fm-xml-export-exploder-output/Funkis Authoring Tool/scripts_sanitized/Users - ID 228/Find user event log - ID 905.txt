@@ -1,0 +1,15 @@
+# Called from a button or a search field 
+If [ Get(scriptParameter) = "" ]
+	Set Variable [ $findUser[1] ; User Event Log::CreatedBy ]
+Else
+	Set Variable [ $findUser[1] ; Get(scriptParameter) ]
+End If
+
+If [ PatternCount ( $findUser ; "@" ) = 1 ]
+	Set Variable [ $findUser[1] ; Replace ( $findUser; Position ( $findUser ; "@" ; 0 ; 1 ) ; 1 ; "\@" ) ]
+End If
+
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Go to Record/Request/Page [ First ]
+

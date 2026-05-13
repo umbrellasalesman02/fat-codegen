@@ -1,0 +1,20 @@
+# Called from a an onModifier script in IO card - Fields - when user selects an IO field from another IO
+
+Set Variable [ $tab[1] ; GetScriptProperty ( "tab" ) ]
+
+# Copy the name & list id from the shared IO. This was needed when doing some specific operations. 
+Set Variable [ $linked_list_id[1] ; FAT IO Field @ Linked IO VL::List id ]
+Set Variable [ $linked_field_name[1] ; FAT IO Field @ Linked IO VL::Name ]
+Set Field [ FAT IO Field @ IO::List id ; $linked_list_id ]
+Set Field [ FAT IO Field @ IO::Name ; $linked_field_name ]
+
+
+Freeze Window
+Set Error Capture [ ON ]
+
+# Find the old PrimaryKey IO field used in Field values.
+  When new fields are added to an IO, FAT adds field id to existing field values.
+  When user selects to use a field from another IO, the new field id needs to be propagated to all field values using the old. 
+
+# PAused this! Don't know if this is the right approch 11 MAy 2025 
+

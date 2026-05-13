@@ -1,0 +1,17 @@
+Freeze Window
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $$login_id[1] ; User @ User::User_id ]
+Set Variable [ $client_id[1] ; User @ User::Client id ]
+Set Variable [ $privilege_set[1] ; User @ User::Privilege set ]
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "Title list" ; Animation: None ]
+Show All Records
+If [ $privilege_set ≠ "Developer" And $client_id ≠ 0 ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=0 ]
+		Show Custom Dialog [ Title: "Cannot find any Titles" ; Message: "It seems that there are no Titles for this client in Funkis Production Tool. " ; Default Button: "OK" ]
+		Perform Script [ From list ; "Go previous layout" ]
+		Exit Script []
+	End If
+End If
+

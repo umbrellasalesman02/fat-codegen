@@ -1,0 +1,16 @@
+Set Error Capture [ ON ]
+Freeze Window
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "FAT Tag" ; Animation: None ]
+// Perform Find [ ⚠️ RESTORE ⚠️ ]
+// If [ Get(foundCount)=0 ]
+// Show Custom Dialog [ Title: "No tags found in Title" ; Message: "There are no tags in this Title yet. ¶¶Create tags using a multiple choice list. Select Tag filter as usage. For each list item created a new tag will be available." ; Default Button: "OK" ]
+// Perform Script [ From list ; "Go previous layout" ]
+// Exit Script []
+// End If
+
+Set Field [ FAT Title::gBlock ; "" ]
+// Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+

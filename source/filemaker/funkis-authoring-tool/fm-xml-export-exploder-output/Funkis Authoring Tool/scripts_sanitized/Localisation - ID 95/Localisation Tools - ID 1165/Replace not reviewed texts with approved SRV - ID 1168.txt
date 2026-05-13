@@ -1,0 +1,76 @@
+# This script is used as a power tool for localisations. 
+  It is called from the Title localisation card window in the title where the not reviewed texts are found.
+  This is the flow: 
+  1. The script looks for Not reviewed texts in the Title and in the localisation language.
+  2. For each text - it searches among approved translations. 
+  
+
+# SetProperty ( "localisation_id" ; $localisation_id ) &
+  SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "localisation_code" ; $localisation_code ) &
+  SetProperty ( "org_localisation_code" ; $org_localisation_code ) &
+  SetProperty ( "localisation_stage" ; $localisation_stage ) &
+  SetProperty ( "fetch_from_title_id" ; $fetch_from_title_id ) &
+  SetProperty ( "fetch_from_package_id" ; $fetch_from_package_id )
+
+Set Variable [ $localisation_id[1] ; GetScriptProperty ( "localisation_id" ) ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty ( "localisation_code" ) ]
+Set Variable [ $org_localisation_code[1] ; GetScriptProperty ( "org_localisation_code" ) ]
+Set Variable [ $localisation_stage[1] ; GetScriptProperty ( "localisation_stage" ) ]
+Set Variable [ $fetch_from_title_id[1] ; GetScriptProperty ( "fetch_from_title_id" ) ]
+Set Variable [ $fetch_from_package_id[1] ; GetScriptProperty ( "fetch_from_package_id" ) ]
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+# Set gCurrentLocalisationCode so it can be used in a relationship with FAT Text later.
+Set Field [ FAT Text::gCurrentLocalisationCode ; $localisation_code ]
+
+# Show all translated texts in Title with status "Not reviewed"
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+# Extend with texts in Title with status "Not translated"
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+
+
+Set Variable [ $num_of_copied_texts[1] ; 0 ]
+
+Loop [ Flush: Always ]
+	Set Variable [ $org_lang_text[1] ; FAT Text @ Translation::Text ]
+	# Go to another Table occurence of FAT Text
+	# FAT Text is now related to FAT Text Current translation
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	
+	# Copy the text in the original language and search an identical text in the selected source
+	If [ IsEmpty ( $fetch_from_package_id ) ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+	
+	If [ Get(foundCount) >0 ]
+		# If we get at least one EXACT match of the text in the selected title or package:
+		  Loop until we found an approved translation.
+		Loop [ Flush: Always ]
+			If [ FAT Text Current translation::Status = "Approved" ]
+				Set Variable [ $translated_and_approved_text[1] ; FAT Text Current translation::Text ]
+				Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+				Set Field [ FAT Text translated::Text ; $translated_and_approved_text ]
+				Set Field [ FAT Text translated::Status ; "Approved" ]
+				Set Variable [ $num_of_copied_texts[1] ; $num_of_copied_texts + 1 ]
+				Exit Loop If [ True ]
+			End If
+			Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+	Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Exit Script [ $num_of_copied_texts ]
+
+
+

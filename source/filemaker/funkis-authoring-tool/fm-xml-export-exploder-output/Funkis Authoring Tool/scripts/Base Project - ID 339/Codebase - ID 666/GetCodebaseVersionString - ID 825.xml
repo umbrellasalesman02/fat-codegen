@@ -1,0 +1,830 @@
+<Script>
+	<ScriptReference id="825" name="GetCodebaseVersionString"></ScriptReference>
+	<ObjectList membercount="67">
+		<Step hash="C493D7A5B682BAD0822A2B83EDAC2DA6" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called from ValidateBlockCodebase"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9756985ED5AE600D18B396EB8057D9DA" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Returns a version string for a codebase_id (i.e Funkis Player @ Latest, Funkis Player @ Next or Funkis Player @ Version)"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="761E830FBB65C4A41F50961207BD92D0" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="25DC3089A09EF9DDE41BB4CE675AAA32" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "codebase_id" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$codebase_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C31EE525A14F5E6C75B4F09FB3E6C988" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "codebase_version_id" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$codebase_version_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E146A7D026EC5FA41DE4BC7044095A35" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F079B929BF1CDCE6BF618D48C463FD26" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="80841322161CBD17DC30FA4166A66D2E" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B690D3A7559CC105B7A99C587159223D" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Check if codebase version id refers to a branch - then exit with branch name instead of version string"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8102AABC262C6621D6CAA07BE1242A86" id="6" name="Go to Layout" enable="True">
+			<Options>8</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="376" name="TABLE Baseproject Codebase Version"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7C498572E6B21AA2DBC8F18958D37A9A" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$codebase_version_id">
+								<FieldReference id="1" name="PrimaryKey">
+									<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9C9463ABEA1F969FF1CEB332122C7C9F" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)=1]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D34DC7215F181E0AD4BCFF54C73A80D6" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Baseproject Codebase Version::Branch string ≠ ""]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="89556AB0CA485E5FA9BF77B28AA0424D" id="103" name="Exit Script" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[SetProperty ( "branch_string" ; Baseproject Codebase Version::Branch string ) &SetProperty ( "version_string" ; "" )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8AEF20A729C58B2FB4629511A8FC8765" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="F0245EF5868FE30B2EB8FFC5D3FEDF8B" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="75D525497B30418DF4D3E7599E99F02C" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3C971D7C3EBEED54E6FD73C2E70D4078" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find codebase properties"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="35D0A4B27E5CE3967502DFE3C672C964" id="6" name="Go to Layout" enable="True">
+			<Options>10</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="318" name="TABLE Baseproject Codebase"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2ED8AF52582209F04D15E78AC4B94DC0" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$codebase_id">
+								<FieldReference id="1" name="PrimaryKey">
+									<TableOccurrenceReference id="1065398" name="Baseproject Codebase"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0D9E2B5E415B6135720AA58D7A797897" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8287F86C6FF043EE3D4E513E3C487554" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="The selected codebase exist - if no codebase just exit."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6A46004B7F94B4DEE9D4AAB05C8EE8D3" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Baseproject Codebase::Name]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$funkisCodeBase"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="74EFB791289D572D543611703A7951DA" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Baseproject Codebase::Family name]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$funkisCodebaseFamilyName"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6BC30377EC71435BBC1A0910EB16DF4F" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[PatternCount ( $funkisCodeBase; "Latest" ) Or PatternCount ( $funkisCodeBase; "Next" )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A65ED3455AAC62B32263B208E06CB07E" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="997B3F471FEB019787840408BBCC4035" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Go to codebase that is versioned - add \ in string since @ is an operator in FileMaker finds"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FE229C3A5BF32132110FD68658F20504" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$funkisCodebaseFamilyName & " \@ Version"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$codeBaseVersioned"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FDD09628386B7CCE71FFB7D2CDF2ABB6" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find the codebase with name = &quot;@ Version&quot;"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F2C0957E2187789FB283B741C968C988" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$codeBaseVersioned">
+								<FieldReference id="8" name="Name">
+									<TableOccurrenceReference id="1065398" name="Baseproject Codebase"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B08A925B5EEFD169E23E733FB6C19B1E" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Show all existing versions and sort"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="03BFFF9A5044508D0B7BAC77097966AE" id="74" name="Go to Related Record" breakpoint="True" enable="True">
+			<Options>34603018</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Related">
+					<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="376" name="TABLE Baseproject Codebase Version"></LayoutReference>
+					</LayoutReferenceContainer>
+					<Animation name="None" value="0"></Animation>
+					<Options ShowRelated="True"></Options>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3F07BAEF4582C2EC2715BEF3E7C56E26" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[PatternCount ( $funkisCodeBase; "Latest" )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EB30D4B55BA75962C0A1627BB62B7B76" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Constrain to only versions with a release date"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5C4428F33AF0403397B8CEA04363BC16" id="126" name="Constrain Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="*">
+								<FieldReference id="13" name="Release date">
+									<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Find without indexes" id="256" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AA4DC0065DED1C5F6BE01BE920DB3F4F" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Sort in version order"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A631E6FC32249DF403F03434D0ED1A34" id="39" name="Sort Records" enable="True">
+			<Options>33587328</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Restore">
+					<Restore value="True"></Restore>
+				</Parameter>
+				<Parameter type="SortSpecification">
+					<SortSpecification value="True" maintain="True">
+						<SortList membercount="3">
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="7" name="Major version">
+										<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="9" name="Minor version">
+										<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="10" name="Patch version">
+										<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+						</SortList>
+					</SortSpecification>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="39D7CE8F81826DE673B0A4BB8B9A7961" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Go to last released version"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="022755E51CFC0DC0D87432D140C5499E" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Last" value="2"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D4B0EEFCB5148F95563F980093A41272" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Last version = Latest version"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D7B2979316396EF45D6B0C982FCC8C27" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Baseproject Codebase Version::Version string]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$version_string"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="49F22F1BCFFD69AD1BEBE02F4DCEF1B2" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[PatternCount ( $funkisCodeBase; "Next" )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C37E5A01DA1208BE9A08E6E2EE72E404" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Sort in version order"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8AB93720C9884ED10B5B6068DDD53057" id="39" name="Sort Records" enable="True">
+			<Options>33587328</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Restore">
+					<Restore value="True"></Restore>
+				</Parameter>
+				<Parameter type="SortSpecification">
+					<SortSpecification value="True" maintain="True">
+						<SortList membercount="3">
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="7" name="Major version">
+										<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="9" name="Minor version">
+										<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="10" name="Patch version">
+										<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+						</SortList>
+					</SortSpecification>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BB572FAE3272A382534D90C0EFEDAEC8" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Go to last released version"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="98328D776673ACEE3A8B7BEF702CCD4E" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Last" value="2"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="35E8C16865E26AEA3040118884B7CED2" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Last version = Latest version"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B2937D209E16A50FA566355142F0BCDE" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="If no next versions - add a patch number to make this the highest existing version"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="38219C7672227AE4E14AD696BB6CF487" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetAsText ( Baseproject Codebase Version::Major version ) & "." & GetAsText ( Baseproject Codebase Version::Minor version )  & "." & GetAsText ( Baseproject Codebase Version::Patch version + 1)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$version_string"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1CED94F128B8304C9460471D96B25351" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Constrain found set to versions without a release date"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6355961DB274A33922572DA7E665E938" id="126" name="Constrain Found Set" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="=">
+								<FieldReference id="13" name="Release date">
+									<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Find without indexes" id="256" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8E86101CB9322CE86E9BAE1B4F38A9DE" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="If FoundCount = 0 $version_string is set above as the last released version + 1 in patch version"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="17E306243A58648EC998AB979F4A1F46" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount) > 0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9B1CF55BB1C72A346BD0EDBC90696C8B" id="39" name="Sort Records" enable="True">
+			<Options>33587328</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Restore">
+					<Restore value="True"></Restore>
+				</Parameter>
+				<Parameter type="SortSpecification">
+					<SortSpecification value="True" maintain="True">
+						<SortList membercount="3">
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="7" name="Major version">
+										<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="9" name="Minor version">
+										<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="10" name="Patch version">
+										<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+						</SortList>
+					</SortSpecification>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2EF8C17085E6FAFD6008E95E727DED18" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Go to last released version"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0A53A2AE88F90A7A27D843BCE9F7666D" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Last" value="2"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1D0708795841FD2725DE75BC7BFF2EE5" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Baseproject Codebase Version::Version string]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$version_string"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C48553626472D2E0F44C4292E796D46F" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="839506DF368BACF99B4ECDA9BF0E49A2" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="23E1A7CA4C1A0654A44851663CE774A4" id="125" name="Else If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[ PatternCount($funkisCodeBase; "Version" )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4E6B8D20F460F2043D2942F3DAE9829E" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find the selected version = $codebase_version_id"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BF5B7447968158A86B121A14EF872A74" id="6" name="Go to Layout" enable="True">
+			<Options>10</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="376" name="TABLE Baseproject Codebase Version"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B76CAD2C0E580BC30C21B9D6F91B6D82" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$codebase_version_id">
+								<FieldReference id="1" name="PrimaryKey">
+									<TableOccurrenceReference id="1065619" name="Baseproject Codebase Version"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="670260C07E9AF7AF6EBE207F52B761F7" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Baseproject Codebase Version::Version string]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$version_string"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0E89B35FA04423A8B28264215F037A56" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="241CF97723272A04654FEF9276CF35DA" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="46FECA6EEA59BA2010F0B60F865377E7" id="103" name="Exit Script" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[SetProperty ( "branch_string" ; "" ) &SetProperty ( "version_string" ; $version_string )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

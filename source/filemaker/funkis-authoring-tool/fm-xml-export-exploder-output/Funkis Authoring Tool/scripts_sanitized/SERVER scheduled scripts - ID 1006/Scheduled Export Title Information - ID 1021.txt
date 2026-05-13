@@ -1,0 +1,99 @@
+# Called from scheduled script - with NO parameters
+# Exports Title Information once per day
+# Can also be called with paramters using PSOS wait for completion = NO
+
+Set Error Capture [ ON ]
+Set Variable [ $exportedTitlesToUpdate[1] ; GetScriptProperty ( "exportedTitlesToUpdate" ) ]
+Set Variable [ $publishedTitlesToUpdate[1] ; GetScriptProperty ( "publishedTitlesToUpdate" ) ]
+Set Variable [ $lastUpdate[1] ; Get(currentTimeStamp) - 24*3600 ]
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+
+# SetProperty ("exportedTitlesToUpdate"; FAT Title::PrimaryKey)  or
+  SetProperty ("publishedTitlesToUpdate"; FAT Title::PrimaryKey)
+
+# --------------- EXPORT LOOP -------------------------------------
+
+# If no script parameter inputs - create a list of all titles that been exported since last launch.
+If [ IsEmpty ( $exportedTitlesToUpdate ) And IsEmpty ( $publishedTitlesToUpdate ) ]
+	# Find packages exported after last time this script was launched (=lastUpdate)
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	If [ Get(foundCount) >0 ]
+		Loop [ Flush: Always ]
+			Set Variable [ $title_id[1] ; FAT Package::Parent id ]
+			If [ PatternCount ( $exportedTitlesToUpdate ; $title_id ) = 0 ]
+				Set Variable [ $exportedTitlesToUpdate[1] ; $exportedTitlesToUpdate & $title_id & ¶ ]
+			End If
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+End If
+
+# If found any - go through the list and Export these Titles' Title informaton package
+If [ Not IsEmpty ( $exportedTitlesToUpdate ) ]
+	Set Variable [ $i[1] ; 1 ]
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Loop [ Flush: Always ]
+		Set Variable [ $title_id[1] ; GetValue ( $exportedTitlesToUpdate ; $i ) ]
+		Set Variable [ $title_information_package_type[1] ; "C69777FA-7286-422C-9337-B722B10663B6" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Set Variable [ $typeOfTask[1] ; "sync" ]
+			Perform Script [ From list ; "Sync or Publish Title information" ; Parameter: $typeOfTask ]
+		End If
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		Set Variable [ $i[1] ; $i + 1 ]
+		Exit Loop If [ $i > ValueCount ( $exportedTitlesToUpdate ) ]
+	End Loop
+End If
+
+# ---------- PUBLISH LOOP -----------------------------------------
+
+# If no script parameter inputs - create a list of all titles that been published since last launch.
+If [ IsEmpty ( $exportedTitlesToUpdate ) And IsEmpty ( $publishedTitlesToUpdate ) ]
+	# Find packages published after last time this script was launched (=lastUpdate)
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	If [ Get(foundCount) >0 ]
+		Loop [ Flush: Always ]
+			Set Variable [ $title_id[1] ; FAT Package::Parent id ]
+			If [ PatternCount ( $publishedTitlesToUpdate ; $title_id ) = 0 ]
+				Set Variable [ $publishedTitlesToUpdate[1] ; $publishedTitlesToUpdate & $title_id & ¶ ]
+			End If
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+End If
+
+# If found any - Go through the list and Publish these Titles' Title informaton package
+If [ Not IsEmpty ( $publishedTitlesToUpdate ) ]
+	Set Variable [ $i[1] ; 1 ]
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Loop [ Flush: Always ]
+		Set Variable [ $title_id[1] ; GetValue ( $publishedTitlesToUpdate ; $i ) ]
+		Set Variable [ $title_information_package_type[1] ; "C69777FA-7286-422C-9337-B722B10663B6" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			If [ Not IsEmpty ( Title Environment::Publish Server id ) 
+							
+							And
+							
+							FAT Package::Last Publish Timestamp < FAT Package::Last Export Timestamp
+							
+							And
+							
+							FAT Title::Title Backend = "Funkis Cloud" ]
+				// Set Variable [ $typeOfTask[1] ; "publish" ]
+				Set Variable [ $typeOfTask[1] ; "sync" ]
+				Perform Script [ From list ; "Sync or Publish Title information" ; Parameter: $typeOfTask ]
+			End If
+		End If
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		Set Variable [ $i[1] ; $i + 1 ]
+		Exit Loop If [ $i > ValueCount ( $publishedTitlesToUpdate ) ]
+	End Loop
+End If
+
+
+
+

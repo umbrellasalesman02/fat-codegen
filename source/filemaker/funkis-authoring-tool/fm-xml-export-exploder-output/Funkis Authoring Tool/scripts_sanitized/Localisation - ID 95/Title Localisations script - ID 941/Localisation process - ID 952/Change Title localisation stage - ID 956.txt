@@ -1,0 +1,61 @@
+# This script is called from Title MT Localisation MASTER
+# Designed for PSOS
+
+Set Error Capture [ ON ]
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translated
+  3.     Original text sent	              Not translated               Translation id: [id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+Set Variable [ $title_localisation_id[1] ; GetScriptProperty ( "title_localisation_id" ) ]
+Set Variable [ $localisation_stage[1] ; GetAsNumber(GetScriptProperty ( "localisation_stage" )) ]
+Set Variable [ $force_stage[1] ; GetAsBoolean(GetScriptProperty ( "force_stage" )) ]
+
+Set Variable [ $error_mess[1] ; "No errors yet. Running on Server = " & isPSOS ]
+# First change Title localisation
+Go to Layout [ Layout: "TABLE FAT Localisation" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $error_mess[1] ; $error_mess & ¶  & Get(lastError) & ": " & Get(lastErrorDetail) ]
+
+# Change stage only if the new stage is higher than current
+If [ $localisation_stage > FAT Localisation::Localisation stage Or $force_stage ]
+	Set Field [ FAT Localisation::Localisation stage ; $localisation_stage ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Set Variable [ $error_mess[1] ; $error_mess & ¶  & Get(lastError) & ": " & Get(lastErrorDetail) ]
+	Set Variable [ $event_text[1] ; "Localisation set to stage " & $localisation_stage ]
+	Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $title_localisation_id ) & 
+					SetProperty ( "event_text" ; $event_text ) &
+					SetProperty ( "localisation_stage" ; $localisation_stage ) ]
+End If
+
+# Then - update all Package localisations
+If [ Count ( FAT Localisation @ Title::PrimaryKey ) > 0 ]
+	Go to Related Record [ Table: FAT Localisation @ Title ; Layout: "TABLE FAT Localisation @ Package" ; Show related ]
+	Loop [ Flush: Always ]
+		# Change stage only if the new stage is higher than current
+		Set Variable [ $localisation_id[1] ; FAT Localisation @ Package::PrimaryKey ]
+		If [ $localisation_stage > FAT Localisation @ Package::Localisation stage Or $force_stage ]
+			Set Field [ FAT Localisation @ Package::Localisation stage ; $localisation_stage ]
+			Commit Records/Requests [ With dialog: OFF ]
+			Set Variable [ $error_mess[1] ; $error_mess & ¶  & Get(lastError) & ": " & Get(lastErrorDetail) ]
+			Set Variable [ $event_text[1] ; "Localisation set to stage " & $localisation_stage ]
+			Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+							SetProperty ( "event_text" ; $event_text ) &
+							SetProperty ( "localisation_stage" ; $localisation_stage ) ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+Exit Script [ $error_mess ]
+
+
+
+
+
+
+

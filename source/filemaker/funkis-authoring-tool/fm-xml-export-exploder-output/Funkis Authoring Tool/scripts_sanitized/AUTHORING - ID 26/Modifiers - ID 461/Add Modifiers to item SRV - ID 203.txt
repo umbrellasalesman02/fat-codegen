@@ -1,0 +1,95 @@
+# This script is called when creating a new Package, Chapter, Page or Page item
+# This script is NOT called when creating a new Title
+
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+Set Variable [ $title_id[1] ; GetScriptProperty ("learningprogramme_id" ) ]
+Set Variable [ $template_id[1] ; GetScriptProperty ( "symbol_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $package_type[1] ; GetScriptProperty ( "package_type" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+Set Error Capture [ ON ]
+# Find all Modifiers defined for the type or package type
+If [ $level = "Block" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $level = "IO" Or $level = "List" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $level = "title" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	# Find all modifiers in title for level and aimed for specific package type
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $modifier_id[1] ; FAT Modifier::PrimaryKey ]
+		Set Variable [ $modifier[1] ; FAT Modifier::Name ]
+		Set Variable [ $modifier_type[1] ; FAT Modifier::Type ]
+		Set Variable [ $modifier_default_value[1] ; FAT Modifier::DefaultValue ]
+		Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+		# Check for existing duplicates - identical attribute name and parent id
+		# If a duplicate exist - do nothing
+		# This can be done faster using a compound ID of Modifier::Name & ModifierValue::parent id and check for error when commiting
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)= 0 ]
+			New Record/Request
+			Set Field [ FAT Modifier Value::Modifier id ; $modifier_id ]
+			Set Field [ FAT Modifier Value::Parent id ; $item_id ]
+			# Set default value here
+			Set Field [ FAT Modifier Value::Value ; Case(
+							
+							   $modifier_type = "Number";  
+							
+							   Substitute ( $modifier_default_value ; "," ; "." ); 
+							
+							   $modifier_type = "Value list checkbox";
+							
+							   Substitute ( $modifier_default_value ; "," ; "¶" );
+							
+							   $modifier_default_value
+							
+							) ]
+			
+			Set Variable [ $modifiervalue_id[1] ; FAT Modifier Value::PrimaryKey ]
+			If [ $level = "Title" ]
+				If [ $modifier_type = "Media" ]
+					Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $modifiervalue_id ) &
+									SetProperty ( "source_table" ; "global" ) &
+									SetProperty ( "source_mediafield" ; GetFieldName ( FAT Modifier Value::Media id ) ) &
+									SetProperty ( "caller_layout" ; Get(layoutName )) &
+									SetProperty ( "package_id" ; $package_id ) &
+									SetProperty ( "learningprogramme_id" ; $title_id) ]
+				Else If [ $modifier_type = "Text" ]
+					Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $modifiervalue_id ) &
+									SetProperty ( "source_table" ; "global" ) &
+									SetProperty ( "source_textfield" ; GetFieldName ( FAT Modifier Value::Text id ) ) &
+									SetProperty ( "caller_layout" ; Get(layoutName )) &
+									SetProperty ( "package_id" ; $package_id ) &
+									SetProperty ( "learningprogramme_id" ; $title_id) ]
+					Set Field [ TF MV::Text ; $modifier_default_value ]
+				End If
+			Else
+				If [ $modifier_type = "Media" ]
+					Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $modifiervalue_id ) &
+									SetProperty ( "source_table" ; "attribute" ) &
+									SetProperty ( "source_mediafield" ; GetFieldName ( FAT Modifier Value::Media id ) ) &
+									SetProperty ( "caller_layout" ; Get(layoutName )) &
+									SetProperty ( "package_id" ; $package_id ) &
+									SetProperty ( "learningprogramme_id" ; $title_id) ]
+				Else If [ $modifier_type = "Text" ]
+					Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $modifiervalue_id ) &
+									SetProperty ( "source_table" ; "attribute" ) &
+									SetProperty ( "source_textfield" ; GetFieldName ( FAT Modifier Value::Text id ) ) &
+									SetProperty ( "caller_layout" ; Get(layoutName )) &
+									SetProperty ( "package_id" ; $package_id ) &
+									SetProperty ( "learningprogramme_id" ; $title_id) ]
+					Set Field [ TF MV::Text ; $modifier_default_value ]
+				End If
+			End If
+		End If
+		Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+

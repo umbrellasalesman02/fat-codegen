@@ -1,0 +1,18 @@
+# Called from a button in Page item or Title List Layout
+Commit Records/Requests [ With dialog: OFF ]
+If [ PatternCount ( Get(layoutName) ; "Page item" ) ]
+	If [ FAT Page item::List id ]
+		# Title List
+		Set Variable [ $list_id[1] ; FAT List @ Page item::PrimaryKey ]
+	Else
+		# Page item list
+		Perform Script [ From list ; "View Card Page item List Setting" ]
+		Exit Script []
+	End If
+Else
+	# List comes from a paramter
+	Set Variable [ $list_id[1] ; Get(scriptParameter) ]
+End If
+
+Perform Script [ From list ; "View Card List Setting" ; Parameter: SetProperty ( "list_id" ; $list_id ) ]
+

@@ -1,0 +1,25 @@
+# Since the iOS version of FileMaker Go opens all URL:s in its own card-style window the login process with magic link will not work. That's why the URL is copied to clipboard for Funkis Cloud productions that requires login.
+# Called from a button in the Phone layout
+
+// If [ Get(Device)= 4 ]
+// # 0 for an unknown device
+  1 for a Mac
+  2 for a computer running Windows
+  3 for iPad
+  4 for iPhone *****************************
+  5 for Android
+  6 for a computer running Linux
+// If [ FAT Title::Title Backend = "Funkis Cloud" ]
+// Perform Script [ From list ; "Copy Title launch link" ]
+// Else
+// Perform Script [ From list ; "Preview Publish on web" ; Parameter: SetProperty ( "level" ; 1 ) &
+				SetProperty ( "caller" ; "Title" ) ]
+// End If
+// Else
+// # If Android
+// Perform Script [ From list ; "Preview Publish on web" ; Parameter: SetProperty ( "level" ; 1 ) &
+				SetProperty ( "caller" ; "Title" ) ]
+// End If
+Perform Script [ From list ; "Preview Publish on web" ; Parameter: SetProperty ( "level" ; 1 ) &
+				SetProperty ( "caller" ; "Title" ) ]
+

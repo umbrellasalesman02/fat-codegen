@@ -1,0 +1,44 @@
+# Called under tab "Tools" on Title Level
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+
+// Perform Script [ From list ; "ValidateJSON SRV" ; Parameter: $title_id ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+Set Variable [ $level[1] ; GetResultProperty ( "level" ) ]
+Set Variable [ $item_id[1] ; GetResultProperty ( "item_id" ) ]
+Set Variable [ $success[1] ; GetAsBoolean(GetResultProperty ( "success" )) ]
+
+If [ $success ]
+	Show Custom Dialog [ Title: "All JSONs seems valid" ; Message: "All JSONs in this Title seems valid." ; Default Button: "OK" ]
+	
+Else
+	# At least one JSON is corrupt
+	
+	# Package
+	If [ $level = "Package" ]
+		Show Custom Dialog [ Title: "A non-valid JSON was found" ; Message: "A non valid JSON was found in the Title. The item will now open. Tip: Click button \"Cleanup modifiers\" to fix the issue." ; Default Button: "OK" ]
+		Perform Script [ From list ; "linkTriggeredOpenPackage" ; Parameter: $item_id ]
+		
+	Else If [ $level = "Chapter" ]
+		# Chapters
+		Show Custom Dialog [ Title: "A non-valid JSON was found" ; Message: "A non valid JSON was found in the Title. The item will now open. Tip: Click button \"Cleanup modifiers\" to fix the issue." ; Default Button: "OK" ]
+		Perform Script [ From list ; "linkTriggeredOpenChapter" ; Parameter: $item_id ]
+		
+	Else If [ $level = "Page" ]
+		# Page
+		Show Custom Dialog [ Title: "A non-valid JSON was found" ; Message: "A non valid JSON was found in the Title. The item will now open. Tip: Click button \"Cleanup modifiers\" to fix the issue." ; Default Button: "OK" ]
+		Perform Script [ From list ; "linkTriggeredOpenPage" ; Parameter: $item_id ]
+		
+	Else If [ $level = "Page item" ]
+		# Page item
+		Show Custom Dialog [ Title: "A non-valid JSON was found" ; Message: "A non valid JSON was found in the Title. The page item will now open. Tip: Click button \"Cleanup modifiers\" to fix the issue." ; Default Button: "OK" ]
+		Perform Script [ From list ; "linkTriggeredOpenPageItem" ; Parameter: $item_id ]
+		
+	End If
+	
+End If
+
+

@@ -1,0 +1,24 @@
+# Called from Rich Text Editor Close Button
+Set Error Capture [ ON ]
+Perform Script [ From list ; "Save Rich Text" ]
+
+If [ Not IsEmpty ($$call_layout) ]
+	
+	Go to Layout [ Layoutname: $$call_layout ; Animation: Slide out to Right ]
+	Set Variable [ $$call_layout[1] ; "" ]
+	
+Else If [ Get(WindowStyle) = 3 ]
+	# Get(WIndowStyle)
+	  0 (zero) if the window is a document window
+	  1 if the window is a floating document window
+	  2 if the window is a dialog window
+	  3 if the window is a card
+	Close Window
+	Select Window [ Name: $$currentWindow ]
+	
+End If
+
+
+
+
+

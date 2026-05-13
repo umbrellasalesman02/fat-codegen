@@ -1,0 +1,10 @@
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $baseproject_id[1] ; FAT Title::gBaseProject ]
+If [ $baseproject_id = "" ]
+	Show Custom Dialog [ Title: "Select base project" ; Message: "You must select a base project for the new block template." ; Default Button: "OK" ]
+	Exit Script []
+End If
+Go to Layout [ Layout: "BlockTemplate" ; Animation: None ]
+New Record/Request
+Set Field [ BlockTemplate::Base Project ; $baseproject_id ]
+

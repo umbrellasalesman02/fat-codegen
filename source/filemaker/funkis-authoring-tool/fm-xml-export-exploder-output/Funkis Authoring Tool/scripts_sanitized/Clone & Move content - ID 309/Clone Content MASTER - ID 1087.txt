@@ -1,0 +1,167 @@
+# This script is called from the Duplicate Card window
+# This script is also called from Duplicate Title Step 2
+# This script is also called from Move Package
+# When called - the clone level, clone item and info is stored in Title global fields
+
+# Clone settings can include:
+  IOs
+  Links
+  Lists
+  Tags
+  Score
+  Localised texts
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+# old_tt_id only used when duplicating a Title or when moving a package
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $clone_level[1] ; FAT Title::gCloneLevel ]
+Set Variable [ $clone_settings[1] ; FAT Title::gCloneDefaultSettings ]
+Set Variable [ $suffix[1] ; FAT Title::gCloneSuffix ]
+Set Variable [ $item_id[1] ; FAT Title::gCloneItemId ]
+Set Variable [ $item_parent_id[1] ; FAT Title::gCloneItemParentId ]
+Set Variable [ $new_sortindex[1] ; FAT Title::gCloneItemNewSortIndex ]
+
+
+# Even if the called scripts below can retreive the Old Title id, we don't include it as a parameter. 
+# isClonedTitle is always = FALSE (0) when called from this script.
+# NOTE!!! OldPrimaryKeyFromClone ONLY lives inside the active cloneSession.
+  All existing values are deleted as a first step in a new clone session. 
+
+# The clone_start_timestamp will be used when searching for newly created text fields
+Set Variable [ $clone_start_timestamp[1] ; Get(currentHostTimeStamp) ]
+
+# -------- CLEAN UP ALL OLDPRIMARY FROM CLONE IN Tags, Lists, Links, IOs in the whole Title ---------------------
+// Perform Script [ From list ; "Cleanup before cloning" ; Parameter: SetProperty("title_id"; $title_id)  &
+				SetProperty("mode"; "content") &
+				SetProperty("clone_level"; $clone_level) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+If [ $clone_level = "Title" ]
+	
+	// Perform Script [ From list ; "Clone Title SRV" ; Parameter: SetProperty ( "old_tt_id" ; $old_tt_id ) &
+					SetProperty ( "title_id" ; $title_id ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+Else If [ $clone_level = "Package group" ]
+	// Perform Script [ From list ; "Clone Package Group SRV" ; Parameter: SetProperty ( "isClonedTitle" ; "" ) &
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "clone_settings" ; $clone_settings ) &
+					SetProperty ( "suffix" ; $suffix) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "package_group_id" ; $item_id ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+Else If [ $clone_level = "Package" ]
+	// Perform Script [ From list ; "Clone Package SRV" ; Parameter: SetProperty ( "isClonedTitle" ; "" ) &
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "clone_settings" ; $clone_settings ) &
+					SetProperty ( "suffix" ; $suffix) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $item_id ) &
+					SetProperty ( "new_sortindex" ; $new_sortindex ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+Else If [ $clone_level = "Chapter" ]
+	// Perform Script [ From list ; "Clone Chapter SRV" ; Parameter: SetProperty ( "isClonedTitle" ; "" ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "clone_settings" ; $clone_settings ) &
+					SetProperty ( "suffix" ; $suffix) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "old_ch_id" ; $item_id ) &
+					SetProperty ( "parent_id" ; $item_parent_id ) &
+					SetProperty ( "new_sortindex" ; $new_sortindex ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+Else If [ $clone_level = "Page" ]
+	// Perform Script [ From list ; "Clone Page SRV" ; Parameter: SetProperty ( "isClonedTitle" ; "" ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "clone_settings" ; $clone_settings ) &
+					SetProperty ( "suffix" ; $suffix) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "old_pg_id" ; $item_id ) &
+					SetProperty ( "parent_id" ; $item_parent_id ) &
+					SetProperty ( "new_sortindex" ; $new_sortindex ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+Else If [ $clone_level = "Page item" ]
+	// Perform Script [ From list ; "Clone PageItem SRV" ; Parameter: SetProperty ( "isClonedTitle" ; "" ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "clone_settings" ; $clone_settings ) &
+					SetProperty ( "suffix" ; $suffix) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "old_pi_id" ; $item_id ) &
+					SetProperty ( "parent_id" ; $item_parent_id ) &
+					SetProperty ( "new_sortindex" ; $new_sortindex ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+
+Set Variable [ $new_item_id[1] ; Get(ScriptResult) ]
+
+If [ PatternCount ( $clone_settings ; "IOs" ) Or $clone_level = "Title" ]
+	# Find all page items, IO values with boolean IO Array and list items to find IO arrays.
+	  Find and replace references to all newly created IOs on OldPrimaryKeys
+	// Perform Script [ From list ; "Fix IOArrays after clone" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "item_id" ; $item_id ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+End If
+
+If [ PatternCount ( $clone_settings ; "IOs" ) And $clone_level ≠ "Title" And Not $isMovedPackage ]
+	# Fix text variables only if they are in same Title. 
+	// Perform Script [ From list ; "Fix TextVariables after clone" ; Parameter: SetProperty("title_id"; $title_id) &
+					SetProperty ( "clone_start_timestamp" ; $clone_start_timestamp ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+
+If [ PatternCount ( $clone_settings ; "Links" ) Or $clone_level = "Title" ]
+	# Traverse through all ModifierValues and List items to find references to newly created links in OldPrimaryKeys
+	// Perform Script [ From list ; "Fix Links after clone" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "item_id" ; $item_id ) &
+					SetProperty ( "clone_start_timestamp" ; $clone_start_timestamp ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+
+# --------------------------------- Publish new code on Funkis Cloud --------------------------------
+If [ $clone_level = "Title"  Or $clone_level = "Package group" Or $clone_level = "Package" ]
+	// Perform Script [ From list ; "Clone Publish packages" ; Parameter: SetProperty("title_id"; $title_id) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+End If
+
+# -------------- CLOSE CARD ------------------
+# REFRESH?
+Perform Script [ From list ; "Close card Window" ]
+
+# ------------ Go to new item -------------------------------
+
+If [ $clone_level = "Title" ]
+	# Ej klar
+	Show Custom Dialog [ Title: "Duplicate completed" ; Message: "Any package in the new title will be ready to launch within a few minutes. " ; Default Button: "OK" ]
+Else If [ $clone_level = "Package group" ]
+	# Do nothing
+	Show Custom Dialog [ Title: "Duplicate completed" ; Message: "The packages in the package group will be ready to launch within a few minutes. " ; Default Button: "OK" ]
+Else If [ $clone_level = "Package" ]
+	Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+	If [ $isMovedPackage ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Show Custom Dialog [ Title: "Duplicate and move completed" ; Message: "The moved package will be ready to launch within a few minutes. " ; Default Button: "OK" ]
+	Else
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Show Custom Dialog [ Title: "Duplicate completed" ; Message: "The new package will be ready to launch within a few minutes. " ; Default Button: "OK" ]
+	End If
+End If
+
+Perform Script [ From list ; "Go FAT Item" ; Parameter: SetProperty ( "level" ; $clone_level ) &
+				SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "item_id" ; $new_item_id ) ]
+
+
+
+
+

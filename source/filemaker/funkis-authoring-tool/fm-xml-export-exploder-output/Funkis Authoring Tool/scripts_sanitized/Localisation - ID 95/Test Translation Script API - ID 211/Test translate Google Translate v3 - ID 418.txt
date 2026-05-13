@@ -1,0 +1,23 @@
+
+Set Variable [ $translationAPI[1] ; "https://translation.googleapis.com/v3/projects/funkis-cms:translateText" ]
+Set Variable [ $text[1] ; "Today is the big grand prix race in Monaco" ]
+Set Variable [ $textJSON[1] ; JSONSetElement ( "{}" ; 
+				
+				
+				["sourceLanguageCode" ; "en" ; JSONString];
+				["targetLanguageCode" ; "sv" ; JSONString];
+				["contents" ; "[\"" & $text & "\"]" ; JSONArray]
+				
+				
+				 ) ]
+// Set Variable [ $TheURL[1] ; $translationAPI
+				& "?key=" & $google_API_key
+				& "&source=" & $en 
+				& "&target=" & $sv
+				& "&q=" & $text ]
+Set Variable [ $TheURL[1] ; $translationAPI
+				& "?key=" & $google_API_key
+				& "&" & $textJSON ]
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+Set Variable [ $des[1] ; "" ]
+

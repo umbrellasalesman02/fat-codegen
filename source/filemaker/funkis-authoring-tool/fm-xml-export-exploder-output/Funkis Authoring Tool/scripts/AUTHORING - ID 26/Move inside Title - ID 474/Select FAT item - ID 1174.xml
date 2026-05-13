@@ -1,0 +1,213 @@
+<Script>
+	<ScriptReference id="1174" name="Select FAT item"></ScriptReference>
+	<ObjectList membercount="19">
+		<Step hash="DC0C2A8C10309D2CB5FD848714DBB93A" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script will select items to move or shuffle.&#13;It is connected to the Move scripts"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="97726252DC1919574AA2E0AD11680E7B" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7C59AC61A732D70D0ADF4856489AE273" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called from a Select button in any layout"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EF88382037B0976EA64A3CFF892D2FAB" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A8F01D01A57FAC040119484530B53FFC" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="fat_item_id = List of PrimaryKeys for Package, Chapter, Page or Page item"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1114D56BE3384045034835D543EB19E9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "item_id" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F3EBD7AC20C9CC1D12116AB7E5689523" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4A2FFA0F319107C87648F2DAD32090CB" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="fat_item_parent_id = PrimaryKey for the parent"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D9A7C4719EC97942286DE26611232037" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetScriptProperty ( "item_parent_id" )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$item_parent_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="928E886BE36D68F4F01C5B6550962FBE" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6138AE83DCF2BF11A1932C51E319C076" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$item_parent_id = $$fat_item_parent_id]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="659C8D55402081AFC92A024CE2B8B4A0" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="The selected item has the same parent as the previous selected item - add to list"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="382D8C8AD8779CC435B1FE28042B18B5" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$$fat_item_id & "¶" & $item_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$$fat_item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9661BDF65FA4469DE28D2E9860660034" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="A294712FDA0505FAE2EAFD6B603FFF4B" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$item_parent_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$$fat_item_parent_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8C1FD7E2ACB5528C542A09D7FB1255D8" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$item_id]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$$fat_item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B64605FCEE8D11A8AF6B1BB65D398DE3" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="E54F58331CDA87DDA2A852971AF19632" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="BF60D12D82862D62242C46DE6A003501" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

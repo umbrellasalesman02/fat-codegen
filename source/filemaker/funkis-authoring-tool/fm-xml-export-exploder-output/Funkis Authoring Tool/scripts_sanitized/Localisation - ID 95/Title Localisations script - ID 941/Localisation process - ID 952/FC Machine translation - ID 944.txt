@@ -1,0 +1,146 @@
+# Designed to work PSOS
+# Called from Title MT Localisation MASTER - row 110 
+
+# Text status can be:
+  1. Not translated
+  2. Sent to API (only asynchronous machine translation)
+  3. Not reviewed
+  4. In progress
+  5. Approved
+
+Set Error Capture [ ON ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $localisation_id[1] ; GetScriptProperty("localisation_id") ]
+
+Go to Layout [ Layout: "TABLE FAT Localisation" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $original_localisation_code[1] ; FAT Localisation::Original Localisation code ]
+Set Variable [ $localisation_code[1] ; FAT Localisation::Localisation code ]
+Set Variable [ $original_language_code[1] ; getLanguageCode ( $original_localisation_code ) ]
+Set Variable [ $target_language_code[1] ; getLanguageCode ( $localisation_code ) ]
+
+# --------------------- Get all info for the translation API -----------------------------------
+If [ Not PatternCount ( Translation API @ Title::API Name ; "Funkis Cloud" ) ]
+	Exit Script [ SetProperty ( "result" ; "Error: This API cannot be used for machine translation of a whole title." ) &
+					SetProperty ( "num_of_translated_texts" ; 0 )&
+					SetProperty ( "api_name" ; Translation API @ Title::API Name ) ]
+End If
+Set Variable [ $send_api_url[1] ; Translation API @ Title::Send translation URL ]
+Set Variable [ $api_key[1] ; Translation API @ Title::API PrivateKey ]
+Set Variable [ $api_name[1] ; Translation API @ Title::API Name ]
+
+# --------------- Create a text JSON to send ------------------------------------------
+# Find all textfields in Title for this localisation that have not been translated yet.
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Go to Record/Request/Page [ First ]
+
+
+If [ Get(foundCount)>0 ]
+	# In MT we use the localised Texts id for fast pairing when retrieving texts
+	Loop [ Flush: Defer ]
+		Set Variable [ $textJSON_for_translation[1] ; Let ( 
+						
+						  obj = JSONSetElement ( "" ; 
+						
+						
+						  ["value" ; FAT Text::Text; JSONString];
+						  ["id" ; FAT Text::PrimaryKey; JSONString]
+						
+						      
+						
+						 );
+						
+						 JSONSetElement ( $textJSON_for_translation ; "[" & Get(recordNumber) - 1 & "]" ; obj ; JSONObject)
+						
+						
+						 ) ]
+		
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# This encode-decode operation was something needed for Google AutoML
+Set Variable [ $textJSON_for_translation[1] ; TextDecode ( TextEncode ( $textJSON_for_translation; "utf-8" ; 1 ) ; "utf-8") ]
+
+
+# --------------------- Send text to API ----------------------------------------
+
+# Communicate with the Funkis Cloud API
+Set Variable [ $body[1] ; JSONSetElement ( "{}" ; 
+				
+				    [ "values"; $textJSON_for_translation; JSONArray];
+				    [ "from"; $original_language_code; JSONString];
+				    [ "to"; $target_language_code; JSONString]
+				 ) ]
+
+# FileMaker Quote function escapes all kind of quotes. These steps escape straight quotes but converts escaped smart quotes back to smart quotes which works. 
+# In 2023-11-06 Smart quotes was not supported by Intento. The API converted these to straight quotes.
+Set Variable [ $cURL_textdata[1] ; Quote ( $body) ]
+Set Variable [ $cURL_textdata[1] ; Substitute ( $cURL_textdata; 
+				
+				["\\" & Char(8221) ; Char(8221)];
+				["\\" & Char(8220) ; Char(8220)];
+				[Char(10) ; "" ]
+				
+				) ]
+
+Set Variable [ $cURL_options[1] ; _cURL_request ( "POST" ) & 
+				_cURL_header ( "Authorization" ; "Bearer " & $api_key ) & 
+				_cURL_header ( "Content-Type" ; "application/json" ) & 
+				_cURL_header ( "Accept" ; "application/json" ) & 
+				_cURL_show_error & 
+				" -d " &  $cURL_textdata ]
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ; $cURL_options ]
+
+If [ Get(lastError) ≠ 0 ]
+	Exit Script [ SetProperty ( "result" ; "Error. " & Get(lastErrorDetail) &  " " &  $resultJSON) &
+					SetProperty ( "num_of_translated_texts" ; 0 ) &
+					SetProperty ( "api_name" ; $api_name ) ]
+End If
+
+# Store variable in the FAT Title field - due to FileMaker limitations when sending large JSON as script parameter
+Set Variable [ $translationJSON[1] ; JSONGetElement ( $resultJSON ; "translation" ) ]
+Set Field [ FAT Title::Latest Imported File ; TextEncode ( $translationJSON ; "utf-8" ; 1 ) ]
+Commit Records/Requests [ With dialog: OFF ]
+
+# ------------------- Pair result JSON field by field with FAT Text ------------------
+
+If [ $translationJSON ≠ "?" And $translationJSON ≠ "[]" ]
+	Perform Script [ From list ; "Import JSON Translation" ; Parameter: SetProperty ( "title_id"; $title_id) &
+					SetProperty ( "localisation_code" ; $localisation_code ) &
+					SetProperty ( "translation_method"; "Machine translation" ) &
+					SetProperty ( "pairing_mode"; "PrimaryKey" ) ]
+	Set Variable [ $num_of_translated_texts[1] ; GetResultProperty ( "num_of_translated_texts" ) ]
+	Set Variable [ $num_of_untranslated_texts[1] ; GetResultProperty ( "num_of_untranslated_texts" ) ]
+	Set Variable [ $result[1] ; GetResultProperty ( "result" ) ]
+Else
+	Set Variable [ $num_of_translated_texts[1] ; 0 ]
+	Set Variable [ $num_of_untranslated_texts[1] ; GetResultProperty ( "num_of_untranslated_texts" ) ]
+	Set Variable [ $result[1] ; "Error. Translation JSON is empty" ]
+End If
+
+Exit Script [ SetProperty ( "result" ; $result ) &
+				SetProperty ( "num_of_translated_texts" ; $num_of_translated_texts ) &
+				SetProperty ( "num_of_untranslated_texts" ; $num_of_untranslated_texts ) &
+				SetProperty ( "api_name" ; $api_name ) ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

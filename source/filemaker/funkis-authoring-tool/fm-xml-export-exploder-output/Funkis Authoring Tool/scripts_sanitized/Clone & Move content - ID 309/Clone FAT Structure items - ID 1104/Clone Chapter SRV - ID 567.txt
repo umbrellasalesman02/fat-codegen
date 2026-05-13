@@ -1,0 +1,175 @@
+# This script clones a specific Chapter and all of its Pages, Page items, Attributes, stateToggles, Tags, Texts, Media, Content arrays
+# This script requires that the active record is the current Chapterthat is going to be cloned.
+  
+  This script is called from Clone Package and from a button in Chaspter Settings
+
+
+# SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+  SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+  SetProperty ( "clone_level" ; $clone_level) &
+  SetProperty ( "clone_settings" ; $clone_settings ) &
+  SetProperty ( "suffix" ; $suffix) &
+  SetProperty ( "object_group_id" ; $object_group_id ) &
+  SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "parent_id" ; $new_pk_id ) &
+  SetProperty ( "old_ch_id" ; $old_ch_id ) &
+  SetProperty ( "new_sortindex" ; $new_sortindex )
+
+Freeze Window
+Set Error Capture [ ON ]
+
+# If the whole Title is cloned we need to point to new Blocks, Attributes, stateToggles and Tags
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $clone_level[1] ; GetScriptProperty ( "clone_level" ) ]
+Set Variable [ $clone_settings[1] ; GetScriptProperty ( "clone_settings" ) ]
+Set Variable [ $suffix[1] ; GetScriptProperty ( "suffix" ) ]
+Set Variable [ $object_group_id[1] ; GetScriptProperty ( "object_group_id" ) ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+Set Variable [ $parent_id[1] ; GetScriptProperty ( "parent_id") ]
+Set Variable [ $old_ch_id[1] ; GetScriptProperty ( "old_ch_id") ]
+Set Variable [ $new_sortindex[1] ; GetScriptProperty ( "new_sortindex") ]
+
+# Find the Chapter
+Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# Save current data
+Set Variable [ $ch_title_text[1] ; Case ( $clone_level= "chapter" And Not IsEmpty($suffix); TF CH Header::Text & " " & $suffix ; TF CH Header::Text) ]
+Set Variable [ $ch_subtitle1_text[1] ; TF CH Sub header::Text ]
+Set Variable [ $ch_bg_media[1] ; Media Main Menu BG CH::Media container ]
+Set Variable [ $ch_fg_media[1] ; Media Main Menu FG CH::Media container ]
+Set Variable [ $ch_icon_media[1] ; Media Main Menu Icon CH::Media container ]
+Set Variable [ $ch_sortindex[1] ; Case ($new_sortindex; $new_sortindex ; FAT Chapter::SortIndex) ]
+
+Duplicate Record/Request
+
+Set Variable [ $new_ch_id[1] ; FAT Chapter::PrimaryKey ]
+# Update cloned record with new data
+Set Field [ FAT Chapter::Old PrimaryKey from clone ; $old_ch_id ]
+Set Field [ FAT Chapter::Parent id ; $parent_id ]
+Set Field [ FAT Chapter::SortIndex ; $ch_sortindex ]
+Commit Records/Requests [ With dialog: OFF ]
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+
+
+If [ IsEmpty ( FAT Chapter::Proxy type ) ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ch_id ) &
+					SetProperty ( "source_table" ; "chapter" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT Chapter::Header txt id ) ) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	Set Field [ TF CH Header::Text ; $ch_title_text ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ch_id ) &
+					SetProperty ( "source_table" ; "chapter" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT Chapter::Sub header txt id ) ) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	Set Field [ TF CH Sub header::Text ; $ch_subtitle1_text ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_ch_id ) &
+					SetProperty ( "source_table" ; "chapter" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT Chapter::Sub header 2 txt id Legacy ) ) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	Set Field [ TF CH Sub header 2::Text ; $ch_subtitle2_text ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Chapter::PrimaryKey ) &
+					SetProperty ( "source_table" ; "chapter" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Chapter::Main menu background image id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) ]
+	Set Field [ Media Main Menu BG CH::Media container ; $ch_bg_media ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Chapter::PrimaryKey ) &
+					SetProperty ( "source_table" ; "chapter" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Chapter::Main menu foreground image id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) ]
+	Set Field [ Media Main Menu FG CH::Media container ; $ch_fg_media ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Chapter::PrimaryKey ) &
+					SetProperty ( "source_table" ; "chapter" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Chapter::Main menu icon id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) ]
+	Set Field [ Media Main Menu Icon CH::Media container ; $ch_icon_media ]
+	
+	# Add to content overview
+	Set Variable [ $item_type[1] ; "Chapter" ]
+	Set Variable [ $item_id[1] ; $new_ch_id ]
+	Perform Script [ From list ; "Add Overview item SRV" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "item_id" ; $item_id ) &
+					SetProperty ( "item_type" ; $item_type ) ]
+	
+	If [ PatternCount ( $clone_settings ; "Link" ) ]
+		Perform Script [ From list ; "Clone Link SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+						SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+						SetProperty ( "clone_level" ; $clone_level ) &
+						SetProperty ( "clone_settings" ; $clone_settings ) &
+						SetProperty ( "object_group_id" ; $object_group_id ) &
+						SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "suffix" ; $suffix) &
+						SetProperty ( "old_item_id" ; $old_ch_id ) &
+						SetProperty ( "new_item_id" ; $new_ch_id ) ]
+	End If
+	
+	Perform Script [ From list ; "Clone ModifierValue" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) & 
+					SetProperty ( "old_item_id" ; $old_ch_id ) & 
+					SetProperty ( "new_item_id" ; $new_ch_id ) & 
+					SetProperty ( "title_id" ; $title_id ) & 
+					SetProperty ( "package_id" ; $package_id ) ]
+	Perform Script [ From list ; "Clone Tag values" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) & 
+					SetProperty ( "clone_settings" ; $clone_settings ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "suffix" ; $suffix ) & 
+					SetProperty ( "object_group_id" ; $object_group_id ) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "old_item_id" ; $old_ch_id ) & 
+					SetProperty ( "new_item_id" ; $new_ch_id ) ]
+	Perform Script [ From list ; "Clone Score values" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) & 
+					SetProperty ( "clone_settings" ; $clone_settings ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "suffix" ; $suffix ) & 
+					SetProperty ( "object_group_id" ; $object_group_id ) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "old_item_id" ; $old_ch_id ) & 
+					SetProperty ( "new_item_id" ; $new_ch_id ) ]
+End If
+
+# Go to pages
+# Callers always use the Alt TO
+Go to Layout [ Layout: "TABLE FAT Page Alt" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		# Page loop
+		Set Variable [ $old_pg_id[1] ; FAT Page Alt::PrimaryKey ]
+		Perform Script [ From list ; "Clone Page SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+						SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+						SetProperty ( "clone_level" ; $clone_level) &
+						SetProperty ( "clone_settings" ; $clone_settings ) &
+						SetProperty ( "suffix" ; $suffix) &
+						SetProperty ( "object_group_id" ; $object_group_id ) &
+						SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "parent_id" ; $new_ch_id ) &
+						SetProperty ( "old_pg_id" ; $old_pg_id ) ]
+		Go to Layout [ Layout: "TABLE FAT Page Alt" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+Exit Script [ $item_id ]
+
+
+

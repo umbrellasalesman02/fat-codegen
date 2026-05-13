@@ -1,0 +1,47 @@
+# Ett projekt som använder mallade modifiers
+Set Variable [ $lp_id[1] ; "F40B842C-0C33-463B-B8C2-2AA0039E135B" ]
+# Base project One
+Set Variable [ $code_base_id[1] ; "432D61A4-618C-4579-A4E4-427A6B521FDD" ]
+Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $level[1] ; FAT Modifier::Level ]
+		Set Variable [ $attribute_type[1] ; FAT Modifier::Type ]
+		Set Variable [ $attribute_name[1] ; FAT Modifier::Name ]
+		Set Variable [ $attribute_default_value[1] ; FAT Modifier::DefaultValue ]
+		Set Variable [ $attribute_description[1] ; FAT Modifier::Description ]
+		Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+		New Record/Request
+		Set Field [ ModifierTemplate @ BlockTemplate::Base Project ; $code_base_id ]
+		Set Field [ ModifierTemplate @ BlockTemplate::Name ; $attribute_name ]
+		Set Field [ ModifierTemplate @ BlockTemplate::Level ; $level ]
+		Set Field [ ModifierTemplate @ BlockTemplate::Type ; $attribute_type ]
+		Set Field [ ModifierTemplate @ BlockTemplate::DefaultValue ; $attribute_default_value ]
+		Set Field [ ModifierTemplate @ BlockTemplate::Description ; $attribute_description ]
+		Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+Go to Layout [ Layout: "🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $level[1] ; <Table Missing>::<Field Missing> ]
+		Set Variable [ $states[1] ; <Table Missing>::<Field Missing> ]
+		Set Variable [ $name[1] ; <Table Missing>::<Field Missing> ]
+		Set Variable [ $default_state[1] ; <Table Missing>::<Field Missing> ]
+		Set Variable [ $description[1] ; <Table Missing>::<Field Missing> ]
+		Go to Layout [ Layout: "🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨" ; Animation: None ]
+		New Record/Request
+		Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $code_base_id ]
+		Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $name ]
+		Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $level ]
+		Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $states ]
+		Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $default_state ]
+		Set Field [ &lt;Table Missing&gt;::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $description ]
+		Go to Layout [ Layout: "🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+

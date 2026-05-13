@@ -1,0 +1,37 @@
+# This script is praparing a found set of stateToggleValues for a Package.
+  Useful when deleting a Package by mistake
+# Must start in the PACKAGE when running this script
+
+# NOT DONE YET!!!!!
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+Set Variable [ $id[1] ; GetScriptProperty ( "id" ) ]
+
+Set Error Capture [ ON ]
+
+# Nu måste man stå på Package istället
+// If [ $level = "Package" ]
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Set Variable [ $id[1] ; FAT Package::PrimaryKey ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+# ------------------------------
+// End If
+
+# Package level
+Set Variable [ $parent_ids[1] ; $id ]
+Set Variable [ $parent_ids[1] ; $parent_ids & ¶ & List(FAT Chapter::PrimaryKey) ]
+Set Variable [ $parent_ids[1] ; $parent_ids & ¶ & List(FAT Page::PrimaryKey) ]
+Set Variable [ $parent_ids[1] ; $parent_ids & ¶ & List(FAT Page item::PrimaryKey) ]
+
+# Then extend
+
+Go to Layout [ Layout: "🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨" ; Animation: None ]
+Show All Records
+Show Omitted Only
+Set Variable [ $i[1] ; 0 ]
+Loop [ Flush: Always ]
+	Set Variable [ $i[1] ; $i + 1 ]
+	Exit Loop If [ $i>ValueCount ( $parent_ids ) ]
+	Set Variable [ $id[1] ; GetValue ( $parent_ids ; $i ) ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+End Loop
+

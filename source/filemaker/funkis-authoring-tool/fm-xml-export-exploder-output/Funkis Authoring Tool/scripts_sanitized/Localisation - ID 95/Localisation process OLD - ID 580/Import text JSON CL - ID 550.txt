@@ -1,0 +1,104 @@
+# The text JSON import works only when texts are stored in an 1.dimensional array with propertys: id and value
+# import_mode can be "new" or "update" or "translation" (which means that the text fields are created and new texts only are going to be imported.)
+# This script is also used for translated texts - using script parameters
+
+Set Variable [ $import_mode[1] ; GetScriptProperty ( "import_mode" ) ]
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $title_id[1] ; Case ( GetScriptProperty ( "title_id" )= ""; FAT Title::PrimaryKey; GetScriptProperty ( "title_id" )) ]
+Set Variable [ $package_id[1] ; Case ( GetScriptProperty ( "package_id" )= ""; FAT Package::PrimaryKey; GetScriptProperty ( "package_id" )) ]
+Set Variable [ $parent_id[1] ; Case ( GetScriptProperty ( "parent_id" )= ""; "" ; GetScriptProperty ( "parent_id" ))
+				// some text imports may use parent_id - sprig story for example ]
+Set Variable [ $language_code[1] ; Case ( GetScriptProperty ( "language_code" )= ""; FAT Title::Original language code; GetScriptProperty ( "language_code" )) ]
+Set Variable [ $country_code[1] ; Case ( GetScriptProperty ( "country_code" )= ""; FAT Title::Original country code
+				; GetScriptProperty ( "country_code" )) ]
+Set Variable [ $localisation_code[1] ; $language_code & "-" & $country_code ]
+
+# Used when importing translated files
+Set Variable [ $text_status[1] ; GetScriptProperty ( "text_status" ) ]
+
+# NOTE!   The script step below works ONLY if the field is present on the current layout!!!!
+Insert File [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ; Target: FAT Title::Latest Imported File ]
+If [ Get(lastError) = 1 ]
+	Exit Script []
+End If
+# Example filepath: /Users/jensthorsen/Desktop/JSON/public/content/json/cmt_symbol.json
+Set Variable [ $filename[1] ; GetContainerAttribute ( FAT Title::Latest Imported File ; "filename" ) ]
+# The text file have the correct langugage suffix
+If [ PatternCount ( $filename ; $localisation_code & ".json" ) ]
+	Set Variable [ $file_id[1] ; Left ( $filename ; Position ( $filename ; $localisation_code & ".json" ; 0 ; 1 )-1) ]
+	Set Variable [ $importedTextJSON[1] ; TextDecode ( FAT Title::Latest Imported File ; "utf-8" ) ]
+	
+	# Content in file is a valid JSON
+	If [ $importedTextJSON ≠ "?" ]
+		# Register in table imported text
+		Go to Layout [ Layout: "TABLE FAT Imported text files" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		
+		# Check all four variants for new and updated and found/not found
+		# If import_mode= "translation" - do nothing
+		If [ Get(foundCount)= 0 And $import_mode = "update" ]
+			Show Custom Dialog [ Title: "New JSON file" ; Message: "This text file has not been imported before and cannot be updated. Please import it as a NEW text file.¶¶
+							Did you change the name of the file? Please go to Title settings and check imported external text files." ; Default Button: "OK" ]
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+			Exit Script []
+		Else If [ Get(foundCount)≠ 0 And $import_mode="new" ]
+			Show Custom Dialog [ Title: "JSON file already exist" ; Message: "This text file has already been imported and cannot be imported as a NEW. Please choose UPDATE to select this file." ; Default Button: "OK" ]
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+			Exit Script []
+		Else If [ Get(foundCount)= 0 And $import_mode="new" ]
+			Show Custom Dialog [ Title: "Importing new text" ; Message: "The text you have imported is a new text file that haven't previously been imported in to this Title. You can label these texts with a specific name if you wish. " ; Default Button: "OK" ; Input 1: $textLabel ; Label 1: "Label for imported texts" ]
+			New Record/Request
+			Set Field [ FAT Imported text files::Title id ; $title_id ]
+			Set Field [ FAT Imported text files::Package id ; $package_id ]
+			Set Field [ FAT Imported text files::File id ; $file_id ]
+			// Set Field [ FAT Imported text files::File path ; $relative_filepath ]
+			Set Field [ FAT Imported text files::Imported document type ; $textLabel ]
+			Set Field [ FAT Imported text files::Parent id ; $parent_id ]
+		End If
+		
+		Commit Records/Requests [ With dialog: OFF ]
+		Perform Script [ From list ; "Import text JSON SRV" ; Parameter: SetProperty ( "import_mode" ; $import_mode) &
+						SetProperty ( "title_id" ; $title_id) &
+						SetProperty ( "package_id" ; $package_id) &
+						SetProperty ( "parent_id" ; $parent_id) &
+						SetProperty ( "file_id" ; $file_id) &
+						SetProperty ( "language_code" ; $language_code) &
+						SetProperty ( "country_code" ; $country_code) &
+						SetProperty ( "text_status" ; $text_status) ]
+		// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		
+		Set Variable [ $result[1] ; Get(ScriptResult) ]
+		
+		If [ PatternCount ( $result ; "Error" ) ]
+			If [ PatternCount ( $result ; "Text already imported" ) ]
+				Show Custom Dialog [ Title: "Warning!" ; Message: "This text is already imported" & ¶ & ¶ & "A text with an identical id is already imported to another Title in the Funkis Content Management Tool. Import will now stop." ; Default Button: "OK" ]
+			Else If [ PatternCount($result; "Not prepared for translation") ]
+				Show Custom Dialog [ Title: "Not prepared for translation" ; Message: "There are at least one textfield that don't correspond with the imported text. You must create these text fields by preparing for translation." ; Default Button: "OK" ]
+			End If
+		End If
+		
+		If [ $import_mode = "translation" ]
+			Go to Layout [ Layout: "FAT Title Settings" ; Animation: None ]
+			If [ PatternCount ( $result ; "success" ) ]
+				Exit Script [ $result & " from " & $filename & "." ]
+			Else
+				Exit Script [ $result ]
+			End If
+		Else
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+		End If
+		
+		
+		# Error messages
+	Else
+		# Content in file is NOT a valid JSON
+		Show Custom Dialog [ Title: "Cannot parse content in file" ; Message: "Sorry but the content in the selected file does not seem to be a valid json object. Please validate the content at https://jsonlint.com/" ; Default Button: "OK" ]
+		Exit Script []
+	End If
+Else
+	# The text file does NOT have the correct langugage suffix
+	Show Custom Dialog [ Title: "The selected file does not seem correctly named." ; Message: "The file should have a suffix and an extension as: " & $localisation_code & ".json.¶¶
+					Please select another file." ; Default Button: "OK" ]
+End If
+

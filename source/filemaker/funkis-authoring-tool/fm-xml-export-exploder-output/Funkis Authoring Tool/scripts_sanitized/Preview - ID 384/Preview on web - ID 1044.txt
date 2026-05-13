@@ -1,0 +1,145 @@
+# Called from preview and published button
+# Can be called everywhere in the Title.
+  All package data needed for the preview is sent in as variables in this version.
+
+# Level = 1,2 or 3 = hierarchyLevel
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+
+# Package directory including path is needed - FAT Package::Package Sub Path
+Set Variable [ $package_dir[1] ; GetScriptProperty ( "package_dir" ) ]
+
+# Package friendly-id - FAT Package::JSON Friendly name
+Set Variable [ $package_friendly_id[1] ; GetScriptProperty ( "package_friendly_id" ) ]
+
+# Package type - Site, Scroll or Slide
+Set Variable [ $package_type_name[1] ; GetScriptProperty ( "package_type_name" ) ]
+
+# Server mode = "preview" or "publish" - the blue or red buttons on Title level. If empty - set to "preview" for compatibility.
+Set Variable [ $server_mode[1] ; Case ( GetScriptProperty ( "server_mode" ) = ""; "preview"; GetScriptProperty ( "server_mode" )) ]
+
+# FAT version - affects URL
+Set Variable [ $fat_version[1] ; Case ( GetScriptProperty ( "fat_version" ) = ""; 1 ; GetAsNumber(GetScriptProperty ( "fat_version" ))) ]
+
+# If level = 0 - no Package selected (Text and Media review layouts) -> STOP
+If [ $level = 0 Or IsEmpty ( $level ) ]
+	Show Custom Dialog [ Title: "Select a package to preview" ; Message: "You are trying to preview content in this title without selecting a package. Please select content belonging to a specific package before previewing." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+# Setting up URL variables
+# Always starts with the language variable which does not include a "&" in the beginning.
+
+# Language code for preview in a specific language
+Set Variable [ $language[1] ; "language=" & Case($$localisation_code ≠ FAT Title::Original localisation code;  
+				
+				$$localisation_code ; 
+				
+				FAT Title::Original localisation code
+				
+				) ]
+
+# Email adress for login to right session if using Quiddity as backend
+Set Variable [ $login_email[1] ; Case ( 
+				
+				   FAT Title::Title Backend="Quiddity" Or FAT Title::Title Backend="Funkis Cloud" And Not IsEmpty (User @ Title::email) ; 
+				
+				   "&email=" & User @ Title::email ;
+				
+				    ""
+				) ]
+
+# Funkis Cloud Titles can have a user specific Session key that will override Funkis Cloud behaviour. 
+  If no session key is included - Funkis Cloud will decide which session to start in. 
+  This value is user specific
+Set Variable [ $funkisCloudSessionKey[1] ; Case ( 
+				
+				   Not IsEmpty ( User X Title @ Title::User Session Key); 
+				    "&sessionKey=" & User X Title @ Title::User Session Key;
+				    ""
+				) ]
+
+# Clear storage is default false - this value is user specific
+Set Variable [ $clearStorage[1] ; Case ( 
+				
+				   User X Title @ Title::User ClearStorage = 1; 
+				    "&clearStorage=true";
+				    "&clearStorage=false"
+				) ]
+
+# Chapter completion is default false  - this value is user specific
+Set Variable [ $chaptersStatusCompleted[1] ; Case ( 
+				
+				   User X Title @ Title::User ChapterCompleted = 1; 
+				    "&chaptersStatus=completed";
+				    ""
+				) ]
+
+# Show inspector is default  - this value is user specific
+Set Variable [ $showInspector[1] ; Case ( 
+				
+				   User X Title @ Title::User ShowInspector in preview = 1; 
+				    "&showInspector=true";
+				    "&showInspector=false"
+				)
+				
+				
+				/*
+				
+				
+				Case ( 
+				
+				   FAT Title::showInspector in preview = 0; 
+				    "&showInspector=false";
+				    "&showInspector=true"
+				)
+				*/ ]
+
+# Show review mode (default = false)  - this value is user specific
+Set Variable [ $showReviewMode[1] ; Case ( 
+				
+				   User X Title @ Title::User ShowReviewMode = 1; 
+				    "&showReviewMode=true";
+				    "&showReviewMode=false"
+				)
+				
+				
+				/*
+				
+				
+				Case ( 
+				
+				   FAT Title::showInspector in preview = 0; 
+				    "&showInspector=false";
+				    "&showInspector=true"
+				)
+				*/ ]
+
+Set Variable [ $url_variable[1] ; "?" & $language & $login_email & $funkisCloudSessionKey & $clearStorage & $chaptersStatusCompleted & $showInspector & $showReviewMode ]
+
+# URL based on Publish server, Client, Title and Package directories and a #
+If [ $server_mode = "preview" ]
+	Set Variable [ $URL[1] ; "https://" & Title Server Preview::URL & "/" & $package_dir & "#" ]
+Else If [ $server_mode = "publish" ]
+	Set Variable [ $URL[1] ; "https://" & Title Server Publish::URL & $package_dir & "#" ]
+End If
+
+If [ $level = 1 ]
+	If [ $fat_version > 1 ]
+		Set Variable [ $URL[1] ; $URL & "/" ]
+	Else
+		# OK as it is?
+	End If
+Else If [ $level = 2 And $package_type_name ≠ "slide" ]
+	// Set Variable [ $URL[1] ; $URL & $package_friendly_id & "/menu" ]
+	Set Variable [ $URL[1] ; $URL & $package_friendly_id & "/" & FAT Chapter::JSON friendly id & "/" & FAT Page::JSON friendly id ]
+Else If [ $level = 2 And $package_type_name = "slide" ]
+	Set Variable [ $URL[1] ; $URL & $package_friendly_id & "/" & FAT Chapter::JSON friendly id & "/" & FAT Page::JSON friendly id ]
+Else If [ $level = 3 ]
+	Set Variable [ $URL[1] ; $URL & $package_friendly_id & "/" & FAT Chapter::JSON friendly id & "/" & FAT Page::JSON friendly id ]
+End If
+
+Set Variable [ $URL[1] ; $URL & $url_variable ]
+Open URL [ In external browser: OFF ; With dialog: OFF ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+
+
+

@@ -1,0 +1,22 @@
+Set Variable [ $media_id[1] ; Get(scriptParameter) ]
+# Can be called from CMT Page item layout and Media layouts
+If [ $media_id ≠ "" ]
+	Freeze Window
+	If [ PatternCount (Get(layoutName); "Page item") ]
+		Perform Script [ From list ; "SavePageItem" ]
+	End If
+	Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+Set Variable [ $new_filename[1] ; getChar ( FAT Media::Container original filename ; 1 ; Position(FAT Media::Container original filename; "."; 1; PatternCount ( FAT Media::Container original filename ; "." ))-1) ]
+Show Custom Dialog [ Title: "Rename media filename" ; Message: "Please enter a new filename for this media file. Don't include the file extension since it cannot be changed." ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $new_filename ; Label 1: "New filename" ]
+If [ Get(lastMessageChoice) = 1 ]
+	Set Variable [ $filename_extension[1] ; Lower ( FAT Media::Container file extension ) ]
+	Set Variable [ $new_filename[1] ; PrettifyDash ($new_filename) & "." &  $filename_extension ]
+	Set Field [ FAT Media::Media container ; Base64Decode(Base64Encode(FAT Media::Media container); $new_filename) ]
+	Commit Records/Requests [ With dialog: OFF ]
+End If
+If [ $media_id ≠ "" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+

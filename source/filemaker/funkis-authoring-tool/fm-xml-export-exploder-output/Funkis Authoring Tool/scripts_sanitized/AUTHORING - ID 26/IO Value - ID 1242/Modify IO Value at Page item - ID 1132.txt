@@ -1,0 +1,85 @@
+# Called from a script trigger onObjectModify when selecting or changing IO from popup menu in IO Page item setting
+# Also called from Create and Add IO to PI
+# TO when called: FAT Page item
+
+Set Variable [ $io_value_id[1] ; Get(scriptParameter) ]
+Freeze Window
+Set Error Capture [ ON ]
+Commit Records/Requests [ With dialog: OFF ]
+
+Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) = 1 ]
+	Set Variable [ $io_has_input_fields[1] ; IO Type @ IO Value::IO has fields ]
+	Set Variable [ $io_num_input_fields[1] ; Count(FAT IO Field @ IO Page item::PrimaryKey) ]
+	Set Variable [ $io_value_num_input_field_values[1] ; Count(FAT IO Field Value @ IO Value PI::PrimaryKey) ]
+	Set Variable [ $io_id[1] ; FAT IO Value @ Page item::IO id ]
+	Set Variable [ $io_type[1] ; IO Type @ IO Value::FATType ]
+	Set Variable [ $field_mode[1] ; Case(BlockTemplate @ Page item::IO write enabled = 1; "Write"; "Read") ]
+	
+	# Clear AI aspect values if any
+	Set Field [ FAT IO Value @ Page item::IO Insight Aspect Field ; "" ]
+	Set Field [ FAT IO Value @ Page item::IO Insight Selected Aspect List items ; "" ]
+	
+	# This fix is to help the author to connect the IO to the chosen tag filter list.
+	  Otherwise tags will not work. 
+	  When using the tags feature it is very easy to forget this and it is painful to fault trace. 
+	
+	If [ ($io_type = "Select" Or $io_type = "Rate") And FAT List @ Page item::Usage type = "Tag filter" ]
+		Set Variable [ $tag_list_id[1] ; FAT Page item::List id ]
+		If [ IsEmpty ( FAT IO @ Page item::List id ) ]
+			Set Field [ FAT IO @ Page item::List id ; $tag_list_id ]
+		Else
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+			Show Custom Dialog [ Title: "" ; Message: "This page item uses a list that can be used to tag items. However, the chosen IO is connected to another list.¶¶
+							Do you want to connect the chosen IO to the current tag filter list?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+			If [ Get(lastMessageChoice) = 1 ]
+				Go to Layout [ Layout: "TABLE FAT IO Value @ Page item" ; Animation: None ]
+				Set Field [ FAT IO @ Page item::List id ; $tag_list_id ]
+			Else
+				Exit Script []
+			End If
+		End If
+	End If
+	
+	# First check if this IO type has input fields
+	If [ $io_has_input_fields ]
+		
+		# Then check if it already exist input field values from a previous modification
+		If [ $io_value_num_input_field_values > 0 ]
+			Go to Related Record [ Table: FAT IO Field Value @ IO Value PI ; Layout: "TABLE FAT IO Field Value" ; Show related ]
+			Delete All Records [ With dialog: OFF ]
+		End If
+		
+		# Create input fields values for IO types with input fields
+		Freeze Window
+		Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Loop [ Flush: Always ]
+				
+				Set Variable [ $input_field_id[1] ; FAT IO Field::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT IO Field Value" ; Animation: None ]
+				
+				New Record/Request
+				
+				Set Field [ FAT IO Field Value::IO Value id ; $io_value_id ]
+				Set Field [ FAT IO Field Value::IO Field id ; $input_field_id ]
+				Set Field [ FAT IO Field Value::Field mode ; $field_mode ]
+				Commit Records/Requests [ With dialog: ON ]
+				
+				If [ Get(lastError) = 504 ]
+					# If this id pair already exist - field "FAT Input field Value::Unique joint combination id" will fail validation
+					Delete Record/Request [ With dialog: OFF ]
+				End If
+				
+				Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+	End If
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+

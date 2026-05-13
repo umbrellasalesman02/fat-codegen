@@ -1,0 +1,23 @@
+# Called from Create new Title Step 2 SRV
+# This script creates a new Title that will be monitored by Funkis Insight
+Set Variable [ $fat_title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $title_environment[1] ; GetScriptProperty ( "title_environment" ) ]
+Set Variable [ $reference_title[1] ; GetScriptProperty ( "reference_title" ) ]
+Set Variable [ $funkis_cloud_title_id[1] ; GetScriptProperty ( "funkis_cloud_title_id" ) ]
+
+Go to Layout [ Layout: "TABLE IN Title" ; Animation: None ]
+New Record/Request
+Set Field [ IN Title::FAT Title PrimaryKey ; $fat_title_id ]
+Set Field [ IN Title::QuiddityKey ; $funkis_cloud_title_id ]
+Set Variable [ $title_pk[1] ; IN Title::PrimaryKey ]
+
+Commit Records/Requests [ With dialog: OFF ]
+
+Open File [ Open hidden: ON ; "Funkis Insight" ]
+Perform Script [ From list ; "Create new IN Title Step 2 CL" ; File: "Funkis Insight" ; Parameter: SetProperty ( "title_environment" ; $title_environment ) &
+				SetProperty ( "title_pk" ; $title_pk ) &
+				SetProperty ( "reference_title" ; $reference_title ) ]
+Close File [ "Funkis Insight" ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

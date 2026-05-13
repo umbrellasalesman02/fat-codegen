@@ -1,0 +1,44 @@
+# Look for all IO references in the text used as text variables and adjust the IO id.
+# This script is working if cloning whole Title
+
+Show Custom Dialog [ Title: "Legacy script" ; Message: "This dialog box should not appear when duplicating. Please contact Jens with information: \"Connect Title IO Text variables\"" ; Default Button: "OK" ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Error Capture [ ON ]
+
+Set Variable [ $io_indicator[1] ; "${ioid:" ]
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		# If there are more than one text variable usage in the same text chunk
+		Set Variable [ $old_text[1] ;  FAT Text::Text ]
+		Set Variable [ $new_text[1] ;  FAT Text::Text ]
+		Set Variable [ $num_of_occurences[1] ; PatternCount ( $old_text; $io_indicator ) ]
+		Set Variable [ $i[1] ; 1 ]
+		Loop [ Flush: Always ]
+			Set Variable [ $nextpos[1] ; Position ( $old_text ; $io_indicator ; 0 ; $i ) + Length ( $io_indicator ) ]
+			Set Variable [ $old_io_id[1] ; Middle ( $old_text ; $nextpos ; 36 ) ]
+			Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+			# Find old io_id in oldPrimaryKey
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)=1 ]
+				Set Variable [ $new_io_id[1] ; FAT IO::PrimaryKey ]
+			Else
+				Set Variable [ $new_io_id[1] ; "----io_not_found------" ]
+			End If
+			Set Variable [ $new_text[1] ; Substitute ( $new_text ; $old_io_id ; $new_io_id ) ]
+			Set Variable [ $i[1] ; $i + 1 ]
+			Exit Loop If [ $i > $num_of_occurences ]
+		End Loop
+		
+		Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+		Set Field [ FAT Text::Text ; $new_text ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+
+

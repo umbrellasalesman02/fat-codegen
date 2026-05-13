@@ -1,0 +1,68 @@
+# Called from buttons in Title localisation
+
+Set Variable [ $exclude_text_status[1] ; GetScriptProperty("exclude_text_status") ]
+Set Variable [ $title_localisation_id[1] ; GetScriptProperty("title_localisation_id") ]
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $title_reference_title[1] ; FAT Title::JSON friendly id ]
+Set Variable [ $original_localisation_code[1] ; FAT Title::Original localisation code ]
+
+# Send all texts in Title in one bunch
+Commit Records/Requests [ With dialog: OFF ]
+
+
+// Perform Script [ From list ; "Check if arrange texts needed" ; Parameter: SetProperty ( "title_id" ; $title_id ) & 
+				SetProperty ( "original_localisation_code" ; $original_localisation_code ) & 
+				SetProperty ( "last_sorted_timestamp" ; $last_sorted_timestamp ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Set Variable [ $new_arrange_needed[1] ; GetAsBoolean ( GetResultProperty ( "new_arrange_needed" )) ]
+Set Variable [ $last_original_textfield_creation_timestamp[1] ; GetAsTimeStamp ( GetResultProperty ( "last_original_textfield_creation_timestamp" )) ]
+
+
+# ------------- If texts needs to be arranged in a new sort order - Arrange text ---------------------------------
+If [ $new_arrange_needed ]
+	
+	Show Custom Dialog [ Title: "Text needs to be arranged in order" ; Message: "Before starting the translation, texts needs to be arranged in the right contextual order for the reviewers. This might take some time." ; Default Button: "Arrange" ; Button 2: "Skip" ; Button 3: "Stop" ]
+	If [ Get(lastMessageChoice) = 3 ]
+		# User pressed Stop
+		Exit Script []
+	Else If [ Get(lastMessageChoice) = 1 ]
+		
+		// Perform Script [ From list ; "Arrange text in order Title" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "title_localisation_id" ; $title_localisation_id ) ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		
+		Set Variable [ $last_sorted_timestamp[1] ; Get(currentHostTimeStamp) ]
+		If [ Not PatternCount ( Get(ScriptResult) ; "error" ) ]
+			# Title and Package texts now are in contextual order
+			# If no errors - save the timestamp when finding new texts
+			Set Field [ FAT Title::TextInContextualOrderTimeStamp ; $last_sorted_timestamp ]
+		Else
+			# Something went wrong when arranging texts. Maybe a record is busy.
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+			Show Custom Dialog [ Title: "Error when sorting text" ; Message: "Something went wrong when sorting the original texts in contextual order.¶Probably there's someone else working with the title right now.¶¶Do you want to stop the process or continue?" ; Default Button: "Stop" ]
+			Exit Script []
+		End If
+	End If
+Else If [ Get(lastMessageChoice) = 2 ]
+	# User pressed Skip - Do nothing
+End If
+
+Commit Records/Requests [ With dialog: OFF ]
+// Perform Script [ From list ; "Title Export HT files SRV" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "title_localisation_id" ; $title_localisation_id ) &
+				SetProperty ( "title_reference_title" ; $title_reference_title ) &
+				SetProperty ( "exclude_text_status" ; $exclude_text_status ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Set Variable [ $result[1] ; Get(ScriptResult) ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+If [ PatternCount ( $result ; "error" ) ]
+	Show Custom Dialog [ Title: "Error" ; Message: $result ; Default Button: "OK" ]
+Else
+	Refresh Window
+	Export Field Contents [ Create folders: OFF ; FAT Title::Latest Exported file ]
+End If
+
+
+

@@ -1,0 +1,25 @@
+# Called from Title Objects
+
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $new_tt_id[1] ; GetScriptProperty ( "new_tt_id" ) ]
+Set Error Capture [ ON ]
+
+# Duplicate Blocks - preparing for page items to link via Old PrimaryKey from clone
+Go to Layout [ Layout: "TABLE FAT Object Group" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		Set Variable [ $old_io_group_id[1] ; FAT Object Group::PrimaryKey ]
+		Duplicate Record/Request
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT Object Group::Title id ; $new_tt_id ]
+		Set Field [ FAT Object Group::Old PrimaryKey from clone ; $old_io_group_id ]
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+

@@ -1,0 +1,70 @@
+# Using Private Key to log in
+# Called when creating a Title in FAT
+# Called from script Create new Title Step 2 SRV
+# Needs to be called from standard content hierarcy (FAT Title and children)
+Set Variable [ $pageItemId[1] ; GetScriptProperty ( "pageItemId" ) ]
+
+
+Set Variable [ $title_environment[1] ; FAT Title::Title Environment ]
+Set Error Capture [ ON ]
+Set Error Logging [ ON ]
+
+
+Set Variable [ $theURL[1] ; Title Environment::Root URL & "/api/admin/v1/quidinputs?targetDataKey=FUNKIS_CLOUD_GLOBAL_REVIEW_IO_ID&select=[id,createdAt,data.pageItemId,data.sender,data.issue]" & "&data.pageItemId=" & $pageItemId ]
+Set Variable [ $private_key[1] ; Title Environment::Private API Key ]
+
+# Communicate with the API to get the review comments for this Page item
+Set Variable [ $cURL_options[1] ; _cURL_request ( "GET" ) & 
+				_cURL_header ( "Authorization" ; "Bearer " & $private_key ) & 
+				_cURL_header ( "Content-Type" ; "application/json" ) & 
+				_cURL_header ( "Accept" ; "application/json" ) & 
+				_cURL_show_error ]
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ; $cURL_options ]
+
+Set Variable [ $last_error[1] ; Get(lastError) ]
+If [ $last_error ≠ 0 ]
+	Show Custom Dialog [ Title: "Authentication to server failed" ; Message: "Error: Please check credentials for superAdmin for chosen title environment." ; Default Button: "OK" ]
+	Exit Script [ "Error: Please check credentials for superAdmin for chosen title environment." ]
+End If
+
+If [ $resultJSON = "[]" ]
+	Set Field [ Variables::gReviewComment ; "No review comments found." ]
+	Exit Script []
+End If
+
+Set Variable [ $i[1] ; 0 ]
+Set Variable [ $reviewComments[1] ; "" ]
+Loop [ Flush: Always ]
+	Exit Loop If [ IsEmpty(JSONGetElement ( $resultJSON ; "[" & $i & "]" )) ]
+	// # Get date from the root level (not root.data) 
+	Set Variable [ $date[1] ; FormatISO8601Date ( JSONGetElement ( $resultJSON ; "[" & $i & "]createdAt"  ) ) ]
+	// # Get the data object containing all the form fields
+	Set Variable [ $data[1] ; JSONGetElement ( $resultJSON ; "[" & $i & "]data" ) ]
+	Set Variable [ $reviewComments[1] ; Let ( 
+					
+					
+					[
+					
+					   comment = TextStyleAdd ( "Comment: "; Bold) & JSONGetElement ( $data ; "issue" ) & "¶";
+					   sender = TextStyleAdd ( "Reviewer: "; Bold) & JSONGetElement ( $data ; "sender" ) & "¶";
+					   date =  TextStyleAdd ( "Date: "; Bold) & $date  & "¶¶" 
+					
+					
+					
+					];
+					
+					  $reviewComments & TextStyleAdd ( GetAsText($i + 1) & "."; Bold) & "¶" & comment & sender & date
+					
+					 ) ]
+	Set Variable [ $i[1] ; $i + 1 ]
+End Loop
+
+Set Field [ Variables::gReviewComment ; $reviewComments ]
+
+
+
+
+
+
+
+

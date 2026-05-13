@@ -1,0 +1,760 @@
+<Script>
+	<ScriptReference id="658" name="Export texts to doc"></ScriptReference>
+	<ObjectList membercount="63">
+		<Step hash="85BC94FE1F756495AEE2EBB9FA0421FC" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script is launched from a button in Localisation views and Text reviews"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8A21FD0DE2C89903D872FC9EED7C5F3C" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3DF0E800D916E9A925C05C7116F72E4D" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="9C6C0E2365A0979964B1DB84A62373D4" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[PatternCount ( Get(layoutName); "Text")]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F5E66A3545B864FB042CE51FA8D51627" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[True]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$text_review"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1C844196E78445443E7C03439BDD3A82" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Text review layout"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6DA0A6B67E9F1362A6AC25B75041DE76" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Title::PrimaryKey]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="73404A5FA6B641516920FFCA954703FE" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$$localisation_code]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$localisation_code"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="72CEA818A8B9BA4038667B826417ECA9" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Not IsEmpty ( FAT Text::gPackage )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="9B0D6DD4657260DDBB61D0C37DA46A24" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Export only one package"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="101BFC589691BC010E7980C32E4F92E9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Text::gPackage]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$package_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D3FFDA93E530C04AA481B98605EC9823" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="C321CE643D319196104B550F64C755ED" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="064C9599AD87237DB26EA2FAF640A06D" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Log in"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4EAE553EE50CC005E952E9796A2282FF" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Export all packages in Title"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="976EDBEEF53E73B68118269F94731B48" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[User X Title::Title id]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$title_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7BE60FD674F6A4FC05A3D19A5337911C" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(scriptParameter)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$localisation_code"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E05D2F738D0CDCEAA97D282582082E05" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="7506CCC0E0E32D834074516F8F8363DB" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8594C4E7BB9E7AA049010ADF6E350A2F" id="1" name="Perform Script" enable="False">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="628" name="Export as Word"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_code" ; $localisation_code ) &SetProperty ( "title_id" ; $title_id ) &SetProperty ( "package_id" ; $package_id )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A5212B80A54F75DF19BF1FFA3D8B12A5" id="164" name="Perform Script on Server" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="628" name="Export as Word"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[SetProperty ( "localisation_code" ; $localisation_code ) &SetProperty ( "title_id" ; $title_id ) &SetProperty ( "package_id" ; $package_id )]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Wait for completion" id="256" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A07ED2FE404FE05A55E4C9F3039E0E1B" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(ScriptResult)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$result"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FC1D5A343DC504CFEE7D642E85B11CC0" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6359C4A730F1BDAF7074EF81FFF2DBA9" id="6" name="Go to Layout" enable="True">
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="1">
+						<Label>original layout</Label>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="21E2C856464AEFACDE28F187AAF6151F" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="33DDBEC5664333E3C7BF2A361AB4BAA8" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Platform ≠ "WebDirect"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="245DF3F97684F744E41BA6F8FBE64F2A" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[IsEmpty ( $package_id )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2308F9A5560CB87DB54C01AB828C02B8" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["file:" & Get(DesktopPath) & Substitute ( FAT Title::Reference title ; "/" ; "-" ) & Case ( IsEmpty ($localisation_code) ; ".doc" ; " " & $localisation_code & ".doc")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$fullFilePath"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D852FF673AFBA0FD778A63C9EB1971DA" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="FDB220C9F4DC26F3420F43206E90A20E" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["file:" & Get(DesktopPath) & Substitute ( FAT Title::Reference title & " - " & FAT Package::Reference name ; "/" ; "-" ) & Case ( IsEmpty ($localisation_code) ; ".doc" ; " " & $localisation_code & ".doc")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$fullFilePath"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1437F06093A685369E6EB531B9A929B2" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="6E707C76BCBD2B63DBBBA0A2CD0F2DD6" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6F6562E3043D3A4BB275285FB26C4F05" id="190" name="Create Data File" enable="True">
+			<Options>32</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="UniversalPathList">
+					<UniversalPathList membercount="1">
+						<ObjectList>
+							<Location><![CDATA[$fullFilePath]]></Location>
+						</ObjectList>
+					</UniversalPathList>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Create folders" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="50EB4E821751CAB5E79D1957279401C6" id="191" name="Open Data File" enable="True">
+			<Options>37</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="UniversalPathList">
+					<UniversalPathList membercount="1">
+						<ObjectList>
+							<Location><![CDATA[$fullFilePath]]></Location>
+						</ObjectList>
+					</UniversalPathList>
+				</Parameter>
+				<Parameter type="Target">
+					<Variable value="$fileID">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+					</Variable>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6472BA89AF6AD39DB467BB4A6B2703E9" id="192" name="Write to Data File" enable="True">
+			<Options>16387</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="id">
+					<Calculation datatype="2" position="0">
+						<Calculation>
+							<Text><![CDATA[$fileID]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Target">
+					<FieldReference id="73" name="Latest Exported file">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065132" name="FAT Title"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Encoding type="2" name="UTF-8"></Encoding>
+				<Parameter type="Boolean">
+					<Boolean type="Append line feed" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="920298CDC9D23F05B19CEB273E8D403E" id="196" name="Close Data File" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="id">
+					<Calculation datatype="2" position="0">
+						<Calculation>
+							<Text><![CDATA[$fileID]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="82FD8648C0596AEB4AF2BF276D386062" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CE4DB96EB23E859855D0C3DE57B602E2" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(lastError) ≠ 100 And Get(lastError) ≠ 300]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2618383FA160C0A1C9A48BAD8A58FEED" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Successful export"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["All texts in this package were successfully exported to a Word document (HTML) on your desktop. "]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8CAA41FEE374FD9FAA2993BCC3486079" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="85DD06DC3EB52B353EED9B07023A80E3" id="87" name="Show Custom Dialog" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="5">
+				<Parameter type="Title">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA["Export error"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Message">
+					<Calculation datatype="1" position="1">
+						<Calculation>
+							<Text><![CDATA["Could not create file on disk. A file with the same name might exist in this location."]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+				<Parameter type="Button1" value="OK">
+					<Boolean type="Commit" value="True"></Boolean>
+				</Parameter>
+				<Parameter type="Button2">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Button3">
+					<Boolean type="Commit" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1D74CABEAC6E6BB3ACD2AC28F64622E6" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="B1849808F11CDBA3BA9B2C24D3E3B410" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="6E2F2485A3F1FEB657BF80BCC45FFB83" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[IsEmpty ( $package_id )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0E061E85DC6A1F41245E80C0AC1EFAE8" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(DesktopPath) & FAT Title::Reference title & Case ( IsEmpty ($localisation_code) ; ".doc" ; " " & $localisation_code & ".doc")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$fullFilePath"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5971D729811AAA67D263A54F754EBCC3" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="5B375C0179293DD815F6C7502465FEC9" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(DesktopPath) & FAT Title::Reference title & " - " & FAT Package::Reference name & Case ( IsEmpty ($localisation_code) ; ".doc" ; " " & $localisation_code & ".doc")]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$fullFilePath"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4E2B54705145A4C443D084035AFECD20" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="A6F18B3B9B99F972C19CC444F98A6668" id="132" name="Export Field Contents" enable="True">
+			<Options>33</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="Create folders" id="512" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="73" name="Latest Exported file">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065132" name="FAT Title"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="UniversalPathList">
+					<UniversalPathList membercount="1">
+						<ObjectList>
+							<Location><![CDATA[$fullFilePath]]></Location>
+						</ObjectList>
+					</UniversalPathList>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6A9A881F706ACB99B46A93FB9119F7DF" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="2FE3674A4920398983CFCB228FEF1777" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="0F1C22B5E003885F881DCE51183761AB" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A99845D5091469EE23F8B0840FA9D477" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This layout requires texts from the Title - otherwise it loses connection with the Title"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FF2F1E814FAD727AE091BC2BD79C49E2" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$title_id">
+								<FieldReference id="11" name="Title id">
+									<TableOccurrenceReference id="1065198" name="FAT Text"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="93DDB7127002B22F4D22DCAD2E15F57C" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="29C8D8193BFA286D599355B328FAC8B6" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$text_review]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D7467B2EBFD13912D15F7C3669084A99" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="If we started in tText review layout - reset"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6804B439E2AF41F26A836EE76DDD60D5" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[IsEmpty ( $package_id )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="125E9EC9B10CF50737A41CFAAE8E7A96" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="249" name="Filter text"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA["Title"]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C90B8D0BD5EB540CF40283DA1323C11A" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="3CD7EC5EF836195C4C46CF446A2C5019" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="249" name="Filter text"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA["Package"]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="918A1F92B65DB89A399DD501A44E7143" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="E92AA778957CA4D7F3AC075FC3100B6B" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

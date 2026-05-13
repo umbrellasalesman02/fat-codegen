@@ -1,0 +1,94 @@
+<Script>
+	<ScriptReference id="1238" name="Paste text into textfields"></ScriptReference>
+	<ObjectList membercount="7">
+		<Step hash="EB71553181199CF9DCCD4D00F7D92747" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script is called from a button in the Page item layout"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="832B9818CC5FA7EC1D0C007EB32BBA5B" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B83F2B48B848874CBCD6785410E8EBEE" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="886F938AA23E833F16925C73D7CF0968" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Variables::gCopyHTMLText]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$html_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="70935923852022D19967C8E2352074E6" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="ModifierValues"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3C64846F4C810AAA0EBE4D11A133C2F4" id="141" name="Set Variable" breakpoint="True" enable="True">
+			<Options>1064964</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[JSONSetElement ( $html_text ;     ["record-id" ; Get(recordID) ; JSONNumber];    ["localisation_code" ; Case ( IsEmpty(FAT Title::gCurrentLocalisationCode);  FAT Title::Original localisation code; FAT Title::gCurrentLocalisationCode) ; JSONString];    ["localisation_mode" ; Case ( IsEmpty ( FAT Title::gCurrentLocalisationCode ) Or FAT Title::gCurrentLocalisationCode = FAT Title::Original localisation code; "original"; "translate" ) ; JSONString])]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$html_text"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EAE9CA4773649826CA3D4E22721BB97D" id="1" name="Perform Script" enable="True">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="194" name="Setup current PageItem"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$html_text]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

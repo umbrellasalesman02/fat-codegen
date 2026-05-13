@@ -1,0 +1,166 @@
+# import XML only available in CMT Media Subtitle view
+Set Error Capture [ ON ]
+Freeze Window
+
+# Using xmlPath requires the BaseElemets plugin
+If [ Not PatternCount (Get(InstalledFMPlugins); "BaseElements") ]
+	Show Custom Dialog [ Title: "BaseElements Plugin not found" ; Message: "To parse an XML you need to have the BaseElements plugin installed. See https://docs.baseelementsplugin.com" ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+Set Variable [ $learningprogramme_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; FAT Media::Package id ]
+Set Variable [ $language_code[1] ; FAT Title::Original language code ]
+Set Variable [ $country_code[1] ; FAT Title::Original country code ]
+Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+Set Variable [ $media_filename[1] ; FAT Media::Container exported filename no extension ]
+
+# Open file dialog box
+Set Variable [ $fileInfo[1] ; "" ]
+Insert File [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ; Target: $fileInfo ]
+# Example $fileInfo result:
+  file:dst_subtitle_en-global.xml
+  filemac:/Macintosh HD/Users/jensthorsen/Desktop/CMT Tester/TMH filmer & subtitles/content/language/en-global/dst_subtitle_en-global.xml
+
+If [ Get(lastError) = 1 ]
+	# User cancelled
+	Exit Script []
+End If
+
+Set Variable [ $filepath[1] ; GetValue ( $fileInfo ; 2 ) ]
+Set Variable [ $filename[1] ; GetFileNameFromPath ( $filepath ) ]
+
+# ----------------- XML file -------------------------------------
+If [ PatternCount ( $filename ; FAT Title::Original localisation code & ".xml" ) ]
+	
+	Open Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Target: $fileID ]
+	Read from Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ; Target: $importedXML ]
+	Show Custom Dialog [ Title: "File selected" ; Message: "Click OK to continue" ; Default Button: "OK" ]
+	Close Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ]
+	Set Variable [ $relative_filepath[1] ; Left ( $filepath ; Position ( $filepath ; $filename ; 0 ; 1 )-1) ]
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	Show Omitted Only
+	Set Variable [ $subtitles[1] ; <Function Missing> (  $importedXML ; "/content/part[@id='" & $media_filename & "']" ) ]
+	Set Variable [ $numberOfsubtitles[1] ; (ValueCount($subtitles)-2)/3 ]
+	If [ $subtitles ≠ "" ]
+		Set Variable [ $i[1] ; 1 ]
+		Set Variable [ $numOfMediaSubtitles[1] ; 0 ]
+		Loop [ Flush: Always ]
+			Set Variable [ $text[1] ; // Find subtitles with filename
+							
+							Let ( 
+							[
+							
+							filename = $media_filename;
+							subNum = $i;
+							
+							htmltag = "<p class='subtitle'>" ;
+							textstring = <Function Missing> (  $importedXML ; "/content/part[@id='" & filename & "']/item[" & subNum & "]" );
+							start = Position ( textstring; htmltag ; 1 ; 1 );
+							start = start + Length(htmltag);
+							end = Position ( textstring; "</p>" ; 1 ; 1 );
+							textstring = Middle ( textstring ; start ; end-start )
+							
+							]
+							
+							;
+							
+							textstring
+							
+							 ) ]
+			Set Variable [ $enterTimeXML[1] ; // Find subtitles with filename
+							
+							Let ( 
+							[
+							
+							time = <Function Missing> (  $importedXML ; "/content/part[@id='" & $media_filename & "']/item[" & $i & "]/@time" )
+							
+							]
+							
+							;
+							
+							time
+							
+							
+							 ) ]
+			Set Variable [ $exitTimeXML[1] ; // Find subtitles with filename
+							
+							Let ( 
+							[
+							
+							time = 
+							
+							Case ( $i = $numberOfSubtitles ; 
+							
+							         <Function Missing> (  $importedXML ; "/content/part[@id='" & $media_filename & "']/item[" & $i & "]/@time" );
+							         <Function Missing> (  $importedXML ; "/content/part[@id='" & $media_filename & "']/item[" & $i+1 & "]/@time" )
+							)
+							
+							
+							]
+							
+							;
+							
+							
+							time
+							
+							
+							 ) ]
+			# xml_id is used to identify the text entry to match with localisation.
+			Set Variable [ $xml_id[1] ; // Find subtitles with filename
+							
+							Let ( 
+							[
+							
+							id = <Function Missing> (  $importedXML ; "/content/part[@id='" & $media_filename & "']/item[" & $i & "]/@id" )
+							
+							]
+							
+							;
+							
+							id
+							
+							
+							 ) ]
+			
+			Set Variable [ $enter[1] ; GetAsTime (Substitute ( $enterTimeXML ; "." ; "," )) ]
+			Set Variable [ $exit[1] ; Case ($i = $numberOfSubtitles ;
+							
+							    //adding a general of 5 seconds for exit of the last subtitle
+							    GetAsTime (Substitute ( $exitTimeXML ; "." ; "," )) + 5;
+							
+							    GetAsTime (Substitute ( $exitTimeXML ; "." ; "," ))
+							
+							) ]
+			Set Variable [ $i[1] ; $i +1 ]
+			
+			# Update import log
+			Set Variable [ $numOfMediaSubtitles[1] ; $numOfMediaSubtitles + 1 ]
+			
+			New Record/Request
+			Set Field [ FAT Text::Title id ; $learningprogramme_id ]
+			Set Field [ FAT Text::Package id ; $package_id ]
+			Set Field [ FAT Text::Text ; $text ]
+			Set Field [ FAT Text::Enter time ; $enter ]
+			Set Field [ FAT Text::Exit time ; $exit ]
+			# xml_id is used to identify the text entry to match with localisation.
+			Set Field [ FAT Text::Label ; $xml_id ]
+			Set Field [ FAT Text::Parent id ; $media_id ]
+			Set Field [ FAT Text::Source item type ; "media" ]
+			Set Field [ FAT Text::Source reference ; "Subtitle FFSub" ]
+			Set Field [ FAT Text::Language code ; $language_code ]
+			Set Field [ FAT Text::Country code ; $country_code ]
+			Set Field [ FAT Text::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; "Not reviewed" ]
+			
+			Exit Loop If [ $i > $numberOfsubtitles ]
+		End Loop
+		Show Custom Dialog [ Title: "Subtitle import result" ; Message: $numOfMediaSubtitles & " subtitles texts were successfully imported" ; Default Button: "OK" ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Else
+		Show Custom Dialog [ Title: "Cannot find the video filename in the xml file" ; Message: "Sorry but the XML-file does not seem to contain subtitles to this video." ; Default Button: "OK" ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	End If
+Else
+	Show Custom Dialog [ Title: "The selected file does not seem correctly named." ; Message: "The file should have a suffix and an extension as: " & FAT Title::Original localisation code & ".xml" ; Default Button: "OK" ]
+End If
+

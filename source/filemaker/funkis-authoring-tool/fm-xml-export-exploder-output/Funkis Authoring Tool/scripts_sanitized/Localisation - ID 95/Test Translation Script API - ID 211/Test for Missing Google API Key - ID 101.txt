@@ -1,0 +1,10 @@
+If [ IsEmpty(Variables::Google API key) ]
+	Show Custom Dialog [ Title: "There is a problem" ; Message: "You seem to be missing the Google API Key. If you don't have one, click 'Get One'. Otherwise paste it into the Google API Key field." ; Default Button: "OK" ; Button 2: "Get One" ]
+	If [ Get(lastMessageChoice)=1 ]
+		Go to Field [ Select/perform ; Variables::Google API key ]
+		Halt Script
+	Else
+		Perform Script [ From list ; "Open Google URLs" ; Parameter: "API Console" ]
+	End If
+End If
+

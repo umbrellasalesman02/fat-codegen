@@ -1,0 +1,118 @@
+# The text JSON import works only when texts are stored in an 1.dimensional array with propertys: id and value
+# import_mode can be "new" or "update" or "translation" (which means that the text fields are created and new texts only are going to be imported.)
+# This script is also used for translated texts - using script parameters
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $import_mode[1] ; GetScriptProperty ( "import_mode" ) ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $parent_id[1] ; GetScriptProperty ( "parent_id" ) ]
+Set Variable [ $file_id[1] ; Case ( GetScriptProperty ( "file_id" )= ""; "" ; GetScriptProperty ( "file_id" ))
+				// some text imports may use source_item_type - sprig story for example ]
+Set Variable [ $language_code[1] ; GetScriptProperty ( "language_code" ) ]
+Set Variable [ $country_code[1] ; GetScriptProperty ( "country_code" ) ]
+Set Variable [ $localisation_code[1] ; $language_code & "-" & $country_code ]
+
+# Text status can either be "In progress" or "Approved" and depends on the localisation stage
+Set Variable [ $text_status[1] ; GetScriptProperty ( "text_status" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $importedTextJSON[1] ; TextDecode ( FAT Title::Latest Imported File ; "utf-8" ) ]
+// Set Variable [ $numberOfTextsInJSON[1] ; PatternCount ( $importedTextJSON ; "\"id\"" ) ]
+# Change 2022-02-02 - could be a possible error with patterncount above
+Set Variable [ $numberOfTextsInJSON[1] ; ValueCount ( JSONListKeys ( $importedTextJSON ; "" )) ]
+Set Variable [ $i[1] ; 0 ]
+Set Variable [ $num_of_texts[1] ; 0 ]
+
+# Loop through all texts
+Loop [ Flush: Always ]
+	
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	// Exit Loop If [ JSONGetElement ( $importedTextJSON ;"[" & $i & "]id") = "" ]
+	Set Variable [ $id[1] ; JSONGetElement ( $importedTextJSON ;"[" & $i & "]id") ]
+	Set Variable [ $text[1] ; Case ( JSONGetElement ( $importedTextJSON ;"[" & $i & "]value") = "";
+					
+					JSONGetElement ( $importedTextJSON ;"[" & $i & "]text") ;
+					
+					JSONGetElement ( $importedTextJSON ;"[" & $i & "]value")
+					
+					)
+					
+					// text have key = "value" in normal json and "text" in subtitles json - really bad... ]
+	
+	If [ $import_mode = "translation" ]
+		# Search original key from clone (global template texts), title_id and localisation_code
+		# Omit approved texts
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount) = 0 ]
+			# Search original key, title_id and localisation_code
+			# Omit approved texts
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			
+			If [ Get(foundCount) = 0 Or (FAT Text::Package id ≠ $package_id And FAT Text::Package id ≠ "") ]
+				# If importing wrong package
+				// Exit Script [ "Not prepared for translation" ]
+			Else
+				Set Field [ FAT Text::Text ; $text ]
+				Set Field [ FAT Text::Status ; $text_status ]
+				Set Field [ FAT Text::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $text_status ]
+				Set Variable [ $num_of_texts[1] ; $num_of_texts + 1 ]
+			End If
+		Else
+			Set Field [ FAT Text::Text ; $text ]
+			Set Field [ FAT Text::Status ; $text_status ]
+			Set Field [ FAT Text::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; $text_status ]
+			Set Variable [ $num_of_texts[1] ; $num_of_texts + 1 ]
+		End If
+		Set Variable [ $error[1] ; Get(lastError) ]
+		If [ $error =401 ]
+			# The translated text does not match any original text. Maybe block is removed after translation.
+			// Exit Script [ "Error. Cannot find orginial text for this translation" ]
+		Else If [ $error ≠ 0 And $error ≠ 401 ]
+			# Maybe record busy with another user
+			Exit Script [ "Error. Cannot import. Error = " & $error & ¶ & Get( lastErrorDetail ) ]
+		End If
+		
+	Else
+		# If import_mode not translation
+		# Search primary key
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		# Check if text exists already
+		If [ Get(foundCount)= 0 ]
+			# create a new record whether mode is new or update
+			New Record/Request
+			Set Field [ FAT Text::PrimaryKey ; $id ]
+			Commit Records/Requests [ With dialog: OFF ]
+			If [ Get(lastError)=504 ]
+				# Error 504 = Value in field is not unique, as required in validation entry options
+				Go to Layout [ Layout: "TABLE FAT Imported text files" ; Animation: None ]
+				Delete Record/Request [ With dialog: OFF ]
+				Go to Layout [ Layout: <original layout> ; Animation: None ]
+				Exit Script [ "Error: Text already imported" ]
+			End If
+		Else If [ Get(foundCount)>0 And $import_mode= "new" ]
+			Go to Layout [ Layout: "TABLE FAT Imported text files" ; Animation: None ]
+			Delete Record/Request [ With dialog: OFF ]
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+			Exit Script [ "Error: Text already imported" ]
+		End If
+		If [ $import_mode="update" And $text ≠ FAT Text::Text Or $import_mode = "new" ]
+			Set Field [ FAT Text::Title id ; $title_id ]
+			Set Field [ FAT Text::Package id ; $package_id ]
+			Set Field [ FAT Text::Parent id ; $parent_id ]
+			Set Field [ FAT Text::Text ; $text ]
+			Set Field [ FAT Text::Source item type ; $file_id ]
+			# Don't change "Imported text" since it is used when deleting texts to make sure we don't delete wrong texts.
+			Set Field [ FAT Text::Source reference ; "Imported text - " & $textLabel ]
+			Set Field [ FAT Text::Language code ; $language_code ]
+			Set Field [ FAT Text::Country code ; $country_code ]
+			Set Field [ FAT Text::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; "Not reviewed" ]
+		End If
+	End If
+	
+	Set Variable [ $i[1] ; $i+1 ]
+	Exit Loop If [ $i  ≥  $numberOfTextsInJSON ]
+End Loop
+Exit Script [ "Successfully imported " & $num_of_texts & " texts" ]
+

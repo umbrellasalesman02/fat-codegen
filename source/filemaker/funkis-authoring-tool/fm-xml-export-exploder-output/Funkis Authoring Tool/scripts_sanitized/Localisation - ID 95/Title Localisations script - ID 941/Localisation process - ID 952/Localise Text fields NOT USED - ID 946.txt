@@ -1,0 +1,92 @@
+# WARNING! THIS SCRIPT IS NOT USED BUT A CLONE IS LOCATED IN "FAT Text.fmp12 " which handles the operation.
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+# This script is used for:
+  Creating new text fields labeled with language and country - prepared to be translated
+  If a text field with the localisation code already exists, it is left as it is
+
+# This script is called for both Human translation and Machine translation
+
+# This script is designed to work for PSOS
+
+Set Error Capture [ ON ]
+Set Variable [ $title_id[1] ; GetScriptProperty ("title_id") ]
+Set Variable [ $package_id[1] ; GetScriptProperty ("package_id") ]
+
+Set Variable [ $original_localisation_code[1] ; GetScriptProperty ( "original_localisation_code" ) ]
+Set Variable [ $target_localisation_code[1] ; GetScriptProperty ( "target_localisation_code" ) ]
+Set Variable [ $last_localised_textfield_creation_timestamp[1] ; GetAsTimeStamp(GetScriptProperty ( "last_localised_textfield_creation_timestamp" )) ]
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+
+# Find all texts in title in orignal localisation code - that was created AFTER last text field was created in localisation.
+  If first time - $last_textfield_creation_timestamp = "2000-01-01"
+
+# Set gCurrentLocalisationCode to quickly find if localised text field exist
+Set Field [ FAT Text::gCurrentLocalisationCode ; $target_localisation_code ]
+Commit Records/Requests [ With dialog: OFF ]
+
+// # Find texts in original language that are created AFTER last localisation creation date AND does NOT have a localised textfield conencted.
+// Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# Find texts (not empty) in original language that does NOT have a localised textfield conencted.
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount) > 0 ]
+	
+	
+	# Sort texts using Package sortIndex and recordNumberReference if exist
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	
+	Set Variable [ $target_language_code[1] ; getLanguageCode ( $target_localisation_code ) ]
+	Set Variable [ $target_country_code[1] ; getCountryCode ( $target_localisation_code ) ]
+	
+	Set Variable [ $num_of_created[1] ; 0 ]
+	Set Variable [ $num_of_errors[1] ; 0 ]
+	
+	If [ Get(foundCount)>0 ]
+		Open Transaction [ Skip auto-enter options: OFF ; Skip data entry validation: ON ; Override ESS locking conflicts: OFF ]
+		Loop [ Flush: Defer ]
+			
+			# Translated version of text does not exist
+			Set Variable [ $original_key[1] ; FAT Text::PrimaryKey ]
+			Set Variable [ $recordNumber[1] ; Get(recordNumber) ]
+			
+			Duplicate Record/Request
+			
+			If [ Get(lastError) ≠0 And Get(lastError)≠401 ]
+				# Record in use by another user - field cannot be duplicated
+				Set Variable [ $num_of_errors[1] ; $num_of_errors + 1 ]
+			Else
+				Set Variable [ $num_of_created[1] ; $num_of_created + 1 ]
+				Set Field [ FAT Text::OriginalKey ; $original_key ]
+				Set Field [ FAT Text::Language code ; $target_language_code ]
+				Set Field [ FAT Text::Country code ; $target_country_code ]
+				Set Field [ FAT Text::Status ; "Not translated" ]
+				# Hide duplicated record and jump back to the original record
+				Omit Record
+				Go to Record/Request/Page [ With dialog: OFF ; $recordNumber ]
+			End If
+			
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+		Commit Transaction
+		# Set a new timestamp when text were created
+		Set Variable [ $last_localised_textfield_creation_timestamp[1] ; Get(currentHostTimeStamp) ]
+	End If
+End If
+
+Exit Script [ SetProperty ( "num_of_errors"; $num_of_errors) &
+				SetProperty ( "num_of_created" ; $num_of_created ) &
+				SetProperty ( "last_localised_textfield_creation_timestamp" ; $last_localised_textfield_creation_timestamp ) ]
+
+
+

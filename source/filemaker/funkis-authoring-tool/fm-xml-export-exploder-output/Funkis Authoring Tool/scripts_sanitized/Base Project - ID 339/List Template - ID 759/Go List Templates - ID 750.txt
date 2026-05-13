@@ -1,0 +1,14 @@
+# Called from button in Login Developer or frrom Block Template
+Set Variable [ $ca_template[1] ; Get(scriptParameter) ]
+Perform Script [ From list ; "Save Active Layout" ]
+Go to Layout [ Layout: "List Templates" ; Animation: None ]
+If [ IsEmpty ( $ca_template ) ]
+	# Show only List Templates for Base Projects (not old)
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Else
+	# Show only current List Template
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+

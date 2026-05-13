@@ -1,0 +1,24 @@
+Set Variable [ $user_id[1] ; User @ User::email ]
+Set Variable [ $privilege_set[1] ; User @ User::Privilege set ]
+
+Set Error Capture [ ON ]
+
+Show Custom Dialog [ Title: "Warning!" ; Message: "You are about to change the privilege set for the user " & $user_id & ". ¶¶Are you absolutely sure?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice) = 1 ]
+	Delete Account [ $user_id ]
+	
+	If [ $privilege_set = "Developer" ]
+		Add Account [ Name: $user_id ; ⚠️ PARAMETER "Password" NOT PARSED ⚠️ ; ⚠️ PARAMETER "PrivilegeSetReference" NOT PARSED ⚠️ ; Expire password: ON ]
+	Else If [ $privilege_set = "Author" ]
+		Add Account [ Name: $user_id ; ⚠️ PARAMETER "Password" NOT PARSED ⚠️ ; ⚠️ PARAMETER "PrivilegeSetReference" NOT PARSED ⚠️ ; Expire password: ON ]
+	Else If [ $privilege_set = "Editor" ]
+		Add Account [ Name: $user_id ; ⚠️ PARAMETER "Password" NOT PARSED ⚠️ ; ⚠️ PARAMETER "PrivilegeSetReference" NOT PARSED ⚠️ ; Expire password: ON ]
+	Else If [ $privilege_set = "Translator" ]
+		Add Account [ Name: $user_id ; ⚠️ PARAMETER "Password" NOT PARSED ⚠️ ; ⚠️ PARAMETER "PrivilegeSetReference" NOT PARSED ⚠️ ; Expire password: ON ]
+	End If
+	
+Else
+	Revert Record/Request [ With dialog: OFF ]
+End If
+

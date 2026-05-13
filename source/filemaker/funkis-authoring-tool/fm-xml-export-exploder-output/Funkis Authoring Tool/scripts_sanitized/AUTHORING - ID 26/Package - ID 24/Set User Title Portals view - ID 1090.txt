@@ -1,0 +1,20 @@
+# Called from popup menu
+# Parameter can be "level", "package_group" or "reset_package_group"
+
+Set Variable [ $parameter[1] ; Get(scriptParameter) ]
+If [ $parameter = "reset_package_group" ]
+	Set Field [ FAT Title::gView Package group Title ; "" ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+	Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+Else If [ $parameter = "package_group" ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+	Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+	Set Field [ User X Title @ Title::View Package group Title ; FAT Title::gView Package group Title ]
+Else If [ $parameter = "level" ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+	Set Field [ User X Title @ Title::View hierarchy level Title ; FAT Title::gView hierarchy level Title ]
+End If
+

@@ -1,0 +1,85 @@
+# URL based on Publish server, Client, Title and Package directories and a #
+# Copy link to Publish server
+# Needs field FAT Title::gPAckageId to be present on the layout to work. 
+Set Variable [ $server_mode[1] ; Get(scriptParameter) ]
+
+# Copy link to preview or publish server
+If [ $server_mode = "" Or $server_mode = "preview" ]
+	Set Variable [ $URL[1] ; "https://" & Title Server Preview::URL & "/" &
+					
+					Case ( IsEmpty ( FAT Title::FC Client directory ) ; ""; FAT Title::FC Client directory & "/" ) &
+					
+					
+					Case ( IsEmpty ( FAT Title::FC Title directory ) ; ""; FAT Title::FC Title directory & "/" ) &
+					
+					
+					Case ( IsEmpty ( FAT Package::FC Package directory ) ; ""; FAT Package::FC Package directory & "/" ) ]
+Else If [ $server_mode = "publish" ]
+	Set Variable [ $URL[1] ; "https://" & Title Server Publish::URL & "/" &
+					
+					Case ( IsEmpty ( FAT Title::FC Client directory ) ; ""; FAT Title::FC Client directory & "/" ) &
+					
+					
+					Case ( IsEmpty ( FAT Title::FC Title directory ) ; ""; FAT Title::FC Title directory & "/" ) &
+					
+					
+					Case ( IsEmpty ( FAT Package::FC Package directory ) ; ""; FAT Package::FC Package directory & "/" ) ]
+End If
+
+# Show review mode (default = false)  - this value is user specific
+Set Variable [ $showReviewMode[1] ; Case ( 
+				
+				   User X Title @ Title::User ShowReviewMode = 1; 
+				    "&showReviewMode=true";
+				    "&showReviewMode=false"
+				)
+				
+				
+				/*
+				
+				
+				Case ( 
+				
+				   FAT Title::showInspector in preview = 0; 
+				    "&showInspector=false";
+				    "&showInspector=true"
+				)
+				*/ ]
+# Show inspector is default  - this value is user specific
+Set Variable [ $showInspector[1] ; Case ( 
+				
+				   User X Title @ Title::User ShowInspector in preview = 1; 
+				    "&showInspector=true";
+				    "&showInspector=false"
+				)
+				
+				
+				/*
+				
+				
+				Case ( 
+				
+				   FAT Title::showInspector in preview = 0; 
+				    "&showInspector=false";
+				    "&showInspector=true"
+				)
+				*/ ]
+
+Set Variable [ $URL[1] ; $URL & "?" & $showReviewMode & $showInspector ]
+
+
+# Just use an avaialble global field
+Set Variable [ $tmp[1] ; FAT Title::gPackage id ]
+Set Field [ FAT Title::gPackage id ; $URL ]
+Copy [ Select: ON ; FAT Title::gPackage id ]
+Show Custom Dialog [ Title: "Package link copied to clipboard" ; Message: Case ( PatternCount ( $showReviewMode; "true" );
+				
+				       "Review enabled link to the package successfully copied to your clipboard!";
+				
+				
+				        "Link to the package successfully copied to your clipboard!"
+				
+				) ; Default Button: "OK" ]
+Set Field [ FAT Title::gPackage id ; $tmp ]
+Commit Records/Requests [ With dialog: OFF ]
+

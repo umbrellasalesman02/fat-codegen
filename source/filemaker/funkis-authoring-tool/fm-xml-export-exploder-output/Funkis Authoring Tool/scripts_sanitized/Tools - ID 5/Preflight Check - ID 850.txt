@@ -1,0 +1,44 @@
+Freeze Window
+Set Error Capture [ ON ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; Case ( IsEmpty ( FAT Title::Base project ); "" ; FAT Package::PrimaryKey) ]
+Set Variable [ $package_type[1] ; Case ( IsEmpty ( FAT Title::Base project ); "" ; FAT Package::Package type id) ]
+Set Variable [ $codebase_id[1] ; Baseproject Codebase @ Package::PrimaryKey ]
+Set Variable [ $codebase_version_id[1] ; Baseproject Codebase Version @ Package::PrimaryKey ]
+# Get codebase version string (can be latest, next etc.
+Perform Script [ From list ; "GetCodebaseVersionString" ; Parameter: SetProperty ( "codebase_id" ; $codebase_id ) &
+				SetProperty ( "codebase_version_id" ; $codebase_version_id ) ]
+
+Set Variable [ $funkisCodeBaseBranch[1] ; GetResultProperty ( "branch_string" ) ]
+Set Variable [ $funkisCodeBaseVersion[1] ; GetResultProperty ( "version_string" ) ]
+
+If [ $funkisCodeBaseVersion ≠ "" ]
+	# Before updating code or building - validate that the included building blocks are compatible with codebase version.
+	Perform Script [ From list ; "ValidateBlockCodebase" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "package_type" ; $package_type ) &
+					SetProperty ( "funkisCodeBaseVersion" ; $funkisCodeBaseVersion ) ]
+	Set Variable [ $incompatible_blocks[1] ; Get(ScriptResult) ]
+	
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	
+	If [ Not IsEmpty ( $incompatible_blocks ) ]
+		Show Custom Dialog [ Title: "Warning" ; Message: "The following building blocks in this package does not seem to be compatible with the selected codebase version:¶¶" & Get(ScriptResult) & "¶Do you want to proceed anyway?" ; Default Button: "Cancel" ; Button 2: "Proceed" ]
+		If [ Get(lastMessageChoice) = 1 ]
+			Exit Script []
+		End If
+	End If
+End If
+
+# Check if package reports completed
+Perform Script [ From list ; "CheckForCompletion" ; Parameter: $package_id ]
+If [ Get(ScriptResult) ≠ "" ]
+	Show Custom Dialog [ Title: "Warning" ; Message: Get(ScriptResult) ; Default Button: "Cancel" ; Button 2: "Proceed" ]
+	If [ Get(lastMessageChoice) = 1 ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Exit Script []
+	End If
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Show Custom Dialog [ Title: "Checkup completed" ; Message: "No additional warnings! You are good to build this package. " ; Default Button: "OK" ]
+

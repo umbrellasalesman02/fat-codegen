@@ -1,0 +1,76 @@
+Freeze Window
+Set Error Capture [ ON ]
+If [ IsEmpty(User @ User::gClientId) Or IsEmpty ( User @ User::gPrivilegeSet ) ]
+	Show Custom Dialog [ Title: "Organisation and privilege set needed" ; Message: "You need to select an organisation and a privilege set before you create a new user.  " ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+Show Custom Dialog [ Title: "Create new user" ; Message: "Please enter the details below to create a new Funkis Authoring Tool user. " ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: User @ User::gLogin_id ; Label 1: "User id - email adress" ; Input 2: User @ User::gName ; Label 2: "Full name" ; Input 3: User @ User::gPassword ; Label 3: "Password - change on first login" ]
+
+If [ Get(lastMessageChoice)=1 ]
+	Allow User Abort [ OFF ]
+	Set Variable [ $user_id[1] ; User @ User::gLogin_id ]
+	Set Variable [ $password[1] ; User @ User::gPassword ]
+	Set Variable [ $name[1] ; User @ User::gName ]
+	Set Variable [ $client_id[1] ; User @ User::gClientId ]
+	Set Variable [ $privilege_set[1] ; User @ User::gPrivilegeSet ]
+	Set Error Capture [ ON ]
+	Go to Layout [ Layout: "TABLE Funkis Clients" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=1 ]
+		Set Variable [ $organisation[1] ; Client::Name ]
+	Else
+		Exit Script [ "The organisation is not a client to Funkis." ]
+	End If
+	Go to Layout [ Layout: "Administrate users" ; Animation: None ]
+	# Check if user already exist
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) = 1 ]
+		Show Custom Dialog [ Title: "User id already exist" ; Message: "This user already exist in FAT. " ; Default Button: "OK" ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Exit Script []
+	End If
+	# Create new user
+	New Record/Request
+	Set Field [ User @ User::User_id ; $user_id ]
+	Set Field [ User @ User::Name ; $name ]
+	Set Field [ User @ User::Organisation name ; $organisation ]
+	Set Field [ User @ User::Client id ; $client_id ]
+	Set Field [ User @ User::Privilege set ; $privilege_set ]
+	If [ $privilege_set = "Developer" ]
+		Add Account [ Name: $user_id ; ⚠️ PARAMETER "Password" NOT PARSED ⚠️ ; ⚠️ PARAMETER "PrivilegeSetReference" NOT PARSED ⚠️ ; Expire password: ON ]
+	Else If [ $privilege_set = "Author" ]
+		Add Account [ Name: $user_id ; ⚠️ PARAMETER "Password" NOT PARSED ⚠️ ; ⚠️ PARAMETER "PrivilegeSetReference" NOT PARSED ⚠️ ; Expire password: ON ]
+	Else If [ $privilege_set = "Editor" ]
+		Add Account [ Name: $user_id ; ⚠️ PARAMETER "Password" NOT PARSED ⚠️ ; ⚠️ PARAMETER "PrivilegeSetReference" NOT PARSED ⚠️ ; Expire password: ON ]
+	Else If [ $privilege_set = "Translator" ]
+		Add Account [ Name: $user_id ; ⚠️ PARAMETER "Password" NOT PARSED ⚠️ ; ⚠️ PARAMETER "PrivilegeSetReference" NOT PARSED ⚠️ ; Expire password: ON ]
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Set Field [ User @ User::gPassword ; "" ]
+	Set Field [ User @ User::gLogin_id ; "" ]
+	Set Field [ User @ User::gClientId ; "" ]
+	Set Field [ User @ User::gPrivilegeSet ; "" ]
+	Set Field [ User @ User::gName ; "" ]
+	Set Field [ User @ User::gTempEmail ; "To: " & $user_id & ¶ & ¶ &
+					
+					"Login to Funkis Authoring Tool" & ¶ & ¶ &
+					
+					
+					"Welcome to Funkis Authoring Tool!" & ¶ & ¶ &
+					"Please log in at https://biz.funkismultimedia.se/fmi/webd/funkis%20authoring%20tool"  & ¶ & ¶ &
+					"User name: " & $user_id  & ¶ &
+					"Temporary password: " & $password ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Copy [ Select: ON ; User @ User::gTempEmail ]
+	// Show Custom Dialog [ Title: "Invitation email copied to clipboard" ; Message: "Invitation email succesfully copied to your clipboard!" ; Default Button: "OK" ]
+	Open URL [ In external browser: OFF ; With dialog: OFF ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+	// Send Mail [ ⚠️ PARAMETER "Email" NOT PARSED ⚠️ ]
+	// Insert from URL [ Verify SSL Certificates: OFF ; Select: OFF ; With dialog: OFF ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ]
+	Perform Script [ From list ; "View User" ; Parameter: $user_id ]
+End If
+
+
+
+
+

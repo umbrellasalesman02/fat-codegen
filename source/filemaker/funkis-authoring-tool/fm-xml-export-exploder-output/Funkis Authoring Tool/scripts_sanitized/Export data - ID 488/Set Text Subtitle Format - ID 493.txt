@@ -1,0 +1,45 @@
+# This script is going through all subtitle texts to decide if they should be exported as VTT or FFSub
+# This script is called from script Export Data MASTER
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $exportMode[1] ; GetScriptProperty ( "exportMode" ) ]
+
+Set Error Capture [ ON ]
+# Search for media with subtitles - mp4 only
+Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+If [ $package_id ≠ "" ]
+	# Find all media with file extension mp4 in Package
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	# Extend find with media with file extension mp4 in Package in a Title Media List
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+Else
+	# Find all media with file extension mp4 in Title
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+		If [ $exportMode = "Translation files" ]
+			# Put all subtitles in one file - more convenient when exporting files for translation
+			Set Variable [ $vtt[1] ; False ]
+		Else
+			# Check if media flag is set to native - then VTT
+			Set Variable [ $vtt[1] ; FAT Media::playAsNativeVideo ]
+		End If
+		Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+		# Find text with parent = media_id
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			If [ $vtt = "yes" ]
+				Replace Field Contents [ FAT Text::Source reference ; Replace with calculation: "Subtitle VTT" ]
+			Else
+				Replace Field Contents [ FAT Text::Source reference ; Replace with calculation: "Subtitle FFSub" ]
+			End If
+		End If
+		Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+

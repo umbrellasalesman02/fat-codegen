@@ -1,0 +1,15 @@
+# This script clones and move a package to a new title
+# Called from Package settings
+
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+Set Field [ FAT Title::gClient ; FAT Title::Client id ]
+Set Field [ FAT Title::gCloneSuffix ; "MOVE" ]
+
+Perform Script [ From list ; "Open card setting" ; Parameter: SetProperty ("card_window_name" ; "Move FAT package" ) &
+				SetProperty ("card_window_layout" ; "FAT Move Package") &
+				SetProperty ("card_window_width" ; "586" ) &
+				SetProperty ("card_window_height" ; "586" ) &
+				SetProperty ("item_id" ; $package_id ) &
+				SetProperty ("item_type" ; "Move" ) ]
+
+

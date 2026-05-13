@@ -1,0 +1,27 @@
+# Called from a button in Title Link Layout
+# Can also be called from list item
+
+Commit Records/Requests [ With dialog: OFF ]
+
+Set Variable [ $link_id[1] ; GetScriptProperty ( "link_id" ) ]
+Set Variable [ $callLayout[1] ; GetScriptProperty ( "callLayout" ) ]
+
+If [ PatternCount ( Get(layoutName) ; "List item" ) ]
+	Perform Script [ From list ; "Close Rich Text Card" ]
+End If
+
+Commit Records/Requests [ With dialog: OFF ]
+# If called from the Card - Page item Settings - close card first (cannot open card on card)
+If [ Get(WindowStyle) = 3 ]
+	Perform Script [ From list ; "Close card Window" ]
+End If
+
+Perform Script [ From list ; "Open card setting" ; Parameter: SetProperty ("card_window_name" ; "Link settings" ) &
+				SetProperty ("card_window_layout" ; "FAT Link Card" ) &
+				SetProperty ("card_window_width" ; "1140" ) &
+				SetProperty ("card_window_height" ; "680" ) &
+				SetProperty ("item_id" ; $link_id ) &
+				SetProperty ("item_type" ; "Link" ) & 
+				SetProperty ( "callLayout" ; $callLayout) ]
+Perform Script [ From list ; "Init Link Rich Text Editor" ]
+

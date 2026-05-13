@@ -1,0 +1,25 @@
+Freeze Window
+Show Custom Dialog [ Title: "Delete page item" ; Message: "Are you sure you want to delete this page item - " & FAT Block @ Page item::Name  & "?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) =1 ]
+	If [ FAT Page::Proxy type = "" ]
+		If [ Get ( layoutTableName ) = "FAT Page item" ]
+			Delete Record/Request [ With dialog: OFF ]
+			If [ Get(foundCount) = 0 ]
+				Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+			End If
+		Else
+			Delete Portal Row [ With dialog: OFF ]
+		End If
+	Else
+		# Slide project
+		Set Variable [ $page_id[1] ; FAT Page item::Parent id ]
+		Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Delete Record/Request [ With dialog: OFF ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		If [ Get(foundCount) = 0 ]
+			Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+		End If
+	End If
+End If
+

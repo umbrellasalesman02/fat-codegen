@@ -1,0 +1,53 @@
+Freeze Window
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+# This script looks for new texts that have been added AFTER localisation begun - and creates new text fields.
+  Texts are translated depending on HT or MT
+
+# Translation method is either "Human translation" HT or "Machine translation" MT
+Set Variable [ $translation_method[1] ; FAT Localisation @ Package::Translation method ]
+Set Variable [ $localisation_id[1] ; FAT Localisation @ Package::PrimaryKey ]
+
+# If localising texts from a human translation - there is a chance that new texts will be translated using machine translation.
+If [ $translation_method = "Human translation" ]
+	Show Custom Dialog [ Title: "Localise new texts" ; Message: "This script will localise all texts added after the previous localisation. ¶¶Press Human if you want to create new text files for a human translation. ¶Press Machine if you want the new text to be translated using machine translation. " ; Default Button: "Human" ; Button 2: "Machine" ; Button 3: "Cancel" ]
+	If [ Get(lastMessageChoice)=2 ]
+		Set Field [ FAT Localisation @ Package::Translation method ; "Machine translation" ]
+		
+		# Add event to log
+		Set Variable [ $event_text[1] ; "Translation method changed to Machine translation." ]
+		Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+						SetProperty ( "event_text" ; $event_text ) ]
+		
+		Show Custom Dialog [ Title: "Translation method changed" ; Message: "The translation method for this localisation is now set to machine translation. Please select a Translation API and then press button Translate new text one again." ; Default Button: "OK" ]
+		Exit Script []
+	Else If [ Get(lastMessageChoice) = 3 ]
+		Exit Script []
+	End If
+Else If [ $translation_method = "Machine translation" ]
+	If [ IsEmpty ( FAT Localisation @ Package::Translation API ) ]
+		Show Custom Dialog [ Title: "Select transaltion API" ; Message: "You have not selected a Machine translation API. " ; Default Button: "OK" ]
+		Exit Script []
+	End If
+	Show Custom Dialog [ Title: "Localise new texts" ; Message: "This script will localise and translate all texts added after the previous localisation, using the selected translation API." ; Default Button: "OK" ; Button 2: "Cancel" ]
+	
+	If [ Get(lastMessageChoice) = 2 ]
+		Exit Script []
+	End If
+End If
+Perform Script [ From list ; "Package localisation MASTER" ]
+
+
+
+
+
+
+
+
+

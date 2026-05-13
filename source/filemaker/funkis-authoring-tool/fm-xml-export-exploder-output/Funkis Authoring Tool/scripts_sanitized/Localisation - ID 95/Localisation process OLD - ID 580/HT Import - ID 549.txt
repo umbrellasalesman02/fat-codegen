@@ -1,0 +1,64 @@
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+
+Set Variable [ $localisation_id[1] ; FAT Localisation @ Package::PrimaryKey ]
+Set Variable [ $localisation_stage[1] ; FAT Localisation @ Package::Localisation stage ]
+Set Variable [ $localisation_stage_name[1] ; Translation stage @ Package::Translation stage name ]
+Set Variable [ $title_id[1] ; FAT Localisation @ Package::Title id ]
+Set Variable [ $package_id[1] ; FAT Localisation @ Package::Package id ]
+Set Variable [ $localisation_code[1] ; FAT Localisation @ Package::Localisation code ]
+Set Variable [ $text_status[1] ; "In progress" ]
+
+Set Variable [ $language_code[1] ; getLanguageCode ( $localisation_code ) ]
+Set Variable [ $country_code[1] ; getCountryCode ( $localisation_code ) ]
+
+Show Custom Dialog [ Title: "Import text" ; Message: "You are about to import texts to this localisation. Your current localisation stage are: " & $localisation_stage_name & ". This means that all imported texts will be labelled \"" & $text_status & "\".¶¶
+				
+				All texts with review status = Approved will not be altered during import. ¶¶
+				
+				Click OK to move on or Cancel to change the localisation stage before importing texts.  " ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice) = 1 ]
+	# If executed from card window
+	// If [ PatternCount ( Get(windowName) ; "translation" ) ]
+	// Close Window
+	// Select Window [ Name: $$currentWindow ]
+	// End If
+	
+	# Missed variable $text_status
+	Perform Script [ From list ; "Import text JSON CL" ; Parameter: SetProperty ( "import_mode" ; "translation") &
+					SetProperty ( "title_id" ; $title_id) &
+					SetProperty ( "package_id" ; $package_id) &
+					SetProperty ( "language_code" ; $language_code) &
+					SetProperty ( "country_code" ; $country_code) &
+					SetProperty ( "text_status" ; $text_status) ]
+	Set Variable [ $result[1] ; Get(ScriptResult) ]
+	Set Variable [ $event_text[1] ; $result ]
+	
+	If [ PatternCount ( $result ; "success") ]
+		
+		# Add event to log
+		Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+						SetProperty ( "event_text" ; $event_text ) ]
+		
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Set Variable [ $new_localisation_stage[1] ; 4 ]
+		# update localisation stage
+		Perform Script [ From list ; "Change Package localisation stage" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) &
+						SetProperty ( "stage" ; $new_localisation_stage ) ]
+	Else
+		# Error when importing
+		// Show Custom Dialog [ Title: "Error when importing" ; Message: $result ; Default Button: "OK" ]
+		Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+						SetProperty ( "event_text" ; $event_text ) ]
+	End If
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+End If
+

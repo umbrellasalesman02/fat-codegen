@@ -1,0 +1,173 @@
+<Script>
+	<ScriptReference id="1225" name="View card Page item IO setting v4"></ScriptReference>
+	<ObjectList membercount="10">
+		<Step hash="FFA59DCAAB55BD5134B44E3BABF6DD9E" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="From FAT version 4 and higher"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E391D63A66B3C54ECBC0F08F69C90353" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="A new IO card, managing IO access in new ways."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="43064AAB524607D38C7702490FB8338A" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7E80FC4856119D500272252C713B3C7F" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="F0DE472F5184CDD7BFF98052E7CDDC76" id="75" name="Commit Records/Requests" enable="True">
+			<Options>128</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="Skip data entry validation" id="256" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Force Commit" id="512" value="False"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="994658A1A26E2AE3D05836CED74F48B3" id="76" name="Set Field" enable="True">
+			<Options>16385</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="FieldReference">
+					<FieldReference id="119" name="gCurrentIOValue">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065129" name="FAT Page item"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[""]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3991725FE975D79E1F466CB8D00BFB14" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(windowName)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$$currentWindow"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="405D1F5A93F627336257F5D614B38803" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(scriptParameter)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$page_item_id"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="73692001FF4F572B6A5E00ACF40DB1CC" id="122" name="New Window" enable="True">
+			<Options>16394</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="WindowReference">
+					<WindowReference>
+						<Style name="Card" value="3222274064"></Style>
+						<Name>
+							<Calculation datatype="1" position="0">
+								<Calculation>
+									<Text><![CDATA["Page item settings"]]></Text>
+								</Calculation>
+							</Calculation>
+						</Name>
+						<LayoutReferenceContainer value="5"></LayoutReferenceContainer>
+						<Bounds>
+							<height>
+								<Calculation datatype="1" position="1">
+									<Calculation>
+										<Text><![CDATA[680 * Get(WindowZoomLevel)/100]]></Text>
+									</Calculation>
+								</Calculation>
+							</height>
+							<width>
+								<Calculation datatype="1" position="2">
+									<Calculation>
+										<Text><![CDATA[1200 * Get(WindowZoomLevel)/100]]></Text>
+									</Calculation>
+								</Calculation>
+							</width>
+							<top></top>
+							<left></left>
+						</Bounds>
+						<Options value="3222274064">
+							<Close>False</Close>
+							<Minimize>False</Minimize>
+							<Maximize>False</Maximize>
+							<Resize>False</Resize>
+							<MenuBar>False</MenuBar>
+							<Toolbar>False</Toolbar>
+							<DimParentWindow>True</DimParentWindow>
+						</Options>
+					</WindowReference>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8367AB084BCE6C670F160881FB4C91F0" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$page_item_id">
+								<FieldReference id="14" name="PrimaryKey">
+									<TableOccurrenceReference id="1065129" name="FAT Page item"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

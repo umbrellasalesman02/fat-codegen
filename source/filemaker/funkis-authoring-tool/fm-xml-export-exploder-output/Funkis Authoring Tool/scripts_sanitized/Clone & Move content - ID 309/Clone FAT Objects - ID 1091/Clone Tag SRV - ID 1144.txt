@@ -1,0 +1,153 @@
+# Called from Clone Tag Values
+# when this script is called we clone WITHOUT checking if it already exist an old cloned Tag
+
+# This script clones ALL Tags in the list, including List and List items (and texts)
+
+
+# SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+  SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+  SetProperty ( "clone_settings" ; $clone_settings ) &
+  SetProperty ( "object_group_id" ; $object_group_id ) &
+  SetProperty ( "old_tag_id" ; $old_tag_id ) & 
+  SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "old_tt_id" ; $old_tt_id )
+
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle" )) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $clone_settings[1] ; GetScriptProperty ( "clone_settings" ) ]
+Set Variable [ $suffix[1] ; GetScriptProperty ( "suffix" ) ]
+Set Variable [ $object_group_id[1] ; GetScriptProperty ( "object_group_id" ) ]
+
+Set Variable [ $chosen_old_tag_id[1] ; GetScriptProperty ( "old_tag_id" ) ]
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+
+Set Error Capture [ ON ]
+# We call the parameter old_tag_id for "chosen_old_tag_id" because we will loop later fthrough all tags in the tag list using the variable name old_tag_id
+
+# The process is the following (only called if clone_title or clone_settings include "Tags"):
+  1. Check if new Tag is already created by checking OldPrimaryKeyFromClone. If found - connect this Tag id
+  2. If not found - call script "Clone Tag" which will return a new Tag id
+  3. Clone Tag will duplicate full Tag Filter list, including List, List items and Tags. For Pre-defined tags, the list will not be created.
+
+# Duplicate Tags - preparing for page items to link via Old PrimaryKey from clone
+# Check how texts are handled
+Go to Layout [ Layout: "TABLE FAT Tag" ; Animation: None ]
+
+# Find the old chosen tag from the tag value
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) = 0 ]
+	Exit Script []
+End If
+
+# Old list id can be empty if pre-defined list
+Set Variable [ $old_list_id[1] ; FAT Tag::List id ]
+
+If [ IsEmpty ( $old_list_id ) ]
+	# Pre-defined list - the pre-defined list id is not unique between titles
+	Set Variable [ $predefined_list_id[1] ; FAT Tag::Predefined list id ]
+	Set Variable [ $old_tt_id[1] ; FAT Tag::Title id ]
+	
+	# Find all Tags that uses the predefined list
+	Go to Layout [ Layout: "TABLE FAT Tag" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	# Check if List exist as OldPrimaryKey
+	Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+	If [ Get(foundCount) = 0 ]
+		# If List isn't found - create a new list
+		Perform Script [ From list ; "Clone List SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+						SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+						SetProperty ( "clone_settings" ; $clone_settings ) &
+						SetProperty ( "suffix" ; $suffix ) &
+						SetProperty ( "object_group_id" ; $object_group_id ) &
+						SetProperty ( "old_list_id" ; $old_list_id ) & 
+						SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "old_tt_id" ; $old_tt_id ) ]
+		Set Variable [ $new_list_id[1] ; Get(ScriptResult) ]
+	Else
+		Set Variable [ $new_list_id[1] ; FAT List::PrimaryKey ]
+	End If
+	
+	# Find all Tags that uses this list
+	Go to Layout [ Layout: "TABLE FAT Tag" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+# All Tags (=list items if List) are now in found set
+
+# Loop through all Tags that uses this list or the pre-defined list
+If [ Get(foundCount)> 0 ]
+	# Match each Tag towards the new list item
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	
+	Loop [ Flush: Always ]
+		Set Variable [ $old_tag_id[1] ; FAT Tag::PrimaryKey ]
+		Set Variable [ $old_list_id[1] ; FAT Tag::List id ]
+		Set Variable [ $old_list_item_id[1] ; FAT Tag::List item id ]
+		Set Variable [ $old_predefined_list_id[1] ; FAT Tag::Predefined list id ]
+		Set Variable [ $old_predefined_list_item_id[1] ; FAT Tag::Predefined list item id ]
+		Set Variable [ $old_tag_text[1] ; TF TAG Name::Text ]
+		
+		# Duplicate Tags
+		Duplicate Record/Request
+		
+		Set Field [ FAT Tag::Old PrimaryKey from clone ; $old_tag_id ]
+		Set Field [ FAT Tag::Title id ; $title_id ]
+		
+		Commit Records/Requests [ With dialog: OFF ]
+		
+		If [ $old_tag_id = $chosen_old_tag_id ]
+			Set Variable [ $new_tag_id[1] ; FAT Tag::PrimaryKey ]
+		End If
+		
+		If [ IsEmpty ( $old_list_id ) ]
+			# Pre-defined list from Funkis Cloud etc
+			Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Tag::PrimaryKey ) &
+							SetProperty ( "source_table" ; "tag" ) &
+							SetProperty ( "learningprogramme_id" ; $title_id ) &
+							SetProperty ( "source_textfield" ; GetFieldName (FAT Tag::Name text id) ) &
+							SetProperty ( "caller_layout" ; Get(layoutName )) ]
+			Set Field [ TF TAG Name::Text ; $old_tag_text ]
+		Else
+			# Title list
+			Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+			# Find the original from clone
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			
+			Set Variable [ $new_list_item_id[1] ; FAT List item::PrimaryKey ]
+			Set Variable [ $new_tag_text_id[1] ; FAT List item::Text 1 id ]
+			Go to Layout [ Layout: "TABLE FAT Tag" ; Animation: None ]
+			
+			Set Field [ FAT Tag::List id ; $new_list_id ]
+			Set Field [ FAT Tag::List item id ; $new_list_item_id ]
+			Set Field [ FAT Tag::Name text id ; $new_tag_text_id ]
+		End If
+		
+		Commit Records/Requests [ With dialog: OFF ]
+		
+		If [ Get(lastError) = 504 ]
+			Set Field [ TF TAG Name::Text ; TF TAG Name::Text & $suffix ]
+			Commit Records/Requests [ With dialog: OFF ]
+			If [ Get(lastError) = 504 ]
+				Delete Record/Request [ With dialog: OFF ]
+			End If
+		End If
+		
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+
+# Return the new Tag id
+Exit Script [ $new_tag_id ]
+
+
+

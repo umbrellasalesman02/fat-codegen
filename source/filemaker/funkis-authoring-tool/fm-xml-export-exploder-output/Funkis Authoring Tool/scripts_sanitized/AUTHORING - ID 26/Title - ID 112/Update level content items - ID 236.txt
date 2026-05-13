@@ -1,0 +1,29 @@
+Set Variable [ $level[1] ; Get(scriptParameter) ]
+Freeze Window
+Set Variable [ $i[1] ; 0 ]
+If [ $level = "Title" ]
+	
+	Set Variable [ $$learning_programme_content_items[1] ; FAT Title::Max char subtitle 1 Title ]
+Else If [ $level = "Package" ]
+	If [ FAT Title::Max char subtitle 1 Package > $$course_content_items ]
+		Set Variable [ $numOfFields[1] ; FAT Title::Max char subtitle 1 Package - $$course_content_items ]
+		Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+		If [ Get(foundCount) >0 ]
+			Loop [ Flush: Always ]
+				Perform Script [ From list ; "Create Page item List CL" ; Parameter: SetProperty ( "item_id" ; FAT Package::PrimaryKey ) &
+								SetProperty ( "source_table" ; "course" ) &
+								SetProperty ( "language" ; FAT Title::Original language code ) &
+								SetProperty ( "num_of_fields" ; $numOfFields ) ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Set Variable [ $$course_content_items[1] ; FAT Title::Max char subtitle 1 Package ]
+	End If
+Else If [ $level = "Chapter" ]
+	Set Variable [ $$chapter_content_items[1] ; FAT Title::Max char subtitle 1 Chapter ]
+Else If [ $level = "Page" ]
+	Set Variable [ $$page_content_items[1] ; FAT Title::Max char subtitle 1 Page ]
+End If
+
+

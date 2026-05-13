@@ -1,0 +1,34 @@
+# A modifier with identical name on the same level will corrupt the JSON.
+  Check when creating a modifer template
+
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+Set Variable [ $name[1] ; GetScriptProperty ( "name" ) ]
+Set Variable [ $template_id[1] ; GetScriptProperty ( "template_id" ) ]
+Set Variable [ $baseproject_id[1] ; GetScriptProperty ( "baseproject_id" ) ]
+Set Variable [ $modifier_package_type[1] ; GetScriptProperty ( "modifier_package_type" ) ]
+Set Variable [ $duplicate[1] ; False ]
+
+Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+If [ $level = "block" Or $level = "IO" ]
+	# Find exact name and blocktemplate / IO Type
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	# Insight item modifiers are added on the same level as page item modifiers.
+	If [ $level = "Insight item" ]
+		Set Variable [ $level[1] ; "Page item" ]
+	End If
+	# Find exact name and level and baseproject_id
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+If [ Get(foundCount) > 1 ]
+	Set Variable [ $duplicate[1] ; True ]
+End If
+
+If [ $duplicate ]
+	Show Custom Dialog [ Title: "Duplicate name" ; Message: "Your modifier has a name that is already in use on this level, IO or block. Please change the name to be unique." ; Default Button: "OK" ]
+	Exit Script [ True ]
+Else
+	Exit Script [ False ]
+End If
+

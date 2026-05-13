@@ -1,0 +1,66 @@
+
+# Called from Login script - before any role-specific scripts is executed
+
+Freeze Window
+Go to Layout [ Layout: "Variables" ; Animation: None ]
+Show All Records
+Go to Record/Request/Page [ First ]
+
+Set Variable [ $$login_id[1] ; Get(accountName) ]
+Set Variable [ $$currentyear[1] ; Year(Get(currentDate)) ]
+Set Variable [ $$fmserver[1] ; Get(hostName) & "  |  " & Get(HostApplicationVersion) ]
+
+# Used for an extra delay first time the web viewer is loaded
+Set Variable [ $$cacheWebViewer[1] ; False ]
+
+Set Field [ Variables::gFAT URL ; "https://biz.funkismultimedia.se/fmi/webd/funkis%20authoring%20tool" ]
+
+#  Gunnar Asplund
+// Set Field [ Variables::taskServerURL ; "http://10.32.6.11:4444/api/tasks/" ]
+
+# Michael Graves
+Set Field [ Variables::taskServerURL ; "http://10.32.6.14:4444/api/tasks/" ]
+
+# Location of WebViewer editor for HTML and Quill page items
+Set Field [ Variables::gCMT WebViewer HTML URL ; "https://biz.funkismultimedia.se/quill/index.html" ]
+
+# Set email variables
+Set Field [ Variables::gSMTP server ; "mail.funkismultimedia.se" ]
+Set Field [ Variables::gSMTP username ; "biz@funkismultimedia.se" ]
+Set Field [ Variables::gSMTP password ; "redacted!" ]
+
+# Set Google API variables
+Set Field [ Variables::Google Cloud Translation API URL ; "https://translation.googleapis.com/language/translate/v2" ]
+Set Field [ Variables::Google API key ; "redacted" ]
+
+# Set OpenAI variables
+# Get a new API Key in your OPEN AI account settings - https://platform.openai.com/account/api-keys
+Set Field [ Variables::gOpen AI API URL ; "https://api.openai.com/v1/chat/completions" ]
+Set Field [ Variables::gOpen AI API Key ; "redacted" ]
+Set Field [ Variables::gOpen AI API Model ; "gpt-4o-mini" ]
+
+# Will probably be more fields added in this global variable later.
+Set Field [ Variables::gAIPromptFoundation ; Variables::FAT documentation for AI Prompt ]
+
+Set Field [ Variables::gMinifiedMarkDownParser ; Variables::Minified MarkDown Parser ]
+
+
+# Set Help URL:s - will be different for different roles in the future..
+Set Field [ Variables::gHelpURLDeveloper ; "https://web.funkiscloud.com/funkis/learn-the-funkis-platform/title-site/" ]
+Set Field [ Variables::gHelpURLAuthor ; "https://web.funkiscloud.com/funkis/learn-the-funkis-platform/using-funkis-platform/" ]
+Set Field [ Variables::gHelpURLEditor ; "https://web.funkiscloud.com/funkis/learn-the-funkis-platform/using-funkis-platform/" ]
+Set Field [ Variables::gHelpURLTranslator ; "https://web.funkiscloud.com/funkis/learn-the-funkis-platform/using-funkis-platform/" ]
+
+# Set webviewer HTML
+Set Variable [ $$WV_HTML[1] ; "data:text/html," & Variables::WebViewer HTML PageItem ]
+Set Variable [ $wv_html_pageitem[1] ; Variables::WebViewer HTML PageItem ]
+Set Field [ FAT Page item::gHTML Code ; $wv_html_pageitem ]
+
+# Set global Level constants
+Set Field [ FAT Title::gLevel ; "Title" ]
+Set Field [ FAT Title::gReadyStatus ; "Ready to use" ]
+Set Field [ FAT Package::gReadyStatus ; "Ready to use" ]
+Set Field [ FAT IO::gReadyStatus ; "Ready to use" ]
+Set Field [ FAT Title::gViewTranslatedLanguage ; False ]
+
+

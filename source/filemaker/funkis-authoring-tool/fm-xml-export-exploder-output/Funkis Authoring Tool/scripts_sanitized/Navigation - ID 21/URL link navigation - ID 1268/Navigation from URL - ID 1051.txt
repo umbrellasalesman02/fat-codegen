@@ -1,0 +1,61 @@
+# Called because the privilege rights does not allow Authors, Editors or Translators to run fmurlscripts
+
+# Example: https://biz.funkismultimedia.se/utils/open-fmp-link.html#fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenTitle&param=912B54AA-8873-4C22-BAAF-FA141266532D
+  
+Set Variable [ $url[1] ; User::gItemURL ]
+Set Variable [ $item_id[1] ; Let ( 
+				
+				
+				  [
+				
+				   url = $url;
+				
+				    pos = Position ( url ; "&param=" ; 0 ; 1 );
+				
+				    id = Right ( url ; Length ( url )- pos - 6 )
+				
+				
+				
+				   ];
+				
+				
+				id
+				
+				 ) ]
+
+Set Variable [ $script_name[1] ; Let ( 
+				
+				
+				  [
+				
+				   url = $url;
+				
+				    pos_start = Position ( url ; "script=" ; 0 ; 1 );
+				    pos_end = Position ( url ; "&param=" ; 0 ; 1 );
+				
+				    script = Middle ( url ; pos_start + 7 ; pos_end -  pos_start- 7)
+				
+				
+				
+				   ];
+				
+				
+				script
+				
+				 ) ]
+
+If [ $script_name = "linkTriggeredOpenTitle" ]
+	Perform Script [ From list ; "linkTriggeredOpenTitle" ; Parameter: $item_id ]
+Else If [ $script_name = "linkTriggeredOpenPackage" ]
+	Perform Script [ From list ; "linkTriggeredOpenPackage" ; Parameter: $item_id ]
+Else If [ $script_name = "linkTriggeredOpenChapter" ]
+	Perform Script [ From list ; "linkTriggeredOpenChapter" ; Parameter: $item_id ]
+Else If [ $script_name = "linkTriggeredOpenPage" ]
+	Perform Script [ From list ; "linkTriggeredOpenPage" ; Parameter: $item_id ]
+Else If [ $script_name = "linkTriggeredOpenPageItem" ]
+	Perform Script [ From list ; "linkTriggeredOpenPageItem" ; Parameter: $item_id ]
+Else
+	Show Custom Dialog [ Title: "Invalid URL" ; Message: "This URL does not seem like a valid FAT link. Please check and try again!" ; Default Button: "OK" ]
+End If
+
+

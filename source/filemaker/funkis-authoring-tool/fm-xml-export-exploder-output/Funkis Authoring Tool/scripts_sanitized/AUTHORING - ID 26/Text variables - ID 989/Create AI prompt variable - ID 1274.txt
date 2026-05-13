@@ -1,0 +1,16 @@
+# Called from a button in Title Textvariable interface
+Freeze Window
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Text variable::Title id ; $title_id ]
+Set Field [ FAT Text variable::Name ; "Give your variable a name" ]
+Set Field [ FAT Text variable::Source type ; "AI Prompt" ]
+Set Variable [ $textvariable_id[1] ; FAT Text variable::PrimaryKey ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Perform Script [ From list ; "View Card Text variable" ; Parameter: SetProperty ( "title_id" ; FAT Title::PrimaryKey ) &
+				SetProperty ( "textvariable_id" ; $textvariable_id ) &
+				SetProperty ( "caller" ; "Title" ) ]
+
+
+

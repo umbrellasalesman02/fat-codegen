@@ -1,0 +1,18 @@
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $param[1] ; Get(scriptParameter) ]
+Set Variable [ $key[1] ; Code(Get(TriggerKeystroke)) ]
+If [ Code(Get(TriggerKeystroke)) = 10 Or Code(Get(TriggerKeystroke)) = 13 Or $param = "button" And Length (FAT Title::gSearch) > 0 ]
+	Set Variable [ $searchStr[1] ; FAT Title::gSearch ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	Go to Field [ FAT Title::gSearch ]
+Else If [ Code(Get(TriggerKeystroke)) = 8  Or Length (FAT Title::gSearch) < 1 ]
+	Set Field [ FAT Title::gSearch ; "" ]
+	Show All Records
+End If
+
+

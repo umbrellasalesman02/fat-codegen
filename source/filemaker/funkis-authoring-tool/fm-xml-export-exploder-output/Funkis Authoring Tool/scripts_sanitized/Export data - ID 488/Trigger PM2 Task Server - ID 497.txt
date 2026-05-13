@@ -1,0 +1,134 @@
+# This script is the only script communication with the PM2 Task Server running on the same machine as the FileMaker Server
+# The PM2 Task Server uses data exported from FAT and combines it with data from GitLab.com, syncs, compress or build.
+
+
+Set Variable [ $destinationRootPath[1] ; GetScriptProperty( "destinationRootPath" ) ]
+# Remote type not used MArch 2021
+Set Variable [ $remoteType[1] ; GetScriptProperty ( "remoteType" ) ]
+Set Variable [ $s3BucketName[1] ; GetScriptProperty ( "s3BucketName" ) ]
+Set Variable [ $s3BucketNameDestination[1] ; GetScriptProperty ( "s3BucketNameDestination" ) ]
+Set Variable [ $urlDestination[1] ; GetScriptProperty ( "urlDestination" ) ]
+Set Variable [ $awsCdnKey[1] ; GetScriptProperty ( "awsCdnKey" ) ]
+Set Variable [ $awsCdnKeyDestination[1] ; GetScriptProperty ( "awsCdnKeyDestination" ) ]
+Set Variable [ $awsEnvironment[1] ; GetScriptProperty ( "awsEnvironment" ) ]
+Set Variable [ $apiEndpoint[1] ; GetScriptProperty ( "apiEndpoint" ) ]
+Set Variable [ $package_dir[1] ; GetScriptProperty( "package_dir" ) ]
+
+# For taskServer - "content-update", "code-update" or "deliver"
+
+Set Variable [ $typeOfTask[1] ; GetScriptProperty ( "typeOfTask" ) ]
+# †ypeOfTask can be "sync", "publish" or "publish-funkis-cloud"
+
+Set Variable [ $jobTypes[1] ; GetScriptProperty ( "jobTypes" ) ]
+# jobTypes can be
+  CODE_UPDATE
+  SCORM_12
+  SCORM_2004
+  WEB_LINK
+  XAPI
+  FC_DELIVERY (only for log)
+
+Set Variable [ $GitLabURL[1] ; GetScriptProperty ( "GitLabURL" ) ]
+Set Variable [ $emailToNotifyWhenDone[1] ; GetScriptProperty ( "emailToNotifyWhenDone" ) ]
+Set Variable [ $title_header[1] ; GetScriptProperty ( "title_header" ) ]
+Set Variable [ $resultTransferTarget[1] ; GetScriptProperty ( "resultTransferTarget" ) ]
+Set Variable [ $funkisCodeBase[1] ; GetScriptProperty ( "funkisCodeBase" ) ]
+Set Variable [ $funkisCodeBaseVersion[1] ; GetScriptProperty ( "funkisCodeBaseVersion" ) ]
+
+# For Publish:: Set branch settings
+Set Variable [ $branchSettings[1] ; GetScriptProperty ( "branchSettings" ) ]
+# For Publish:: Pass the name of the delivery milestone
+Set Variable [ $delivery_milestone[1] ; GetScriptProperty ( "delivery_milestone" ) ]
+# For Publish-Build:: Pass the id of the build log item
+Set Variable [ $build_id[1] ; GetScriptProperty ( "build_id" ) ]
+
+Go to Layout [ Layout: "Variables" ; Animation: None ]
+Set Variable [ $taskServerURL[1] ; Variables::taskServerURL ]
+
+Set Error Capture [ ON ]
+
+# Remove volume name from path i.e "Macintosh HD"
+Set Variable [ $destinationRootPath_noVolumeName[1] ; GetPathWithoutVolumeName ($destinationRootPath) ]
+
+If [ $typeOfTask = "sync" ]
+	# Call the sync server - running on same machine as FMServer
+	Set Variable [ $theURL[1] ; $taskServerURL & "sync" ]
+	Set Variable [ $json[1] ; JSONSetElement ( "{}"; 
+					
+					["localAbsolutePath"; $destinationRootPath_noVolumeName; JSONString];
+					["remoteFolderName"; $package_dir; JSONString];
+					["resultTransferTarget"; $resultTransferTarget; JSONString];
+					["testOnly"; False ; JSONBoolean];
+					["s3BucketName"; $s3bucketName ; JSONString];
+					["awsCdnKey"; $awsCdnKey ; JSONString];
+					["awsEnvironment"; $awsEnvironment ; JSONString];
+					["apiEndpoint"; $apiEndpoint ; JSONString]
+					) ]
+Else If [ $typeOfTask = "publish" ]
+	# Create a build with resultTransferTarget
+	Set Variable [ $jobTypeJSON[1] ; FMListToJSONArray ( "jobTypeArr" ; $jobTypes ) ]
+	Set Variable [ $theURL[1] ; $taskServerURL & "publish" ]
+	Set Variable [ $json[1] ; JSONSetElement ( "{}"; 
+					
+					["jobTypes"; JSONGetElement ( $jobTypeJSON ; "jobTypeArr" ); JSONArray];
+					["resultTransferTarget"; $resultTransferTarget; JSONString];
+					["originalTitle"; $title_header; JSONString];
+					["localAbsolutePath"; $destinationRootPath_noVolumeName; JSONString];
+					["remoteFolderPath"; $package_dir; JSONString];
+					["gitlabUrl"; $GitLabURL ; JSONString];
+					["funkisCodeBase"; $funkisCodeBase; JSONString];
+					["funkisCodeBaseVersion"; $funkisCodeBaseVersion; JSONString];
+					["branchSettings"; $branchSettings; JSONObject];
+					["delivery_milestone"; $delivery_milestone; JSONString];
+					["version"; $publishType ; JSONString];
+					["emailToNotifyWhenDone"; $emailToNotifyWhenDone ; JSONString];
+					["testOnly"; False ; JSONBoolean];
+					["buildId"; $build_id ; JSONString];
+					["s3BucketName"; $s3bucketName ; JSONString];
+					["awsCdnKey"; $awsCdnKey ; JSONString];
+					["awsEnvironment"; $awsEnvironment ; JSONString];
+					["apiEndpoint"; $apiEndpoint ; JSONString]
+					
+					
+					) ]
+Else If [ $typeOfTask = "publish-funkis-cloud" ]
+	# Deliver a funkis cloud package by copying from draft to web
+	Set Variable [ $theURL[1] ; $taskServerURL & "publish-funkis-cloud" ]
+	Set Variable [ $json[1] ; JSONSetElement ( "{}"; 
+					
+					["resultTransferTarget"; $resultTransferTarget; JSONString];
+					["originalTitle"; $title_header; JSONString];
+					["remoteFolderPath"; $package_dir; JSONString];
+					["delivery_milestone"; $delivery_milestone; JSONString];
+					["version"; $publishType ; JSONString];
+					["buildId"; $build_id ; JSONString];
+					["emailToNotifyWhenDone"; $emailToNotifyWhenDone ; JSONString];
+					["s3BucketName"; $s3bucketName ; JSONString];
+					["s3BucketNameDestination"; $s3bucketNameDestination ; JSONString];
+					["awsCdnKey"; $awsCdnKey ; JSONString];
+					["awsCdnKeyDestination"; $awsCdnKeyDestination ; JSONString];
+					["urlDestination"; $urlDestination ; JSONString];
+					["awsEnvironment"; $awsEnvironment ; JSONString];
+					["apiEndpoint"; $apiEndpoint ; JSONString]
+					
+					
+					) ]
+End If
+# Test only
+Show Custom Dialog [ Title: "JSON" ; Message: JSONFormatElements ($json) ; Default Button: "OK" ]
+
+Set Error Logging [ ON ]
+Set Variable [ $cURL_options[1] ; _cURL_request ( "POST" ) & 
+				_cURL_header ( "Content-Type" ; "application/json" ) & 
+				_cURL_header ( "Accept" ; "application/json" ) & 
+				_cURL_show_error & 
+				_cURL_data___string ( $json ) ]
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ; $cURL_options ]
+Set Variable [ $last_error[1] ; Get(lastError) ]
+Exit Script [ Case ( $last_error = 0 ; ""; ", Last error: " & $last_error & " Details: " & Get(lastErrorDetail) ) ]
+
+
+
+
+
+

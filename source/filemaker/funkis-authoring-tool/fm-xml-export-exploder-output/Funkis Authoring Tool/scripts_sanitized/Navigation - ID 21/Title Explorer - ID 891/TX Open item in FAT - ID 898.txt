@@ -1,0 +1,27 @@
+# Click on open
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+Set Variable [ $item_type[1] ; GetScriptProperty ( "item_type" ) ]
+
+// Show Custom Dialog [ Title: "Go to item" ; Message: "Do you want to show this " &  $item_type & " in the main window?" ; Default Button: "Yes" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+If [ Platform ≠ "Desktop" ]
+	Close Window
+End If
+
+Select Window [ Name: GetValue ( Variables::gWindowList; 1) ]
+
+If [ $item_type = "Package" ]
+	Perform Script [ From list ; "linkTriggeredOpenPackage" ; Parameter: $item_id ]
+Else If [ $item_type = "Chapter" ]
+	Perform Script [ From list ; "linkTriggeredOpenChapter" ; Parameter: $item_id ]
+Else If [ $item_type = "Page" ]
+	Perform Script [ From list ; "linkTriggeredOpenPage" ; Parameter: $item_id ]
+Else If [ $item_type = "Page item" ]
+	Perform Script [ From list ; "linkTriggeredOpenPageItem" ; Parameter: $item_id ]
+End If
+
+

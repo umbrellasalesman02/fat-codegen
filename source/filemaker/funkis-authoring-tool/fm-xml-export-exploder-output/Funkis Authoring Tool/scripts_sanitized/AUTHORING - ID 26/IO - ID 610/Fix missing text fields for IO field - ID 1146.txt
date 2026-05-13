@@ -1,0 +1,36 @@
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $field_id[1] ; GetScriptProperty ( "field_id" ) ]
+Set Variable [ $tab[1] ; GetScriptProperty ( "tab" ) ]
+
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount) = 1 ]
+	
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT IO Field::PrimaryKey ) &
+					SetProperty ( "source_table" ; "field" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT IO Field::Label input ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT IO Field::PrimaryKey ) &
+					SetProperty ( "source_table" ; "field" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT IO Field::Label output ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT IO Field::PrimaryKey ) &
+					SetProperty ( "source_table" ; "field" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT IO Field::Hint ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	
+End If
+
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+If [ $tab≠ "" ]
+	Go to Object [ $tab ; Repetition: 1 ]
+End If
+

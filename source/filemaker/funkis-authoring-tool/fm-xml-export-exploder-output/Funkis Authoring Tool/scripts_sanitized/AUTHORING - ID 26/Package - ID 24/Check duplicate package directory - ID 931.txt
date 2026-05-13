@@ -1,0 +1,17 @@
+# Checks if a direcotry name is already used in title
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $new_package_directory[1] ; GetScriptProperty ( "new_package_directory" ) ]
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount) > 0 ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Exit Script [ "Error: Duplicate package direcotry in title." ]
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+

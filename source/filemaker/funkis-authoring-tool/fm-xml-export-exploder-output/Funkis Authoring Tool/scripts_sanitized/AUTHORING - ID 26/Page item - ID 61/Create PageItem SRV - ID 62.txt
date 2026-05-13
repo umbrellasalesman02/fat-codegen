@@ -1,0 +1,124 @@
+# This script is called from four different locations:
+# 1. From a button in the Page layout - Create PageItem CL - page item will be added in the end
+# 2. From a button in the PageItem layout - Create PageItem in Page CL - page item will be added with a sort index immediately after the current page item
+# 3. From the script Create Page SRV in case Page is a proxy for a Page item (Slide projects) - can be both with or without sort index
+# 4. From a button in the Page layout calling the loop Create page items template SRV
+
+Set Variable [ $learningprogramme_id[1] ; GetScriptProperty ( "learningprogramme_id" ) ]
+Set Variable [ $title_id[1] ; $learningprogramme_id ]
+Set Variable [ $page_id[1] ; GetScriptProperty ( "page_id" ) ]
+Set Variable [ $block_id[1] ; GetScriptProperty ( "block_id" ) ]
+Set Variable [ $hierarchy_level[1] ; GetScriptProperty ( "hierarchy_level" ) ]
+Set Variable [ $sort_index[1] ; GetScriptProperty ( "sort_index" ) ]
+Set Variable [ $sort_table[1] ; GetScriptProperty ( "sort_table" ) ]
+# If sort index - create an item in-between existing page items
+If [ $sort_index ≠ "" And $sort_table = "page_item" ]
+	Perform Script [ From list ; "GetNextSortIndex" ; Parameter: SetProperty ( "sort_table" ; $sort_table ) &
+					SetProperty ( "parent_id" ; $page_id ) &
+					SetProperty ( "sort_index" ; $sort_index ) ]
+	Set Variable [ $new_index[1] ; GetAsNumber (Get(ScriptResult)) ]
+End If
+Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+New Record/Request
+Set Variable [ $page_item_id[1] ; FAT Page item::PrimaryKey ]
+Set Field [ FAT Page item::Parent id ; $page_id ]
+Set Field [ FAT Page item::Block id ; $block_id ]
+Set Field [ FAT Page item::Hierarchy level ; $hierarchy_level ]
+If [ $new_index ≠ "" ]
+	Set Field [ FAT Page item::SortIndex ; $new_index ]
+End If
+Set Variable [ $package_type[1] ; FAT Package::Package type id ]
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+
+
+# Always create 7 textfields - change JT 2019-05-19
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Page item::PrimaryKey ) &
+				SetProperty ( "source_table" ; "page-item" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 1 id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Page item::PrimaryKey ) &
+				SetProperty ( "source_table" ; "page-item" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 2 id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Page item::PrimaryKey ) &
+				SetProperty ( "source_table" ; "page-item" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 3 id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Page item::PrimaryKey ) &
+				SetProperty ( "source_table" ; "page-item" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 4 id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Page item::PrimaryKey ) &
+				SetProperty ( "source_table" ; "page-item" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 5 id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Page item::PrimaryKey ) &
+				SetProperty ( "source_table" ; "page-item" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 6 id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Page item::PrimaryKey ) &
+				SetProperty ( "source_table" ; "page-item" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Page item::Text 7 id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+
+# Always create 2 mediafields - change JT 2019-07-21
+Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Page item::PrimaryKey ) &
+				SetProperty ( "source_table" ; "page-item" ) &
+				SetProperty ( "source_mediafield" ; GetFieldName ( FAT Page item::Media 1 id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty ( "learningprogramme_id" ; $learningprogramme_id) ]
+Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Page item::PrimaryKey ) &
+				SetProperty ( "source_table" ; "page-item" ) &
+				SetProperty ( "source_mediafield" ; GetFieldName ( FAT Page item::Media 2 id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty ( "learningprogramme_id" ; $learningprogramme_id) ]
+
+# Add attributes and stateToggles - first on Symbol/Block level, then on Page item level
+Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "Block" ) & 
+				SetProperty ( "item_id" ; $page_item_id ) &
+				SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty ( "package_type" ; $package_type )&
+				SetProperty ( "symbol_id" ; $block_id ) ]
+Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "Page item" ) & 
+				SetProperty ( "item_id" ; $page_item_id ) &
+				SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty ( "package_type" ; $package_type ) ]
+If [ FAT Page::Page type = "insight" ]
+	Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "Insight item" ) & 
+					SetProperty ( "item_id" ; $page_item_id ) &
+					SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "package_type" ; $package_type ) ]
+End If
+
+# Add to content overview - NEW 2024-02-10
+Set Variable [ $item_type[1] ; "Page item" ]
+Set Variable [ $item_id[1] ; $page_item_id ]
+Perform Script [ From list ; "Add Overview item SRV" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "item_id" ; $item_id ) &
+				SetProperty ( "item_type" ; $item_type ) ]
+
+Perform Script [ From list ; "ValidateBlockCodebase" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty ( "package_type" ; $package_type ) &
+				SetProperty ( "funkisCodeBaseVersion" ; $funkisCodeBaseVersion ) &
+				SetProperty ( "page_item_id" ; $page_item_id ) ]
+Set Variable [ $incompatible_blocks[1] ; Get(ScriptResult) ]
+
+If [ $incompatible_blocks ]
+	Exit Script [ "Error: This block is incompatible with the current code base.¶¶Change code base if you want to add this block. However, this might imply that other blocks will not work. " ]
+Else
+	Exit Script [ $page_item_id ]
+End If
+
+
+
+
+
+
+
+

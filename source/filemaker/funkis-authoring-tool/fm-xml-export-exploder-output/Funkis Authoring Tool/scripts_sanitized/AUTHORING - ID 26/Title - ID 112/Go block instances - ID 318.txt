@@ -1,0 +1,11 @@
+Perform Script [ From list ; "Save Active Layout" ]
+If [ FAT Block::Number of page item instances >0 ]
+	Set Variable [ $block_id[1] ; FAT Block::PrimaryKey ]
+	Set Field [ FAT Title::gBlock ; FAT Block::PrimaryKey ]
+	Go to Layout [ Layout: "FAT Block instances" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Go to Related Record [ Table: FAT Page item ; Layout: "FAT Block instances 2" ; Show related ; Match found set ]
+Else
+	Show Custom Dialog [ Title: "Block not used" ; Message: "No page items use this block yet." ; Default Button: "OK" ]
+End If
+

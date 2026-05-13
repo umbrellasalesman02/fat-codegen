@@ -1,0 +1,28 @@
+// Commit Records/Requests [ With dialog: OFF ]
+
+If [ Not IsEmpty ($$call_layout) ]
+	Go to Layout [ Layoutname: $$call_layout ; Animation: Slide out to Right ]
+	Set Variable [ $$call_layout[1] ; "" ]
+	If [ Not IsEmpty ($$call_item_id) And Not IsEmpty ( $$call_item_type ) ]
+		If [ $$call_item_type = "Page item" ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+		End If
+	End If
+	Set Variable [ $$call_item_id[1] ; "" ]
+	Set Variable [ $$call_item_type[1] ; "" ]
+Else If [ Get(WindowStyle) = 3 ]
+	# Get(WIndowStyle)
+	  0 (zero) if the window is a document window
+	  1 if the window is a floating document window
+	  2 if the window is a dialog window
+	  3 if the window is a card
+	If [ Get(layoutName) = "FAT IO Page item settings Card" ]
+		Set Variable [ $$call_item_id[1] ; FAT Page item::PrimaryKey ]
+		Set Variable [ $$call_item_type[1] ; "Page item" ]
+	End If
+	Close Window
+	Select Window [ Name: $$currentWindow ]
+	
+End If
+// Refresh Window [ Flush cached join results ; Flush cached external data ]
+

@@ -1,0 +1,44 @@
+# Adding newly added global texts to translated titles
+
+
+Set Variable [ $title_id[1] ; "75E68BAF-4D54-4140-889D-31444F9C01A7" ]
+# A package with all localisations
+Set Variable [ $package_id[1] ; "92FDAA23-5C30-493F-8889-C1BEF1419297" ]
+
+Set Variable [ $text_pk_list[1] ; "E10DAD75-25BB-4FA2-B0F9-3B9757FCDAD7¶" &
+				"EEFF4667-05B9-4F73-84B2-B59E398F7835" ]
+Set Variable [ $text_pk_override_list[1] ; "2C6D5CB7-74A1-4E5D-8BBE-8DD057174E21¶" &
+				"DAF684AB-5DF8-4356-8191-046DE8F3A3C0" ]
+
+Go to Layout [ Layout: "TABLE FAT Localisation" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $localisation_code[1] ; FAT Localisation::Localisation code ]
+		If [ $localisation_code ≠ FAT Localisation::Original Localisation code ]
+			Set Variable [ $language_code[1] ; getLanguageCode (FAT Localisation::Localisation code) ]
+			Set Variable [ $country_code[1] ; getCountryCode (FAT Localisation::Localisation code) ]
+			Set Variable [ $i[1] ; 0 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $i[1] ; $i + 1 ]
+				Set Variable [ $text_id[1] ; GetValue ( $text_pk_list ; $i ) ]
+				Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)=1 ]
+					Duplicate Record/Request
+					Set Field [ FAT Text::Language code ; $language_code ]
+					Set Field [ FAT Text::Country code ; $country_code ]
+					Set Field [ FAT Text::OriginalKey ; $text_id ]
+				End If
+				Exit Loop If [ $i = ValueCount ( $text_pk_list ) ]
+			End Loop
+			
+		End If
+		
+		Go to Layout [ Layout: "TABLE FAT Localisation" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	
+End If
+

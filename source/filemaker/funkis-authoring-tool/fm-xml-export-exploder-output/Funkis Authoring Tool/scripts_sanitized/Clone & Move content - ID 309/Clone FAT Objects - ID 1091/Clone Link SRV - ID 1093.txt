@@ -1,0 +1,115 @@
+# This script checks if the old item (PK, CH, PG, or PI) has a link connected to it. 
+  If a link exist - a new link is created. 
+
+# SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+  SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+  SetProperty ( "clone_level" ; $clone_level ) &
+  SetProperty ( "clone_settings" ; $clone_settings ) &
+  SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "suffix" ; $suffix) &
+  SetProperty ( "object_group_id" ; $object_group_id ) &
+  SetProperty ( "old_pk_id" ; $old_pk_id ) &
+  SetProperty ( "new_pk_id" ; $new_pk_id )
+
+
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty("isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $clone_settings[1] ; GetScriptProperty ( "clone_settings" ) ]
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id" ) ]
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $old_item_id[1] ; GetScriptProperty("old_item_id") ]
+Set Variable [ $new_item_id[1] ; GetScriptProperty("new_item_id") ]
+Set Variable [ $suffix[1] ; GetScriptProperty("suffix") ]
+Set Variable [ $object_group_id[1] ; GetScriptProperty ( "object_group_id" ) ]
+
+
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT Link" ; Animation: None ]
+# Search for a link using old_item_id as internal id
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get ( foundCount )>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $new_name[1] ; TruncateText ( FAT Link::Name & Case ( IsEmpty($suffix); "" ;  " " & $suffix) ; 27 ) // with "..." = 30 characters ]
+		Set Variable [ $old_link_id[1] ; FAT Link::PrimaryKey ]
+		
+		Set Variable [ $text1[1] ; TF LK 1::Text ]
+		Set Variable [ $text2[1] ; TF LK 2::Text ]
+		Set Variable [ $media1[1] ; Media LK 1::Media container ]
+		Set Variable [ $media2[1] ; Media LK 2::Media container ]
+		Set Variable [ $hasTextVariables[1] ; Count(FAT Text variable @ Link::PrimaryKey) ]
+		
+		# Connect to new Object group if any
+		If [ $isClonedTitle And Not IsEmpty ( FAT Link::Object Group) ]
+			Set Variable [ $old_ogr_id[1] ; FAT Link::Object Group ]
+			Go to Layout [ Layout: "TABLE FAT Object Group" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Set Variable [ $new_ogr_id[1] ; FAT Object Group::PrimaryKey ]
+			Go to Layout [ Layout: "TABLE FAT Link" ; Animation: None ]
+		Else If [ $object_group_id ≠ "" ]
+			# If cloning a Package group - a new object group is created
+			Set Variable [ $new_ogr_id[1] ; $object_group_id ]
+		End If
+		
+		Duplicate Record/Request
+		
+		Set Field [ FAT Link::Old PrimaryKey from clone ; $old_link_id ]
+		Set Field [ FAT Link::Title id ; $title_id ]
+		
+		# Set a valid object name - no duplicates allowed in same title, not exceeding number of characters
+		Perform Script [ From list ; "Set valid object name" ; Parameter: SetProperty ( "source_textfield" ; GetFieldName ( FAT Link::Name ) ) &
+						SetProperty ( "new_name" ; $new_name ) &
+						SetProperty ( "max_characters" ; 32 ) ]
+		
+		Set Field [ FAT Link::Internal Item id ; Case(IsEmpty($new_item_id); FAT Link::Internal Item id; $new_item_id) ]
+		
+		If [ $new_ogr_id ≠ "" ]
+			Set Field [ FAT Link::Object Group ; $new_ogr_id ]
+		End If
+		
+		Set Variable [ $new_link_id[1] ; FAT Link::PrimaryKey ]
+		
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Link::PrimaryKey ) &
+						SetProperty ( "source_table" ; "link" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Link::Text 1 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) ]
+		Set Field [ TF LK 1::Text ; $text1 ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Link::PrimaryKey ) &
+						SetProperty ( "source_table" ; "link" ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT Link::Text 2 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) ]
+		Set Field [ TF LK 2::Text ; $text2 ]
+		
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Link::PrimaryKey ) &
+						SetProperty ( "source_table" ; "link" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT Link::Media 1 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) ]
+		Set Field [ Media LK 1::Media container ; $media1 ]
+		Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Link::PrimaryKey ) &
+						SetProperty ( "source_table" ; "link" ) &
+						SetProperty ( "source_mediafield" ; GetFieldName ( FAT Link::Media 2 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) &
+						SetProperty ( "learningprogramme_id" ; $title_id) ]
+		Set Field [ Media LK 2::Media container ; $media2 ]
+		
+		If [ $hasTextVariables ]
+			Perform Script [ From list ; "Clone Text variable" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+							SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+							SetProperty ( "old_item_id" ; $old_link_id ) &
+							SetProperty ( "new_item_id" ; $new_link_id ) &
+							SetProperty ("suffix" ; $suffix) &
+							SetProperty ( "title_id" ; $title_id ) &
+							SetProperty ( "old_tt_id" ; $old_tt_id ) &
+							SetProperty ("source_type" ; "link") ]
+		End If
+		
+		
+		Go to Layout [ Layout: "TABLE FAT Link" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+

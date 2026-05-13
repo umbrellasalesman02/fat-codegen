@@ -1,0 +1,49 @@
+# Called from an onObjectModify Script Event on popup menu
+
+Set Variable [ $level[1] ; Get(scriptParameter) ]
+Set Variable [ $activeObject[1] ; Get(ActiveLayoutObjectName) ]
+Set Variable [ $io_context[1] ; Usage type::Name ]
+
+Freeze Window
+
+Set Error Capture [ ON ]
+
+If [ $level= "Title" ]
+	Set Variable [ $item_id[1] ; FAT Title::PrimaryKey ]
+Else If [ $level = "Package" ]
+	Set Variable [ $item_id[1] ; FAT Package::PrimaryKey ]
+Else If [ $level = "Chapter" ]
+	Set Variable [ $item_id[1] ; FAT Chapter::PrimaryKey ]
+Else If [ $level = "Page" ]
+	Set Variable [ $item_id[1] ; FAT Page::PrimaryKey ]
+Else If [ $level = "Page item" ]
+	Set Variable [ $item_id[1] ; FAT Page item::PrimaryKey ]
+	# Remove reveal next block - will help debugging 
+	Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Field [ FAT Modifier Value::Value ; "yes" ]
+Else If [ $level = "List item" ]
+	Set Variable [ $item_id[1] ; FAT List item::PrimaryKey ]
+Else If [ $level = "PI List item" ]
+	Set Variable [ $item_id[1] ; FAT List item @ Page item::PrimaryKey ]
+End If
+
+Set Variable [ $tag_id[1] ; FAT Title::gTagID ]
+Go to Layout [ Layout: "TABLE FAT Tag Value" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Tag Value::Tag id ; $tag_id ]
+Set Field [ FAT Tag Value::Parent id ; $item_id ]
+Set Field [ FAT Tag Value::Level ; $level ]
+Set Field [ FAT Tag Value::IO Context ; $io_context ]
+Set Field [ FAT Tag Value::Tag behaviour ; "Hide" ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Go to Object [ $activeObject ; Repetition: 1 ]
+
+Set Field [ FAT Title::gTagID ; "" ]
+
+If [ $level = "List item" ]
+	Set Variable [ $caller[1] ; "Title List" ]
+	Perform Script [ From list ; "Init List item Rich Text Editor" ; Parameter: $caller ]
+End If
+

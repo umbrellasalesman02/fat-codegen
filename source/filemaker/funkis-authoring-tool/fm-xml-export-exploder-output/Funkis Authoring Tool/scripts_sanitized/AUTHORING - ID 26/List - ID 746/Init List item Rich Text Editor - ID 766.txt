@@ -1,0 +1,199 @@
+# Each time the Web viewer needs to be refreshed
+# Called from View Card List item when a user click an item in a List
+
+# Caller can be "Title List" or "Page item List"
+Set Variable [ $caller[1] ; Get(scriptParameter) ]
+
+
+If [ Not $$cacheWebViewer ]
+	Set Variable [ $$cacheWebViewer[1] ; True ]
+	// Set Variable [ $$WV_HTML[1] ; "data:text/html," & FAT Page item::gHTML Code ]
+	Set Web Viewer [ "WV" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+	Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+Else
+	Set Web Viewer [ "WV" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+	Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+End If
+
+If [ $caller = "Title List" ]
+	Set Variable [ $List_HTML_JSON[1] ; /* HTML Parameters */ 
+					
+					
+					Let ( 
+					       [
+					         i = 1;
+					         trans = Case ( FAT Title::gViewTranslatedLanguage ; " TRANS" ; "" );
+					         localisation_mode = Case ( FAT Title::gViewTranslatedLanguage; "translate"; "original");
+					         localisation_code = $$localisation_code;
+					      
+					
+					        LTjson1 = JSONSetElement ( "{}" ; 
+					             ["label" ; List template::Text Label 1; JSONString];
+					             ["id" ; "1" ; JSONString];
+					             ["html" ; Case(List template::Text 1 HTML format= ""; False; True) ; JSONBoolean];
+					             ["maxchars" ; 10000 ; JSONNumber];
+					             ["value" ; sanitizeHTML ( GetField("TF LI 1" & trans & "::Text") ) ; JSONString] 
+					         );
+					
+					        LTjson2 = JSONSetElement ( "{}"  ;
+					             ["label" ; List template::Text Label 2 ; JSONString];
+					             ["id" ; "2" ; JSONString];
+					             ["html" ; Case(List template::Text 2 HTML format=""; False; True) ; JSONBoolean];
+					             ["maxchars" ; 10000 ; JSONNumber];
+					             ["value" ; sanitizeHTML ( GetField("TF LI 2" & trans & "::Text") ) ; JSONString] 
+					         );
+					
+					        LTjson3 = JSONSetElement ( "{}"  ;
+					             ["label" ; List template::Text Label 3 ; JSONString];
+					             ["id" ; "3" ; JSONString];
+					             ["html" ; Case(List template::Text 3 HTML format = ""; False; True) ; JSONBoolean];
+					             ["maxchars" ; 10000 ; JSONNumber];
+					             ["value" ; sanitizeHTML ( GetField("TF LI 3" & trans & "::Text") ) ; JSONString] 
+					         );
+					
+					         LTtextArr = "[" & Case ( List template::Number of text fields = 1; LTjson1;
+					                     List template::Number of text fields = 2; LTjson1 & "," & LTjson2;
+					                     List template::Number of text fields = 3; LTjson1 & "," & LTjson2 & "," & LTjson3)  & "]";
+					 
+					          
+					         LTjsonResult = JSONSetElement ( "{}" ; 
+					
+					                      ["environment" ; Case ( Platform="WebDirect"; "web"; "FileMaker") ; JSONString];
+					                      ["record-id" ; Get(recordID) ; JSONNumber];
+					                      ["localisation_mode" ; localisation_mode; JSONString];
+					                      ["edit_mode" ; "titleListItem"; JSONString];
+					                      ["localisation_code" ; localisation_code ; JSONString];
+					                      ["texts" ; LTtextArr ; JSONArray]
+					               )
+					
+					       
+					
+					        ];
+					
+					      JSONFormatElements ( LTjsonResult)
+					      //LTjsonResult
+					) ]
+Else If [ $caller = "Page item List" ]
+	If [ IsEmpty(FAT List::List template id) ]
+		# Some old productions does not have a list based on a template
+		Set Variable [ $List_HTML_JSON[1] ; /* HTML Parameters */ 
+						
+						
+						Let ( 
+						       [
+						         i = 1;
+						         trans = Case ( FAT Title::gViewTranslatedLanguage ; " TRANS" ; "" );
+						         localisation_mode = Case ( FAT Title::gViewTranslatedLanguage; "translate"; "original");
+						         localisation_code = $$localisation_code;
+						      
+						
+						        LTjson1 = JSONSetElement ( "{}" ; 
+						             ["label" ; FAT Block @ Page item::Label override text 1; JSONString];
+						             ["id" ; "1" ; JSONString];
+						             ["html" ; False ; JSONBoolean];
+						             ["maxchars" ; FAT Block @ Page item::List Text 1 max characters ; JSONNumber];
+						             ["value" ; sanitizeHTML ( GetField("TF LI PI 1" & trans & "::Text") ) ; JSONString] 
+						         );
+						
+						        LTjson2 = JSONSetElement ( "{}"  ;
+						             ["label" ; FAT Block @ Page item::Label override text 2 ; JSONString];
+						             ["id" ; "2" ; JSONString];
+						             ["html" ; False ; JSONBoolean];
+						             ["maxchars" ; FAT Block @ Page item::List Text 2 max characters ; JSONNumber];
+						             ["value" ; sanitizeHTML ( GetField("TF LI PI 2" & trans & "::Text") ) ; JSONString] 
+						         );
+						
+						        LTjson3 = JSONSetElement ( "{}"  ;
+						             ["label" ; FAT Block @ Page item::Label override text 3 ; JSONString];
+						             ["id" ; "3" ; JSONString];
+						             ["html" ; False; JSONBoolean];
+						             ["maxchars" ; FAT Block @ Page item::List Text 3 max characters ; JSONNumber];
+						             ["value" ; sanitizeHTML ( GetField("TF LI PI 3" & trans & "::Text") ) ; JSONString] 
+						         );
+						
+						         LTtextArr = "[" & Case ( FAT Block @ Page item::List number of textfields = 1; LTjson1;
+						                     FAT Block @ Page item::List number of textfields = 2; LTjson1 & "," & LTjson2;
+						                     FAT Block @ Page item::List number of textfields = 3; LTjson1 & "," & LTjson2 & "," & LTjson3)  & "]";
+						 
+						          
+						         LTjsonResult = JSONSetElement ( "{}" ; 
+						
+						                      ["environment" ; Case ( Platform="WebDirect"; "web"; "FileMaker") ; JSONString];
+						                      ["record-id" ; Get(recordID) ; JSONNumber];
+						                      ["localisation_mode" ; localisation_mode; JSONString];
+						                      ["edit_mode" ; "pageItemListItem"; JSONString];
+						                      ["localisation_code" ; localisation_code ; JSONString];
+						                      ["texts" ; LTtextArr ; JSONArray]
+						               )
+						
+						       
+						
+						        ];
+						
+						      JSONFormatElements ( LTjsonResult)
+						      //LTjsonResult
+						) ]
+	Else
+		Set Variable [ $List_HTML_JSON[1] ; /* HTML Parameters */ 
+						
+						
+						Let ( 
+						       [
+						         i = 1;
+						         trans = Case ( FAT Title::gViewTranslatedLanguage ; " TRANS" ; "" );
+						         localisation_mode = Case ( FAT Title::gViewTranslatedLanguage; "translate"; "original");
+						         localisation_code = $$localisation_code;
+						      
+						
+						        LTjson1 = JSONSetElement ( "{}" ; 
+						             ["label" ; List template @ Page item::Text Label 1; JSONString];
+						             ["id" ; "1" ; JSONString];
+						             ["html" ; Case(List template @ Page item::Text 1 HTML format= ""; False; True) ; JSONBoolean];
+						             ["maxchars" ; FAT Block @ Page item::List Text 1 max characters ; JSONNumber];
+						             ["value" ; sanitizeHTML ( GetField("TF LI PI 1" & trans & "::Text") ) ; JSONString] 
+						         );
+						
+						        LTjson2 = JSONSetElement ( "{}"  ;
+						             ["label" ; List template @ Page item::Text Label 2 ; JSONString];
+						             ["id" ; "2" ; JSONString];
+						             ["html" ; Case(List template @ Page item::Text 2 HTML format=""; False; True) ; JSONBoolean];
+						             ["maxchars" ; FAT Block @ Page item::List Text 2 max characters ; JSONNumber];
+						             ["value" ; sanitizeHTML ( GetField("TF LI PI 2" & trans & "::Text") ) ; JSONString] 
+						         );
+						
+						        LTjson3 = JSONSetElement ( "{}"  ;
+						             ["label" ; List template @ Page item::Text Label 3 ; JSONString];
+						             ["id" ; "3" ; JSONString];
+						             ["html" ; Case(List template @ Page item::Text 3 HTML format = ""; False; True) ; JSONBoolean];
+						             ["maxchars" ; FAT Block @ Page item::List Text 3 max characters ; JSONNumber];
+						             ["value" ; sanitizeHTML ( GetField("TF LI PI 3" & trans & "::Text") ) ; JSONString] 
+						         );
+						
+						         LTtextArr = "[" & Case ( FAT Block @ Page item::List number of textfields = 1; LTjson1;
+						                     FAT Block @ Page item::List number of textfields = 2; LTjson1 & "," & LTjson2;
+						                     FAT Block @ Page item::List number of textfields = 3; LTjson1 & "," & LTjson2 & "," & LTjson3)  & "]";
+						 
+						          
+						         LTjsonResult = JSONSetElement ( "{}" ; 
+						
+						                      ["environment" ; Case ( Platform="WebDirect"; "web"; "FileMaker") ; JSONString];
+						                      ["record-id" ; Get(recordID) ; JSONNumber];
+						                      ["localisation_mode" ; localisation_mode; JSONString];
+						                      ["edit_mode" ; "pageItemListItem"; JSONString];
+						                      ["localisation_code" ; localisation_code ; JSONString];
+						                      ["texts" ; LTtextArr ; JSONArray]
+						               )
+						
+						       
+						
+						        ];
+						
+						      JSONFormatElements ( LTjsonResult)
+						      //LTjsonResult
+						) ]
+	End If
+End If
+
+Perform JavaScript in Web Viewer [ Name: "WV" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+Go to Object [ FAT List item::LastSettingTab ; Repetition: 1 ]
+

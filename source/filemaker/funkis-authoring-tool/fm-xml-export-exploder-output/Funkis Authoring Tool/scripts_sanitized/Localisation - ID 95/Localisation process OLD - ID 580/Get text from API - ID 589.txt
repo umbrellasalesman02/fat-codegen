@@ -1,0 +1,67 @@
+# This script can be called from a loop or from a single translation request.
+  It is used to get translated text from asynchronous machine translation apis.
+
+# The translation id to get
+Set Variable [ $translation_id[1] ; GetScriptProperty ( "translation_id" ) ]
+
+# THe translation API
+Set Variable [ $translation_api[1] ; GetScriptProperty ( "translation_api" ) ]
+Set Variable [ $get_api_url[1] ; GetScriptProperty ( "get_api_url" ) ]
+Set Variable [ $api_key[1] ; GetScriptProperty ( "api_key" ) ]
+
+If [ $get_api_url = "" ]
+	# Get all info for the translation API if not in the function call - used for translating one text
+	Go to Layout [ Layout: "TABLE Translation API" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $get_api_url[1] ; Translation API @ Title::Get translation URL ]
+	Set Variable [ $api_key[1] ; Translation API @ Title::API PrivateKey ]
+	Set Variable [ $asynchronous[1] ; Translation API @ Title::Asynchronous ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+
+
+# ----------------  Start logic for different translation apis ------------------------------------
+
+
+If [ $translation_api = "78E0ADA2-AF9C-4983-887F-555DDF084C0F" // Google Translation API v2 ]
+	
+	# Google Translate API is not asynchronous
+	
+Else If [ $translation_api = "EE355B37-B655-48F6-9D4D-B7B3DE745DDF" // Intento IKEA ikea-best-engines
+				
+				Or 
+				
+				$translation_api = "6A20D8F0-DD6F-41A6-A5EA-FC5617233FB3"  // Intento IKEA ikea-it-desk ]
+	
+	Set Variable [ $operationAPI[1] ; $get_api_url & $translation_id ]
+	
+	Set Variable [ $cURL_options[1] ; _cURL_request ( "GET" ) & 
+					_cURL_header ( "Content-Type" ; "application/json" ) & 
+					_cURL_header ( "Accept" ; "application/json; charset=utf-8" ) & 
+					_cURL_header ( "apikey" ; $api_key ) ]
+	Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ; $cURL_options ]
+	
+	If [ JSONGetElement($resultJSON ; "done") ]
+		If [ IsEmpty(JSONGetElement ( $resultJSON ; "error" )) ]
+			Set Variable [ $translatedText[1] ; JSONGetElement ( $resultJSON ; "response[0]results[0]" ) ]
+		Else
+			Set Variable [ $translatedText[1] ; $resultJSON ]
+		End If
+		Exit Script [ $translatedText ]
+	Else
+		# Return something that cannot be a translation response
+		Exit Script [ "--- NOT TRANSLATED YET ---" ]
+	End If
+	
+End If
+
+# ------------------------------- End translation APIs -------------------------------
+
+
+
+
+
+
+
+

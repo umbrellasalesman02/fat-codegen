@@ -1,0 +1,89 @@
+# The new navigation script for all navigation to Package, Chapter, Page and Page items in a Title
+
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+
+# Level can be:
+  Package
+  Chapter
+  Page
+  Page item
+
+If [ $level = "Package" ]
+	# Find all packages in Title and go to selected
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ With dialog: OFF ; ValuePosition ( List (FAT Package::List of PrimaryKey) ; $item_id ) ]
+	Go to Layout [ Layout: "FAT Package" ; Animation: None ]
+Else If [ $level = "Chapter" ]
+	# Find chapter
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $package_id[1] ; FAT Chapter::Parent id ]
+	# Find all packages in Title and go to selected
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ With dialog: OFF ; ValuePosition ( List (FAT Package::List of PrimaryKey) ; $package_id ) ]
+	# Go to chapter
+	Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; ValuePosition ( List (FAT Chapter::List of PrimaryKey) ; $item_id ) ]
+	Go to Layout [ Layout: "FAT Chapter" ; Animation: None ]
+Else If [ $level = "Page" ]
+	# Find page
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $chapter_id[1] ; FAT Page::Parent id ]
+	Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	# Find all packages in Title and go to selected
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ With dialog: OFF ; ValuePosition ( List (FAT Package::List of PrimaryKey) ; $package_id ) ]
+	# Go to chapter
+	Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; ValuePosition ( List (FAT Chapter::List of PrimaryKey) ; $chapter_id ) ]
+	# Go to page
+	Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; ValuePosition ( List (FAT Page::List of PrimaryKey) ; $item_id ) ]
+	Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+	# Used for navigating between Pages from Page Item layout
+	Set Field [ FAT Page::gRecordNumber ; Get(recordNumber) ]
+	Set Field [ FAT Page::gPageFoundCount ; Get(foundCount) ]
+Else If [ $level = "Page item" ]
+	# Find page item
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $pageitem_id[1] ; FAT Page item::PrimaryKey ]
+	Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+	Set Variable [ $chapter_id[1] ; FAT Chapter::PrimaryKey ]
+	Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	Set Variable [ $proxy_type[1] ; FAT Page::Proxy type ]
+	# Find all packages in Title and go to selected
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	// Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ With dialog: OFF ; ValuePosition ( List (FAT Package::List of PrimaryKey) ; $package_id ) ]
+	# Go to chapter
+	Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; ValuePosition ( List (FAT Chapter::List of PrimaryKey) ; $chapter_id ) ]
+	# Used for navigating between Chapters from Page Item layout - Slide
+	Set Field [ FAT Page::gRecordNumber ; Get(recordNumber) ]
+	Set Field [ FAT Page::gPageFoundCount ; Get(foundCount) ]
+	# Go to page
+	Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; ValuePosition ( List (FAT Page::List of PrimaryKey) ; $page_id ) ]
+	
+	# Go direct to page item view on slides
+	Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "chapter_id" ; $chapter_id ) & 
+					SetProperty ( "page_id" ; $page_id ) & 
+					SetProperty ( "pageitem_id" ; $item_id ) &
+					SetProperty ( "proxy_type" ; $proxy_type ) ]
+	
+Else If [ $level = "List item" ]
+	Go to Layout [ Layout: "FAT TT List Item Card" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+

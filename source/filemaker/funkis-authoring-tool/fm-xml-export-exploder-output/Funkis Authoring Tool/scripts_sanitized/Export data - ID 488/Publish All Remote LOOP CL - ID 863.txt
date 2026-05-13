@@ -1,0 +1,37 @@
+# Called from a onTimerScript - only developers
+# This script export content from FAT and instructs Task Server to build new code versions for all Packages included in Title.
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $recNum[1] ; FAT Title::gExportingPackageNum + 1 ]
+Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+
+Go to Record/Request/Page [ With dialog: OFF ; $recNum ]
+Set Variable [ $package_id[1] ; FAT Package Alt::PrimaryKey ]
+
+Perform Script [ From list ; "Publish Remote CL" ; Parameter: SetProperty ( "publish_mode" ; "CODE_UPDATE") &
+				SetProperty ( "caller" ; "Title") &
+				SetProperty ( "show_dialog" ; "false") &
+				SetProperty ( "package_id" ; $package_id) ]
+
+If [ Get(ScriptResult) = "error" ]
+	Set Variable [ $$error[1] ; $$error + 1 ]
+Else
+	Set Variable [ $$success[1] ; $$success + 1 ]
+	If [ $recNum = Get(foundCount) ]
+		# Remove onTimer
+		Install OnTimer Script
+		
+		Go to Layout [ Layout: "FAT Title Settings" ; Animation: None ]
+		Show Custom Dialog [ Title: "Export summary" ; Message: "Successfully initiated build of  " & $$success & " packages. Could not initiate build for " & $$error & " packages." & " An email will tell you when each package is ready" ; Default Button: "OK" ]
+		Perform Script [ From list ; "Init Title settings" ]
+	Else
+		Set Field [ FAT Title::gExportingPackageNum ; $recNum ]
+	End If
+End If
+
+# Go to wherever the user is
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+

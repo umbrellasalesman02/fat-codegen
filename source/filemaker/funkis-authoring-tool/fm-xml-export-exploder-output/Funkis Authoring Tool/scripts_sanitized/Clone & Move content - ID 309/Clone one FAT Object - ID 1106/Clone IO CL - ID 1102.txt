@@ -1,0 +1,21 @@
+# This script is called from a button in IO card
+
+Set Variable [ $isClonedTitle[1] ; False ]
+Set Variable [ $clone_level[1] ; "IO" ]
+Set Variable [ $suffix[1] ; "COPY" ]
+Set Variable [ $title_id[1] ; FAT IO::Title id ]
+Set Variable [ $old_io_id[1] ; FAT IO::PrimaryKey ]
+
+Perform Script [ From list ; "Clone IO SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+				SetProperty ( "clone_level" ; $clone_level ) &
+				SetProperty ( "clone_settings" ; $clone_settings ) &
+				SetProperty ( "suffix" ; $suffix ) & 
+				SetProperty ( "old_tt_id" ; $old_tt_id ) &
+				SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "old_io_id" ; $old_io_id ) ]
+// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+
+

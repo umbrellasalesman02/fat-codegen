@@ -1,0 +1,182 @@
+<Script>
+	<ScriptReference id="266" name="Export as Excel"></ScriptReference>
+	<ObjectList membercount="8">
+		<Step hash="F1A65E178100F8458821C3C0E7E41B98" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Platform = "WebDirect"]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C9E1D3723D64EBA63026C98BFCB26666" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Title::JSON friendly id & " texts - " & FAT Title::Original localisation code & " to " & $$localisation_code & ".csv"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$fileName"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D9566CDBB7A73528D864583C7B93949F" id="36" name="Export Records" enable="True">
+			<Options>570474656</Options>
+			<ParameterValues membercount="4">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Create folders" id="512" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="UniversalPathList">
+					<UniversalPathList fileType="COMS" AutoOpen="True" membercount="1">
+						<ObjectList>
+							<Location><![CDATA[$fileName]]></Location>
+						</ObjectList>
+					</UniversalPathList>
+				</Parameter>
+				<Parameter type="Export">
+					<Export>
+						<Options name="Unicode (UTF-8)" value="4" Formatting="False"></Options>
+						<Order type="Group"></Order>
+						<Order type="Field">
+							<Field value="1">
+								<FieldReference id="40" name="RecordNumberReference">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</Field>
+							<Field value="2">
+								<FieldReference id="6" name="Text">
+									<TableOccurrenceReference id="1065140" name="FAT Text @ Translation"></TableOccurrenceReference>
+								</FieldReference>
+							</Field>
+							<Field value="3">
+								<FieldReference id="6" name="Text">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</Field>
+						</Order>
+					</Export>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C2A9100A0CDB4B756E0D03AA2A38F2E7" id="69" name="Else" enable="True">
+		</Step>
+		<Step hash="2E0DAB5648C679F8BA8B472E391A68D3" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[FAT Title::JSON friendly id & " texts - " & FAT Title::Original localisation code & " to " & $$localisation_code & ".xlsx"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$fileName"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E7884BBB2E170488DBA4F8AEA1EA858B" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(DesktopPath) & $fileName]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$documentPath"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="169F87CD28011B30BBA725335D7D4A38" id="36" name="Export Records" enable="True">
+			<Options>570474656</Options>
+			<ParameterValues membercount="4">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Boolean">
+					<Boolean type="Create folders" id="512" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="UniversalPathList">
+					<UniversalPathList fileType="XLXE" AutoOpen="True" membercount="1">
+						<Excel>
+							<Boolean type="Use field names as column names" value="False"></Boolean>
+							<Parameter type="Worksheet">
+								<Calculation datatype="1" position="0">
+									<Calculation>
+										<Text><![CDATA["Text export"]]></Text>
+									</Calculation>
+								</Calculation>
+							</Parameter>
+							<Parameter type="Title"></Parameter>
+							<Parameter type="Subject"></Parameter>
+							<Parameter type="Author"></Parameter>
+						</Excel>
+						<ObjectList>
+							<Location><![CDATA[$documentPath]]></Location>
+						</ObjectList>
+					</UniversalPathList>
+				</Parameter>
+				<Parameter type="Export">
+					<Export>
+						<Options name="Unicode (UTF-16)" value="3" Formatting="False"></Options>
+						<Order type="Group"></Order>
+						<Order type="Field">
+							<Field value="1">
+								<FieldReference id="40" name="RecordNumberReference">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</Field>
+							<Field value="2">
+								<FieldReference id="6" name="Text">
+									<TableOccurrenceReference id="1065140" name="FAT Text @ Translation"></TableOccurrenceReference>
+								</FieldReference>
+							</Field>
+							<Field value="3">
+								<FieldReference id="6" name="Text">
+									<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+								</FieldReference>
+							</Field>
+						</Order>
+					</Export>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C2D8A740F2E4097FB30957CD21509127" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

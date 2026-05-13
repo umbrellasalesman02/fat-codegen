@@ -1,0 +1,34 @@
+# This script is called from a button in IO Card
+# The script sets a default text for an undefined text variable. 
+
+# Called from a button in IO Card window AND in Link Card window
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+
+If [ $caller = "Link" ]
+	Set Variable [ $location_id[1] ; FAT Text variable @ Link::PrimaryKey ]
+Else If [ $caller = "IO" ]
+	Set Variable [ $location_id[1] ; FAT Text variable @ IO::PrimaryKey ]
+Else If [ $caller = "IO_in_list" ]
+	Set Variable [ $location_id[1] ; FAT Text variable @ IO LI::PrimaryKey ]
+End If
+
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $location_id ) &
+				SetProperty ( "source_table" ; "text_variable" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Text variable::Default Text id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+If [ $caller = "Link" ]
+	Go to Field [ Select/perform ; TF TV Link Default text::Text ]
+Else If [ $caller = "IO" ]
+	Go to Object [ "TextVars" ; Repetition: 1 ]
+	Go to Field [ Select/perform ; TF TV IO Default text::Text ]
+Else If [ $caller = "IO_in_list" ]
+	Go to Object [ "TextVars" ; Repetition: 1 ]
+	Go to Field [ Select/perform ; TF TV IO LI Default text::Text ]
+End If
+

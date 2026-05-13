@@ -1,0 +1,15 @@
+Show Custom Dialog [ Title: "Delete chapter \"" & TF CH Header::Text & "\"" ; Message: "If you delete the chapter - all child items will also be deleted and cannot be restored. ¶¶Are you sure you want to delete the chapter \"" & TF CH Header::Text & "\"?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) =1 ]
+	Show Custom Dialog [ Title: "This operation cannot be undone" ; Message: "Are you absolutely sure that you want to delete the chapter  \"" & TF CH Header::Text & "\"?¶¶
+					This operation can under no circumstance be undone." ; Default Button: "Cancel" ; Button 2: "Delete" ]
+	If [ Get(lastMessageChoice) =2 ]
+		
+		# Log deletion
+		Set Variable [ $event_log_text[1] ; "Deleted chapter " & TF CH Header::Text & " - " &  FAT Chapter::PrimaryKey ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+		
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		
+	End If
+End If
+

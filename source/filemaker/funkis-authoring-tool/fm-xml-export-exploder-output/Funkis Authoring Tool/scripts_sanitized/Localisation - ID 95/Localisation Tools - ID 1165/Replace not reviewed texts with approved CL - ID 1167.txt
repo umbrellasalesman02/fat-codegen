@@ -1,0 +1,55 @@
+# This script is used as a power tool for localisations. 
+  It is called from the Title localisation card window in the title where the not reviewed texts are found.
+  This is the flow: 
+  1. The script looks for Not reviewed texts in the Title and in the localisation language.
+  2. For each text - it searches among approved translations. 
+  
+If [ FAT Localisation::Type of localisation ≠ "Title" ]
+	Show Custom Dialog [ Title: "Not a Title localisation" ; Message: "This tool only works for Title localisations. " ; Default Button: "OK" ]
+	Exit Script []
+Else If [ IsEmpty ( FAT Localisation::gUseApprovedTranslationsFrom ) And IsEmpty ( FAT Title::gTitle ) ]
+	Show Custom Dialog [ Title: "Source for Approved texts not selected" ; Message: "You need to select a source where you will find the approved texts." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+Set Variable [ $localisation_id[1] ; FAT Localisation::PrimaryKey ]
+Set Variable [ $title_id[1] ; FAT Localisation::Title id ]
+Set Variable [ $localisation_code[1] ; FAT Localisation::Localisation code ]
+Set Variable [ $org_localisation_code[1] ; FAT Localisation::Original Localisation code ]
+Set Variable [ $localisation_stage[1] ; FAT Localisation::Localisation stage ]
+
+If [ FAT Localisation::gUseApprovedTranslationsFrom = "Package in Title" ]
+	Set Variable [ $fetch_from_title_id[1] ; FAT Localisation::Title id ]
+	Set Variable [ $fetch_from_package_id[1] ; FAT Localisation::gUseApprovedTranslationsFromId ]
+Else
+	Set Variable [ $fetch_from_title_id[1] ; FAT Title::gTitle ]
+End If
+
+Show Custom Dialog [ Title: "Fetch existing translated and approved texts" ; Message: "Fetching previously approved translation texts can take some time. Please be patient. " ; Default Button: "OK" ; Button 2: "Cancel" ]
+
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+// Perform Script [ From list ; "Replace not reviewed texts with approved SRV" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) &
+				SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "localisation_code" ; $localisation_code ) &
+				SetProperty ( "org_localisation_code" ; $org_localisation_code ) &
+				SetProperty ( "localisation_stage" ; $localisation_stage ) &
+				SetProperty ( "fetch_from_title_id" ; $fetch_from_title_id ) &
+				SetProperty ( "fetch_from_package_id" ; $fetch_from_package_id ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Set Variable [ $num_of_copied_texts[1] ; Get(ScriptResult) ]
+
+Set Variable [ $event_text[1] ; $num_of_copied_texts & " texts with approved translation were successfully copied to this localisation." ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+Perform Script [ From list ; "Log translation status CL" ; Parameter: SetProperty ( "caller" ; "Title localisation" ) &
+				SetProperty ( "localisation_id" ; $localisation_id ) &
+				SetProperty ( "localisation_stage" ; $localisation_stage ) &
+				SetProperty ( "status_type" ; "status" ) ]
+
+
+
+
+

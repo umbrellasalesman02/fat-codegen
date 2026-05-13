@@ -1,0 +1,18 @@
+# Called from a button in List layout - where all Title Lists are visible
+
+Show Custom Dialog [ Title: "Create a new List of existing Lists" ; Message: "A list of lists is a special feature used for specific design patterns with multiple choice or select blocks. ¶¶Do you want to create a new list of lists?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) = 1 ]
+	
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Freeze Window
+	Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+	New Record/Request
+	Set Variable [ $list_id[1] ; FAT List::PrimaryKey ]
+	Set Field [ FAT List::Title id ; $title_id ]
+	Set Field [ FAT List::List of Lists ; 1 ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	
+	Perform Script [ From list ; "View Card List of Lists" ; Parameter: SetProperty ( "list_id" ; $list_id ) ]
+	
+End If
+

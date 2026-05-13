@@ -1,0 +1,305 @@
+<Script>
+	<ScriptReference id="1147" name="Substitute text variables"></ScriptReference>
+	<ObjectList membercount="27">
+		<Step hash="727B0082CC7DBDE650E89EF50F454868" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This script is not in use - only as a backup"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DD85FC341C30A4205D0FEFBCACD91FFD" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="53218B5D244E8E8B7DA45324427E3297" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[PatternCount ( $exportDB ; "Text" ) Or PatternCount ( $exportDB ; "Subtitle" )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="DBDADD29CC0C68D3655EED13775BDC0B" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="This must be done INSIDE this script since sending fileContent between functions did not work well."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="ED9B43939262430CD5BC4C25061E0AED" id="6" name="Go to Layout" enable="True">
+			<Options>10</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="LayoutReferenceContainer">
+					<LayoutReferenceContainer value="5">
+						<LayoutReference id="450" name="TABLE FAT Text variable"></LayoutReference>
+					</LayoutReferenceContainer>
+				</Parameter>
+				<Parameter type="Animation">
+					<Animation name="None" value="0"></Animation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="46F2A4DE9560A8860BE3500A324CE853" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Find all text variables in title"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="24951BD7D4BE1E7F56B171DECD46B102" id="28" name="Perform Find" enable="True">
+			<Options>33587200</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="FindRequest">
+					<FindRequestSet membercount="1">
+						<FindRequest membercount="1" action="find">
+							<find criteria="$title_id">
+								<FieldReference id="10" name="Title id">
+									<TableOccurrenceReference id="1065760" name="FAT Text variable"></TableOccurrenceReference>
+								</FieldReference>
+							</find>
+						</FindRequest>
+					</FindRequestSet>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3269902561003F92C4A2FB7DEB441F21" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[Get(foundCount)>0]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AE693C0906595FCA631E5E757FAF7471" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Build a Substitute string to evaluate"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2082F352175FC60D0283E48C0B4A4A89" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[False]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$substitute"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="1D7279201C2588E0B06179BD84CE378A" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="POTENTIAL problem - Quote seems to add line breaks \n at some points."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CAA789476111A8576D2BB351272A6E86" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA["Substitute ( " & Quote($fileContent) //eval_string = "Substitute ( " & a & " ; [" & b & ";" & c &  "];[" & d & ";" & e & "])"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$evaluate_string"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="F6A289877D7B49F65F93EF0596A09FA5" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C74F73213DD92EC9601790C639C90F35" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Create the evaluate string - only add when string and definition differs."></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CF59922C3AC2D8F297B81BDA10FEC304" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[FAT Text variable::Friendly string ≠ FAT Text variable::String source definition]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="93E2240E0FB9715DE76E5BA76B41FDD1" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$evaluate_string & "; [" & Quote(FAT Text variable::Friendly string) & ";" & Quote(FAT Text variable::String source definition) &  "]"//eval_string = "Substitute ( " & a & " ; [" & b & ";" & c &  "];[" & d & ";" & e & "])"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$evaluate_string"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="E9F0CD69EEFF07DC4F82E360341D7427" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[True]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$substitute"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AA4C7F6F99705C624D5CB6E08F943CF4" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="C24AD8BFEDB856091F2B1BDEC203F33D" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>8194</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="True"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="A0EFF7425385DE70DDB420A3105B63A4" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="D9EC5FAECE2D8F59B985BEC596DAB465" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$substitute]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="895B704DFF639F16F0DD214E6B156F75" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Substitute prettified text variables with source definition"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="28EC0168F4F5570C69C6A0A9E4FD10A2" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[$evaluate_string & ")"//eval_string = "Substitute ( " & a & " ; [" & b & ";" & c &  "];[" & d & ";" & e & "])"]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$evaluate_string"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="B4DE11AB8522691C28ACBE83D16A344E" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Evaluate ( $evaluate_string )]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$fileContent"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CD32F6DD641CF61B9372417ECE67D47A" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="ADF4E02913F50BBC588F355A28F2189A" id="70" name="End If" enable="True">
+		</Step>
+		<Step hash="CE96F7DC8903DC907C86115694F80825" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

@@ -1,0 +1,40 @@
+# Change package id on text and media in attribute values
+
+Set Variable [ $new_package_id[1] ; GetScriptProperty ("new_package_id") ]
+Set Variable [ $fat_item_id[1] ; GetScriptProperty ("fat_item_id") ]
+
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+# Find all modifierValues of type = text
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $title_id[1] ; FAT Modifier::Title id ]
+	Loop [ Flush: Always ]
+		Set Field [ TF MV::Title id ; $title_id ]
+		Set Field [ TF MV::Package id ; $new_package_id ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+# Find all modifierValues of type = media
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $title_id[1] ; FAT Modifier::Title id ]
+	Loop [ Flush: Always ]
+		Set Field [ Media MV::Title id ; $title_id ]
+		Set Field [ Media MV::Package id ; $new_package_id ]
+		# Check if media have subtitles
+		If [ Media MV::hasMedia And SubtitleMedia ( Media MV::Container file extension ) ]
+			# Check if media have subtitles
+			Set Variable [ $media_id[1] ; FAT Modifier Value::Media id ]
+			Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+			# Find text with parent = media
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount)>0 ]
+				Replace Field Contents [ FAT Text::Package id ; Replace with calculation: $new_package_id ]
+			End If
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

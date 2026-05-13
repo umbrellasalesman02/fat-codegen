@@ -1,0 +1,72 @@
+Freeze Window
+# FindOrCreate IO
+# Called from:
+  Create new IO
+  Edit IO from Page item
+  Tags in Title
+
+Set Variable [ $io_id[1] ; GetScriptProperty ( "io_id" ) ]
+Set Variable [ $io_type[1] ; GetScriptProperty ( "io_type" ) ]
+Set Variable [ $call_layout[1] ; GetScriptProperty ( "call_layout" ) ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+Commit Records/Requests [ With dialog: OFF ]
+# If called from the Card - Page item Settings - close card first (cannot open card on card)
+If [ Get(WindowStyle) = 3 ]
+	Perform Script [ From list ; "Close card Window" ]
+End If
+
+# Open card
+Set Variable [ $$call_layout[1] ; $call_layout ]
+Set Variable [ $$currentWindow[1] ; Get(windowName) ]
+New Window [ Style: Card ; Name: "IO settings" ; Layout: "FAT IO Card" ; Height: 680 * Get(WindowZoomLevel)/100 ; Width: 1200 * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+
+# Fix IO popup menus for field
+Set Field [ FAT Title::gIOFilter ; $io_type ]
+
+If [ $io_id ≠ "" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Go to Object [ FAT IO::LastSettingTab ; Repetition: 1 ]
+Else
+	# Create a new IO
+	New Record/Request
+	Set Field [ FAT IO::Title id ; $title_id ]
+	# When creating an IO from Title IOs oveview - type is "new"
+	Set Field [ FAT IO::IO type ; $io_type ]
+	Set Variable [ $io_id[1] ; FAT IO::PrimaryKey ]
+	Set Variable [ $source_table[1] ; "io" ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Set Field [ FAT IO::xAPI storage ; Case ( IO Type::xAPI enabled ; 1 ; 0 ) ]
+	# If there are modifiers connected
+	If [ IO Type::IO has modifiers ]
+		Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "IO" ) & 
+						SetProperty ( "item_id" ; $io_id ) &
+						SetProperty ( "learningprogramme_id" ; $title_id ) &
+						SetProperty ( "symbol_id" ; $io_type ) ]
+		Go to Layout [ Layout: "FAT IO Card" ; Animation: None ]
+	End If
+	
+	# If there are fields connected - create one field!
+	If [ IO Type::IO has fields ]
+		Perform Script [ From list ; "New input field" ; Parameter: SetProperty ( "io_id" ; $io_id ) &
+						SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "new_io" ; True ) ]
+	End If
+	
+	# If there are corresponding texts to the io (i.e. rate) create textfields
+	If [ IO Type::Number of text fields>0 ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $io_id ) &
+						SetProperty ( "source_table" ; $source_table ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT IO::Text 1 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+	If [ IO Type::Number of text fields>1 ]
+		Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $io_id ) &
+						SetProperty ( "source_table" ; $source_table ) &
+						SetProperty ( "source_textfield" ; GetFieldName ( FAT IO::Text 2 id ) ) &
+						SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	End If
+	
+	Go to Field [ Select/perform ; FAT IO::Name ]
+End If
+

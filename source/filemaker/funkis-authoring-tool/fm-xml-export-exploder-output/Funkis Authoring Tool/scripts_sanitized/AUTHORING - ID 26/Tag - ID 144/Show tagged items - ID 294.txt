@@ -1,0 +1,24 @@
+# Called from FAT Tag list
+Freeze Window
+Set Error Capture [ ON ]
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+Set Variable [ $tag_key[1] ; GetScriptProperty ( "tag_key" ) ]
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+
+If [ PatternCount ( $caller ; "card" ) ]
+	Perform Script [ From list ; "Close card Window" ]
+Else
+	Set Variable [ $level[1] ; FAT Tag::Level ]
+	Set Variable [ $tag_key[1] ; FAT Tag::PrimaryKey ]
+End If
+
+Perform Script [ From list ; "Save Active Layout" ]
+Go to Layout [ Layout: "FAT Tag Value" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+Else
+	Show Custom Dialog [ Title: "No items found with this tag" ; Message: "There's currently no items in the Title using this tag. " ; Default Button: "OK" ]
+	Perform Script [ From list ; "Go previous layout" ]
+End If
+
+

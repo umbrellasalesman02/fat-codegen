@@ -1,0 +1,16 @@
+Set Error Capture [ ON ]
+// Commit Records/Requests [ With dialog: OFF ]
+If [ Length(FAT Media::gSearchText) >2 ]
+	Set Variable [ $filename[1] ; FAT Media::gSearchText ]
+	// Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+Else If [ Length(FAT Media::gSearchText) = 0 ]
+	If [ FAT Media::gPackage = "" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else
+		Set Variable [ $package_id[1] ; FAT Media::gPackage ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+End If
+Go to Field [ FAT Media::gSearchText ]
+

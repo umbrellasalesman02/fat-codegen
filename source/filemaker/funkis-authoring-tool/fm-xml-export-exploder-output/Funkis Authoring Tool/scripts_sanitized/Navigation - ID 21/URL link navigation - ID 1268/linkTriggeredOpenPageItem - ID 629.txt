@@ -1,0 +1,69 @@
+# Called from Insepctor in a title, i.e. fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenPageItem&param=8FAD2EC0-736E-4ED5-AD62-37A5CF8F10DD
+# Called from Block instances layout inside FAT
+# Called from Sprig story
+
+
+Allow User Abort [ OFF ]
+Set Error Capture [ ON ]
+
+Select Window [ Name: GetValue ( Variables::gWindowList; 1) ]
+// Set Variable [ $$pageItemRecordLoadTrigger[1] ; 0 ]
+Perform Script [ From list ; "Save Active Layout" ]
+
+Set Variable [ $pageitem_id[1] ; Get(scriptParameter) ]
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# ----------- SECURITY CHECKS ----------------------------------
+If [ notDeveloper ]
+	If [ Get(foundCount) = 0 ]
+		Show Custom Dialog [ Title: "Warning" ; Message: "Page item does not exist" ; Default Button: "OK" ]
+		Exit Application
+	End If
+	
+	# Security check so external users cannot reach other clients programs
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $login_id[1] ; Case( 
+					
+					        PatternCount(Get(accountName); "@") > 0; 
+					        Replace ( Get(accountName) ; Position ( Get(accountName) ; "@" ; 0 ; 1 ) ; 1 ; "\@" );
+					        Get(accountName)
+					) ]
+	Go to Layout [ Layout: "TABLE User X Title" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+	If [ Get(foundCount) =0 ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+		Show Custom Dialog [ Title: "No access" ; Message: "Sorry. Your user does not seem to have access to this page item." ; Default Button: "OK" ]
+		Exit Application
+	End If
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+Else
+	If [ Get(foundCount) = 0 ]
+		Show Custom Dialog [ Title: "Warning" ; Message: "Page item does not exist" ; Default Button: "OK" ]
+		Go to Layout [ Layout: "Login Developer" ; Animation: None ]
+		Exit Script []
+	End If
+End If
+# --------------- END SECURITY CHECKS ------------------------------------------
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+
+Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+
+Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+
+Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ]
+Set Variable [ $$currentPackage[1] ; FAT Package::JSON Friendly id ]
+
+Go to Related Record [ Table: FAT Title ; Layout: "TABLE FAT Title" ; Show related ]
+Set Variable [ $$lp_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $$localisation_code[1] ; FAT Title::Original localisation code ]
+
+Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+Set Variable [ $page_id[1] ; FAT Page item::Parent id ]
+Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "chapter_id" ; FAT Chapter::PrimaryKey ) & 
+				SetProperty ( "page_id" ; FAT Page::PrimaryKey ) & 
+				SetProperty ( "pageitem_id" ; $pageitem_id) &
+				SetProperty ( "proxy_type" ; FAT Page::Proxy type ) ]
+

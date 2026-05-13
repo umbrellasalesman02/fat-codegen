@@ -1,0 +1,68 @@
+# Used to arrange order of all FAT items in portals
+# ================================================
+
+Freeze Window
+
+# ================================================
+Set Variable [ $action[1] ; GetScriptProperty ( "action" ) ]
+Set Variable [ $sortField[1] ; GetScriptProperty ( "sortField" ) ]
+Set Variable [ $numberOfPortalRows[1] ; GetField ( GetScriptProperty ( "numberOfChildrenField" ) ) ]
+Set Variable [ $portal_no[1] ; Get(ActivePortalRowNumber) ]
+Set Variable [ $portal_name[1] ; "Portal" ]
+If [ $action = "up" ]
+	If [ Get(ActivePortalRowNumber)≠1 ]
+		If [ Get(ActivePortalRowNumber)>2 ]
+			Go to Portal Row [ Exit after last: OFF ; Previous ]
+			Set Variable [ $sortindex1[1] ; GetField ( $sortField ) ]
+			Go to Portal Row [ Exit after last: OFF ; Previous ]
+			Set Variable [ $sortindex2[1] ; GetField ( $sortField ) ]
+			Set Variable [ $newindex[1] ; $sortindex1 + ($sortindex2 - $sortindex1)/2 ]
+		Else If [ Get(ActivePortalRowNumber)=2 ]
+			Go to Portal Row [ Exit after last: OFF ; Previous ]
+			Set Variable [ $sortindex1[1] ; GetField ( $sortField ) ]
+			Set Variable [ $newindex[1] ; $sortindex1 - ,1 ]
+		End If
+		Go to Portal Row [ With dialog: OFF ; By Calculation… ]
+		Set Field By Name [ Specify target field: ON ; $sortField ; $newindex ]
+		Commit Records/Requests [ With dialog: OFF ]
+		Go to Object [ $portal_name ; Repetition: 1 ]
+		Go to Portal Row [ With dialog: OFF ; By Calculation… ]
+	End If
+Else If [ $action = "down" ]
+	
+	If [ Get(ActivePortalRowNumber) ≠ $numberOfPortalRows ]
+		If [ ($numberOfPortalRows - Get(ActivePortalRowNumber))>1 ]
+			Go to Portal Row [ Exit after last: OFF ; Next ]
+			Set Variable [ $sortindex1[1] ; GetField ( $sortField ) ]
+			Go to Portal Row [ Exit after last: OFF ; Next ]
+			Set Variable [ $sortindex2[1] ; GetField ( $sortField ) ]
+			Set Variable [ $newindex[1] ; $sortindex1 + ($sortindex2 - $sortindex1)/2 ]
+		Else If [ ($numberOfPortalRows - Get(ActivePortalRowNumber)) = 1 ]
+			Go to Portal Row [ Exit after last: OFF ; Next ]
+			Set Variable [ $sortindex1[1] ; GetField ( $sortField ) ]
+			Set Variable [ $newindex[1] ; $sortindex1 + ,1 ]
+		End If
+		Go to Portal Row [ With dialog: OFF ; By Calculation… ]
+		Set Field By Name [ Specify target field: ON ; $sortField ; $newindex ]
+		Commit Records/Requests [ With dialog: OFF ]
+		Go to Object [ $portal_name ; Repetition: 1 ]
+		Go to Portal Row [ With dialog: OFF ; By Calculation… ]
+	End If
+End If
+
+If [ $sortField = "FAT Package::SortIndex" ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+Else If [ $sortField = "FAT Chapter::SortIndex" ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+Else If [ $sortField = "FAT Page::SortIndex" ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+Else If [ $sortField = "FAT Page item::SortIndex" ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+End If
+
+If [ Get(layoutName) = "FAT Title" Or Get(layoutName) = "FAT Package" ]
+	# Only Title and Package have content overviews
+	Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+End If
+
+

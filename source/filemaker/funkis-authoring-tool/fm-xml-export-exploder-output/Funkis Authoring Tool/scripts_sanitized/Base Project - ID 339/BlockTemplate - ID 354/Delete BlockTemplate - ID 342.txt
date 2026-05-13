@@ -1,0 +1,22 @@
+Show Custom Dialog [ Title: "Delete block template" ; Message: "If you delete this block template - all blocks using this template will be disconnected from the template. ¶¶Are you sure you want to delete the block template?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) =1 ]
+	Freeze Window
+	Set Error Capture [ ON ]
+	Set Variable [ $listOfLPs[1] ; Substitute ( List(FAT Title::Reference title); ¶ ; ", ") ]
+	Set Variable [ $templatesymbol_id[1] ; BlockTemplate::PrimaryKey ]
+	Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Show Custom Dialog [ Title: "Found " & Get(foundCount) & " blocks" ; Message: "Found  " & Get(foundCount) & " blocks using this template in programmes: " & $listOfLPs & "." & ¶ & ¶ &   "Are you OK to disconnect the blocks in these programmes from the template? This cannot be undone." ; Default Button: "Cancel" ; Button 2: "Delete" ]
+		If [ Get(lastMessageChoice) =2 ]
+			Replace Field Contents [ FAT Block::BlockTemplate id ; Replace with calculation: "" ]
+			Go to Layout [ Layout: <original layout> ; Animation: None ]
+			Delete Record/Request [ With dialog: OFF ]
+		End If
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Else
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Delete Record/Request [ With dialog: OFF ]
+	End If
+End If
+

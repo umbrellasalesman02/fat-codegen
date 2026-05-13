@@ -1,0 +1,80 @@
+
+# This script sets up all visual elements
+# Called from script trigger OnRecordLoad in layout FAT Page item
+# Also called from ChangeSortOrder and Go FAT item and more
+# Also called from a button script in master-layout portal. Logic stops from double-fire. 
+# Must stand on the record to set it up
+
+# NEW 2025-04-08: Also used when Paste text into text fields
+
+Freeze Window
+Set Variable [ $html_text[1] ; Get(scriptParameter ) ]
+
+
+# Only launch if not launched recently - to avoid double-fire when clicking in portal
+If [ $$pageItemRecordLoadTrigger And Get(CurrentTimeUTCMilliseconds) - $$lastTriggeredMilliseconds > 2000 ]
+	
+	Refresh Object [ Name: "Tag-Score-Condition buttons" ]
+	Go to Object [ FAT Page item::LastSettingTab ; Repetition: 1 ]
+	
+	Set Web Viewer [ "WebViewer Quill" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+	
+	If [ Platform = "WebDirect" Or Platform = "iOS" ]
+		# This makes a difference with current script architecture
+		Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+	End If
+	
+	If [ IsEmpty ( $html_text ) ]
+		Loop [ Flush: Always ]
+			Set Variable [ $i[1] ; $i + 1 ]
+			// Set Variable [ $html_text[1] ; Case ( IsEmpty ( $html_text) ; FAT Page item::HTML JSON Parameters; $html_text) ]
+			If [ $i < 5 ]
+				# Try to set direct
+				Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+			Else If [ $i ≥ 5 And $i < 10 ]
+				# Try with an initial pause
+				Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+				Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+			Else
+				# Try to re-set web viewer and refresh
+				Set Web Viewer [ "WebViewer Quill" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+				Refresh Object [ Name: "WebViewer Quill" ]
+				Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+				Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+				Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+			End If
+			# Continue to loop if Perform Javascript in Web Viewer throws an error
+			Exit Loop If [ Get(lastError) ≠ 5 Or $i > 20 ]
+		End Loop
+	Else
+		# Paste HTML text. Due to an error in Web Viewer this couldn't be done in the same loop
+		Loop [ Flush: Always ]
+			Set Variable [ $i[1] ; $i + 1 ]
+			If [ $i < 5 ]
+				# Try to set direct
+				Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+			Else If [ $i ≥ 5 And $i < 10 ]
+				# Try with an initial pause
+				Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+				Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+			Else
+				# Try to re-set web viewer and refresh
+				Set Web Viewer [ "WebViewer Quill" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+				Refresh Object [ Name: "WebViewer Quill" ]
+				Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+				Perform JavaScript in Web Viewer [ Name: "WebViewer Quill" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+				Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+			End If
+			# Continue to loop if Perform Javascript in Web Viewer throws an error
+			Exit Loop If [ Get(lastError) ≠ 5 Or $i > 20 ]
+		End Loop
+	End If
+	// Show Custom Dialog [ Title: $$lasterror ; Default Button: "OK" ]
+	Set Variable [ $$lastTriggeredMilliseconds[1] ; Get(CurrentTimeUTCMilliseconds) ]
+	
+End If
+
+
+
+
+

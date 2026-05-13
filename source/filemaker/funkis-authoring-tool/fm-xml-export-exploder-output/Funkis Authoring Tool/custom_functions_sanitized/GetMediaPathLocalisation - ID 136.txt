@@ -1,0 +1,21 @@
+Let ( 
+[
+ image =PatternCount ( mediafile ; ".jpg" ) Or PatternCount ( mediafile ; ".jpeg" ) Or PatternCount ( mediafile ; ".png" ) Or PatternCount ( mediafile ; ".svg" ) Or PatternCount ( mediafile ; ".gif" ) Or PatternCount ( mediafile ; ".webp" ); 
+ video = PatternCount ( mediafile ; ".mp4" );
+ sound = PatternCount ( mediafile ; ".mp3" );
+ subtitle = PatternCount ( mediafile ; ".vtt" );
+ pdf = PatternCount ( mediafile ; ".pdf" );
+ json = PatternCount ( mediafile ; ".json" );
+ isKnownFileType = image Or video Or sound Or subtitle Or pdf Or json;
+ Other = Not isKnownFileType
+] ;
+
+If ( image ; "content/language/" & localisationCode & "/images/"; 
+If (video Or subtitle ; "content/language/" & localisationCode & "/videos/";
+If (sound ; "content/language/" & localisationCode & "/sounds/";
+If (pdf ; "content/language/" & localisationCode & "/pdf/";
+If (json ; "content/language/" & localisationCode & "/json/";
+If ( Other ; "content/language/" & localisationCode & "/files/"
+))))))
+
+)

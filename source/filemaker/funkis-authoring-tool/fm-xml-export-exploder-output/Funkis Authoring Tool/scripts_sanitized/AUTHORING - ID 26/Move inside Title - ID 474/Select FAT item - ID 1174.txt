@@ -1,0 +1,21 @@
+# This script will select items to move or shuffle.
+  It is connected to the Move scripts
+
+# Called from a Select button in any layout
+
+# fat_item_id = List of PrimaryKeys for Package, Chapter, Page or Page item
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+
+# fat_item_parent_id = PrimaryKey for the parent
+Set Variable [ $item_parent_id[1] ; GetScriptProperty ( "item_parent_id" ) ]
+
+If [ $item_parent_id = $$fat_item_parent_id ]
+	# The selected item has the same parent as the previous selected item - add to list
+	Set Variable [ $$fat_item_id[1] ; $$fat_item_id & "¶" & $item_id ]
+Else
+	Set Variable [ $$fat_item_parent_id[1] ; $item_parent_id ]
+	Set Variable [ $$fat_item_id[1] ; $item_id ]
+End If
+
+
+

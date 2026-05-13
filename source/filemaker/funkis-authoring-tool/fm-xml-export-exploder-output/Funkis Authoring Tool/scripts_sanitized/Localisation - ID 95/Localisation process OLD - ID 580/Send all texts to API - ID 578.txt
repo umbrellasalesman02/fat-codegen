@@ -1,0 +1,133 @@
+Set Error Capture [ ON ]
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+Set Variable [ $title_id[1] ; GetScriptProperty ("title_id") ]
+Set Variable [ $package_id[1] ; GetScriptProperty ("package_id") ]
+
+Set Variable [ $original_localisation_code[1] ; GetScriptProperty ( "original_localisation_code" ) ]
+Set Variable [ $target_localisation_code[1] ; GetScriptProperty ( "target_localisation_code" ) ]
+
+# THe translation API
+Set Variable [ $translation_api[1] ; GetScriptProperty ( "translation_api" ) ]
+
+# Get all info for the translation API
+Go to Layout [ Layout: "TABLE Translation API" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $send_api_url[1] ; Translation API @ Title::Send translation URL ]
+Set Variable [ $api_key[1] ; Translation API @ Title::API PrivateKey ]
+Set Variable [ $asynchronous[1] ; Translation API @ Title::Asynchronous ]
+Set Variable [ $routing[1] ; Translation API @ Title::Routing ]
+
+Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+
+# Find all texts in Title with the target language and country code and that don't belong to a specific package
+# Omit translated texts
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+# Extend found with all texts in Package with the target language and country code
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+// # Omit translated and Approved texts
+// Perform Find [ ⚠️ RESTORE ⚠️ ]
+// # Extend found with all texts in Package with the target language and country code
+// Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+# Sort texts using recordNumberReference if exist
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Go to Record/Request/Page [ First ]
+
+Set Variable [ $num_of_new_translations[1] ; 0 ]
+Set Variable [ $num_of_updated_translations[1] ; 0 ]
+
+If [ Get(foundCount)>0 ]
+	
+	Loop [ Flush: Always ]
+		# Make sure the translated text will get the same reference number
+		Set Variable [ $record_number_reference[1] ; FAT Text @ Translation::RecordNumberReference ]
+		// Set Field [ FAT Text translated::RecordNumberReference ; $record_number_reference ]
+		
+		Set Variable [ $original_modification_timestamp[1] ; FAT Text @ Translation::ModificationTimeStamp ]
+		
+		# Translate if text is new or if its modified since last translation. Don't translate if text is approved
+		  Text status can be:
+		  1. Not translated
+		  2. Sent to API (only asynchronous machine translation)
+		  3. Not reviewed
+		  4. In progress
+		  5. Approved
+		
+		If [ FAT Text translated::Status = "Not translated" 
+						
+						// If the text hasn't been translated before or sent to API (async only)
+						
+						Or 
+						
+						($original_modification_timestamp > FAT Text translated::ModificationTimeStamp And FAT Text translated::Status ≠ "Approved")
+						
+						// If the original text has changed and the translation har not yet been approved ]
+			If [ FAT Text translated::Status = "Not translated" ]
+				Set Variable [ $num_of_new_translations[1] ; $num_of_new_translations + 1 ]
+			Else
+				Set Variable [ $num_of_updated_translations[1] ; $num_of_updated_translations + 1 ]
+			End If
+			# Get the text to translate
+			Set Variable [ $text_to_translate[1] ; FAT Text @ Translation::Text ]
+			
+			# ------------     TRANSLATE     ------------------------------------------------
+			Perform Script [ From list ; "Send text to API" ; Parameter: SetProperty( "text_to_translate" ; $text_to_translate ) &
+							SetProperty( "original_localisation_code" ; $original_localisation_code) &
+							SetProperty( "target_localisation_code" ; $target_localisation_code) &
+							SetProperty( "translation_api" ; $translation_api ) &
+							SetProperty( "send_api_url"; $send_api_url) &
+							SetProperty( "api_key"; $api_key) &
+							SetProperty( "asynchronous"; $asynchronous) &
+							SetProperty( "routing"; $routing) ]
+			
+			# Use result in different ways depending if the api requires asynchronous translations or not
+			If [ $asynchronous ]
+				# Result is an id that will be used when fetching the translation later
+				Set Variable [ $translation_id[1] ; Get(ScriptResult) ]
+				# Sometimes we receve an error JSON object from Intento instead of an id
+				If [ PatternCount ( $translation_id; "--- ERROR ---" ) ]
+					Set Field [ FAT Text translated::aSync translation id ; "" ]
+					Set Field [ FAT Text translated::Text ; $translation_id ]
+					Set Field [ FAT Text translated::Status ; "Not translated" ]
+					Set Field [ FAT Text translated::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; "Not translated" ]
+				Else
+					# If we receive an id - everything's OK
+					Set Field [ FAT Text translated::aSync translation id ; $translation_id ]
+					Set Field [ FAT Text translated::Status ; "Sent to API" ]
+					Set Field [ FAT Text translated::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; "Sent to API" ]
+				End If
+			Else
+				# Result is the translated text
+				Set Variable [ $translation_text[1] ; Get(ScriptResult) ]
+				Set Field [ FAT Text translated::Text ; $translation_text ]
+				If [ Not IsEmpty ( $translation_text) ]
+					Set Field [ FAT Text translated::Status ; "Not reviewed" ]
+					Set Field [ FAT Text translated::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; "Not reviewed" ]
+				Else
+					Set Field [ FAT Text translated::Status ; "Not translated" ]
+					Set Field [ FAT Text translated::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; "Not translated" ]
+				End If
+			End If
+			
+		Else If [ FAT Text translated::Status = "Approved" And $original_modification_timestamp > FAT Text translated::ModificationTimeStamp ]
+			# If text already is approved (also = translated) - set is as In progress
+			Set Field [ FAT Text translated::Status ; "In progress" ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+Exit Script [ SetProperty ( "num_of_updated_translations" ; $num_of_updated_translations ) & SetProperty ( "num_of_new_translations" ; $num_of_new_translations ) ]
+
+
+
+
+
+
+

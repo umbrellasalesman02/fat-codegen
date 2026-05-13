@@ -1,0 +1,43 @@
+# Find all Modifiers for the specific Block.
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $blocktemplate_id[1] ; GetScriptProperty("blocktemplate_id") ]
+Set Variable [ $block_id[1] ; GetScriptProperty("block_id") ]
+
+Freeze Window
+Set Error Capture [ ON ]
+
+# Check blockTemplate for modifierTemplates
+Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $attribute_template_id[1] ; ModifierTemplate::PrimaryKey ]
+		Set Variable [ $level[1] ; "Block" ]
+		Set Variable [ $attribute_type[1] ; ModifierTemplate::Type ]
+		Set Variable [ $attribute_name[1] ; ModifierTemplate::Name ]
+		Set Variable [ $modifier_values[1] ; ModifierTemplate::Values ]
+		Set Variable [ $attribute_default_value[1] ; ModifierTemplate::DefaultValue ]
+		Set Variable [ $attribute_description[1] ; ModifierTemplate::Description ]
+		
+		Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+		
+		# Check if modifier already exist
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		
+		If [ Get ( foundCount ) = 0 ]
+			New Record/Request
+			Set Field [ FAT Modifier::Title id ; $title_id ]
+			Set Field [ FAT Modifier::ModifierTemplate id ; $attribute_template_id ]
+			Set Field [ FAT Modifier::Name ; $attribute_name ]
+			Set Field [ FAT Modifier::Parent id ; $block_id ]
+			Set Field [ FAT Modifier::Level ; $level ]
+			Set Field [ FAT Modifier::Type ; $attribute_type ]
+			Set Field [ FAT Modifier::Values ; $modifier_values ]
+			Set Field [ FAT Modifier::DefaultValue ; $attribute_default_value ]
+			Set Field [ FAT Modifier::Description ; $attribute_description ]
+		End If
+		Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+

@@ -1,0 +1,104 @@
+# This script is called from Title settings on the language TAB
+# Mode can be "cleanup" - deleting unused blocks or "optimise" also deleting unsed texts and media fields
+
+# It deletes all unused Blocks and Text fields that are empty. 
+Freeze Window
+Set Error Capture [ ON ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $mode[1] ; GetScriptProperty ( "mode" ) ]
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $localisation_code[1] ; FAT Title::Original localisation code ]
+# Delete unused blocks
+Go to Layout [ Layout: "TABLE FAT Block" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $blocks_deleted[1] ; Get(foundCount) ]
+Delete All Records [ With dialog: OFF ]
+# Find all page items in Title
+
+If [ $mode = "optimise" ]
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $textFields[1] ; "CMT Page item::Text 1 id¶CMT Page item::Text 2 id¶CMT Page item::Text 3 id¶CMT Page item::Text 4 id¶CMT Page item::Text 5 id¶CMT Page item::Text 6 id¶CMT Page item::Text 7 id" ]
+	Set Variable [ $mediaFields[1] ; "CMT Page item::Media 1 id¶CMT Page item::Media 2 id" ]
+	
+	
+	If [ Get(foundCount)>0 ]
+		Loop [ Flush: Always ]
+			Set Variable [ $page_item_id[1] ; FAT Page item::PrimaryKey ]
+			Set Variable [ $num_of_text_fields[1] ; FAT Block @ Page item::Number of text fields ]
+			Set Variable [ $num_of_media_containers[1] ; FAT Block @ Page item::Number of media containers ]
+			Set Variable [ $textFieldList[1] ; List(
+							
+							FAT Page item::Text 1 id; 
+							FAT Page item::Text 2 id; 
+							FAT Page item::Text 3 id; 
+							FAT Page item::Text 4 id; 
+							FAT Page item::Text 5 id; 
+							FAT Page item::Text 6 id; 
+							FAT Page item::Text 7 id
+							
+							) ]
+			Set Variable [ $mediaFieldList[1] ; List(
+							
+							FAT Page item::Media 1 id; 
+							FAT Page item::Media 2 id
+							
+							) ]
+			# Delete text ids
+			Set Variable [ $i[1] ; $num_of_text_fields + 1 ]
+			If [ $i ≤ 7 ]
+				Loop [ Flush: Always ]
+					Set Field By Name [ Specify target field: ON ; GetValue ( $textFields ; $i ) ; "" ]
+					Set Variable [ $i[1] ; $i+1 ]
+					Exit Loop If [ $i>7 ]
+				End Loop
+			End If
+			# Delete media ids
+			Set Variable [ $i[1] ; $num_of_media_containers + 1 ]
+			If [ $i ≤ 2 ]
+				Loop [ Flush: Always ]
+					Set Field By Name [ Specify target field: ON ; GetValue ( $mediaFields ; $i ) ; "" ]
+					Set Variable [ $i[1] ; $i+1 ]
+					Exit Loop If [ $i>2 ]
+				End Loop
+			End If
+			# Delete unused texts
+			Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+			Set Variable [ $i[1] ; $num_of_text_fields + 1 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $text_id[1] ; GetValue ( $textFieldList ; $i ) ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)=1 ]
+					Set Variable [ $textfields_deleted[1] ; $textfields_deleted + 1 ]
+					Delete Record/Request [ With dialog: OFF ]
+				End If
+				Set Variable [ $i[1] ; $i+1 ]
+				Exit Loop If [ $i>7 ]
+			End Loop
+			# Delete unused media
+			Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+			Set Variable [ $i[1] ; $num_of_media_containers + 1 ]
+			Loop [ Flush: Always ]
+				Set Variable [ $media_id[1] ; GetValue ( $mediaFieldList ; $i ) ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)=1 ]
+					Set Variable [ $mediafields_deleted[1] ; $mediafields_deleted + 1 ]
+					Delete Record/Request [ With dialog: OFF ]
+				End If
+				Set Variable [ $i[1] ; $i+1 ]
+				Exit Loop If [ $i>2 ]
+			End Loop
+			Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+		Set Variable [ $scriptResult[1] ; "The cleanup resulted in:  "  & ¶ & ¶  & 
+						"Unused blocks: " & $blocks_deleted  & ¶ & 
+						"Unused text fields: " & $textfields_deleted & ¶ & 
+						"Unused media fields: " & $mediafields_deleted & ¶ & ¶ & 
+						"Thank you for keeping the database healthy!" ]
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+Exit Script [ $scriptResult ]
+

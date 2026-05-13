@@ -1,0 +1,105 @@
+# Called from BLock Template detailed view
+Show Custom Dialog [ Title: "Duplicate block template" ; Message: "Are you sure you want to duplicate this block template?¶¶All stateToggles and attributes connected to the block template will also be duplicated.¶¶ Global texts will NOT be duplicated." ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice)= 2 ]
+	Exit Script []
+End If
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $old_blocktemplate_id[1] ; BlockTemplate::PrimaryKey ]
+
+Go to Layout [ Layout: "TABLE BlockTemplate" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# Save all Auto-enter data fields
+Set Variable [ $blocktemplate_name[1] ; BlockTemplate::Name ]
+Set Variable [ $block_page_type[1] ; BlockTemplate::Block page type ]
+Set Variable [ $num_of_textfields[1] ; BlockTemplate::Number of text fields ]
+Set Variable [ $num_of_media_containers[1] ; BlockTemplate::Number of media containers ]
+Set Variable [ $page_item_list_enabled[1] ; BlockTemplate::Page item List enabled ]
+Set Variable [ $list_enabled[1] ; BlockTemplate::List enabled ]
+Set Variable [ $io_enabled[1] ; BlockTemplate::IO enabled ]
+Set Variable [ $io_write_enabled[1] ; BlockTemplate::IO write enabled ]
+Set Variable [ $useLabelsInJSON[1] ; BlockTemplate::UseLabelsInJSON ]
+Set Variable [ $min_num_of_list_items[1] ; BlockTemplate::Minimum number of items ]
+Set Variable [ $max_num_of_list_items[1] ; BlockTemplate::Maximum number of items ]
+
+Set Variable [ $label_override_text_1[1] ; BlockTemplate::Label override text 1 ]
+Set Variable [ $label_override_text_2[1] ; BlockTemplate::Label override text 2 ]
+Set Variable [ $label_override_text_3[1] ; BlockTemplate::Label override text 3 ]
+Set Variable [ $label_override_text_4[1] ; BlockTemplate::Label override text 4 ]
+Set Variable [ $label_override_text_5[1] ; BlockTemplate::Label override text 5 ]
+Set Variable [ $label_override_text_6[1] ; BlockTemplate::Label override text 6 ]
+Set Variable [ $label_override_text_7[1] ; BlockTemplate::Label override text 7 ]
+Set Variable [ $label_override_media_1[1] ; BlockTemplate::Label override media 1 ]
+Set Variable [ $label_override_media_2[1] ; BlockTemplate::Label override media 2 ]
+
+
+Set Variable [ $num_of_ca_textfields[1] ; BlockTemplate::CA number of textfields OLD ]
+Set Variable [ $num_of_ca_media_container[1] ; BlockTemplate::CA number of media containers OLD ]
+Set Variable [ $num_of_ca_valuefield[1] ; BlockTemplate::CA number of value fields OLD ]
+Set Variable [ $ca_header_label[1] ; BlockTemplate::Label override CA header OLD ]
+Set Variable [ $ca_text1_label[1] ; BlockTemplate::Label override CA Text 1 OLD ]
+Set Variable [ $ca_text2_label[1] ; BlockTemplate::Label override CA Text 2 OLD ]
+Set Variable [ $ca_text3_label[1] ; BlockTemplate::Label override CA Text 3 OLD ]
+Set Variable [ $ca_media_label[1] ; BlockTemplate::Label override CA Media OLD ]
+Set Variable [ $ca_value_label[1] ; BlockTemplate::Label override CA Value OLD ]
+
+Duplicate Record/Request
+
+Set Variable [ $new_blocktemplate_id[1] ; BlockTemplate::PrimaryKey ]
+Set Field [ BlockTemplate::Name ; $blocktemplate_name & " COPY" ]
+Set Field [ BlockTemplate::Block page type ; $block_page_type ]
+Set Field [ BlockTemplate::Number of text fields ; $num_of_textfields ]
+Set Field [ BlockTemplate::Number of media containers ; $num_of_media_containers ]
+Set Field [ BlockTemplate::Page item List enabled ; $page_item_list_enabled ]
+Set Field [ BlockTemplate::List enabled ; $list_enabled ]
+Set Field [ BlockTemplate::IO enabled ; $io_enabled ]
+Set Field [ BlockTemplate::IO write enabled ; $io_write_enabled ]
+Set Field [ BlockTemplate::UseLabelsInJSON ; $useLabelsInJSON ]
+Set Field [ BlockTemplate::Minimum number of items ; $min_num_of_list_items ]
+Set Field [ BlockTemplate::Maximum number of items ; $max_num_of_list_items ]
+
+Set Field [ BlockTemplate::Label override text 1 ; $label_override_text_1 ]
+Set Field [ BlockTemplate::Label override text 2 ; $label_override_text_2 ]
+Set Field [ BlockTemplate::Label override text 3 ; $label_override_text_3 ]
+Set Field [ BlockTemplate::Label override text 4 ; $label_override_text_4 ]
+Set Field [ BlockTemplate::Label override text 5 ; $label_override_text_5 ]
+Set Field [ BlockTemplate::Label override text 6 ; $label_override_text_6 ]
+Set Field [ BlockTemplate::Label override text 7 ; $label_override_text_7 ]
+Set Field [ BlockTemplate::Label override media 1 ; $label_override_media_1 ]
+Set Field [ BlockTemplate::Label override media 2 ; $label_override_media_2 ]
+
+
+Set Field [ BlockTemplate::CA number of textfields OLD ; $num_of_ca_textfields ]
+Set Field [ BlockTemplate::CA number of media containers OLD ; $num_of_ca_media_container ]
+Set Field [ BlockTemplate::CA number of value fields OLD ; $num_of_ca_valuefield ]
+Set Field [ BlockTemplate::Label override CA header OLD ; $ca_header_label ]
+Set Field [ BlockTemplate::Label override CA Text 1 OLD ; $ca_text1_label ]
+Set Field [ BlockTemplate::Label override CA Text 2 OLD ; $ca_text2_label ]
+Set Field [ BlockTemplate::Label override CA Text 3 OLD ; $ca_text3_label ]
+Set Field [ BlockTemplate::Label override CA Media OLD ; $ca_media_label ]
+Set Field [ BlockTemplate::Label override CA Value OLD ; $ca_value_label ]
+
+Commit Records/Requests [ With dialog: OFF ]
+
+
+# Check if old blockTemplate has attributeTemplates
+Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		Duplicate Record/Request
+		Set Field [ ModifierTemplate::Template parent id ; $new_blocktemplate_id ]
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

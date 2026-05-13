@@ -1,0 +1,22 @@
+# The GetThumbnail FileMaker function scales horroble. DONT USE!!!!
+Show Custom Dialog [ Title: "Shrink image" ; Message: "Enter your desired width or height and the image will shrink to fit. Proportions will not be changed.¶¶
+				This cannot be undone." ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $width ; Label 1: "Image width (px)" ; Input 2: $height ; Label 2: "Image height (px)" ]
+
+If [ Get(lastMessageChoice) = 1 ]
+	Set Variable [ $shrink_media[1] ; GetThumbnail(
+					
+					  FAT Media::Media container; 
+					
+					
+					  Case ( $width>0 ; $width ; GetWidth ( FAT Media::Media container )) ;
+					
+					
+					  Case ( $height>0 ; $height ; GetHeight ( FAT Media::Media container )) 
+					
+					
+					) ]
+	Set Field [ FAT Media::Media container ; $shrink_media ]
+	Commit Records/Requests [ With dialog: OFF ]
+End If
+
+

@@ -1,0 +1,55 @@
+# This script is called from the Chapter layout. It is not used for creating Pages outside the Baseproject structure
+
+Set Variable [ $proxy_type[1] ; GetScriptProperty ( "proxy_type" ) ]
+Set Variable [ $block_id[1] ; GetScriptProperty ( "block_id" ) ]
+Set Error Capture [ ON ]
+Freeze Window
+Perform Script [ From list ; "Save Active Layout" ]
+Set Variable [ $learningprogramme_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $parent_id[1] ; FAT Chapter::PrimaryKey ]
+
+If [ IsEmpty ( FAT Chapter::Hierarchy level ) ]
+	# Proxy chapter
+	If [ IsEmpty ( FAT Package::Hierarchy level ) ]
+		# Proxy package
+		Set Variable [ $hierarchy_level[1] ; 0 ]
+	Else
+		Set Variable [ $hierarchy_level[1] ; FAT Package::Hierarchy level ]
+	End If
+Else
+	Set Variable [ $hierarchy_level[1] ; FAT Chapter::Hierarchy level ]
+End If
+// Perform Script [ From list ; "Create Page SRV" ; Parameter: SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) &
+				SetProperty ( "parent_id" ; $parent_id ) &
+				SetProperty ( "proxy_type" ; $proxy_type ) &
+				SetProperty ( "block_id" ; $block_id ) &
+				SetProperty ( "hierarchy_level" ; $hierarchy_level ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+If [ $proxy_type = "" ]
+	Set Variable [ $page_id[1] ; Get(ScriptResult) ]
+	Go to Related Record [ Table: FAT Page ; Layout: "TABLE FAT Page" ; Show related ]
+	Go to Record/Request/Page [ With dialog: OFF ; Let ( [
+					
+					listOfRecordIDs = List (FAT Page::List of PrimaryKey);
+					theDesiredRecordID = $page_id
+					
+					] ;
+					
+					ValueCount ( Left ( listOfRecordIDs ; Position ( listOfRecordIDs ; theDesiredRecordID ; 1 ; 1 ) ) )
+					
+					) ]
+	Go to Layout [ Layout: "FAT Page" ; Animation: None ]
+	Set Field [ FAT Page::Page type ; "default" ]
+	Set Field [ FAT Page::Allowed Block type ; FAT Page::Package type ]
+	Go to Field [ Select/perform ; TF PG Header::Text ]
+Else If [ $proxy_type= "page_item" ]
+	Set Variable [ $pageitem_id[1] ; Get(ScriptResult) ]
+	Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "chapter_id" ; $parent_id ) & 
+					SetProperty ( "pageitem_id" ; $pageitem_id ) &
+					SetProperty ( "proxy_type" ; $proxy_type ) ]
+End If
+
+
+
+

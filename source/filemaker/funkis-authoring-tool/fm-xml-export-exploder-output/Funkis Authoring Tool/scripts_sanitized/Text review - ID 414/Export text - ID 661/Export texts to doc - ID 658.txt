@@ -1,0 +1,66 @@
+# This script is launched from a button in Localisation views and Text reviews
+
+Freeze Window
+If [ PatternCount ( Get(layoutName); "Text") ]
+	Set Variable [ $text_review[1] ; True ]
+	# Text review layout
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $localisation_code[1] ; $$localisation_code ]
+	If [ Not IsEmpty ( FAT Text::gPackage ) ]
+		# Export only one package
+		Set Variable [ $package_id[1] ; FAT Text::gPackage ]
+	End If
+Else
+	# Log in
+	# Export all packages in Title
+	Set Variable [ $title_id[1] ; User X Title::Title id ]
+	Set Variable [ $localisation_code[1] ; Get(scriptParameter) ]
+End If
+
+// Perform Script [ From list ; "Export as Word" ; Parameter: SetProperty ( "localisation_code" ; $localisation_code ) &
+				SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "package_id" ; $package_id ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+Set Variable [ $result[1] ; Get(ScriptResult) ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+
+If [ Platform ≠ "WebDirect" ]
+	If [ IsEmpty ( $package_id ) ]
+		Set Variable [ $fullFilePath[1] ; "file:" & Get(DesktopPath) & Substitute ( FAT Title::Reference title ; "/" ; "-" ) & Case ( IsEmpty ($localisation_code) ; ".doc" ; " " & $localisation_code & ".doc") ]
+	Else
+		Set Variable [ $fullFilePath[1] ; "file:" & Get(DesktopPath) & Substitute ( FAT Title::Reference title & " - " & FAT Package::Reference name ; "/" ; "-" ) & Case ( IsEmpty ($localisation_code) ; ".doc" ; " " & $localisation_code & ".doc") ]
+	End If
+	
+	Create Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Create folders: OFF ]
+	Open Data File [ ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ; Target: $fileID ]
+	Write to Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ; Target: FAT Title::Latest Exported file ; Append line feed: OFF ]
+	Close Data File [ ⚠️ PARAMETER "id" NOT PARSED ⚠️ ]
+	
+	If [ Get(lastError) ≠ 100 And Get(lastError) ≠ 300 ]
+		Show Custom Dialog [ Title: "Successful export" ; Message: "All texts in this package were successfully exported to a Word document (HTML) on your desktop. " ; Default Button: "OK" ]
+	Else
+		Show Custom Dialog [ Title: "Export error" ; Message: "Could not create file on disk. A file with the same name might exist in this location." ; Default Button: "OK" ]
+	End If
+Else
+	If [ IsEmpty ( $package_id ) ]
+		Set Variable [ $fullFilePath[1] ; Get(DesktopPath) & FAT Title::Reference title & Case ( IsEmpty ($localisation_code) ; ".doc" ; " " & $localisation_code & ".doc") ]
+	Else
+		Set Variable [ $fullFilePath[1] ; Get(DesktopPath) & FAT Title::Reference title & " - " & FAT Package::Reference name & Case ( IsEmpty ($localisation_code) ; ".doc" ; " " & $localisation_code & ".doc") ]
+	End If
+	Export Field Contents [ Create folders: OFF ; FAT Title::Latest Exported file ; ⚠️ PARAMETER "UniversalPathList" NOT PARSED ⚠️ ]
+End If
+
+
+# This layout requires texts from the Title - otherwise it loses connection with the Title
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ $text_review ]
+	# If we started in tText review layout - reset
+	If [ IsEmpty ( $package_id ) ]
+		Perform Script [ From list ; "Filter text" ; Parameter: "Title" ]
+	Else
+		Perform Script [ From list ; "Filter text" ; Parameter: "Package" ]
+	End If
+End If
+

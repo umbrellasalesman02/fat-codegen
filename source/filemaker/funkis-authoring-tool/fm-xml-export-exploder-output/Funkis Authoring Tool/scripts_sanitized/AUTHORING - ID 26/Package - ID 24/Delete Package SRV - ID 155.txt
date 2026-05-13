@@ -1,0 +1,31 @@
+# Called from Package Settings tab Tools
+
+Set Variable [ $package_id[1] ; Get(scriptParameter) ]
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)=1 ]
+	# Deleting a package deletes all original texts and media but not localised
+	Delete Record/Request [ With dialog: OFF ]
+	# Delete all texts - also localised
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Delete All Records [ With dialog: OFF ]
+	End If
+	# Delete all media - also localised
+	Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Delete All Records [ With dialog: OFF ]
+	End If
+	# Delete all localisations
+	Go to Layout [ Layout: "TABLE FAT Localisation" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Delete All Records [ With dialog: OFF ]
+	End If
+	
+	
+End If
+

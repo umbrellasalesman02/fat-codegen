@@ -1,0 +1,26 @@
+# Called from a button in the Page layout
+Freeze Window
+
+Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+Set Variable [ $block_id[1] ; FAT Page item::gBlock ]
+Set Variable [ $hierarchy_level[1] ; FAT Page::Hierarchy level + 1 ]
+Set Variable [ $learningprogramme_id[1] ; FAT Title::PrimaryKey ]
+// Perform Script [ From list ; "Create PageItem SRV" ; Parameter: SetProperty ( "page_id" ; $page_id ) &
+				SetProperty ( "block_id" ; $block_id ) &
+				SetProperty ( "hierarchy_level" ; $hierarchy_level ) &
+				SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+
+Set Variable [ $result[1] ; Get(ScriptResult) ]
+If [ PatternCount ( $result ; "Error" ) ]
+	Show Custom Dialog [ Title: "Warning" ; Message: $result ; Default Button: "OK" ]
+Else
+	Set Variable [ $pageitem_id[1] ; $result ]
+	Perform Script [ From list ; "Create and add IO to PI" ; Parameter: $pageitem_id ]
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+// Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+Refresh Window
+Refresh Portal [ ⚠️ PARAMETER "Object" NOT PARSED ⚠️ ]
+

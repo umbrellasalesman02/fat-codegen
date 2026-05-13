@@ -1,0 +1,32 @@
+Freeze Window
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $base_project[1] ; FAT Title::Base project ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $language_code[1] ; FAT Title::Original language code ]
+Set Variable [ $country_code[1] ; FAT Title::Original country code ]
+Go to Layout [ Layout: "TABLE BlockTemplate 2" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $blocktemplate_id[1] ; BlockTemplate @ Title::PrimaryKey ]
+		If [ $caller = "button" ]
+			Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+		Else
+			Perform Script [ From list ; "Create block from template" ; Parameter: SetProperty ( "blocktemplate_id" ; $blocktemplate_id  ) &
+							SetProperty ( "title_id" ; $title_id ) &
+							SetProperty ( "language_code" ; $language_code ) &
+							SetProperty ( "country_code" ; $country_code ) ]
+		End If
+		
+		Go to Layout [ Layout: "TABLE BlockTemplate 2" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+Go to Layout [ Layout: "FAT Title Settings" ; Animation: None ]
+

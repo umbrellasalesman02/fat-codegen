@@ -1,0 +1,58 @@
+# Each time the Web viewer needs to be refreshed
+# editorMode = "Translate" or "Original"
+Set Variable [ $editorMode[1] ; Get(scriptParameter) ]
+
+Set Variable [ $WV_HTML[1] ; "data:text/html," & FAT Page item::gHTML Code ]
+
+Set Web Viewer [ "WV" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+Set Variable [ $HTML_JSON[1] ; /* HTML Parameters */ 
+				
+				Let ( 
+				
+				[
+				
+				originalText = JSONSetElement ( "{}" ;  
+				                    ["id" ; "1" ; JSONString];
+				                    ["label" ; "Original text" ; JSONString];
+				                    ["html" ; False  ; JSONBoolean ];
+				                    ["value" ; sanitizeHTML(FAT Text @ Translation::Text); JSONString ];
+				                    ["maxchars" ; 0 ; JSONNumber ]
+				                 ) ;
+				
+				translatedText = JSONSetElement ( "{}" ;  
+				                    ["id" ; "2" ; JSONString];
+				                    ["label" ; "Translated text" ; JSONString];
+				                    ["html" ; True  ; JSONBoolean ];
+				                    ["value" ; sanitizeHTML(FAT Text translated::Text); JSONString ];
+				                    ["maxchars" ; 0 ; JSONNumber ]
+				                 ) ;
+				
+				textArr =  "[" & originalText & "," & translatedText & "]";
+				
+				
+				
+				json = JSONSetElement ( "{}" ; 
+				             ["environment" ; Case ( Platform="WebDirect"; "web"; "FileMaker") ; JSONString];
+				             ["record-id" ; Get(recordID) ; JSONNumber];
+				             ["localisation_mode" ; "translate"; JSONString];
+				             ["edit_mode" ; "textTranslate"; JSONString];
+				             ["localisation_code" ; $$localisation code ; JSONString];
+				             ["texts" ; textArr ; JSONArray]
+				        )
+				
+				
+				];
+				
+				
+				json
+				
+				) ]
+If [ Not $$cacheWebViewer ]
+	Set Variable [ $$cacheWebViewer[1] ; True ]
+	Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+Else
+	Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+End If
+
+Perform JavaScript in Web Viewer [ Name: "WV" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+

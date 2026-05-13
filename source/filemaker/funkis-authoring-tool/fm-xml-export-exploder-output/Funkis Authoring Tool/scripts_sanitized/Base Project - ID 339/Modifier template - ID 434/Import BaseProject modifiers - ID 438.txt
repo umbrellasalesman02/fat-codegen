@@ -1,0 +1,84 @@
+# Called BOTH from Create new Title Step 2 SRV AND from Add missing modifiers script (from each setting window
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $base_project[1] ; FAT Title::Base project ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $language_code[1] ; FAT Title::Original language code ]
+Set Variable [ $country_code[1] ; FAT Title::Original country code ]
+
+If [ $base_project = "" ]
+	Show Custom Dialog [ Title: "Base project not defined" ; Message: "You need to select a Base Project before creating a new Title." ; Default Button: "OK" ]
+	Exit Script [ "Cancel" ]
+End If
+
+# Find all Modifiers for the specific base project. Exclude Symbol Modifiers ad Retired Modifiers.
+# Package type (Scroll, Slide etc) will be filtered on Paackage level
+Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $attribute_template_id[1] ; ModifierTemplate::PrimaryKey ]
+		Set Variable [ $package_types[1] ; ModifierTemplate::Package type id ]
+		Set Variable [ $level[1] ; ModifierTemplate::Level ]
+		Set Variable [ $attribute_type[1] ; ModifierTemplate::Type ]
+		Set Variable [ $attribute_name[1] ; ModifierTemplate::Name ]
+		Set Variable [ $modifier_values[1] ; ModifierTemplate::Values ]
+		Set Variable [ $attribute_default_value[1] ; ModifierTemplate::DefaultValue ]
+		Set Variable [ $attribute_description[1] ; ModifierTemplate::Description ]
+		Set Variable [ $io_id[1] ; ModifierTemplate::Template parent id ]
+		Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+		# Check if modifier already exist in Title - valid when checking for missing modifiers
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount) = 0 ]
+			New Record/Request
+			Set Field [ FAT Modifier::Title id ; $title_id ]
+			Set Field [ FAT Modifier::ModifierTemplate id ; $attribute_template_id ]
+			Set Field [ FAT Modifier::Name ; $attribute_name ]
+			Set Field [ FAT Modifier::Package type id ; $package_types ]
+			Set Field [ FAT Modifier::Parent id ; $io_id ]
+			Set Field [ FAT Modifier::Level ; $level ]
+			Set Field [ FAT Modifier::Type ; $attribute_type ]
+			Set Field [ FAT Modifier::Values ; $modifier_values ]
+			Set Field [ FAT Modifier::DefaultValue ; $attribute_default_value ]
+			Set Field [ FAT Modifier::Description ; $attribute_description ]
+			
+			If [ $level = "Title" ]
+				# Create Attribute values directly
+				Set Variable [ $attribute_id[1] ; FAT Modifier::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+				New Record/Request
+				Set Field [ FAT Modifier Value::Modifier id ; $attribute_id ]
+				Set Field [ FAT Modifier Value::Parent id ; $title_id ]
+				Set Field [ FAT Modifier Value::Value ; $attribute_default_value ]
+				Set Variable [ $attributevalue_id[1] ; FAT Modifier Value::PrimaryKey ]
+				If [ $attribute_type = "Media" ]
+					Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+									SetProperty ( "source_table" ; "attribute" ) &
+									SetProperty ( "source_mediafield" ; GetFieldName ( FAT Modifier Value::Media id ) ) &
+									SetProperty ( "caller_layout" ; Get(layoutName )) &
+									SetProperty ( "learningprogramme_id" ; $title_id)&
+									SetProperty ( "language_code" ; $language_code) &
+									SetProperty ( "country_code" ; $country_code) ]
+				Else If [ $attribute_type = "Text" ]
+					Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $attributevalue_id ) &
+									SetProperty ( "source_table" ; "attribute" ) &
+									SetProperty ( "learningprogramme_id" ; $title_id) &
+									SetProperty ( "language_code" ; $language_code) &
+									SetProperty ( "country_code" ; $country_code) &
+									SetProperty ( "source_textfield" ; GetFieldName ( FAT Modifier Value::Text id ) ) &
+									SetProperty ( "caller_layout" ; Get(layoutName )) ]
+				End If
+			End If
+		End If
+		Go to Layout [ Layout: "TABLE ModifierTemplate" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+Go to Layout [ Layout: "FAT Title Settings" ; Animation: None ]
+
+

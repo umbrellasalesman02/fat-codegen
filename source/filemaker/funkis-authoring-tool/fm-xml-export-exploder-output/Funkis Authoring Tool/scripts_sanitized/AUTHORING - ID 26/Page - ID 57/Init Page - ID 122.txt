@@ -1,0 +1,28 @@
+Set Field [ FAT Page::gBlock ; "" ]
+Set Field [ FAT Title::gPageTemplate ; "" ]
+Set Field [ FAT Title::gLevel ; "Page" ]
+Set Field [ FAT Title::gTagID ; "" ]
+Set Field [ FAT Title::gTagName ; "" ]
+Set Variable [ $$hierarchyLevel[1] ; FAT Page::Hierarchy level ]
+Set Variable [ $$hierarchyPath[1] ; FAT Title::Reference title & ¶ &
+				Case(FAT Package::Reference name = "" ; "" ; TruncateText ( FAT Package::Reference name ; 25 ) & ¶) &
+				Case(TF CH Header::Text = "" ; "" ; TruncateText ( TF CH Header::Text; 25) & ¶) &
+				Case(TF PG Header::Text = "" ; "" ; TruncateText ( TF PG Header::Text; 25) & ¶) ]
+Set Variable [ $$hierarchyType[1] ; Case(
+				
+				$$hierarchyLevel = 1; 
+				
+				"Title" & ¶ & "Page";
+				
+				$$hierarchyLevel = 2;
+				
+				"Title" & ¶ & "Chapter" & ¶ & "Page";
+				
+				$$hierarchyLevel = 3;
+				
+				"Title" & ¶ & "Package" & ¶ & "Chapter" & ¶ & "Page";
+				
+				) ]
+Set Variable [ $$pageItemRecordLoadTrigger[1] ; True ]
+Go to Object [ FAT Page::LastSettingTab ; Repetition: 1 ]
+

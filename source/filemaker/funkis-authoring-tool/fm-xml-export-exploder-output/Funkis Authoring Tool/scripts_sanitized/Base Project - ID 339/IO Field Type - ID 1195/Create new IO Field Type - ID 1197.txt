@@ -1,0 +1,10 @@
+# Called from a button in IO Field Type List
+If [ FAT Title::gBaseProject = "" ]
+	Show Custom Dialog [ Title: "Select BaseProject" ; Message: "You must select a BaseProject before creating a new IO Field type. " ; Default Button: "OK" ]
+	Exit Script []
+End If
+Set Variable [ $baseproject_id[1] ; FAT Title::gBaseProject ]
+New Record/Request
+Set Field [ IO Field Type::Base Project ; $baseproject_id ]
+
+

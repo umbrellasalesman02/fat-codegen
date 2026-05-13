@@ -1,0 +1,141 @@
+# This script is called by Clone IO Value
+# Not complete yet!!!!! 
+  No loop for IO Value conditition
+  No loop for IO Value SortOrder
+  Not tested!
+
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $clone_level[1] ; GetScriptProperty ( "clone_level" ) ]
+Set Variable [ $clone_settings[1] ; GetScriptProperty ( "clone_settings" ) ]
+Set Variable [ $suffix[1] ; GetScriptProperty ( "suffix" ) ]
+Set Variable [ $old_tt_id[1] ; GetScriptProperty ( "old_tt_id") ]
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+Set Variable [ $old_io_value_id[1] ; GetScriptProperty ( "old_io_value_id") ]
+Set Variable [ $new_io_value_id[1] ; GetScriptProperty ( "new_io_value_id") ]
+Set Variable [ $io_id[1] ; GetScriptProperty ( "io_id") ]
+
+# SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+  SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+  SetProperty ( "clone_level" ; $clone_level ) &
+  SetProperty ( "clone_settings" ; $clone_settings ) &
+  SetProperty ( "suffix" ; $suffix ) &
+  SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "old_io_value_id" ; $old_io_value_id ) &
+  SetProperty ( "new_io_value_id" ; $io_value_id ) &
+  SetProperty ( "io_id" ; $io_id )
+
+
+
+# -----------------------------------------------------------------------------
+# --------------- IO FIELD VALUE --------------------------------------------------------
+
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT IO Field Value" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		
+		# Check if this will interfere with compound id using Field id and IO value id
+		
+		Duplicate Record/Request
+		
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT IO Field Value::IO Value id ; $new_io_value_id ]
+		
+		If [ $isClonedTitle Or PatternCount($clone_settings; "IOs") ]
+			# Point to the input field value created earlier in Make an empty copy
+			Set Variable [ $old_input_field_id[1] ; FAT IO Field Value::IO Field id ]
+			Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 1 ]
+				Set Variable [ $new_input_field_id[1] ; FAT IO Field::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT IO Field Value" ; Animation: None ]
+				Set Field [ FAT IO Field Value::IO Field id ; $new_input_field_id ]
+			End If
+		End If
+		
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Layout [ Layout: "TABLE FAT IO Field Value" ; Animation: None ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+# -----------------------------------------------------------------------------
+# --------------- FAT IO Value Sort Order --------------------------------------------------------
+
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT IO Sort Order" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		
+		Duplicate Record/Request
+		
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT IO Sort Order::Parent id ; $new_io_value_id ]
+		
+		If [ $isClonedTitle Or PatternCount($clone_settings; "IOs") ]
+			# Point to the input field value created earlier in Make an empty copy
+			Set Variable [ $old_input_field_id[1] ; FAT IO Sort Order::IO Field id ]
+			Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 1 ]
+				Set Variable [ $new_input_field_id[1] ; FAT IO Field::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT IO Sort Order" ; Animation: None ]
+				Set Field [ FAT IO Sort Order::IO Field id ; $new_input_field_id ]
+			End If
+		End If
+		
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Layout [ Layout: "TABLE FAT IO Sort Order" ; Animation: None ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+# --------------- FAT IO Value Condition --------------------------------------------------------
+
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT IO Condition" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	Go to Record/Request/Page [ First ]
+	
+	Loop [ Flush: Always ]
+		
+		Duplicate Record/Request
+		
+		Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+		Set Field [ FAT IO Condition::Parent id ; $new_io_value_id ]
+		
+		If [ $isClonedTitle Or PatternCount($clone_settings; "IOs") ]
+			# Point to the input field value created earlier when creating the new IO
+			Set Variable [ $old_input_field_id[1] ; FAT IO Condition::IO Field id ]
+			Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 1 ]
+				Set Variable [ $new_input_field_id[1] ; FAT IO Field::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT IO Field Value" ; Animation: None ]
+				Set Field [ FAT IO Condition::IO Field id ; $new_input_field_id ]
+			End If
+		End If
+		
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Layout [ Layout: "TABLE FAT IO Condition" ; Animation: None ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+
+

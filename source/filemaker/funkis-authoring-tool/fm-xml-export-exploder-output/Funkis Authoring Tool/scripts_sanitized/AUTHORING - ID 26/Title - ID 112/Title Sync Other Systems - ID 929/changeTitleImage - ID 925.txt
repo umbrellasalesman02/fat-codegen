@@ -1,0 +1,24 @@
+# Called fom scriptTrigger onModify field event everywhere image can be changed
+# Updates thumbnail image on other systems to keep them in sync
+Set Error Capture [ ON ]
+Freeze Window
+
+If [ FAT Title::Title Backend = "Funkis Cloud" ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $funkis_cloud_title_id[1] ; FAT Title::Funkis Cloud Title id ]
+	Set Variable [ $title_image[1] ; FAT Title::Icon image ]
+	
+	# Update image on Funkis Cloud
+	# Requires exporting image and sync (via taskserver ?) to Funkis Cloud
+	
+	# Update image on Funkis Insight
+	Go to Layout [ Layout: "TABLE IN Title" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ IN Title::Icon image ; Replace with calculation: $title_image ]
+	End If
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	
+End If
+

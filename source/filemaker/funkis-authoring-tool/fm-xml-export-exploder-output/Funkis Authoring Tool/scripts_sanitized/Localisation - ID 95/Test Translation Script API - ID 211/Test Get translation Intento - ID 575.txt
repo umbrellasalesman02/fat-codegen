@@ -1,0 +1,20 @@
+
+// Set Variable [ $$translation_id[1] ; "1262bd9d-5930-4c6c-9614-ea417f42eaad" ]
+Set Variable [ $operationAPI[1] ; "https://api.inten.to/operations/" & $$translation_id ]
+Set Variable [ $api_key[1] ; "REDACTED_INTENTO_API_KEY" ]
+
+Set Variable [ $cURL_options[1] ; _cURL_request ( "GET" ) & 
+				_cURL_header ( "Content-Type" ; "application/json" ) & 
+				_cURL_header ( "Accept" ; "application/json; charset=utf-8" ) & 
+				_cURL_header ( "apikey" ; $api_key ) ]
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ; $cURL_options ]
+
+If [ JSONGetElement($resultJSON ; "done") ]
+	Set Variable [ $$intento_translation[1] ; JSONGetElement ( $resultJSON ; "response[0]results[0]" ) ]
+End If
+
+
+
+Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+
+

@@ -1,0 +1,99 @@
+// Commit Records/Requests [ With dialog: OFF ]
+
+# The purpose of this script is to create a generic way of opening windows. If FileMaker client we can experiment using a floating window,
+# Script parameter example:
+  
+  SetProperty ("card_window_name" ; "Page item settings" ) &
+  SetProperty ("card_window_layout" ; "FAT Page item settings Card" ) &
+  SetProperty ("card_window_width" ; "1200" ) &
+  SetProperty ("card_window_height" ; "680" ) &
+  SetProperty ("item_id" ; $page_item_id ) &
+  SetProperty ("item_type" ; "Page item" ) &
+  SetProperty ("callLayout" ; ---only if called from another card---)
+  
+
+Freeze Window
+Set Error Capture [ ON ]
+Commit Records/Requests [ With dialog: OFF ]
+
+Set Variable [ $card_window_name[1] ; GetScriptProperty ( "card_window_name" ) ]
+Set Variable [ $card_window_layout[1] ; GetScriptProperty ( "card_window_layout" ) ]
+Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+Set Variable [ $item_type[1] ; GetScriptProperty ( "item_type" ) ]
+
+Set Variable [ $$call_layout[1] ; GetScriptProperty ( "callLayout" ) ]
+Set Variable [ $$call_item_id[1] ; $item_id ]
+Set Variable [ $$call_item_type[1] ; $item_type ]
+
+
+Set Variable [ $card_window_width[1] ; Case( GetScriptProperty ( "card_window_width" )=""; 1140; GetAsNumber ( GetScriptProperty ( "card_window_width" ))) ]
+Set Variable [ $card_window_height[1] ; Case( GetScriptProperty ( "card_window_height" )=""; 680; GetAsNumber ( GetScriptProperty ( "card_window_height" ))) ]
+
+# For media card we need to know the localisation code and that the script is called within a title context.
+Set Variable [ $localisation_code[1] ; Case ( FAT Title::Original localisation code ≠ FAT Title::gCurrentLocalisationCode; FAT Title::gCurrentLocalisationCode; "") ]
+
+Set Variable [ $$currentWindow[1] ; Get(windowName) ]
+
+If [ Platform = "Desktop" And Get(WindowStyle) ≠ 3 // not a card window ]
+	New Window [ Style: Card ; Name: $card_window_name ; Layoutname: $card_window_layout ; Height: $card_window_height * Get(WindowZoomLevel)/100 ; Width: $card_window_width * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+Else If [ Platform = "Desktop" And Get(WindowStyle) = 3 // card window ]
+	Move/Resize Window [ Height: $card_window_height * Get(WindowZoomLevel)/100 ; Width: $card_window_width * Get(WindowZoomLevel)/100 ]
+	Go to Layout [ Layoutname: $card_window_layout ; Animation: None ]
+Else
+	New Window [ Style: Card ; Name: $card_window_name ; Layoutname: $card_window_layout ; Height: $card_window_height * Get(WindowZoomLevel)/100 ; Width: $card_window_width * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+End If
+
+If [ $item_type = "Chapter" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "Page" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "Page item" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "List item" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "Link" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "Title localisation" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "Package localisation" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "Sub page item" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Else If [ $item_type = "List template" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "List" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "IO type" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "Media" ]
+	# Media will display localised media if exist and 
+	If [ $localisation_code = "" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount) = 0 ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+		End If
+	End If
+Else If [ $item_type = "Clone" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "Move" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "Move Package Group" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $item_type = "AI Prompt" ]
+	# Table is FAT Title
+Else If [ $item_type = "User" ]
+	# Handling email login
+	If [ PatternCount ( $item_id ; "@" ) = 0 ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else
+		Set Variable [ $searchstring[1] ; Replace ( $item_id ; Position ( $item_id ; "@" ; 0 ; 1 ) ; 1 ; "\@" ) ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+End If
+
+
+// Refresh Window [ Flush cached join results ; Flush cached external data ]
+

@@ -1,0 +1,35 @@
+# This script will check that a Scroll package uses the "Complete status" block and
+  that a Slide package has at least one page item set to report completion. 
+# Called from both Publish and Check
+
+Set Variable [ $package_id[1] ; Get(scriptParameter) ]
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $package_name[1] ; FAT Package::Reference name ]
+
+# Check if backend requires completion
+If [ FAT Title::Title Backend ≠ "Other" ]
+	If [ Package type::Name = "Scroll" ]
+		# This is id for block "Course status"
+		Set Variable [ $completion_block_id[1] ; "34398F82-8BAF-41A0-AF1A-EC3ABB04EFEF" ]
+		Go to Layout [ Layout: "TABLE FAT Page Item Alt" ; Animation: None ]
+		# Find page items in Package using course status block and are included in export.
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)= 0 ]
+			Exit Script [ "Warning. No Course status block added in scroll package " & $package_name & "." &¶ & ¶ & 
+							"To make this package report completed you need to add this block in the end of the final page." ]
+		End If
+	Else If [ Package type::Name = "Slide" ]
+		# This is id for stateToggleTemplate "Course status"
+		Set Variable [ $completion_stateToggle_id[1] ; "ABF2AE59-4EB8-48C6-92CB-0ECCA4F24D93" ]
+		Set Variable [ $completion_stateToggle_value[1] ; "completed" ]
+		Go to Layout [ Layout: "TABLE FAT Page Item Alt" ; Animation: None ]
+		# Find page items in Package using course status block and are included in export.
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)= 0 ]
+			Exit Script [ "Warning. No Course status stateToggle set to completed in slide package " & $package_name & "." &¶ & ¶ & 
+							"To make this package report completed you should set the last page item in the last chapter to course_status = completed." ]
+		End If
+	End If
+End If
+

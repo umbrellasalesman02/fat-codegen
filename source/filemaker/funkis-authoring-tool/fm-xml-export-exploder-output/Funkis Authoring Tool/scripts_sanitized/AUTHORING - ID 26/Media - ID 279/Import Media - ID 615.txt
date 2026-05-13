@@ -1,0 +1,26 @@
+# Import Media to special Page items i.e. Sprig Story
+Freeze Window
+Set Error Capture [ ON ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+Set Variable [ $parent_id[1] ; FAT Page item::PrimaryKey ]
+Set Variable [ $source_table[1] ; FAT Block @ Page item::Name ]
+Set Variable [ $language_code[1] ; FAT Title::Original language code ]
+Set Variable [ $country_code[1] ; FAT Title::Original country code ]
+
+Go to Layout [ Layout: "TABLE FAT Media" ; Animation: None ]
+New Record/Request
+Insert File [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ; Target: FAT Media::Media container ]
+If [ Get(lastError)≠ 1 ]
+	Set Field [ FAT Media::Title id ; $title_id ]
+	Set Field [ FAT Media::Package id ; $package_id ]
+	Set Field [ FAT Media::Parent id ; $parent_id ]
+	Set Field [ FAT Media::Source item type ; $source_table ]
+	Set Field [ FAT Media::Language code ; $language_code ]
+	Set Field [ FAT Media::Country code ; $country_code ]
+Else
+	Delete Record/Request [ With dialog: OFF ]
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Go to Object [ "MediaTab" ; Repetition: 1 ]
+

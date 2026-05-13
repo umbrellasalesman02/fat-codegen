@@ -1,0 +1,93 @@
+# NOT READY - NOT USED
+
+# This script clones and move all pacjkages in a package group to a new title
+# Called from a card window
+
+Set Variable [ $title_id[1] ; FAT Title::gTitle ]
+Perform Script [ From list ; "Close card Window" ]
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $old_tt_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_group_id[1] ; FAT Title::gCloneItemId ]
+
+If [ $old_tt_id = $title_id ]
+	Show Custom Dialog [ Title: "Same title" ; Message: "You are trying to move the package to the same title as it is already located. " ; Default Button: "OK" ]
+	Go to Layout [ Layout: "FAT Title" ; Animation: None ]
+	Exit Script []
+Else
+	Set Variable [ $old_localisation_code[1] ; FAT Title::Original localisation code ]
+	Go to Layout [ Layout: "TABLE FAT Title Alt" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $new_localisation_code[1] ; FAT Title Alt::Original localisation code ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	If [ $old_localisation_code ≠ $new_localisation_code ]
+		# Cannot change localisation code when moving
+		Go to Layout [ Layout: "FAT Title Settings" ; Animation: None ]
+		Show Custom Dialog [ Title: "Localisation codes don't match" ; Message: "You are trying to move packages with localisation code \"" & $old_localisation_code & "\" to a title with  localisation code \"" & $new_localisation_code & "\". ¶¶This is not allowed." ; Default Button: "OK" ]
+		Exit Script []
+	End If
+End If
+
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+# Find all packages in package group
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount)  = 0 ]
+	Go to Layout [ Layout: "FAT Title Settings" ; Animation: None ]
+	Show Custom Dialog [ Title: "No packages in package group" ; Message: "This package group is empty and does not contain packages to move. " ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+Loop [ Flush: Always ]
+	Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	Set Variable [ $package_name[1] ; FAT Package::Reference name ]
+	Set Variable [ $package_type_id[1] ; FAT Package::Package type id ]
+	# Start checking that all blocks and modifiers exist
+	// Perform Script [ From list ; "Check title compatibility" ; Parameter: SetProperty ( "title_id"; $title_id ) &
+					SetProperty ( "old_tt_id"; $old_tt_id ) &
+					SetProperty ( "package_type_id"; $package_type_id ) &
+					SetProperty ( "package_id"; $package_id ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+	Set Variable [ $result[1] ; Get(ScriptResult) ]
+	
+	If [ $result ≠ "" ]
+		Go to Layout [ Layout: "FAT Title Settings" ; Animation: None ]
+		If [ PatternCount ( $result ; "No page items found in package" ) ]
+			Show Custom Dialog [ Title: "Empty package" ; Message: "The package \"" & $package_name & "\" does not include any page items. Remove or delete the package from the package group to continue. " ; Default Button: "OK" ]
+		Else
+			Show Custom Dialog [ Title: "Cannot move package group" ; Message: $result ; Default Button: "OK" ]
+		End If
+		Exit Script [ $result ]
+	End If
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+# Start cloning and moving
+# SetProperty ( "clone_level" ; "Package group" ) &
+  SetProperty ( "item_id" ; FAT Package Group::PrimaryKey ) &
+  SetProperty ( "item_parent_id" ; FAT Title::PrimaryKey ) &
+  SetProperty ( "item_description" ; FAT Package Group::Name )
+Set Field [ FAT Title::gCloneItemInfo ; "" ]
+Set Field [ FAT Title::gCloneLevel ; "Package group" ]
+Set Field [ FAT Title::gCloneItemId ; $package_group_id ]
+Set Field [ FAT Title::gCloneItemParentId ; $old_tt_id ]
+Set Field [ FAT Title::gCloneDefaultSettings ; "IOs¶Links¶Lists¶Tags¶Score categories" ]
+
+Set Variable [ $isMovedPackage[1] ; True ]
+
+Commit Records/Requests [ With dialog: OFF ]
+
+Perform Script [ From list ; "Clone Content MASTER" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "old_tt_id" ; $old_tt_id ) &
+				SetProperty ( "isMovedPackage" ; $isMovedPackage ) ]
+
+
+Go to Layout [ Layout: "FAT Title" ; Animation: None ]
+
+
+
+

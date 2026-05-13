@@ -1,0 +1,116 @@
+# Triggered on OnFirstWindowOpen in File options
+
+Allow User Abort [ OFF ]
+Freeze Window
+Set Window Title
+# Temporary splash
+If [ Not isSuperAdmin ]
+	// Show Custom Dialog [ Title: "Development in progress" ; Message: "Hej Funkis Authoring Tool är under utveckling. Just nu arbetas det med IO-funktionerna. Räkna inte med att ändringar som använder denna funktionalitet kommer sparas. " ; Default Button: "OK" ]
+	// Exit Application
+End If
+Perform Script [ From list ; "Init variables ALL" ]
+Go to Layout [ Layout: "Login BLANK" ; Animation: None ]
+If [ Get(accountName) = "SERVER" ]
+	Exit Script []
+End If
+Move/Resize Window [ Height: 960 ; Width: 1280 ; Top: 20 ; Left: 20 ]
+Allow Formatting Bar [ OFF ]
+Show/Hide Text Ruler [ Hide ]
+Set Error Capture [ ON ]
+# Handling the user rights
+# Handling email login
+If [ PatternCount ( Get(accountName) ; "@" ) = 0 ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	Set Variable [ $searchstring[1] ; Replace ( Get(accountName) ; Position ( Get(accountName) ; "@" ; 0 ; 1 ) ; 1 ; "\@" ) ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+Set Session Identifier [ User::Name & " " & User::Organisation name ]
+# Client - Author, Editor or Translator
+If [ Get ( AccountPrivilegeSetName ) = "Author" Or Get ( AccountPrivilegeSetName ) = "Editor" ]
+	// Install Menu Set [ ⚠️ PARAMETER "CustomMenuSet" NOT PARSED ⚠️ ]
+	Show/Hide Menubar [ Hide ; Lock: ON ]
+	Show/Hide Toolbars [ Lock: OFF ; Include Edit Record Toolbar: OFF ; Hide ]
+	If [ GetDevice = "Phone" ]
+		Go to Layout [ Layout: "Login Phone" ; Animation: None ]
+	Else
+		Go to Layout [ Layout: "Login Editor" ; Animation: None ]
+	End If
+	If [ Get(foundCount)>0 ]
+		Perform Script [ From list ; "Login as Editor" ]
+	Else
+		New Record/Request
+		Set Field [ User::User_id ; Get(accountName) ]
+		Set Field [ User::Privilege set ; Get(AccountPrivilegeSetName) ]
+	End If
+	Perform Script [ From list ; "Login as Editor" ]
+Else If [ Get ( AccountPrivilegeSetName ) = "Developer" ]
+	Show/Hide Toolbars [ Lock: OFF ; Include Edit Record Toolbar: OFF ; Hide ]
+	Show/Hide Menubar [ Hide ; Lock: OFF ]
+	If [ GetDevice = "Phone" ]
+		Go to Layout [ Layout: "Login Phone" ; Animation: None ]
+	Else
+		Go to Layout [ Layout: "Login Developer" ; Animation: None ]
+	End If
+	If [ Get(foundCount)=0 ]
+		New Record/Request
+		Set Field [ User::User_id ; Get(accountName) ]
+		Set Field [ User::Privilege set ; Get(AccountPrivilegeSetName) ]
+		If [ PatternCount ( Get(accountName) ; "funkismultimedia.se" ) ]
+			Set Field [ User::Client id ; "9AB997FA-3E4C-4487-B608-7E86E9C25236" // Funkis Multimedia AB ]
+			Set Field [ User::Organisation name ; "Funkis Multimedia" ]
+		End If
+	End If
+	Perform Script [ From list ; "Login as Developer" ]
+Else If [ Get ( AccountPrivilegeSetName ) = "Translator" ]
+	Show/Hide Toolbars [ Lock: OFF ; Include Edit Record Toolbar: OFF ; Hide ]
+	Show/Hide Menubar [ Hide ; Lock: OFF ]
+	Go to Layout [ Layout: "Login Translator" ; Animation: None ]
+	If [ Get(foundCount)=0 ]
+		New Record/Request
+		Show Custom Dialog [ Title: "First login to Funkis Tool" ; Message: "Please enter your full name" ; Default Button: "OK" ; Input 1: User::Name ; Label 1: "Full name" ]
+		Set Field [ User::User_id ; Get(accountName) ]
+		Set Field [ User::Privilege set ; Get(AccountPrivilegeSetName) ]
+		If [ PatternCount ( Get(accountName) ; "funkismultimedia.se" ) ]
+			Set Field [ User::Client id ; "9AB997FA-3E4C-4487-B608-7E86E9C25236" // Funkis Multimedia AB ]
+			Set Field [ User::Organisation name ; "Funkis Multimedia" ]
+		End If
+	End If
+	Perform Script [ From list ; "Login as Editor" ]
+Else If [ Get ( AccountPrivilegeSetName ) = "[Full Access]" ]
+	Show/Hide Toolbars [ Lock: OFF ; Include Edit Record Toolbar: OFF ; Hide ]
+	Show/Hide Menubar [ Hide ; Lock: OFF ]
+	If [ GetDevice = "Phone" ]
+		Go to Layout [ Layout: "Login Phone" ; Animation: None ]
+	Else
+		Go to Layout [ Layout: "Login Developer" ; Animation: None ]
+	End If
+	If [ Get(foundCount)=0 ]
+		New Record/Request
+		Set Field [ User::User_id ; Get(accountName) ]
+		Set Field [ User::Privilege set ; Get(AccountPrivilegeSetName) ]
+		If [ PatternCount ( Get(accountName) ; "funkismultimedia.se" ) ]
+			Set Field [ User::Client id ; "9AB997FA-3E4C-4487-B608-7E86E9C25236" // Funkis Multimedia AB ]
+			Set Field [ User::Organisation name ; "Funkis Multimedia" ]
+		End If
+	End If
+	Perform Script [ From list ; "Login as Developer" ]
+End If
+Set Field [ User::Last login ; Get(currentHostTimeStamp) ]
+Set Variable [ $$home_layout[1] ; Get(layoutName) ]
+Set Field [ FAT Title::gLogin ; $$login_id ]
+
+
+Set Variable [ $event_log_text[1] ; "Log in to FAT as " & Get(AccountPrivilegeSetName) ]
+# Do NOT use PSOS here because of a bug in event onWindowFirstOpen
+Perform Script [ From list ; "Add To Event log" ; Parameter: $event_log_text ]
+// Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+
+
+Set Field [ Variables::gWindowList ; "" ]
+# After this script - script "New Window" will be called,
+
+
+
+
+

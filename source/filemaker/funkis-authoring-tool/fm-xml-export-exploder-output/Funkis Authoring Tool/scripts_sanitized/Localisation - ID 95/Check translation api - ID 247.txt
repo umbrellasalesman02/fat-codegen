@@ -1,0 +1,18 @@
+# Checks if we have custom translation model for a specific client domain registered in Funkis CMT
+Set Variable [ $client_id[1] ; GetScriptProperty ( "client_id" ) ]
+Set Variable [ $target_language_code[1] ; GetScriptProperty ( "target_language_code" ) ]
+Set Variable [ $original_language_code[1] ; GetScriptProperty ( "original_language_code" ) ]
+Go to Layout [ Layout: "TABLE Client X Language model" ; Animation: None ]
+Set Error Capture [ ON ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) >0 ]
+	Set Variable [ $model_name[1] ; Client X Language model::Model name ]
+	Set Variable [ $model_URL[1] ; Client X Language model::Model URL ]
+	Set Variable [ $translation_provider[1] ; Client X Language model::Translation provider ]
+	Exit Script [ SetProperty ( "model_name" ; $model_name ) &
+					SetProperty ( "model_URL" ; $model_URL ) &
+					SetProperty ( "translation_provider" ; $translation_provider ) ]
+Else
+	Exit Script []
+End If
+

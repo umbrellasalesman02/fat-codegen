@@ -1,0 +1,55 @@
+# Called from the login window
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $event_log_text[1] ; "Viewed translated texts for " & FAT Title::Reference title ]
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+Perform Script [ From list ; "Save Active Layout" ]
+
+
+Set Variable [ $$localisation_code[1] ; User X Title::Localisation code ]
+Set Variable [ $$lp_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $lastEditedTextRecord[1] ; User X Title::LastTextRecord ]
+Set Variable [ $package_id[1] ; User X Title::LastReviewedPackage ]
+
+Go to Related Record [ Table: FAT Title ; Layout: "TABLE FAT Title" ; Show related ]
+Set Field [ FAT Title::gLogin ; $$login_id ]
+
+# If Title only contains one Package - show only that package
+Go to Related Record [ Table: FAT Package ; Layout: "TABLE FAT Package" ; Show related ; Match found set ]
+If [ Get(foundCount) = 1 ]
+	# only one package in title
+	Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+	Set Field [ FAT Text::gPackage ; $package_id ]
+Else
+	Set Field [ FAT Text::gPackage ; "" ]
+End If
+
+If [ $$localisation_code ≠ FAT Title::Original localisation code ]
+	# Translators mainly - continue where they left off
+	Set Field [ FAT Title::gCurrentLocalisationCode ; $$localisation_code ]
+	Set Field [ FAT Title::gViewTranslatedLanguage ; True ]
+	Set Field [ FAT Text::gRecordNumberReference ; "" ]
+	# Otherwise it will try to go in portal onLayoutEnter
+	Go to Layout [ Layout: "FAT Translated Texts" ; Animation: None ]
+	
+	# Script "Update text status CL" also find texts for title, package and localisation_code
+	Perform Script [ From list ; "Update Text status CL" ]
+	Perform Script [ From list ; "Show Translated Texts" ; Parameter: SetProperty ( "title_id" ; $$lp_id ) &
+					SetProperty ( "package_id" ; $package_id ) ]
+	Perform Script [ From list ; "GoToRecordNumberReference" ; Parameter: $lastEditedTextRecord ]
+	
+Else
+	Set Variable [ $original_language[1] ; FAT Title::Original language code ]
+	Set Field [ FAT Title::gCurrentLocalisationCode ; "" ]
+	Set Field [ FAT Title::gViewTranslatedLanguage ; "" ]
+	Go to Layout [ Layout: "FAT Texts" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	# Gives the user an opportunity to cancel the sorting if it takes time.
+	Refresh Window
+	Freeze Window
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+End If
+

@@ -1,0 +1,115 @@
+# Called from both MT and HT
+# MT - From FC Machine translation
+# HT - Title HT Localisation MASTER 2
+# Designed to work for PSOS
+
+# Translation method can be:
+  Machine translation
+  Human translation
+
+# Pairing mode can be:
+  PrimaryKey - matches the primary key
+  OriginalKey - uses both original id and localisation code to find the match
+
+# Text status can be:
+  1. Not translated
+  2. Sent to API (only asynchronous machine translation)
+  3. Not reviewed
+  4. In progress
+  5. Approved
+
+# ------------------- Pair result JSON field by field with FAT Text ------------------
+Set Error Capture [ ON ]
+
+# Please note, this script will NEVER overwrite an existing translation with status "Approved"  
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty ( "localisation_code" ) ]
+Set Variable [ $translation_method[1] ; GetScriptProperty ( "translation_method" ) ]
+Set Variable [ $pairing_mode[1] ; GetScriptProperty ( "pairing_mode" ) ]
+
+Set Variable [ $text_status_after_import[1] ; Case ( $translation_method = "Machine translation" ; "Not reviewed" ; "In progress" ) ]
+Set Variable [ $num_of_translated_texts[1] ; 0 ]
+Set Variable [ $num_of_untranslated_texts[1] ; 0 ]
+Set Variable [ $error_message[1] ; "" ]
+
+Go to Layout [ Layout: "TABLE FAT Title Alt" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# Set variabel from field - Filemaker limits script parameters to 1.000.000 characters
+Set Variable [ $translationJSON_unparsed[1] ; TextDecode ( FAT Title Alt::Latest Imported File ; "utf-8" ) ]
+Set Variable [ $translationJSON[1] ; <Function Missing> ( $translationJSON_unparsed ) ]
+
+If [ $translationJSON ≠ "?" ]
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	Set Variable [ $i[1] ; 0 ]
+	
+	# Machine translation loop does only need to look for the localised text id
+	  since this is what was sent to Funkis Cloud in script step FC Machine translation
+	Loop [ Flush: Defer ]
+		Exit Loop If [ JSONGetElement ( $translationJSON ;"[" & $i & "]id") = "" ]
+		Set Variable [ $text[1] ; JSONGetElement ( $translationJSON ;"[" & $i & "]value") ]
+		
+		If [ $pairing_mode = "PrimaryKey" ]
+			Set Variable [ $id[1] ; JSONGetElement ( $translationJSON ;"[" & $i & "]id") ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Else If [ $pairing_mode = "PrimaryKey_plus_localisation_code" ]
+			# Updated 2026-01-13
+			  If OriginalKey is NOT EMPTY because the text sent to translators was a deleted localisation and
+			  no orginal key exists yet, this function will instead use the id. 
+			# Updated 2026-04-20
+			  OR If OriginalKey is NOT EMPTY because the text is a global text and global shared text (primarykey override) is exposed in the JSON, this function will instead use the id. 
+			# This pairing_mode can only be set by changing script Title HT Localisation 2
+			Set Variable [ $original_id[1] ; JSONGetElement ( $translationJSON ;"[" & $i & "]id") ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+		End If
+		
+		If [ Get(foundCount) = 1 ]
+			Set Field [ FAT Text::Text ; $text ]
+			Set Field [ FAT Text::Status ; $text_status_after_import ]
+			Set Variable [ $num_of_translated_texts[1] ; $num_of_translated_texts + 1 ]
+		Else
+			# The rows below in the loop are for both MT and HT
+			Set Variable [ $error[1] ; Get(lastError) ]
+			
+			If [ $error =401 And $translation_method = "Machine translation" ]
+				# The translated text does not match any original text. Maybe block is removed after translation.
+				// Exit Script [ SetProperty ( "result" ; "Error. Cannot find original text for this translation. Maybe block is removed after translation." ) &
+								SetProperty ( "num_of_translated_texts" ; $i-1 ) ]
+				Set Variable [ $error_message[1] ; Case(IsEmpty($error_message); "Text not found. (Text id: " & $id  & ")"; $error_message) ]
+			Else If [ $error =401 And $translation_method = "Human translation" And $pairing_mode = "PrimaryKey" ]
+				// Exit Script [ SetProperty ( "result" ; "Texts not found." ) &
+								SetProperty ( "num_of_translated_texts" ; $i-1 ) ]
+				Set Variable [ $error_message[1] ; Case(IsEmpty($error_message); "Text not found. (Text id: " & $id  & ")"; $error_message) ]
+			Else If [ $error =401 And $translation_method = "Human translation"  And $pairing_mode = "OriginalKey" ]
+				// Exit Script [ SetProperty ( "result" ; "Error. Cannot find original text for this translation." ) &
+								SetProperty ( "num_of_translated_texts" ; $i-1 ) ]
+				Set Variable [ $error_message[1] ; Case(IsEmpty($error_message); "Text not found. (Text id: " & $original_id  & ")"; $error_message) ]
+			Else If [ $error ≠ 0 And $error ≠ 401 ]
+				# Maybe record busy with another user
+				Exit Script [ SetProperty ( "result" ; "Error. Cannot import. Error = " & $error & ¶ & Get( lastErrorDetail ) ) &
+								SetProperty ( "num_of_translated_texts" ; $i-1 ) ]
+			Else
+				# Unknown error
+				// Exit Script [ SetProperty ( "result" ; "Error. Cannot import. Error = " & $error & ¶ & Get( lastErrorDetail ) ) &
+								SetProperty ( "num_of_translated_texts" ; $i-1 ) ]
+				Set Variable [ $error_message[1] ; Case(IsEmpty($error_message); "Text not found. (Text id: " & $id  & ")"; $error_message) ]
+			End If
+		End If
+		
+		Set Variable [ $i[1] ; $i+1 ]
+		
+	End Loop
+End If
+If [ $error_message = "" ]
+	Set Variable [ $result[1] ; "Success." ]
+Else
+	Set Variable [ $result[1] ; $error_message ]
+End If
+
+Exit Script [ SetProperty ( "result" ; $result ) &
+				SetProperty ( "num_of_translated_texts" ; $num_of_translated_texts ) &
+				SetProperty ( "num_of_untranslated_texts" ; $num_of_untranslated_texts ) ]
+
+
+

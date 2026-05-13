@@ -1,0 +1,72 @@
+# Called from ValidateBlockCodebase
+# Returns a version string for a codebase_id (i.e Funkis Player @ Latest, Funkis Player @ Next or Funkis Player @ Version)
+
+Set Variable [ $codebase_id[1] ; GetScriptProperty ( "codebase_id" ) ]
+Set Variable [ $codebase_version_id[1] ; GetScriptProperty ( "codebase_version_id" ) ]
+
+Set Error Capture [ ON ]
+
+# Check if codebase version id refers to a branch - then exit with branch name instead of version string
+Go to Layout [ Layout: "TABLE Baseproject Codebase Version" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)=1 ]
+	If [ Baseproject Codebase Version::Branch string ≠ "" ]
+		Exit Script [ SetProperty ( "branch_string" ; Baseproject Codebase Version::Branch string ) &
+						SetProperty ( "version_string" ; "" ) ]
+	End If
+End If
+
+# Find codebase properties
+Go to Layout [ Layout: "TABLE Baseproject Codebase" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) ]
+	# The selected codebase exist - if no codebase just exit.
+	Set Variable [ $funkisCodeBase[1] ; Baseproject Codebase::Name ]
+	Set Variable [ $funkisCodebaseFamilyName[1] ; Baseproject Codebase::Family name ]
+	If [ PatternCount ( $funkisCodeBase; "Latest" ) Or PatternCount ( $funkisCodeBase; "Next" ) ]
+		
+		# Go to codebase that is versioned - add \ in string since @ is an operator in FileMaker finds
+		Set Variable [ $codeBaseVersioned[1] ; $funkisCodebaseFamilyName & " \@ Version" ]
+		# Find the codebase with name = "@ Version"
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		# Show all existing versions and sort
+		Go to Related Record [ Table: Baseproject Codebase Version ; Layout: "TABLE Baseproject Codebase Version" ; Show related ]
+		If [ PatternCount ( $funkisCodeBase; "Latest" ) ]
+			# Constrain to only versions with a release date
+			Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+			# Sort in version order
+			Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+			# Go to last released version
+			Go to Record/Request/Page [ Last ]
+			# Last version = Latest version
+			Set Variable [ $version_string[1] ; Baseproject Codebase Version::Version string ]
+		Else If [ PatternCount ( $funkisCodeBase; "Next" ) ]
+			# Sort in version order
+			Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+			# Go to last released version
+			Go to Record/Request/Page [ Last ]
+			# Last version = Latest version
+			# If no next versions - add a patch number to make this the highest existing version
+			Set Variable [ $version_string[1] ; GetAsText ( Baseproject Codebase Version::Major version ) & "." & 
+							GetAsText ( Baseproject Codebase Version::Minor version )  & "." & 
+							GetAsText ( Baseproject Codebase Version::Patch version + 1) ]
+			# Constrain found set to versions without a release date
+			Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+			# If FoundCount = 0 $version_string is set above as the last released version + 1 in patch version
+			If [ Get(foundCount) > 0 ]
+				Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+				# Go to last released version
+				Go to Record/Request/Page [ Last ]
+				Set Variable [ $version_string[1] ; Baseproject Codebase Version::Version string ]
+			End If
+		End If
+	Else If [ PatternCount($funkisCodeBase; "Version" ) ]
+		# Find the selected version = $codebase_version_id
+		Go to Layout [ Layout: "TABLE Baseproject Codebase Version" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Variable [ $version_string[1] ; Baseproject Codebase Version::Version string ]
+	End If
+End If
+Exit Script [ SetProperty ( "branch_string" ; "" ) &
+				SetProperty ( "version_string" ; $version_string ) ]
+

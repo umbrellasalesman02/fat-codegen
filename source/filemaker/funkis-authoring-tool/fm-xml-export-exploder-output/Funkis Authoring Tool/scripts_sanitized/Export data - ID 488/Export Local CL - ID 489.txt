@@ -1,0 +1,86 @@
+# Called from a button with only one parameter - exportMode -  in Package Settings. Can only be triggered by Developers. 
+# Trigger an export to a local directory on the users computer.
+
+Set Variable [ $exportMode[1] ; GetScriptProperty ( "exportMode" ) ]
+
+# Level can be "Title" (= all packages will be exported) or empty
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+
+Freeze Window
+
+Commit Records/Requests [ With dialog: OFF ]
+
+Set Variable [ $typeOfTask[1] ; "sync" ]
+# typeOfTask /*
+  sync - syncing new content from CMT to Quiddity server
+  publish - building a new package with both content from CMT and code from GitLab
+  */
+// Set Variable [ $exportMode[1] ; "json" ]
+// Set Variable [ $exportMode[1] ; "Media all" ]
+
+# exportMode /*
+  JSON = All JSON files
+  TEXT = JSON + all TEXT files
+  Media update = JSON + TEXT + updated media - This option is for Authors and Editors
+  Media all = JSON + TEXT + all media
+  Translation = TEXT and Subtitles for localised language (only remote export)
+  Translation files = TEXT and Subtitles for localised language (only local export)
+  */
+
+If [ PatternCount (Get(layoutName); "Page item") ]
+	# If publishing from a page item - make sure all changes in webviewer are comitted before publishing. 
+	Perform Script [ From list ; "SavePageItem" ]
+End If
+
+Set Variable [ $exportDestination[1] ; "Local" ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+# Translation files - exports only export language specific text files for a specific language to a specific folder name "
+# Translation files - all texts in the whole Title is exported in one file
+
+If [ $exportMode = "Translation files" ]
+	Set Variable [ $titleLocalisationCode[1] ; FAT Title::gCurrentLocalisationCode ]
+	Set Variable [ $destinationRootpath[1] ; User X Title @ Title::Title Filepath export & "send_to_translators/" ]
+Else
+	Set Variable [ $package_id[1] ; Case ( IsEmpty ( FAT Title::Base project ); "" ; FAT Package::PrimaryKey) ]
+	Set Variable [ $package_type[1] ; Case ( IsEmpty ( FAT Title::Base project ); "" ; FAT Package::Package type id) ]
+	Set Variable [ $titleLocalisationCode[1] ; FAT Title::Original localisation code ]
+	
+	Set Variable [ $destinationRootpath[1] ; Case ( 
+					
+					   $level = "Title" Or IsEmpty ( User X Title @ Title::Package Filepath ) ;
+					
+					   User X Title @ Title::Title Filepath export & FAT Package::FC Package directory & "/";
+					
+					   User X Title @ Title::Package Filepath
+					
+					) ]
+End If
+
+If [ $destinationRootpath="" ]
+	Show Custom Dialog [ Title: "No file path found!" ; Message: "You haven't defined an export path in the Title or Package setting. Select an output folder and redo the export." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+Perform Script [ From list ; "Export Data MASTER" ; Parameter: SetProperty ( "exportDestination" ; $exportDestination ) &
+				SetProperty ( "title_id" ; $title_id ) &
+				SetProperty ( "package_id" ; $package_id ) &
+				SetProperty ( "package_type" ; $package_type ) &
+				SetProperty ( "titleLocalisationCode" ; $titleLocalisationCode ) &
+				SetProperty ( "destinationRootPath" ; $destinationRootPath ) &
+				SetProperty ( "exportMode" ; $exportMode ) &
+				SetProperty ( "typeOfTask" ; $typeOfTask ) ]
+
+If [ Get(ScriptResult) ≠ "success" And Get(ScriptResult) ≠ "" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "Something went wrong during the export." ; Message: "Error message: " & Get(ScriptResult) ; Default Button: "OK" ]
+	Exit Script [ Get(ScriptResult) ]
+End If
+
+If [ $exportMode = "Translation files" ]
+	# Called from either Export Human translations or Package Localisation MASTER
+	Exit Script [ "success" ]
+Else
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+

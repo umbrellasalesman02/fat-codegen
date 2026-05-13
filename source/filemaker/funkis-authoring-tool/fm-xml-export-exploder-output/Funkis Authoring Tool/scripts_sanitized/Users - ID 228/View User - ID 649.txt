@@ -1,0 +1,15 @@
+Freeze Window
+Set Variable [ $user_id[1] ; Get(scriptParameter) ]
+// Set Variable [ $user_id[1] ; User @ User::User_id ]
+
+Perform Script [ From list ; "Open card setting" ; Parameter: SetProperty ("card_window_name" ; "FAT User information" ) &
+				SetProperty ("card_window_layout" ; "FAT User" ) &
+				SetProperty ("card_window_width" ; "1024" ) &
+				SetProperty ("card_window_height" ; "740" ) &
+				SetProperty ("item_id" ; $user_id ) &
+				SetProperty ("item_type" ; "User" ) ]
+Set Field [ User @ User::gRelationString ; "connect" ]
+Set Field [ FAT Title All titles::gRelationString ; "connect" ]
+Commit Records/Requests [ With dialog: OFF ]
+// Perform Find [ ⚠️ RESTORE ⚠️ ]
+

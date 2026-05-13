@@ -1,0 +1,18 @@
+Set Variable [ $searchStr[1] ; Baseproject Text variables::gSearchText ]
+Set Error Capture [ ON ]
+Freeze Window
+If [ $searchStr = "" ]
+	Show All Records
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Exit Script []
+End If
+
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+
+If [ Get(foundCount) = 0 ]
+	Show Custom Dialog [ Title: "Text not found" ; Message: "The text could not be found in any text variable name or in a description text. " ; Default Button: "OK" ]
+	Show All Records
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+End If
+

@@ -1,0 +1,39 @@
+# Import all text variables from BaseProject
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $title_backend[1] ; GetScriptProperty ( "title_backend" ) ]
+Set Variable [ $base_project[1] ; GetScriptProperty ( "base_project" ) ]
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "Text variables" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ $title_backend = "Funkis Cloud" ]
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+End If
+
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $name[1] ; Baseproject Text variables::Variable name ]
+		Set Variable [ $text_variable[1] ; Baseproject Text variables::Text to implement ]
+		Set Variable [ $text_variable_source[1] ; Baseproject Text variables::Source ]
+		Set Variable [ $text_variable_context[1] ; Baseproject Text variables::Context ]
+		Go to Layout [ Layout: "TABLE FAT Text variable" ; Animation: None ]
+		New Record/Request
+		Set Field [ FAT Text variable::Title id ; $title_id ]
+		Set Field [ FAT Text variable::Name ; $name ]
+		Set Field [ FAT Text variable::Source type ; $text_variable_source ]
+		Set Field [ FAT Text variable::String override source definition ; $text_variable ]
+		Set Field [ FAT Text variable::IO Context legacy ; $text_variable_context ]
+		Commit Records/Requests [ With dialog: OFF ]
+		If [ Get(lastError) = 504 ]
+			Delete Record/Request [ With dialog: OFF ]
+		End If
+		Go to Layout [ Layout: "Text variables" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

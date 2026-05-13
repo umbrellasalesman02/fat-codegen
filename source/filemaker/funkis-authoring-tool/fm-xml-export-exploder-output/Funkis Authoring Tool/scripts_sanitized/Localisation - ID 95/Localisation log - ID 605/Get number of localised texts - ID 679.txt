@@ -1,0 +1,65 @@
+# This script is called from both translation scripts and from review scripts
+Set Error Capture [ ON ]
+
+# Stage  Name                             Text status HT              Text status MT
+  1.     Language added                   - (text does not exist)     - (text does not exist)
+  2.     Text prepared for translation    Not translated              Not translate
+  3.     Original text sent	              Not translated               Sent to API + async translation id:¶[id_from_api] (async only)
+  4.     Translated text imported	      Not reviewed                 Not reviewed
+  5.	   Translation in review           In progress                  In progress
+  6.     Translation approved             Approved                    Approved
+
+# Use localisation id
+Set Variable [ $localisation_id[1] ; GetScriptProperty ( "localisation_id" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Localisation @ Package" ; Animation: None ]
+
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $title_id[1] ; FAT Localisation @ Package::Title id ]
+Set Variable [ $package_id[1] ; FAT Localisation @ Package::Package id ]
+Set Variable [ $localisation_code[1] ; FAT Localisation @ Package::Localisation code ]
+
+Set Variable [ $shared_text_localisation_id[1] ; FAT Localisation @ Package::Shared text localisation id ]
+Set Variable [ $shared_text_localisation[1] ; FAT Localisation @ Package::Shared text localisation ]
+
+Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+
+If [ Not IsEmpty ( $shared_text_localisation_id) ]
+	# This is a Title localisation - count all texts
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $num_title_texts[1] ; Get(foundCount) ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $num_package_texts[1] ; Get(foundCount) ]
+	
+	Set Variable [ $number_of_localised_texts[1] ; "Number of localised texts: " & $num_title_texts + $num_package_texts & ", Shared in title=" & $num_title_texts & ", Packages=" & $num_package_texts & "." ]
+	
+Else If [ Not IsEmpty ( $package_id ) ]
+	# This is a Package localisation - count only text in Package
+	# Now Package only texts are logged
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $num_package_texts[1] ; Get(foundCount) ]
+	
+	Set Variable [ $number_of_localised_texts[1] ; "Number of localised texts in package: " & $num_package_texts & "." ]
+	
+Else If [ $shared_text_localisation ]
+	# This is only the shared texts between packages
+	# Get package texts - with package_id
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Set Variable [ $num_title_texts[1] ; Get(foundCount) ]
+	Set Variable [ $number_of_localised_texts[1] ; "Number of localised texts shared in title=" & $num_title_texts & "." ]
+	
+End If
+
+Exit Script [ $number_of_localised_texts ]
+
+// 
+// Exit Script [ "Number of localised texts: " & $num_title_texts + $num_package_texts & ", Title=" & $num_title_texts & ", Package=" & $num_package_texts & "." ]
+
+
+
+
+
+
+
+

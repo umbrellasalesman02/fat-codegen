@@ -1,0 +1,52 @@
+/*
+RemoveValue ( Values ; ValuesToRemove )
+2015.06.24, Koji Takeuchi <takeuchi@nemoux.com>
+
+Rewrited in collaboration with Bruce Robertson, Agnes, John Davis. Thanks, all!
+
+description:
+	Opposite version of FilterValues ().
+ex.
+	theList = "aa¶bb¶cc¶aa¶dd"
+
+	RemoveValue ( theList ; "aa" )
+	 -> "bb¶cc¶dd"
+	RemoveValue ( theList ; "a" )
+	 -> "aa¶bb¶cc¶aa¶dd"
+	RemoveValue ( theList ; "bb¶dd" )
+	 -> "aa¶cc¶aa"
+*/
+
+Let (
+[
+CURRENT =
+	GetValue ( ValuesToRemove ; 1 ) ;
+REST =
+	RightValues ( ValuesToRemove ; ValueCount ( ValuesToRemove ) - 1 ) ;
+REST =
+	Left ( REST ; Length ( REST ) - 1 ) ;
+SOURCE =
+	Substitute ( Values ; ¶ ; "¶¶" ) ;
+REMOVED =
+	Case (
+		Not IsEmpty ( CURRENT ) ;
+		Substitute (
+			¶ & SOURCE & ¶ ;
+			¶ & CURRENT & ¶ ;
+			""
+		) ;
+		¶ & SOURCE & ¶
+	) ;
+RESULT =
+	Substitute ( REMOVED ; "¶¶" ; ¶ ) ;
+RESULT =
+	Middle ( RESULT ; 2 ; Length ( RESULT ) - 2 )
+] ;
+
+Case (
+	Not IsEmpty ( REST ) ;
+	RemoveValue ( RESULT ; REST ) ;
+	RESULT
+)
+
+)

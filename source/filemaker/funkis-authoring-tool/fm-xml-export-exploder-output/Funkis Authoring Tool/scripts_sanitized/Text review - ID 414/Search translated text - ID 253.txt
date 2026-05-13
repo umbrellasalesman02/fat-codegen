@@ -1,0 +1,100 @@
+# This script cna be called from BOTH FAT Texts and FAT Texts Translated
+
+
+Set Error Capture [ ON ]
+Set Field [ FAT Text::gFilterType ; "" ]
+Set Field [ FAT Text::gEditor ; "" ]
+Set Variable [ $current_localisation_code[1] ; FAT Title::gCurrentLocalisationCode ]
+Set Variable [ $original_localisation_code[1] ; FAT Title::Original localisation code ]
+Set Variable [ $$localisation_code[1] ; Case ( $current_localisation_code = "" ; 
+				
+				
+				$original_localisation_code ; 
+				
+				
+				$current_localisation_code  ) ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; FAT Text::gPackage ]
+
+If [ $package_id = "" ]
+	# Search the whole Title
+	# If translated text
+	If [ Not IsEmpty ( FAT Title::gCurrentLocalisationCode ) And FAT Title::gCurrentLocalisationCode ≠ FAT Title::Original localisation code ]
+		If [ FAT Text translated::gSearchText = "" ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Else
+			Set Variable [ $searchString[1] ; "*" & FAT Text translated::gSearchText & "*" ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 0 ]
+				Freeze Window
+				Show Custom Dialog [ Title: "Text not found" ; Message: "The text could not be found in the Title." ; Default Button: "OK" ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+			End If
+		End If
+		# Omit empty original records. Do this as a last step since it is a related field to improve performance
+		Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+		Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Else
+		# If normal text search
+		If [ FAT Text::gSearchText = "" ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Else
+			Set Variable [ $searchString[1] ; "*" & FAT Text::gSearchText & "*" ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 0 ]
+				Freeze Window
+				Show Custom Dialog [ Title: "Text not found" ; Message: "The text could not be found in the Title." ; Default Button: "OK" ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+			End If
+		End If
+		Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	End If
+Else
+	# Search only in a specific package
+	# If translated text
+	If [ Not IsEmpty ( FAT Title::gCurrentLocalisationCode ) And FAT Title::gCurrentLocalisationCode ≠ FAT Title::Original localisation code ]
+		If [ FAT Text translated::gSearchText = "" ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		Else
+			Set Variable [ $searchString[1] ; "*" & FAT Text translated::gSearchText & "*" ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 0 ]
+				Freeze Window
+				Show Custom Dialog [ Title: "Text not found" ; Message: "The text could not be found in the Package. Clear selected package to search text in the whole Title." ; Default Button: "OK" ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+			End If
+		End If
+		# Omit empty original records. Do this as a last step since it is a related field to improve performance
+		Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+		# Sorting using value list = Package makes empty package ids come in the end = Global texts
+		Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Else
+		# If normal text search
+		If [ FAT Text::gSearchText = "" ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		Else
+			Set Variable [ $searchString[1] ; "*" & FAT Text::gSearchText & "*" ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+			If [ Get(foundCount) = 0 ]
+				Freeze Window
+				Show Custom Dialog [ Title: "Text not found" ; Message: "The text could not be found in the Package. Clear selected package to search text in the whole Title." ; Default Button: "OK" ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+			End If
+			# Sorting using value list = Package makes empty package ids come in the end = Global texts
+			Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+		End If
+	End If
+	
+	
+	
+End If
+Go to Record/Request/Page [ First ]
+Go to Field [ FAT Text translated::Text ]
+Exit Script [ True ]
+

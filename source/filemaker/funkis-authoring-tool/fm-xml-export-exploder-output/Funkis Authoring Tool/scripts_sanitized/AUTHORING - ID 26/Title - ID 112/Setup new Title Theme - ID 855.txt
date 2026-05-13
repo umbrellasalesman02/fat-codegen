@@ -1,0 +1,191 @@
+# Called from Create new title Step 2 SRV - normally called from Server
+# Can also be called from Title Setting when user selects Re-import theme - then $re_import = true
+
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $theme_template_id[1] ; GetScriptProperty ( "theme_template_id" ) ]
+Set Variable [ $language_code[1] ; GetScriptProperty ( "language_code" ) ]
+Set Variable [ $country_code[1] ; GetScriptProperty ( "country_code" ) ]
+
+# Two variables below - only when called from Title Settings and a theme exist
+Set Variable [ $re_import[1] ; GetAsBoolean (GetScriptProperty ( "re_import" )) ]
+Set Variable [ $theme_id[1] ; GetScriptProperty ( "theme_id" ) ]
+
+Freeze Window
+Set Error Capture [ ON ]
+
+# Set up the Title theme
+If [ Not $re_import ]
+	Go to Layout [ Layout: "TABLE FAT Theme" ; Animation: None ]
+	New Record/Request
+	Set Variable [ $theme_id[1] ; FAT Theme::PrimaryKey ]
+	Set Field [ FAT Theme::Title id ; $title_id ]
+End If
+
+Set Field [ FAT Theme::Theme template id ; $theme_template_id ]
+Commit Records/Requests [ With dialog: OFF ]
+
+Set Variable [ $logo_scroll_image[1] ; Theme Template @ FAT Theme::Logo Scroll ]
+Set Variable [ $logo_slide_image[1] ; Theme Template @ FAT Theme::Logo Slide ]
+Set Variable [ $side_menu_icon_image[1] ; Theme Template @ FAT Theme::Side Menu Icon ]
+Set Variable [ $block_divider_image[1] ; Theme Template @ FAT Theme::Block Divider Image ]
+
+If [ Not $re_import ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Theme::PrimaryKey ) &
+					SetProperty ( "source_table" ; "theme" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Theme::Logo scroll media id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Theme::PrimaryKey ) &
+					SetProperty ( "source_table" ; "theme" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Theme::Logo slide media id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Theme::PrimaryKey ) &
+					SetProperty ( "source_table" ; "theme" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Theme::Side Menu Icon media id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Theme::PrimaryKey ) &
+					SetProperty ( "source_table" ; "theme" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Theme::Block divider image id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id) ]
+End If
+
+Set Field [ Media TSC::Media container ; $logo_scroll_image ]
+Set Field [ Media TSL::Media container ; $logo_slide_image ]
+Set Field [ Media SMI::Media container ; $side_menu_icon_image ]
+Set Field [ Media BDI::Media container ; $block_divider_image ]
+
+# ------------ COLORS -----------------------------------------------------
+Go to Layout [ Layout: "TABLE FAT Theme Color" ; Animation: None ]
+
+# Find all colors in the theme template
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $foundCount[1] ; Get(foundCount) ]
+Set Variable [ $recordPosn[1] ; 1 ]
+Go to Record/Request/Page [ First ]
+
+Loop [ Flush: Always ]
+	Set Variable [ $color_value[1] ; FAT Theme Color::Color Hex Value ]
+	Set Variable [ $color_custom_name[1] ; FAT Theme Color::Custom Color Name ]
+	Set Variable [ $color_predefined_name[1] ; FAT Theme Color::Predefined Color Name ]
+	If [ $re_import ]
+		# Check if predefined color exist in Title
+		Go to Layout [ Layout: "TABLE FAT Theme Color Alt" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Set Field [ FAT Theme Color Alt::Custom Color Name ; $color_custom_name ]
+			Set Field [ FAT Theme Color Alt::Color Hex Value ; $color_value ]
+			Go to Layout [ Layout: "TABLE FAT Theme Color" ; Animation: None ]
+		Else
+			# if re_import and pre-defined does not exist -> duplicate from theme
+			Go to Layout [ Layout: "TABLE FAT Theme Color" ; Animation: None ]
+			Duplicate Record/Request
+			Set Field [ FAT Theme Color::Theme template id ; "" ]
+			Set Field [ FAT Theme Color::Theme id ; $theme_id ]
+		End If
+	Else
+		Duplicate Record/Request
+		Set Field [ FAT Theme Color::Theme template id ; "" ]
+		Set Field [ FAT Theme Color::Theme id ; $theme_id ]
+	End If
+	# Added 2025-02-12 - We need to ensure that templates cannot use duplicate names either! 
+	Commit Records/Requests [ With dialog: OFF ]
+	If [ Get(lastError) = 504 ]
+		Delete Record/Request [ With dialog: OFF ]
+	End If
+	Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+	Exit Loop If [ $recordPosn > $foundCount ]
+	Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+End Loop
+
+# ------------ TEXT STYLES -----------------------------------------------------
+Go to Layout [ Layout: "TABLE FAT Theme TextStyle" ; Animation: None ]
+
+# Find all text styles in the theme template
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $foundCount[1] ; Get(foundCount) ]
+Set Variable [ $recordPosn[1] ; 1 ]
+Go to Record/Request/Page [ First ]
+
+Loop [ Flush: Always ]
+	Set Variable [ $textstyle_custom_name[1] ; FAT Theme TextStyle::Custom Name ]
+	Set Variable [ $textstyle_type[1] ; FAT Theme TextStyle::Type ]
+	Set Variable [ $textstyle_predefined_name[1] ; FAT Theme TextStyle::Predefined Text style Name ]
+	Set Variable [ $textstyle_textsize[1] ; FAT Theme TextStyle::Text Font size ]
+	Set Variable [ $textstyle_textalign[1] ; FAT Theme TextStyle::Text Align ]
+	Set Variable [ $textstyle_textcolor[1] ; FAT Theme TextStyle::Text color ]
+	Set Variable [ $textstyle_fontfamily[1] ; FAT Theme TextStyle::Text Font family ]
+	Set Variable [ $textstyle_fontweight[1] ; FAT Theme TextStyle::Text Font weight ]
+	Set Variable [ $textstyle_letterspacing[1] ; FAT Theme TextStyle::Text letter spacing ]
+	Set Variable [ $textstyle_lineheight[1] ; FAT Theme TextStyle::Text line height ]
+	
+	If [ $re_import ]
+		# Check if predefined color exist in Title
+		Go to Layout [ Layout: "TABLE FAT Theme TextStyle Alt" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		If [ Get(foundCount)>0 ]
+			Set Field [ FAT Theme TextStyle Alt::Custom Name ; $textstyle_custom_name ]
+			Set Field [ FAT Theme TextStyle Alt::Type ; $textstyle_type ]
+			Set Field [ FAT Theme TextStyle Alt::Text color ; $textstyle_textcolor ]
+			Set Field [ FAT Theme TextStyle Alt::Text Font family ; $textstyle_fontfamily ]
+			Set Field [ FAT Theme TextStyle Alt::Text Font size ; $textstyle_textsize ]
+			Set Field [ FAT Theme TextStyle Alt::Text Align ; $textstyle_textalign ]
+			Set Field [ FAT Theme TextStyle Alt::Text line height ; $textstyle_lineheight ]
+			Set Field [ FAT Theme TextStyle Alt::Text letter spacing ; $textstyle_letterspacing ]
+			Set Field [ FAT Theme TextStyle Alt::Text Font weight ; $textstyle_fontweight ]
+			Go to Layout [ Layout: "TABLE FAT Theme Color" ; Animation: None ]
+		Else
+			# if re_import and pre-defined does not exist -> duplicate from theme
+			Go to Layout [ Layout: "TABLE FAT Theme TextStyle" ; Animation: None ]
+			Duplicate Record/Request
+			Set Field [ FAT Theme TextStyle::Theme template id ; "" ]
+			Set Field [ FAT Theme TextStyle::Theme id ; $theme_id ]
+		End If
+	Else
+	End If
+	Duplicate Record/Request
+	Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+	Exit Loop If [ $recordPosn > $foundCount ]
+	Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+End Loop
+
+
+# ------------ FONT -----------------------------------------------------
+Go to Layout [ Layout: "TABLE FAT Theme Font" ; Animation: None ]
+If [ $re_import ]
+	# Find all fonts in the theme and delete them
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Delete All Records [ With dialog: OFF ]
+	End If
+End If
+
+# Find all fonts in the theme template
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $foundCount[1] ; Get(foundCount) ]
+Set Variable [ $recordPosn[1] ; 1 ]
+Go to Record/Request/Page [ First ]
+
+Loop [ Flush: Always ]
+	Duplicate Record/Request
+	Set Variable [ $recordPosn[1] ; $recordPosn  + 1 ]
+	Set Field [ FAT Theme Font::Theme template id ; "" ]
+	Set Field [ FAT Theme Font::Theme id ; $theme_id ]
+	Exit Loop If [ $recordPosn > $foundCount ]
+	Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+End Loop
+
+
+
+If [ $re_import ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+
+
+
+

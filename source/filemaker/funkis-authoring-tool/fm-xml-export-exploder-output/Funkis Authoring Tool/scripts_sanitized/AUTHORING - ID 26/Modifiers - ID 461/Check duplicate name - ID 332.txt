@@ -1,0 +1,35 @@
+
+# An attribute or stateToggle with identical name on the same level will corrupt the JSON.
+  Check when adding an attribute or stateToggle to a FAT item
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "learningprogramme_id" ) ]
+Set Variable [ $level[1] ; GetScriptProperty ( "level" ) ]
+Set Variable [ $block_id[1] ; GetScriptProperty ( "symbol_id" ) ]
+Set Variable [ $name[1] ; GetScriptProperty ( "name" ) ]
+Set Variable [ $modifier_package_type[1] ; GetScriptProperty ( "modifier_package_type" ) ]
+Set Variable [ $duplicate[1] ; False ]
+
+Go to Layout [ Layout: "TABLE FAT Modifier" ; Animation: None ]
+If [ $level = "block" ]
+	# Find if exist with same title, block and name
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	# Insight item modifiers are added on the same level as page item modifiers.
+	If [ $level = "Insight item" ]
+		Set Variable [ $level[1] ; "Page item" ]
+	End If
+	# Find if exist with same title, level, package_types and name
+	# Package types must always be in the same order if multiple
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+If [ Get(foundCount) > 0 ]
+	Set Variable [ $duplicate[1] ; True ]
+End If
+
+If [ $duplicate ]
+	Show Custom Dialog [ Title: "Duplicate name" ; Message: "Your modifier \"" & $name & "\" has a name that is already in use. Please change the name to be unique." ; Default Button: "OK" ]
+	Exit Script [ True ]
+Else
+	Exit Script [ False ]
+End If
+

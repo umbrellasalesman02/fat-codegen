@@ -1,0 +1,32 @@
+# This script fixes the legacy IOArray (a comma-separated list) that are used in Page items and List items. 
+# This script does NOT create any new IOs. If a cloned IO is not found in OldPrimaryKey it uses the existing IO. 
+# The script takes an old_io_array as parameter and returns a new io_array
+# The script is called from Fix IOArrays after clone
+
+
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $old_io_array[1] ; GetScriptProperty("old_io_array") ]
+
+Set Variable [ $old_io_list[1] ; Substitute ( $old_io_array ; "," ; "¶" ) ]
+
+Set Variable [ $new_io_array[1] ; "" ]
+
+Set Variable [ $i[1] ; 1 ]
+# Check IO for IO from Array to see if any new IOs have been created during clone process
+Loop [ Flush: Always ]
+	Exit Loop If [ $i > ValueCount ( $old_io_list ) ]
+	Set Variable [ $old_io_id[1] ; GetValue ( $old_io_list ; $i ) ]
+	Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+	# Search for IO value in OldPrimaryKey from clone
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)=1 ]
+		Set Variable [ $new_io_array[1] ; $new_io_array & FAT IO::PrimaryKey & "," ]
+	Else
+		Set Variable [ $new_io_array[1] ; $new_io_array & $old_io_id & "," ]
+	End If
+	Set Variable [ $i[1] ; $i + 1 ]
+End Loop
+
+# Exit a new io array - remove last comma-sign
+Exit Script [ Case ( Right ( $new_io_array ; 1 ) = "," ; Left ( $new_io_array ; Length($new_io_array) - 1 ); $new_io_array ) ]
+

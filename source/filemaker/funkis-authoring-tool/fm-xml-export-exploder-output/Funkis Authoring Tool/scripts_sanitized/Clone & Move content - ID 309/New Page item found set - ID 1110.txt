@@ -1,0 +1,49 @@
+# Called from Start Cloning->Fix IOArrays after clone after all cloning is ready
+
+# SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "clone_level" ; $clone_level ) &
+  SetProperty ( "old_item_id" ; $old_item_id ) 
+
+Set Variable [ $title_id[1] ; GetScriptProperty("title_id") ]
+Set Variable [ $clone_level[1] ; GetScriptProperty("clone_level") ]
+Set Variable [ $old_item_id[1] ; GetScriptProperty("old_item_id") ]
+
+If [ $clone_level = "Title" ]
+	Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else If [ $clone_level = "Package group" ]
+	# Find all packages in PAckage Group
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+Else If [ $clone_level = "Package" ]
+	Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+Else If [ $clone_level = "Chapter" ]
+	Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+Else If [ $clone_level = "Page" ]
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+Else If [ $clone_level = "Page item" ]
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+End If
+
+If [ Get(foundCount)>0 ]
+	Go to Related Record [ Table: FAT Page item ; Layout: "TABLE FAT Page Item" ; Show related ; Match found set ]
+	# So the correct way to test for no related records is:
+	  - GTRR Match current record only: test for error 101
+	  - GTRR Match found set: test for error 401
+	If [ Get(lastError) = 401 ]
+		Exit Script [ "Error. No page items found." ]
+	End If
+Else
+	Exit Script [ "Error. No page items found." ]
+End If
+
+

@@ -1,0 +1,24 @@
+/*Converts JSON text into a JSON string (usually for testing purposes)
+   Author:         Kyle Williams
+   Date:            11/20/2019
+
+
+To test JSON conversion in data viewer:    JSONFormatElements ( Evaluate ( JSON.stringify ( $$JSON ) ) )
+*/
+
+"\"" & 
+
+Substitute( json
+	;[ ¶; "" ]
+	;[ Char(9); "" ]
+	;[ "\r"; ¶ ]
+	;[ "\t"; Char(9) ]
+
+	;[ Char(92); Char(92) & Char(92)  ]
+	;[ Char(34); "\\\"" ]
+
+	;[ ¶; "\r" ]
+	;[ Char(9); "\t" ]
+ )
+
+& "\""

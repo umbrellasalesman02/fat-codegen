@@ -1,0 +1,13 @@
+# Called from Packa group portal in Title settings
+
+Set Variable [ $package_group[1] ; FAT Package Group::PrimaryKey ]
+Delete Portal Row [ With dialog: OFF ]
+Freeze Window
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Replace Field Contents [ FAT Package::Package Group ; Replace with calculation: "" ]
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

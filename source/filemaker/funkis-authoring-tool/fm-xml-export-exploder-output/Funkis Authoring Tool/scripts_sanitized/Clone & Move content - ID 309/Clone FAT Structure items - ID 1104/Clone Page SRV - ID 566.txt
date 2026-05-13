@@ -1,0 +1,163 @@
+# This script clones a specific Page and all of its Page items
+# This script requires that the active record is the current Page that is going to be cloned.
+  
+  This script is called from Clone Chapter and from a button in Page Settings
+
+# SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+  SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+  SetProperty ( "clone_level" ; $clone_level) &
+  SetProperty ( "clone_settings" ; $clone_settings ) &
+  SetProperty ( "suffix" ; $suffix) &
+  SetProperty ( "object_group_id" ; $object_group_id ) &
+  SetProperty ( "title_id" ; $title_id ) &
+  SetProperty ( "parent_id" ; $new_ch_id ) &
+  SetProperty ( "old_pg_id" ; $old_pg_id ) &
+  SetProperty ( "new_sortindex" ; $new_sortindex )
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Set Variable [ $isClonedTitle[1] ; GetAsBoolean(GetScriptProperty ( "isClonedTitle")) ]
+Set Variable [ $isMovedPackage[1] ; GetAsBoolean(GetScriptProperty ( "isMovedPackage" )) ]
+
+Set Variable [ $clone_level[1] ; GetScriptProperty ( "clone_level" ) ]
+Set Variable [ $clone_settings[1] ; GetScriptProperty ( "clone_settings" ) ]
+Set Variable [ $suffix[1] ; GetScriptProperty ( "suffix" ) ]
+Set Variable [ $object_group_id[1] ; GetScriptProperty ( "object_group_id" ) ]
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id") ]
+Set Variable [ $parent_id[1] ; GetScriptProperty ( "parent_id") ]
+Set Variable [ $old_pg_id[1] ; GetScriptProperty ( "old_pg_id") ]
+Set Variable [ $new_sortindex[1] ; GetScriptProperty ( "new_sortindex") ]
+
+# Find the Page
+Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# Duplication of pages that have a proxy chapter means that we have to duplicate the proxy chapter if clone_level = "page"
+If [ $clone_level = "page" And FAT Chapter::Proxy type = "page" ]
+	Go to Related Record [ Table: FAT Chapter ; Layout: "TABLE FAT Chapter" ; Show related ]
+	Duplicate Record/Request
+	Set Variable [ $proxy_parent[1] ; FAT Chapter::PrimaryKey ]
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+End If
+
+# Save current data
+Set Variable [ $pg_title_text[1] ; Case ( $clone_level= "page" And Not IsEmpty($suffix); TF PG Header::Text & " " & $suffix ; TF PG Header::Text) ]
+Set Variable [ $pg_subtitle1_text[1] ; TF PG Sub header 1::Text ]
+Set Variable [ $pg_subtitle2_text[1] ; TF PG Sub header 2::Text ]
+Set Variable [ $pg_media[1] ; Media Main Menu Image PG::Media container ]
+Set Variable [ $pg_sortindex[1] ; Case ($new_sortindex; $new_sortindex ; FAT Page::SortIndex) ]
+
+Duplicate Record/Request
+
+Set Variable [ $new_pg_id[1] ; FAT Page::PrimaryKey ]
+# Update cloned record with new data
+Set Field [ FAT Page::Old PrimaryKey from clone ; $old_pg_id ]
+Set Field [ FAT Page::Parent id ; Case(Not IsEmpty($proxy_parent); $proxy_parent; $parent_id) ]
+Set Field [ FAT Page::SortIndex ; $pg_sortindex ]
+Commit Records/Requests [ With dialog: OFF ]
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+
+If [ IsEmpty ( FAT Page::Proxy type ) ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pg_id ) &
+					SetProperty ( "source_table" ; "page" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT Page::Header txt id ) ) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	Set Field [ TF PG Header::Text ; $pg_title_text ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pg_id ) &
+					SetProperty ( "source_table" ; "page" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT Page::Sub header 1 txt id ) ) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	Set Field [ TF PG Sub header 1::Text ; $pg_subtitle1_text ]
+	Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; $new_pg_id ) &
+					SetProperty ( "source_table" ; "page" ) &
+					SetProperty ( "source_textfield" ; GetFieldName ( FAT Page::Sub header 2 txt id ) ) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) ]
+	Set Field [ TF PG Sub header 2::Text ; $pg_subtitle2_text ]
+	Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Page::PrimaryKey ) &
+					SetProperty ( "source_table" ; "page" ) &
+					SetProperty ( "source_mediafield" ; GetFieldName ( FAT Page::Main menu media id ) ) &
+					SetProperty ( "caller_layout" ; Get(layoutName )) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "package_id" ; $package_id ) ]
+	Set Field [ Media Main Menu Image PG::Media container ; $pg_media ]
+	
+	# Add to content overview - NEW 2024-02-10
+	Set Variable [ $item_type[1] ; "Page" ]
+	Set Variable [ $item_id[1] ; $new_pg_id ]
+	Perform Script [ From list ; "Add Overview item SRV" ; Parameter: SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "item_id" ; $item_id ) &
+					SetProperty ( "item_type" ; $item_type ) ]
+	
+	If [ PatternCount ( $clone_settings ; "Link" ) ]
+		Perform Script [ From list ; "Clone Link SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+						SetProperty ( "clone_level" ; $clone_level ) &
+						SetProperty ( "clone_settings" ; $clone_settings ) &
+						SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "suffix" ; $suffix) &
+						SetProperty ( "object_group_id" ; $object_group_id ) &
+						SetProperty ( "old_item_id" ; $old_pg_id ) &
+						SetProperty ( "new_item_id" ; $new_pg_id ) ]
+	End If
+	
+	Perform Script [ From list ; "Clone ModifierValue" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) & 
+					SetProperty ( "old_item_id" ; $old_pg_id ) & 
+					SetProperty ( "new_item_id" ; $new_pg_id ) & 
+					SetProperty ( "title_id" ; $title_id ) & 
+					SetProperty ( "package_id" ; $package_id ) ]
+	Perform Script [ From list ; "Clone Tag values" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) & 
+					SetProperty ( "clone_settings" ; $clone_settings ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "suffix" ; $suffix ) & 
+					SetProperty ( "object_group_id" ; $object_group_id ) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "old_item_id" ; $old_pg_id ) & 
+					SetProperty ( "new_item_id" ; $new_pg_id ) ]
+	Perform Script [ From list ; "Clone Score values" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+					SetProperty ( "isMovedPackage" ; $isMovedPackage ) & 
+					SetProperty ( "clone_settings" ; $clone_settings ) &
+					SetProperty ( "clone_level" ; $clone_level ) &
+					SetProperty ( "suffix" ; $suffix ) & 
+					SetProperty ( "object_group_id" ; $object_group_id ) &
+					SetProperty ( "title_id" ; $title_id ) &
+					SetProperty ( "old_item_id" ; $old_pg_id ) & 
+					SetProperty ( "new_item_id" ; $new_pg_id ) ]
+	
+End If
+
+# Go to page items
+# Callers always use the Alt TO
+Go to Layout [ Layout: "TABLE FAT Page Item Alt" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	Loop [ Flush: Always ]
+		# Page item loop
+		Set Variable [ $old_pi_id[1] ; FAT Page item Alt::PrimaryKey ]
+		Perform Script [ From list ; "Clone PageItem SRV" ; Parameter: SetProperty ( "isClonedTitle" ; $isClonedTitle ) &
+						SetProperty ( "isMovedPackage" ; $isMovedPackage ) &
+						SetProperty ( "clone_level" ; $clone_level) &
+						SetProperty ( "clone_settings" ; $clone_settings ) &
+						SetProperty ( "suffix" ; $suffix) &
+						SetProperty ( "object_group_id" ; $object_group_id ) &
+						SetProperty ( "title_id" ; $title_id ) &
+						SetProperty ( "parent_id" ; $new_pg_id ) &
+						SetProperty ( "old_pi_id" ; $old_pi_id ) ]
+		Go to Layout [ Layout: "TABLE FAT Page Item Alt" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+Exit Script [ $item_id ]
+
+

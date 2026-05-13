@@ -1,0 +1,26 @@
+# Used in recursive funtions of list items
+Set Variable [ $current_found_set[1] ; GetScriptProperty ( "current_found_set" ) ]
+Set Variable [ $record_num[1] ; GetScriptProperty ( "record_num" ) ]
+Set Variable [ $table[1] ; GetScriptProperty ( "table" ) ]
+
+Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+Set Variable [ $i[1] ; 1 ]
+If [ ValueCount ( $current_found_set )> 0 ]
+	Set Variable [ $list_item_id[1] ; GetValue ( $current_found_set ; $i ) ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ ValueCount ( $current_found_set )> 1 ]
+		Loop [ Flush: Always ]
+			Set Variable [ $i[1] ; $i + 1 ]
+			Set Variable [ $list_item_id[1] ; GetValue ( $current_found_set ; $i ) ]
+			Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+			Exit Loop If [ $i = ValueCount ( $current_found_set ) ]
+		End Loop
+	End If
+	# Now we have the found set - go to right record
+	Go to Record/Request/Page [ With dialog: OFF ; $record_num ]
+End If
+
+If [ $table = "list_item_page_item" And Get(foundCount) > 0 ]
+	Go to Related Record [ Table: FAT List item ; Layout: "TABLE FAT List item PI" ]
+End If
+

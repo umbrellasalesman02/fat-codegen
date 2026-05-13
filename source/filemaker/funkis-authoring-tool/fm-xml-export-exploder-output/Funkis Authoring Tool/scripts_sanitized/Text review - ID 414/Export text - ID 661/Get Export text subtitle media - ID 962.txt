@@ -1,0 +1,26 @@
+# Called from List items and Sprig story that uses media
+
+Set Variable [ $media_id[1] ; GetScriptProperty ( "media_id" ) ]
+Set Variable [ $media_filename[1] ; GetScriptProperty ( "media_filename" ) ]
+Set Variable [ $localisation_code[1] ; GetScriptProperty ( "localisation_code" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Go to Record/Request/Page [ First ]
+
+If [ Get(foundCount)>0 ]
+	Set Variable [ $result_html[1] ; "<p style=\"font-size:10px\">" & $media_filename & " - subtitles</p>" ]
+	Set Variable [ $subtitle_text[1] ; "" ]
+	Loop [ Flush: Always ]
+		Set Variable [ $subtitle_text[1] ; $subtitle_text & FAT Text::Text & " " ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Set Variable [ $result_html[1] ; $result_html  & "<em>" & $subtitle_text & "</em><br><br>" ]
+End If
+
+Exit Script [ $result_html ]
+
+
+

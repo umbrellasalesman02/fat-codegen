@@ -1,0 +1,75 @@
+# Each time the Web viewer needs to be refreshed
+# Called from View Card Text variable when a user click a text variable of type AI prompt
+
+# Caller can be "Title"
+Set Variable [ $caller[1] ; Get(scriptParameter) ]
+
+
+If [ Not $$cacheWebViewer ]
+	Set Variable [ $$cacheWebViewer[1] ; True ]
+	// Set Variable [ $$WV_HTML[1] ; "data:text/html," & FAT Page item::gHTML Code ]
+	Set Web Viewer [ "WV" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+	Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+Else
+	Set Web Viewer [ "WV" ; ⚠️ PARAMETER "action" NOT PARSED ⚠️ ]
+	Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+End If
+
+If [ $caller = "Title" ]
+	Set Variable [ $Text_variable_HTML_JSON[1] ; /* HTML Parameters */ 
+					
+					
+					Let ( 
+					       [
+					         i = 1;
+					         localisation_mode = "original";
+					      
+					
+					        TVjson1 = JSONSetElement ( "{}" ; 
+					             ["label" ; "Manuscript" ; JSONString];
+					             ["id" ; "1" ; JSONString];
+					             ["html" ; True ; JSONBoolean];
+					             ["maxchars" ; 100000 ; JSONNumber];
+					             ["value" ; sanitizeHTML ( FAT Text variable::Manuscript ) ; JSONString] 
+					         );
+					
+					        TVjson2 = JSONSetElement ( "{}"  ;
+					             ["label" ; "Loading text" ; JSONString];
+					             ["id" ; "2" ; JSONString];
+					             ["html" ; False ; JSONBoolean];
+					             ["maxchars" ; 10000 ; JSONNumber];
+					             ["value" ; sanitizeHTML ( FAT Text variable::Loading text ) ; JSONString] 
+					         );
+					
+					        TVjson3 = JSONSetElement ( "{}"  ;
+					             ["label" ; "Background context" ; JSONString];
+					             ["id" ; "3" ; JSONString];
+					             ["html" ; True ; JSONBoolean];
+					             ["maxchars" ; 100000 ; JSONNumber];
+					             ["value" ; sanitizeHTML ( FAT Text variable::Background context ) ; JSONString] 
+					         );
+					
+					         TVtextArr = "[" & TVjson1 & "," & TVjson2 & "," & TVjson3 & "]";
+					 
+					          
+					         TVjsonResult = JSONSetElement ( "{}" ; 
+					
+					                      ["environment" ; Case ( Platform="WebDirect"; "web"; "FileMaker") ; JSONString];
+					                      ["record-id" ; Get(recordID) ; JSONNumber];
+					                      ["localisation_mode" ; localisation_mode; JSONString];
+					                      ["edit_mode" ; "textVariable"; JSONString];
+					                      ["texts" ; TVtextArr ; JSONArray]
+					               )
+					
+					       
+					
+					        ];
+					
+					      JSONFormatElements ( TVjsonResult)
+					      //LTjsonResult
+					) ]
+End If
+
+Perform JavaScript in Web Viewer [ Name: "WV" ; ⚠️ PARAMETER "FunctionRef" NOT PARSED ⚠️ ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ]
+Go to Object [ FAT List item::LastSettingTab ; Repetition: 1 ]
+

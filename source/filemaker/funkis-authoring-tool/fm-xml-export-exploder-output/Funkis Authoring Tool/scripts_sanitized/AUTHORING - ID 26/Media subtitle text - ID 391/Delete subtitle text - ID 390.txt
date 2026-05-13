@@ -1,0 +1,31 @@
+# only from FAT media table
+Set Variable [ $media_id[1] ; FAT Media::PrimaryKey ]
+
+If [ $$localisation_code ≠ FAT Title::Original localisation code ]
+	Show Custom Dialog [ Title: "Delete localised subtitle texts" ; Message: "Deleting subtitle texts cannot be undone." & ¶ & ¶ & "Are you sure you want to delete all subtitle texts in the displayed language connected to this media file?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+	Set Variable [ $viewLocalisation[1] ; FAT Title::gViewTranslatedLanguage ]
+Else
+	Show Custom Dialog [ Title: "Delete subtitle texts" ; Message: "Deleting subtitle texts cannot be undone." & ¶ & ¶ & "Are you sure you want to delete all subtitle texts in all languages connected to this media file?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+End If
+
+If [ Get(lastMessageChoice)=2 ]
+	Exit Script []
+End If
+
+Set Error Capture [ ON ]
+Freeze Window
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+
+If [ $viewLocalisation ≠ "" ]
+	# Deleting text in viewed language only
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	# Delete original localisation code subtitles to media
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+If [ Get(foundCount)>0 ]
+	Delete All Records [ With dialog: OFF ]
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

@@ -1,0 +1,44 @@
+# Called from event OnObjectSave on field Enter time and Exit time in subtitle layout
+# This script can be called from all kind o
+
+# time_point = "Enter" or "Exit"
+Set Variable [ $time_point[1] ; Get(scriptParameter) ]
+Set Variable [ $localisation_code[1] ; FAT Media::Localisation code ]
+Set Variable [ $original_key[1] ; TF Subtitle::PrimaryKey ]
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Set Variable [ $localisation[1] ; Case (List ( FAT Text All translations::PrimaryKey ) = ""; False; True) ]
+
+If [ $localisation = True ]
+	Show Custom Dialog [ Title: "Warning! This text is localised" ; Message: "This text is localised and several language versions may exist. Do you want to adjust the " & $time_point & "-time on all localised texts or only on current language?" ; Default Button: "All" ; Button 2: "Only " & $localisation_code ; Button 3: "Cancel" ]
+	
+	# Check if user wants to adjust localised texts or not
+	If [ Get(lastMessageChoice) = 1 ]
+		Set Variable [ $new_enter_time[1] ; FAT Text::Enter time ]
+		Set Variable [ $new_exit_time[1] ; FAT Text::Exit time ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		# User press All languages - change time in all texts both original and localised
+		If [ $time_point = "Enter" ]
+			Replace Field Contents [ FAT Text::Enter time ; Replace with calculation: $new_enter_time ]
+		Else If [ $time_point = "Exit" ]
+			Replace Field Contents [ FAT Text::Exit time ; Replace with calculation: $new_exit_time ]
+		End If
+	Else If [ Get(lastMessageChoice) = 2 ]
+		# do nothing
+	Else If [ Get(lastMessageChoice) = 3 ]
+		# User press Cancel
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Exit Script [ False ]
+	End If
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Exit Script [ True ]
+
+
+

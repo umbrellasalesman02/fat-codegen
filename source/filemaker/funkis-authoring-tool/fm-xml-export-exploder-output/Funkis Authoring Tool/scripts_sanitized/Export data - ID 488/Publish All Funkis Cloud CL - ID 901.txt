@@ -1,0 +1,58 @@
+# Called from Title Settings button - Packages tab
+# Loops through all packages and instruct Task server to do the copy from draft to production
+
+
+If [ Get(layoutName) = "FAT Title Settings" Or Count ( FAT Package Group::PrimaryKey ) = 0 Or IsEmpty ( FAT Title::gView Package group Title ) ]
+	Show Custom Dialog [ Title: "Publish all packages" ; Message: "Do you want to deliver all packages in this Title to the production server on Funkis Cloud? " ; Default Button: "OK" ; Button 2: "Cancel" ]
+	Set Variable [ $package_group_id[1] ; "" ]
+Else
+	Show Custom Dialog [ Title: "Publish packages in group" ; Message: "This operation will publish all packages in the selected package group to the preview server. 
+					
+					Do you want to proceed?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+	Set Variable [ $package_group_id[1] ; FAT Title::gView Package group Title ]
+End If
+
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+If [ Not isSuperAdmin ]
+	Allow User Abort [ OFF ]
+End If
+
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+
+
+If [ $package_group_id = "" ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+Else
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	# And include Title information
+	Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+End If
+
+
+If [ Get(foundCount) > 0 ]
+	
+	Loop [ Flush: Always ]
+		Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+		Set Variable [ $package_id[1] ; FAT Package Alt::PrimaryKey ]
+		Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Perform Script [ From list ; "Publish Funkis Cloud CL" ; Parameter: SetProperty ( "package_id" ; $package_id) &
+						SetProperty ( "show_dialog" ; "false") ]
+		# Hide the table view
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		Freeze Window
+		Pause/Resume Script [ ⚠️ PARAMETER "Options" NOT PARSED ⚠️ ]
+		Go to Layout [ Layout: "TABLE FAT Package Alt" ; Animation: None ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

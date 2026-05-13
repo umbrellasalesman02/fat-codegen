@@ -1,0 +1,43 @@
+# Called from Title Localisation 
+# Designed to be run on PSOS
+# Callback when ready?
+# All scripts using Loop Flush: Defer for Server 20.3.1
+
+
+Set Variable [ $title_id[1] ; GetScriptProperty ( "title_id" ) ]
+Set Variable [ $title_localisation_id[1] ; GetScriptProperty ( "title_localisation_id" ) ]
+Go to Layout [ Layout: "TABLE FAT Localisation" ; Animation: None ]
+
+// If [ Not notJens ]
+// Set Variable [ $title_id[1] ; "F3ECC183-FE36-4733-9410-F34A3D334BCD" ]
+// Set Variable [ $title_localisation_id[1] ; "69CDE6D4-69BE-464E-A0B4-552783BE1622" ]
+// End If
+
+# Find all Package localisations based on Title localisation
+Go to Layout [ Layout: "TABLE FAT Localisation" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+Freeze Window
+
+If [ Get(foundCount) >0 ]
+	Loop [ Flush: Defer ]
+		
+		Perform Script [ From list ; "Arrange text in order Package" ; Parameter: SetProperty ( "title_id" ; $title_id) &
+						SetProperty ( "package_id" ; FAT Localisation::Package id ) &
+						SetProperty ( "localisation_id" ; FAT Localisation::PrimaryKey) &
+						SetProperty ( "localisation_code" ; FAT Localisation::Original Localisation code) ]
+		Set Variable [ $result[1] ; $result  & Get(ScriptResult) & ¶ ]
+		# If no error when arranging texts - set timestamp when arranged
+		If [ Not PatternCount ( Get(ScriptResult) ; "error" ) ]
+			Set Field [ FAT Package @ Localisation::TextInContextualOrderTimeStamp ; Get(currentHostTimeStamp) ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Set Field [ FAT Title::TextInContextualOrderTimeStamp ; Get(currentHostTimeStamp) ]
+End If
+
+Exit Script [ $result ]
+
+
+

@@ -1,0 +1,29 @@
+# Add event to log
+# Called from both Title localisation and PAckage localisation
+
+Set Variable [ $caller[1] ; GetScriptProperty ( "caller" ) ]
+Set Variable [ $localisation_id[1] ; GetScriptProperty ( "localisation_id" ) ]
+Set Variable [ $localisation_stage[1] ; GetScriptProperty ( "localisation_stage" ) ]
+
+Set Variable [ $event_text[1] ; FAT Localisation::gEvent Note ]
+
+Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+				SetProperty ( "localisation_stage" ; $localisation_stage ) &
+				SetProperty ( "event_text" ; $event_text ) ]
+
+If [ $caller = "Title localisation" And Count ( FAT Localisation @ Title::PrimaryKey ) > 0 ]
+	# If Title localisation - add to all childrens event log
+	# Always use the Localisation @ Package layout when doing children operations
+	Go to Related Record [ Table: FAT Localisation @ Title ; Layout: "TABLE FAT Localisation @ Package" ; Show related ]
+	Loop [ Flush: Always ]
+		Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; FAT Localisation @ Package::PrimaryKey ) & 
+						SetProperty ( "localisation_stage" ; FAT Localisation @ Package::Localisation stage ) &
+						SetProperty ( "event_text" ; $event_text ) ]
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+
+Set Field [ FAT Localisation::gEvent Note ; "" ]
+Go to Object [ "Event log" ; Repetition: 1 ]
+

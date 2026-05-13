@@ -1,0 +1,15 @@
+# #Called from button in IO Setting layout
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $title_id[1] ; FAT IO::Title id ]
+Set Variable [ $io_type[1] ; FAT IO::IO type ]
+Perform Script [ From list ; "Close card Window" ]
+Perform Script [ From list ; "Save Active Layout" ]
+Go to Layout [ Layout: "FAT Block" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) = 0 ]
+	Show Custom Dialog [ Title: "No blocks found" ; Message: "There are no blocks in this Title that can use this IO type. Only developers can add new blocks to the Title." ; Default Button: "OK" ]
+	Perform Script [ From list ; "Go previous layout" ]
+End If
+
+

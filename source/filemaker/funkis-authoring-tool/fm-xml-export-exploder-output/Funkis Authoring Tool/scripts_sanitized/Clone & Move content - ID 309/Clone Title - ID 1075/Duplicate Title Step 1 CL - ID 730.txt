@@ -1,0 +1,45 @@
+
+# Duplicate the Title
+Show Custom Dialog [ Title: "Duplicate Title" ; Message: "This Title will be duplicated by duplicating all content, blocks, theme, modifiers and settings. It will probably take some time. If Title contains localised packages, these will NOT be duplicated. ¶¶Are you sure you want to duplicate the title?" ; Default Button: "OK" ]
+
+If [ Get(lastMessageChoice)= 1 ]
+	
+	
+	Set Variable [ $clone_level[1] ; GetScriptProperty ( "clone_level" ) ]
+	Set Variable [ $item_id[1] ; GetScriptProperty ( "item_id" ) ]
+	Set Variable [ $item_parent_id[1] ; GetScriptProperty ( "item_parent_id" ) ]
+	Set Variable [ $item_description[1] ; GetScriptProperty ( "item_description" ) ]
+	Set Variable [ $item_sortindex[1] ; GetAsNumber(GetScriptProperty ( "item_sortindex" )) ]
+	
+	Set Variable [ $old_tt_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $old_theme_template_id[1] ; FAT Theme::Theme template id ]
+	Set Variable [ $$currentWindow[1] ; Get(windowName) ]
+	Set Variable [ $old_localisation_code[1] ; FAT Title::Original localisation code ]
+	
+	Set Field [ FAT Title::Old PrimaryKey from clone ; "" ]
+	
+	New Window [ Style: Card ; Name: "Clone Title" ; Layout: "FAT New Title" ; Height: 740 * Get(WindowZoomLevel)/100 ; Width: 960 * Get(WindowZoomLevel)/100 ; Close: OFF ; Minimize: OFF ; Maximize: OFF ; Resize: OFF ; Menu: OFF ; Toolbar: OFF ]
+	Freeze Window
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+	Duplicate Record/Request
+	
+	Set Field [ FAT Title::Old PrimaryKey from clone ; $old_tt_id ]
+	Set Field [ FAT Title::Header txt id ; "" ]
+	Set Field [ FAT Title::Sub header txt id ; "" ]
+	Set Field [ FAT Title::LastSettingTab ; "tab1" ]
+	Set Field [ FAT Title::Reference title ; "" ]
+	Set Field [ FAT Title::Funkis Cloud Title id ; "" ]
+	Set Field [ FAT Title::FC Client directory ; "" ]
+	Set Field [ FAT Title::FC Title directory ; "" ]
+	Set Field [ FAT Title::Business System Production id ; "" ]
+	Set Field [ FAT Title::URL Web development ; "" ]
+	Set Field [ FAT Title::gSelectedLocalisation ; $old_localisation_code ]
+	Set Field [ FAT Title::gThemeTemplate ; $old_theme_template_id ]
+	Set Field [ FAT Title::gViewTranslatedLanguage ; 0 ]
+	
+	Set Variable [ $$lp_id[1] ; FAT Title::PrimaryKey ]
+	Go to Field [ FAT Title::Reference title ]
+	
+End If
+

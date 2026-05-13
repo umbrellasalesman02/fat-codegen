@@ -1,0 +1,76 @@
+# Called from Card window - List item @ Pqge item
+
+Set Variable [ $title_list_name[1] ; Case ( IsEmpty ( TF PI Text 1::Text ) ; TF PI Text 2::Display text; TF PI Text 1::Display text) ]
+Show Custom Dialog [ Title: "Convert to Title List" ; Message: "Are you sure you want to convert this page item list to a list that will be accessible in the whole Title?¶
+				Please enter a name for your Title List in the field below." ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $title_list_name ; Label 1: "List name" ]
+Freeze Window
+
+If [ Get(lastMessageChoice) = 1 ]
+	Commit Records/Requests [ With dialog: OFF ]
+	Set Variable [ $pageitem_id[1] ; FAT Page item::PrimaryKey ]
+	Set Variable [ $list_template_id[1] ; BlockTemplate @ Page item::List template id ]
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	
+	# Create a new list in title
+	Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+	New Record/Request
+	Set Variable [ $list_id[1] ; FAT List::PrimaryKey ]
+	Set Field [ FAT List::Name ; $title_list_name ]
+	Set Field [ FAT List::List template id ; $list_template_id ]
+	Set Field [ FAT List::Title id ; $title_id ]
+	Set Field [ FAT List::List backend ; "FAT" ]
+	
+	# Connect all list items to new list
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	If [ Count(FAT List item @ Page item::PrimaryKey) > 0 ]
+		Go to Related Record [ Table: FAT List item @ Page item ; Layout: "TABLE FAT List item PI" ; Show related ]
+		Replace Field Contents [ FAT List item @ Page item::Parent id ; Replace with calculation: $list_id ]
+	End If
+	
+	# Must remove Package id on Text and Media fields connected to list.
+	# Go back to list again - now all list items are connected
+	Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+	If [ Count(FAT List item::PrimaryKey) > 0 ]
+		Go to Related Record [ Table: FAT List item ; Layout: "TABLE FAT List item" ; Show related ]
+		
+		If [ Count ( TF LI 1::PrimaryKey ) > 0 ]
+			Go to Related Record [ Table: TF LI 1 ; Layout: "TABLE FAT Text" ; Show related ; Match found set ]
+			Replace Field Contents [ TF LI 1::Package id ; Replace with calculation: "" ]
+		End If
+		
+		Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+		If [ Count ( TF LI 2::PrimaryKey ) > 0 ]
+			Go to Related Record [ Table: TF LI 2 ; Layout: "TABLE FAT Text" ; Show related ; Match found set ]
+			Replace Field Contents [ TF LI 2::Package id ; Replace with calculation: "" ]
+		End If
+		
+		Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+		
+		If [ Count ( TF LI 3::PrimaryKey ) > 0 ]
+			Go to Related Record [ Table: TF LI 3 ; Layout: "TABLE FAT Text" ; Show related ; Match found set ]
+			Replace Field Contents [ TF LI 3::Package id ; Replace with calculation: "" ]
+		End If
+		
+		Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+		
+		If [ Count (Media LI 1::PrimaryKey ) > 0 ]
+			Go to Related Record [ Table: Media LI 1 ; Layout: "TABLE FAT Media" ; Show related ; Match found set ]
+			Replace Field Contents [ Media LI 1::Package id ; Replace with calculation: "" ]
+		End If
+		
+		Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+		
+		If [ Count ( Media LI 2::PrimaryKey ) > 0 ]
+			Go to Related Record [ Table: Media LI 2 ; Layout: "TABLE FAT Media" ; Show related ; Match found set ]
+			Replace Field Contents [ Media LI 2::Package id ; Replace with calculation: "" ]
+		End If
+		
+	End If
+	
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Set Field [ FAT Page item::List id ; $list_id ]
+	Go to Layout [ Layout: "FAT TT List Card" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+End If
+
+

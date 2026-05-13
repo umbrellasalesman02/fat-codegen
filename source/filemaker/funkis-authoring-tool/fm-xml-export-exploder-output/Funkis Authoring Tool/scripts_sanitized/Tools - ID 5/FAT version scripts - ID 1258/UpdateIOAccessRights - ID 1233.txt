@@ -1,0 +1,84 @@
+# IMPORTANT!!!!
+# Called from Update to FAT v4 and CheckIOAccessRights SRV
+
+
+Set Variable [ $io_type[1] ; GetScriptProperty ( "io_type" ) ]
+Set Variable [ $io_id[1] ; GetScriptProperty ( "io_id" ) ]
+Set Variable [ $read_filter[1] ; GetScriptProperty ( "read_filter" ) ]
+Set Variable [ $write_as[1] ; GetScriptProperty ( "write_as" ) ]
+
+# Find the IO to adjust permissions
+Go to Layout [ Layout: "TABLE FAT IO Alt" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# -------------Special case for IO List -----------------------------
+If [ $io_type = "IO List" ]
+	# IO List includes a list of IO Rates that needs the same permissions as the IO List
+	Set Variable [ $io_list_id[1] ; FAT IO Alt::IO List id ]
+	Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) > 0 ]
+		Loop [ Flush: Always ]
+			# Extend the found set of io:s with all io:s in the IO List
+			Set Variable [ $io_in_list_id[1] ; FAT List item::Value 1 ]
+			Go to Layout [ Layout: "TABLE FAT IO Alt" ; Animation: None ]
+			Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+			Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+			Go to Record/Request/Page [ Next ; Exit after last: ON ]
+		End Loop
+	End If
+	Go to Layout [ Layout: "TABLE FAT IO Alt" ; Animation: None ]
+End If
+# --------- End IO List ----------------------------------------------
+
+Loop [ Flush: Always ]
+	
+	Set Variable [ $io_read_permission_list[1] ; FAT IO Alt::IO Read Permissions ]
+	Set Variable [ $io_write_permission_list[1] ; FAT IO Alt::IO Write Permissions ]
+	
+	If [ Not PatternCount ( $io_read_permission_list ; $read_filter ) And Not IsEmpty ( $read_filter ) ]
+		If [ $read_filter = "My Member" ]
+			Set Variable [ $io_read_permission_list[1] ; Case ( IsEmpty ( $io_read_permission_list ) ; "My Member"; "My Member¶" & $io_read_permission_list) ]
+		Else If [ $read_filter = "My Group" ]
+			If [ $io_read_permission_list = "" ]
+				Set Variable [ $io_read_permission_list[1] ; "My Group" ]
+			Else If [ $io_read_permission_list = "My Member¶My Session" ]
+				Set Variable [ $io_read_permission_list[1] ; "My Member¶My Group¶My Session" ]
+			Else If [ $io_read_permission_list = "My Member" ]
+				Set Variable [ $io_read_permission_list[1] ; "My Member¶My Group" ]
+			Else If [ $io_read_permission_list = "My Session" ]
+				Set Variable [ $io_read_permission_list[1] ; "My Group¶My Session" ]
+			End If
+		Else If [ $read_filter = "My Session" ]
+			Set Variable [ $io_read_permission_list[1] ; Case ( IsEmpty ( $io_read_permission_list) ; "My Session"; $io_read_permission_list & "¶My Session") ]
+		End If
+		Set Field [ FAT IO Alt::IO Read Permissions ; $io_read_permission_list ]
+		Commit Records/Requests [ With dialog: OFF ]
+	End If
+	
+	If [ Not IsEmpty ( $write_as ) And Not PatternCount ( $io_write_permission_list ; $write_as ) ]
+		
+		If [ $write_as = "My Member" ]
+			Set Variable [ $io_write_permission_list[1] ; Case(IsEmpty($io_write_permission_list); "My Member" ; "My Member¶" & $io_write_permission_list) ]
+		Else If [ $write_as = "My Group" ]
+			If [ $io_write_permission_list = "" ]
+				Set Variable [ $io_write_permission_list[1] ; "My Group" ]
+			Else If [ $io_write_permission_list = "My Member¶My Session" ]
+				Set Variable [ $io_write_permission_list[1] ; "My Member¶My Group" ]
+			Else If [ $io_write_permission_list = "My Member" ]
+				Set Variable [ $io_write_permission_list[1] ; "My Member¶My Group" ]
+			Else If [ $io_write_permission_list = "My Session" ]
+				Set Variable [ $io_write_permission_list[1] ; "My Group¶My Session" ]
+			End If
+		Else If [ $write_as = "My Session" ]
+			Set Variable [ $io_write_permission_list[1] ; Case(IsEmpty( $io_write_permission_list); "My Session" ; $io_write_permission_list & "¶My Session") ]
+		End If
+		Set Field [ FAT IO Alt::IO Write Permissions ; $io_write_permission_list ]
+		Commit Records/Requests [ With dialog: OFF ]
+	End If
+	
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+
+

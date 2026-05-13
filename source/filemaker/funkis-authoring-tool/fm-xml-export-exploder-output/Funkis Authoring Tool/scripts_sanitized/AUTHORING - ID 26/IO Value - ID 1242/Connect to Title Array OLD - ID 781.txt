@@ -1,0 +1,13 @@
+# This script is called from a onModifiy script trigger on the IO Id field
+# If the IO is designed to use a specific Title Content Array - this script adds the TCA to the page item.
+
+Show Custom Dialog [ Title: "Inform sysadmin if this dialog appears! " ; Message: "Script = Connect to Title Array" ; Default Button: "OK" ]
+
+If [ FAT Block @ Page item::List enabled ]
+	Set Variable [ $tca_id[1] ; FAT IO @ Page item::List id ]
+	If [ $tca_id ≠ "" ]
+		Set Field [ FAT Page item::List id ; $tca_id ]
+		Show Custom Dialog [ Title: "Title Content Array Set" ; Message: "This IO uses a Title Content Array that now has been applied to the page item." ; Default Button: "OK" ]
+	End If
+End If
+

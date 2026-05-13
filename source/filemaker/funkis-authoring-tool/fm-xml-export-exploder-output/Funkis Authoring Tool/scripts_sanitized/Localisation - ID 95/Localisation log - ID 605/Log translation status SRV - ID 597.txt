@@ -1,0 +1,35 @@
+# Searches all texts in this localisation and updates the text fields trasnaltion status.
+
+# Script parameter status_type can be:
+  "progress" - check translation approval status in %
+  "size" - number of text chunks in localisation
+  "status" - check number of texts for each status
+
+Set Variable [ $localisation_id[1] ; GetScriptProperty ( "localisation_id" ) ]
+Set Variable [ $localisation_stage[1] ; GetScriptProperty ( "localisation_stage" ) ]
+Set Variable [ $status_type[1] ; GetScriptProperty ( "status_type" ) ]
+
+Go to Layout [ Layout: "TABLE FAT Localisation @ Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# Refresh all status
+Perform Script [ From list ; "Refresh Localisation status" ; Parameter: "Localisation" ]
+
+If [ FAT Localisation @ Package::Localisation stage > 1 ]
+	If [ $status_type = "progress" Or $status_type = "status" ]
+		Perform Script [ From list ; "Get translation progress" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) &
+						SetProperty ( "status_type" ; $status_type ) ]
+	Else If [ $status_type = "size" ]
+		Perform Script [ From list ; "Get number of localised texts" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) ]
+	End If
+	Set Variable [ $event_text[1] ; Get(ScriptResult) ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+Else
+	Set Variable [ $event_text[1] ; "No localised texts exist yet." ]
+End If
+
+# Add event to log
+Perform Script [ From list ; "Add to localisation log" ; Parameter: SetProperty ( "localisation_id" ; $localisation_id ) & 
+				SetProperty ( "localisation_stage" ; $localisation_stage ) & 
+				SetProperty ( "event_text" ; $event_text ) ]
+

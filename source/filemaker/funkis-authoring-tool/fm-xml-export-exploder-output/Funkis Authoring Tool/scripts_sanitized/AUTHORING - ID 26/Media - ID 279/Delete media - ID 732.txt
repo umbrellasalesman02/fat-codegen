@@ -1,0 +1,7 @@
+# Can be called from a delete button on any authoring layout
+Set Variable [ $media_field[1] ; Get(scriptParameter) ]
+Show Custom Dialog [ Title: "Delete media" ; Message: "Are you sure you want to delete the selected media? ¶¶This cannot be undone. " ; Default Button: "Cancel" ; Button 2: "OK" ]
+If [ Get(lastMessageChoice) = 2 ]
+	Set Field By Name [ Specify target field: ON ; $media_field ; "" ]
+End If
+

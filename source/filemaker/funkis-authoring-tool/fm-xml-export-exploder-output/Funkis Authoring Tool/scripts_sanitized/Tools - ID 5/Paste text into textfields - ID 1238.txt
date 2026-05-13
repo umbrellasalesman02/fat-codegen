@@ -1,0 +1,12 @@
+# This script is called from a button in the Page item layout
+Set Error Capture [ ON ]
+Freeze Window
+Set Variable [ $html_text[1] ; Variables::gCopyHTMLText ]
+# ModifierValues
+Set Variable [ $html_text[1] ; JSONSetElement ( $html_text ; 
+				    ["record-id" ; Get(recordID) ; JSONNumber];
+				    ["localisation_code" ; Case ( IsEmpty(FAT Title::gCurrentLocalisationCode);  FAT Title::Original localisation code; FAT Title::gCurrentLocalisationCode) ; JSONString];
+				    ["localisation_mode" ; Case ( IsEmpty ( FAT Title::gCurrentLocalisationCode ) Or FAT Title::gCurrentLocalisationCode = FAT Title::Original localisation code; "original"; "translate" ) ; JSONString]
+				) ]
+Perform Script [ From list ; "Setup current PageItem" ; Parameter: $html_text ]
+

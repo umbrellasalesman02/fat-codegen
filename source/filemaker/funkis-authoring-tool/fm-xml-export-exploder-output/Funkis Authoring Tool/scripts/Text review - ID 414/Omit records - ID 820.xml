@@ -1,0 +1,86 @@
+<Script>
+	<ScriptReference id="820" name="Omit records"></ScriptReference>
+	<ObjectList membercount="6">
+		<Step hash="19D4CA4E6A5D721814A8B72147B9C749" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="A test script to get rid of the annoying WebDirect Bug"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C261D160F4ED61416348B8B3B61B7F60" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[30]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$maxRecords"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="AB1910F1556EF2EDA255B7206D3A181A" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[Get(foundCount)]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$foundCount"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CFE4A080F10A2B9AC6FE9BD862827A5B" id="68" name="If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$foundCount>$maxRecords]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="2A7E96EE00D616B782E3162DC9CAA67E" id="26" name="Omit Multiple Records" enable="True">
+			<Options>16512</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Calculation">
+					<Calculation datatype="1" position="0">
+						<Calculation>
+							<Text><![CDATA[$foundCount-$maxRecords]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6CA410D350DDC4AAC5F766A188914FCE" id="70" name="End If" enable="True">
+		</Step>
+	</ObjectList>
+</Script>

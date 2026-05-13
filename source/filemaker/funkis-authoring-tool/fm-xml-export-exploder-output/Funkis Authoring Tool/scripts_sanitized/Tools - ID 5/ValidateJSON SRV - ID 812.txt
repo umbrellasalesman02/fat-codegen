@@ -1,0 +1,76 @@
+# Called under tab "Tools" on Title Level
+
+Set Variable [ $title_id[1] ; Get(scriptParameter) ]
+Set Error Capture [ ON ]
+
+# Go to the Title
+Go to Layout [ Layout: "TABLE FAT Title" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+# Package
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $json[1] ; FAT Package::Package JSON ]
+		If [ Not JSONisValid ( $json ) ]
+			Set Variable [ $level[1] ; "Package" ]
+			Set Variable [ $item_id[1] ; FAT Package::PrimaryKey ]
+			Exit Script [ SetProperty ( "level" ; $level ) &
+							SetProperty ("item_id" ; $item_id) ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# Chapters
+Go to Layout [ Layout: "TABLE FAT Chapter" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $json[1] ; FAT Chapter::Chapter JSON ]
+		If [ Not JSONisValid ( $json ) ]
+			Set Variable [ $level[1] ; "Chapter" ]
+			Set Variable [ $item_id[1] ; FAT Chapter::PrimaryKey ]
+			Exit Script [ SetProperty ( "level" ; $level ) &
+							SetProperty ("item_id" ; $item_id) ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# Page
+Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $json[1] ; FAT Page::Page JSON ]
+		If [ Not JSONisValid ( $json ) ]
+			Set Variable [ $level[1] ; "Page" ]
+			Set Variable [ $item_id[1] ; FAT Page::PrimaryKey ]
+			Exit Script [ SetProperty ( "level" ; $level ) &
+							SetProperty ("item_id" ; $item_id) ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+# Page item
+Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount) > 0 ]
+	Loop [ Flush: Always ]
+		Set Variable [ $json[1] ; FAT Page item::Page item JSON ]
+		If [ Not JSONisValid ( $json ) ]
+			Set Variable [ $level[1] ; "Page item" ]
+			Set Variable [ $item_id[1] ; FAT Page item::PrimaryKey ]
+			Exit Script [ SetProperty ( "level" ; $level ) &
+							SetProperty ("item_id" ; $item_id) ]
+		End If
+		Go to Record/Request/Page [ Next ; Exit after last: ON ]
+	End Loop
+End If
+
+Exit Script [ SetProperty ( "success" ; True ) ]
+
+

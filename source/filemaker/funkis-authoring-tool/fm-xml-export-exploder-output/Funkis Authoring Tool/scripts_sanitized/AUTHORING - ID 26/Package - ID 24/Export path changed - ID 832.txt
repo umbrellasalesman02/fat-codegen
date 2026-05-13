@@ -1,0 +1,39 @@
+# Called from OnObjectModify script trigger on field in Package settings
+
+Freeze Window
+
+Set Variable [ $level[1] ; Get(scriptParameter) ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+If [ $level = "Title" ]
+	Show Custom Dialog [ Title: "New title directory" ; Message: "Enter a new name for the title directory. This will affect the export path and all links to all packages in this title. " ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $new_directory ; Label 1: "Directory name" ]
+Else If [ $level = "Package" ]
+	Show Custom Dialog [ Title: "New package directory" ; Message: "Enter a new name for the package directory. This will affect the export path and all links to this package. " ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $new_directory ; Label 1: "Directory name" ]
+Else
+	Show Custom Dialog [ Title: "Cannot change export path in this way!" ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+
+Set Variable [ $new_directory[1] ; PrettifyDash($new_directory) ]
+
+If [ $level = "Title" ]
+	Set Field [ FAT Title::FC Title directory ; $new_directory ]
+Else If [ $level = "Package" ]
+	# Check if package directory is already in use
+	Perform Script [ From list ; "Check duplicate package directory" ; Parameter: SetProperty ( "title_id" ; $title_id ) & 
+					SetProperty ( "new_package_directory" ; $new_directory ) ]
+	If [ PatternCount ( Get(ScriptResult); "Error") ]
+		Show Custom Dialog [ Title: "Directory name already in use" ; Message: "This name is already in use in this title. Please select another name." ; Default Button: "OK" ]
+		Exit Script []
+	End If
+	Set Field [ FAT Package::FC Package directory ; $new_directory ]
+	Perform Script [ From list ; "UpdateOverviewItem" ; Parameter: SetProperty("level"; "package") ]
+End If
+
+
+Show Custom Dialog [ Title: "WARNING!" ; Message: "You have changed the export path and URL. This is a serious change. Make sure to:¶¶
+				- Update code for all packages in the new location." ; Default Button: "OK" ]
+

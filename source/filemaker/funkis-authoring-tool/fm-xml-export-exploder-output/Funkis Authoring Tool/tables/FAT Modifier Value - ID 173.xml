@@ -1,0 +1,207 @@
+<FieldCatalog>
+	<UUID modifications="241" userName="jensthorsen" accountName="jensthorsen" timestamp="2025-07-10T16:22:33">DF4649F1-FCBA-45D3-83F6-28D35882264B</UUID>
+	<BaseTableReference id="173" name="FAT Modifier Value"></BaseTableReference>
+	<ObjectList membercount="18">
+		<Field id="1" name="PrimaryKey" fieldtype="Normal" datatype="Text" comment="Unique identifier of each record in this table">
+			<UUID modifications="1" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">A56FC930-5B73-45E0-A196-92DEAD5CA64C</UUID>
+			<AutoEnter type="Calculated" prohibitModification="True" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<Text><![CDATA[Get( UUID )]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="True" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<TagList primary="True">#^FMI* #_FMI_0 </TagList>
+		</Field>
+		<Field id="2" name="CreationTimestamp" fieldtype="Normal" datatype="Timestamp" comment="Date and time each record was created">
+			<UUID modifications="1" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">7C63CD39-59D9-45FF-A706-55301F4C8A6A</UUID>
+			<AutoEnter type="CreationTimestamp" prohibitModification="True"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="False" existing="False">
+				<Strict>FourDigitYear</Strict>
+			</Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<TagList>#_FMI_0 </TagList>
+		</Field>
+		<Field id="3" name="CreatedBy" fieldtype="Normal" datatype="Text" comment="Account name of the user who created each record">
+			<UUID modifications="1" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">9CAA552E-964D-4C91-81E6-566E76126FE4</UUID>
+			<AutoEnter type="CreationAccountName" prohibitModification="True"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<TagList>#_FMI_0 </TagList>
+		</Field>
+		<Field id="4" name="ModificationTimestamp" fieldtype="Normal" datatype="Timestamp" comment="Date and time each record was last modified">
+			<UUID modifications="1" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">06990AF5-B8D1-417C-A6DE-6582C750FADB</UUID>
+			<AutoEnter type="ModificationTimestamp" prohibitModification="True"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="False" existing="False">
+				<Strict>FourDigitYear</Strict>
+			</Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<TagList>#_FMI_0 </TagList>
+		</Field>
+		<Field id="5" name="ModifiedBy" fieldtype="Normal" datatype="Text" comment="Account name of the user who last modified each record">
+			<UUID modifications="1" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">F1BEBB2C-E5EC-4A60-93F5-EA29CC59AED8</UUID>
+			<AutoEnter type="ModificationAccountName" prohibitModification="True"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="False" notEmpty="True" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<TagList>#_FMI_0 </TagList>
+		</Field>
+		<Field id="6" name="Value" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="20" userName="Erik Wiberg" accountName="erikwiberg" timestamp="2021-05-06T12:11:41">396A07D8-F3E5-4827-901C-0B92A21C5FC1</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+						<Text><![CDATA[TextFormatRemove ( Value )]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation alwaysValidate="False" type="OnlyDuringDataEntry" allowOverride="False" notEmpty="False" unique="False" existing="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+						<Text><![CDATA[/* Checks if entered value is a valid number if the Attribute defines it as a Number */Case (     FAT Modifier::Type="Number" ;     Value = Filter (Value; "0123456789,.*-+/") ;    1)]]></Text>
+					</Calculation>
+				</Calculated>
+			</Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="9" name="Parent id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="2" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-08-28T18:25:01">3BC1B05C-BE7D-4DD9-A42F-6D12341CB64D</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="11" name="Value JSON" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="110" userName="jensthorsen" accountName="jensthorsen" timestamp="2025-05-19T20:47:25">A15549F2-736C-46C1-80DB-1B2091C98ABC</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+				<Text><![CDATA[Let ( [  json1 = Case (        FAT Modifier::Type = "URL encoded string" ; "\"" & FAT Modifier::Name & "\" : \"" & GetAsURLEncoded(Value) & "\"" ;        FAT Modifier::Type = "Number" ; "\"" & FAT Modifier::Name & "\" : " & Number JSON  ;       FAT Modifier::Type = "Prettified string" ; "\"" & FAT Modifier::Name & "\" : \"" & PrettifyDash(Value) & "\""  ;       FAT Modifier::Type = "Media"; "\"" & FAT Modifier::Name & "\" : \"" & PrettifyDash(Media MV::Container exported filename) & "\""  ;       FAT Modifier::Type = "String"; "\"" & FAT Modifier::Name & "\" : \"" & Value & "\""  ;       FAT Modifier::Type = "Color"; "\"" & FAT Modifier::Name & "\" : \"" & Value & "\""  ;       FAT Modifier::Type = "Value list checkbox"; "\"" & FAT Modifier::Name & "\" : \"" & Substitute(Value; "¶"; ",") & "\""  ;       FAT Modifier::Type = "Link"; "\"" & FAT Modifier::Name & "\" : \"" & FAT Link MV::Link ModifierValue & "\"" &  ¶  &                                      "\"" & FAT Modifier::Name & "_fat_link_id" & "\" : \"" & FAT Link MV::PrimaryKey & "\"";       FAT Modifier::Type = "Text"; "\"" & FAT Modifier::Name & "\" : \"" & Text id & "\""  ;       FAT Modifier::Type = "Multi-line string"; "\"" & FAT Modifier::Name & "\" : \"" & Substitute ( Value; ¶; "" ) & "\""  ;          "\"" & FAT Modifier::Name & "\" : \"" & Value & "\"")];json1 )]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="13" name="Modifier id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="6" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-03-29T10:06:58">65C8BA4F-0BA0-4FF0-8DF2-9AC45AA63E2A</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="18" name="Media id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="3" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-08-28T18:25:13">ACAC4ED1-7AB6-4B4B-84FF-2BB5C8C833EF</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="21" name="Text id" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="3" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-08-28T18:25:18">DB0BC495-D15A-4679-8C4D-B187A2C2923B</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="22" name="Number JSON" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="65" userName="Jens Thorsen" accountName="jensthorsen" timestamp="2021-01-19T16:32:39">7D04C369-1269-45A2-BBED-86DA97C8F77E</UUID>
+			<AutoEnter alwaysEvaluate="True"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+				<Text><![CDATA[Let ( [    value0 = FAT Modifier Value::Value;    value1 = Substitute ( value0 ; "." ; "," );    value2 = Evaluate ( value1 );    value3 = GetAsText ( value2 );    prefix = Case ( Abs ( value2 )<1 And value2 ≠ 0; "0"; "" );    value4 = prefix & Substitute ( value3 ; "," ; "." )];   Case(value0 = ""; "0"; value4)      )]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="24" name="Funkis Cloud Item Path JSON" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="88" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-12-17T08:35:01">FBA32F3F-F4C3-4747-AFE1-F509D29F89E0</UUID>
+			<AutoEnter alwaysEvaluate="True"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+				<Text><![CDATA[Case (     PatternCount(Value; "https://") Or IsEmpty(Value);      Value;      "https://" & Title Server Preview::URL & "/" & FAT Title::Export Title Sub Path & "/")/*Case (     PatternCount(Value; "https://") or IsEmpty(Value);      Value;      "https://" & Title Server Preview::URL & "/" & FAT Title::Export Title Sub Path & Value & "/")*//*Case (  FAT Attribute::Type = "Package URL";   Case (     PatternCount(Value; "https://") or IsEmpty(Value);      Value;      "https://" & Title Server Preview::URL & "/" & FAT Title::Export Title Sub Path & FAT Package ATT::FC Package directory & "/"   );   // Type = Sync Server Path   Case (     PatternCount(Value; "https://") or IsEmpty(Value);      Value;       "https://" & Title Server Preview::URL & "/" &  FAT Title::Export Title Sub Path & Value   ))*/]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="29" name="Theme id" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="2" userName="Jens Thorsen" accountName="jensthorsen" timestamp="2022-01-03T17:22:55">06A95014-069E-4D81-87B5-9BDCBB9DAB1F</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Theme::PrimaryKey]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="30" name="Current localisation code" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2023-06-07T11:52:31">89403174-A68F-4A09-9AF2-8BE9AFEBF15F</UUID>
+			<AutoEnter alwaysEvaluate="True"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Title::gCurrentLocalisationCode]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="32" name="Funkis Cloud Package Path JSON" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="88" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-02-13T16:24:45">1A1E35D2-5AEC-4EF8-A6D4-BC89019C95F7</UUID>
+			<AutoEnter alwaysEvaluate="True"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+				<Text><![CDATA[Case (     PatternCount(Value; "https://") Or IsEmpty(Value);      Value;      "https://" & Title Server Preview::URL & "/" & FAT Title::Export Title Sub Path & Value & "/"   )]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="33" name="Importance" fieldtype="Calculated" datatype="Number" comment="Values = 1 or 2. Decide if the modifier  should be visible as a basic setting or on a more advanced level">
+			<UUID modifications="6" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-09-07T17:27:49">90DF880F-E9E9-4200-B8A0-E3903A6B70CB</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="False" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+				<Text><![CDATA[FAT Modifier::Importance]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="34" name="Modifier group" fieldtype="Normal" datatype="Text" comment="Decides the group of the modifier. ">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-03-20T21:24:51">43CA48F2-4DAF-4FF4-BEFC-91517B5494B9</UUID>
+			<AutoEnter type="Calculated" prohibitModification="False" overwriteExisting="True" alwaysEvaluate="False">
+				<Calculated>
+					<Calculation>
+						<TableOccurrenceReference id="1065340" name="FAT Modifier Value"></TableOccurrenceReference>
+						<Text><![CDATA[ModifierTemplate::Modifier group]]></Text>
+					</Calculation>
+				</Calculated>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+	</ObjectList>
+</FieldCatalog>

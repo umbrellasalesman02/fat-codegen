@@ -1,0 +1,81 @@
+# Called from a portal button in layout FAT Link or in card
+
+Set Variable [ $link_id[1] ; FAT Link::PrimaryKey ]
+Set Variable [ $title_id[1] ; FAT Link::Title id ]
+
+Set Variable [ $num_of_mv[1] ; Count(FAT ModifierValue @ Link::PrimaryKey) ]
+Set Variable [ $num_of_li[1] ; Count(FAT List item @ Link::PrimaryKey) ]
+
+# If called from the Card - Settings - close card first 
+If [ Get(WindowStyle) = 3 ]
+	Set Variable [ $$call_layout[1] ; "" ]
+	Perform Script [ From list ; "Close card Window" ]
+End If
+
+Set Error Capture [ ON ]
+Freeze Window
+
+Perform Script [ From list ; "Save Active Layout" ]
+
+# Make sure the overview found set is empty
+Go to Layout [ Layout: "FAT Overview" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ $num_of_mv > 0 ]
+	Go to Layout [ Layout: "TABLE FAT ModifierValue" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+	If [ Get(foundCount)> 0 ]
+		Go to Related Record [ Table: FAT Overview MV ; Layout: "TABLE FAT Overview" ; Show related ; Match found set ]
+	End If
+	
+End If
+
+If [ $num_of_li > 0 ]
+	
+	# Look at the list items using the Link
+	Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)> 0 ]
+		
+		# Show all lists
+		Go to Related Record [ Table: FAT List ; Layout: "TABLE FAT List" ; Show related ; Match found set ]
+		If [ Get(lastError) ≠ 401 ]
+			
+			Loop [ Flush: Always ]
+				Set Variable [ $list_id[1] ; FAT List::PrimaryKey ]
+				Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+				Perform Find [ ⚠️ RESTORE ⚠️ ]
+				If [ Get(foundCount)>0 ]
+					Loop [ Flush: Always ]
+						Set Variable [ $item_id[1] ; FAT Page item::PrimaryKey ]
+						Go to Layout [ Layout: "TABLE FAT Overview" ; Animation: None ]
+						Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+						Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+						Go to Record/Request/Page [ Next ; Exit after last: ON ]
+					End Loop
+				End If
+				Go to Layout [ Layout: "TABLE FAT List" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		Else
+			# List items parent is not a list but a page item
+			Loop [ Flush: Always ]
+				Set Variable [ $page_item_id[1] ; FAT List item::Parent id ]
+				Go to Layout [ Layout: "TABLE FAT Overview" ; Animation: None ]
+				Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+				
+				Go to Layout [ Layout: "TABLE FAT List item" ; Animation: None ]
+				Go to Record/Request/Page [ Next ; Exit after last: ON ]
+			End Loop
+		End If
+	End If
+	
+End If
+
+Go to Layout [ Layout: "FAT Overview" ; Animation: None ]
+
+
+
+# Must show list instances too!!!! Check https://www.soliantconsulting.com/blog/recreating-a-filemaker-found-set/
+

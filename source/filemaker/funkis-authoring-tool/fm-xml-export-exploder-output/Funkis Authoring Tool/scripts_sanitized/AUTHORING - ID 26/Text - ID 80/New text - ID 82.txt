@@ -1,0 +1,106 @@
+# Called from many locations where a text field is needed. All text fields are possible to localise. 
+# Text source item types can be:
+  global baseproject
+  -
+  global
+  title
+  package
+  chapter
+  page
+  page-item
+  tag
+  media
+  attribute
+  list-item
+  alt-text
+  io
+  score
+  io-sprig-story
+  link
+  field
+  text_variable
+  -
+  custom imported
+
+
+Set Variable [ $location_id[1] ; GetScriptProperty ( "location_id" ) ]
+Set Variable [ $source_table[1] ; GetScriptProperty ( "source_table" ) ]
+Set Variable [ $source_textfield[1] ; GetScriptProperty ( "source_textfield" ) ]
+Set Variable [ $caller_layout[1] ; GetScriptProperty ( "caller_layout" ) ]
+Set Variable [ $title_id[1] ; Case( GetScriptProperty ( "learningprogramme_id" ) = "";
+				
+				    FAT Title::PrimaryKey;
+				
+				    GetScriptProperty ( "learningprogramme_id" )
+				
+				) ]
+Set Variable [ $package_id[1] ; GetScriptProperty ( "package_id" ) ]
+Set Variable [ $package_id[1] ; Case
+				
+				( $package_id = "" ;
+				
+				   Case ( $source_table = "global" Or 
+				          $source_table = "title" Or 
+				          $source_table = "list-item" Or 
+				          $source_table = "tag" Or 
+				          $source_table = "io" Or 
+				          $source_table = "score" Or 
+				          $source_table = "link" Or 
+				          $source_table = "field" Or 
+				          $source_table = "media"Or 
+				          $source_table = "text_variable";
+				
+				          "" ; FAT Package::PrimaryKey) ;
+				
+				   $package_id
+				
+				) ]
+
+Set Variable [ $language_code[1] ; Case( GetScriptProperty ( "language_code" ) = "";
+				
+				    FAT Title::Original language code;
+				
+				    GetScriptProperty ( "language_code" )
+				
+				) ]
+Set Variable [ $country_code[1] ; Case( GetScriptProperty ( "country_code" ) = "";
+				
+				    FAT Title::Original country code;
+				
+				    GetScriptProperty ( "country_code" )
+				
+				) ]
+
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Text::Title id ; $title_id ]
+Set Field [ FAT Text::Package id ; $package_id ]
+Set Field [ FAT Text::Parent id ; $location_id ]
+Set Field [ FAT Text::Source item type ; $source_table ]
+Set Field [ FAT Text::Source reference ; $source_textfield ]
+Set Field [ FAT Text::Language code ; $language_code ]
+Set Field [ FAT Text::Country code ; $country_code ]
+
+Set Variable [ $text_id[1] ; FAT Text::PrimaryKey ]
+
+# Improved localisation process - hope to not need this JT 2023-09-15
+// # Create localised versions of text if package localisation already is started. 
+// If [ FAT Localisation @ Package::Localisation code ≠ "" ]
+// Set Variable [ $localised_versions[1] ; RemoveDuplicates ( List ( FAT Localisation @ Package::Localisation code )) ]
+// Set Variable [ $i[1] ; 0 ]
+// Loop [ Flush: Always ]
+// Set Variable [ $i[1] ; $i + 1 ]
+// Exit Loop If [ $i > ValueCount ( $localised_versions ) ]
+// Duplicate Record/Request
+// Set Field [ FAT Text::OriginalKey ; $text_id ]
+// Set Field [ FAT Text::Language code ; getLanguageCode (GetValue ( $localised_versions ; $i )) ]
+// Set Field [ FAT Text::Country code ; getCountryCode (GetValue ( $localised_versions ; $i )) ]
+// End Loop
+// End If
+// # End localised versions
+
+Go to Layout [ Layoutname: $caller_layout ; Animation: None ]
+Set Field By Name [ Specify target field: ON ; $source_textfield ; $text_id ]
+
+
+

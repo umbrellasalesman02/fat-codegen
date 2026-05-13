@@ -1,0 +1,41 @@
+Set Variable [ $translationAPI[1] ; "https://api.inten.to/ai/text/translate" ]
+Show Custom Dialog [ Title: "Text to translate from English" ; Default Button: "OK" ; Button 2: "Cancel" ; Input 1: $language_code ; Label 1: "Language code" ; Input 2: $text ; Label 2: "Text to translate" ]
+// Set Variable [ $text[1] ; "Today is the big grand prix race in Monaco" ]
+// Set Variable [ $language_code[1] ; "sv" ]
+Set Variable [ $textJSON[1] ; Let ( 
+				
+				[
+				
+				  txtArr = "[\"" & $text & "\"]";
+				  context = JSONSetElement ( "{}" ; 
+				            ["text" ; txtArr ; JSONArray];
+				            ["to" ; $language_code ; JSONString];
+				            ["from"; "en" ; JSONString]);
+				  
+				  service = JSONSetElement ( "{}" ; 
+				            ["routing" ; "ikea-it-desk"; JSONString ];
+				            // means something for intento - ikea specific glossary
+				            ["async" ; True; JSONBoolean ]);
+				
+				  data = JSONSetElement ( "{}" ; 
+				            ["context" ; context ; JSONObject ];
+				            ["service" ; service ; JSONObject ])
+				
+				];
+				
+				data
+				
+				
+				 ) ]
+Set Variable [ $api_key[1] ; "REDACTED_INTENTO_API_KEY" ]
+
+Set Variable [ $cURL_options[1] ; _cURL_request ( "POST" ) & 
+				_cURL_header ( "Content-Type" ; "application/json" ) & 
+				_cURL_header ( "Accept" ; "application/json" ) & 
+				_cURL_header ( "apikey" ; $api_key ) & 
+				_cURL_data___string ( $textJSON ) ]
+Insert from URL [ Verify SSL Certificates: OFF ; Select: ON ; With dialog: OFF ; Target: $resultJSON ; ⚠️ PARAMETER "URL" NOT PARSED ⚠️ ; $cURL_options ]
+
+Set Variable [ $$translation_id[1] ; JSONGetElement ( $resultJSON ; "id" ) ]
+
+Set Variable [ $des[1] ; "" ]

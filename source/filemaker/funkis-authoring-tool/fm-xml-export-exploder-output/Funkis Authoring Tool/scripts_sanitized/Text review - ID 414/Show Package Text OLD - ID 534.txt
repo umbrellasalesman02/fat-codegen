@@ -1,0 +1,74 @@
+# The script is triggered by an OnModify Script trigger on the dropdown menu in text review layout
+Show Custom Dialog [ Title: "Deprecated script - Show Package Text OLD" ; Message: "Contact FAT superadmin if you see this dialog message" ; Default Button: "OK" ]
+Exit Script []
+
+Set Error Capture [ ON ]
+Freeze Window
+
+Set Variable [ $original_localisation_code[1] ; FAT Title::Original localisation code ]
+Set Variable [ $current_localisation_code[1] ; FAT Title::gCurrentLocalisationCode ]
+Set Variable [ $$localisation_code[1] ; Case ( $current_localisation_code = "" ; 
+				
+				
+				$original_localisation_code ; 
+				
+				
+				$current_localisation_code  ) ]
+
+If [ Get(scriptParameter) = "Title" ]
+	Set Field [ FAT Text::gPackage ; "" ]
+End If
+Set Variable [ $package_id[1] ; FAT Text::gPackage ]
+
+If [ $current_localisation_code = "" ]
+	# View text in original language
+	
+	
+	If [ $package_id = "" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else
+		# Search show Package text including lists, global texts, tags, etc
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	End If
+	
+	If [ Get(foundCount) = 0 ]
+		Show Custom Dialog [ Title: "No texts found" ; Message: "No texts were found in this package. " ; Default Button: "OK" ]
+		Set Field [ FAT Text::gPackage ; "" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+	Set Field [ FAT Text::gEditor ; "" ]
+	Set Field [ FAT Text::gFilterType ; "" ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	
+Else
+	# View text in loclised language
+	
+	If [ $package_id = "" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Else
+		# Search show Package text including global texts, tags
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+	End If
+	
+	If [ Get(foundCount) = 0 ]
+		Show Custom Dialog [ Title: "No texts found" ; Message: "No localised texts were found in this package. " ; Default Button: "OK" ]
+		Set Field [ FAT Text::gPackage ; "" ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+	End If
+	# Omit empty original records. Do this as a last step since it is a related field to improve performance
+	Constrain Found Set [ ⚠️ RESTORE ⚠️ ]
+	
+	Perform Script [ From list ; "Update Text status CL" ]
+	Set Field [ FAT Text translated::gEditor ; "" ]
+	Set Field [ FAT Text translated::gFilterType ; "" ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+	Go to Record/Request/Page [ First ]
+	
+End If
+
+
+
+

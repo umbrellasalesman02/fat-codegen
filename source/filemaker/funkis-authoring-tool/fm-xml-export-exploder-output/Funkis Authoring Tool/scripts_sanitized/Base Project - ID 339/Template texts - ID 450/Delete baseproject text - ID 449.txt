@@ -1,0 +1,21 @@
+Show Custom Dialog [ Title: "Delete this text in all Titles?" ; Message: "When deleting - this global text in all Titles using the same base project will be deleted. It can cause severe malfunction. ¶¶Are you sure you want to do this? " ; Default Button: "Cancel" ; Button 2: "OK" ]
+If [ Get(lastMessageChoice) = 2 ]
+	Set Error Capture [ ON ]
+	Set Variable [ $old_globaltext_id[1] ; FAT Text @ Base Project Primary::PrimaryKey ]
+	Delete Portal Row [ With dialog: OFF ]
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	
+	# Delete all clones
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) >0 ]
+		Delete All Records [ With dialog: OFF ]
+	End If
+	# Delete secondary language
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount) >0 ]
+		Delete All Records [ With dialog: OFF ]
+	End If
+	
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+End If
+

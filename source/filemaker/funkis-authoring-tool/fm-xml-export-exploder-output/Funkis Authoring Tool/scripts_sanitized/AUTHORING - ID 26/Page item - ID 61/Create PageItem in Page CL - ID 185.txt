@@ -1,0 +1,71 @@
+# Called from the pageItem layout - when the user wants to add a new page item immediately below.
+# Called from script Create Page item ƒ block and from button in Page item layout
+
+Freeze Window
+Set Variable [ $learningprogramme_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $block_id[1] ; FAT Page item::gBlock ]
+Set Variable [ $currentRecordNum[1] ; Get(ActiveRecordNumber) ]
+Set Variable [ $$pageItemRecordLoadTrigger[1] ; False ]
+
+# Managing Page items in card window using table FAT Page item 2
+Set Variable [ $page_item2[1] ; GetAsBoolean(GetScriptProperty ( "page_item2" )) ]
+
+Perform Script [ From list ; "SavePageItem" ]
+If [ FAT Page::Proxy type = "" ]
+	Set Variable [ $hierarchy_level[1] ; FAT Page::Hierarchy level + 1 ]
+	Set Variable [ $page_id[1] ; FAT Page::PrimaryKey ]
+	
+	If [ Not $page_item2 ]
+		Set Variable [ $sort_index[1] ; FAT Page item::SortIndex ]
+	Else If [ $page_item2 ]
+		Set Variable [ $sort_index[1] ; FAT Page item 2::SortIndex ]
+	End If
+	// Perform Script [ From list ; "Create PageItem SRV" ; Parameter: SetProperty ( "page_id" ; $page_id ) &
+					SetProperty ( "block_id" ; $block_id) &
+					SetProperty ( "hierarchy_level" ; $hierarchy_level ) &
+					SetProperty ( "sort_index" ; $sort_index ) &
+					SetProperty ( "sort_table" ;"page_item" ) &
+					SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+	Set Variable [ $result[1] ; Get(ScriptResult) ]
+	If [ PatternCount ( $result ; "Error" ) ]
+		Show Custom Dialog [ Title: "Warning" ; Message: $result ; Default Button: "OK" ]
+	Else
+		Set Variable [ $pageitem_id[1] ; $result ]
+		Perform Script [ From list ; "Create and add IO to PI" ; Parameter: $pageitem_id ]
+	End If
+	
+	Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "page_id" ; $page_id ) & 
+					SetProperty ( "pageitem_id" ; $pageitem_id ) &
+					SetProperty ( "proxy_type" ; "" ) ]
+Else
+	# Slide project - call createPage, then create PageItem
+	Set Variable [ $hierarchy_level[1] ; FAT Chapter::Hierarchy level ]
+	Set Variable [ $chapter_id[1] ; FAT Chapter::PrimaryKey ]
+	Set Variable [ $sort_index[1] ; FAT Page::SortIndex ]
+	Set Variable [ $proxy_type[1] ; "page_item" ]
+	// Perform Script [ From list ; "Create Page SRV" ; Parameter: SetProperty ( "learningprogramme_id" ; $learningprogramme_id ) &
+					SetProperty ( "parent_id" ; $chapter_id ) &
+					SetProperty ( "proxy_type" ; $proxy_type ) &
+					SetProperty ( "block_id" ; $block_id ) &
+					SetProperty ( "sort_index" ; $sort_index ) &
+					SetProperty ( "hierarchy_level" ; $hierarchy_level ) ]
+	Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: ON ]
+	
+	Set Variable [ $result[1] ; Get(ScriptResult) ]
+	If [ PatternCount ( $result ; "Error" ) ]
+		Show Custom Dialog [ Title: "Warning" ; Message: $result ; Default Button: "OK" ]
+	Else
+		Set Variable [ $pageitem_id[1] ; $result ]
+		Perform Script [ From list ; "Create and add IO to PI" ; Parameter: $pageitem_id ]
+	End If
+	
+	Perform Script [ From list ; "Setup PageItem found set" ; Parameter: SetProperty ( "chapter_id" ; $chapter_id ) & 
+					SetProperty ( "pageitem_id" ; $pageitem_id ) &
+					SetProperty ( "proxy_type" ; $proxy_type ) ]
+End If
+Set Variable [ $$pageItemRecordLoadTrigger[1] ; True ]
+// Set Field [ FAT Page item::gBlock ; "" ]
+
+

@@ -1,0 +1,31 @@
+# Called from portal in layout gamification
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Score Reward" ; Animation: None ]
+New Record/Request
+Set Field [ FAT Score Reward::Title id ; $title_id ]
+
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Score Reward::PrimaryKey ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Score Reward::Name text id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+Perform Script [ From list ; "New text" ; Parameter: SetProperty ( "location_id" ; FAT Score Reward::PrimaryKey ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_textfield" ; GetFieldName ( FAT Score Reward::Description text id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) ]
+
+Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Score Reward::PrimaryKey ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_mediafield" ; GetFieldName ( FAT Score Reward::Reward icon media id) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) &
+				SetProperty ( "learningprogramme_id" ; $title_id) ]
+Perform Script [ From list ; "New media" ; Parameter: SetProperty ( "location_id" ; FAT Score variable::PrimaryKey ) &
+				SetProperty ( "source_table" ; "score" ) &
+				SetProperty ( "source_mediafield" ; GetFieldName ( FAT Score Reward::Reward animation media id ) ) &
+				SetProperty ( "caller_layout" ; Get(layoutName )) &
+				SetProperty ( "learningprogramme_id" ; $title_id) ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+

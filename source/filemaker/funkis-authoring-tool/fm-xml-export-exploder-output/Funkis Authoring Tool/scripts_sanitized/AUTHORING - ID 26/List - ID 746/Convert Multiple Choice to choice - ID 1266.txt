@@ -1,0 +1,24 @@
+# Only for multiple choice lists - cannot be reversed 
+# Multiple choice = BAF6DADF-7209-4916-BD32-980F27F248EA
+# Choice = 554F3879-AC78-4DB2-8BCB-CEEBDC579C74
+Commit Records/Requests [ With dialog: OFF ]
+
+If [ FAT List::List template id ≠ "554F3879-AC78-4DB2-8BCB-CEEBDC579C74" ]
+	Show Custom Dialog [ Title: "Only Choice lists are allowed!" ; Message: "You cannot convert this list to this list type. Use a choice list. " ; Default Button: "OK" ]
+	Set Field [ FAT List::List template id ; "BAF6DADF-7209-4916-BD32-980F27F248EA" ]
+	Exit Script []
+End If
+
+Set Variable [ $list_id[1] ; FAT List::PrimaryKey ]
+Set Variable [ $title_id[1] ; FAT List::Title id ]
+Set Variable [ $list_template_id[1] ; FAT List::List template id ]
+
+If [ List template::List has modifiers ]
+	Perform Script [ From list ; "Add Modifiers to item SRV" ; Parameter: SetProperty ( "level" ; "List" ) & 
+					SetProperty ( "item_id" ; $list_id ) &
+					SetProperty ( "learningprogramme_id" ; $title_id ) &
+					SetProperty ( "symbol_id" ; $list_template_id ) ]
+End If
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Go to Object [ "Settings" ; Repetition: 1 ]
+

@@ -1,0 +1,54 @@
+# Called from a button in tab "Localisation" under button "Special tools"
+# This script sets all localised texts to status not approved based on the original texts that are changed/modified after a certain date. 
+
+If [ IsEmpty(FAT Package::gChangeDate) ]
+	Show Custom Dialog [ Title: "Select change date" ; Message: "You must select at date" ; Default Button: "OK" ]
+	Exit Script []
+End If
+Set Variable [ $changeDate[1] ; GetAsTimeStamp ( FAT Package::gChangeDate ) ]
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $package_id[1] ; FAT Package::PrimaryKey ]
+Set Variable [ $original_localisation_code[1] ; FAT Title::Original localisation code ]
+
+Freeze Window
+Set Error Capture [ ON ]
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+Set Variable [ $numOfChangedTexts[1] ; Get(foundCount) ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Show Custom Dialog [ Title: $numOfChangedTexts & " changed texts found" ; Message: $numOfChangedTexts & " changed texts found in the original language. These texts have been changed after the selected date. Do you want to set all localised texts of these original texts to Not approved ?" ; Default Button: "OK" ; Button 2: "Cancel" ]
+If [ Get(lastMessageChoice) = 2 ]
+	Exit Script []
+End If
+Freeze Window
+Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+Set Variable [ $numOfUpdatedTexts[1] ; 0 ]
+Loop [ Flush: Always ]
+	Set Variable [ $original_text_id[1] ; FAT Text::PrimaryKey ]
+	Go to Layout [ Layout: "TABLE FAT Text Translated" ; Animation: None ]
+	# Find localised text based on original
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	If [ Get(foundCount)>0 ]
+		Replace Field Contents [ FAT Text translated::Status ; Replace with calculation: "Not reviewed" ]
+		Replace Field Contents [ FAT Text translated::🚨🚨🚨 <BROKEN REFERENCE> 🚨🚨🚨 ; Replace with calculation: "Not reviewed" ]
+		Set Variable [ $numOfUpdatedTexts[1] ; $numOfUpdatedTexts + Get(foundCount) ]
+	End If
+	Go to Layout [ Layout: "TABLE FAT Text" ; Animation: None ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+# Update status on all translations
+Go to Layout [ Layout: "TABLE FAT Localisation @ Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+Loop [ Flush: Always ]
+	Perform Script [ From list ; "Log translation status CL" ; Parameter: "status" ]
+	Go to Layout [ Layout: "TABLE FAT Localisation @ Package" ; Animation: None ]
+	Go to Record/Request/Page [ Next ; Exit after last: ON ]
+End Loop
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Show Custom Dialog [ Title: $numOfUpdatedTexts & " changed status to Not approved" ; Message: $numOfUpdatedTexts & " in all localised versions changed status to Not approved" ; Default Button: "OK" ]
+
+

@@ -1,0 +1,51 @@
+# Called from Insepctor in a title, i.e. fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenPackage&param=94C1CF49-AFDF-4E05-B956-984D2F8661D0
+
+Set Variable [ $package_id[1] ; Get(scriptParameter) ]
+
+Allow User Abort [ OFF ]
+Freeze Window
+
+Select Window [ Name: GetValue ( Variables::gWindowList; 1) ]
+Go to Layout [ Layout: "TABLE FAT Package" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+
+# ----------- SECURITY CHECKS ----------------------------------
+If [ notDeveloper ]
+	If [ Get(foundCount) = 0 ]
+		Show Custom Dialog [ Title: "Warning" ; Message: "Package does not exist" ; Default Button: "OK" ]
+		Exit Application
+	End If
+	
+	# Security check so external users cannot reach other clients programs
+	Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+	Set Variable [ $login_id[1] ; Case( 
+					
+					        PatternCount(Get(accountName); "@") > 0; 
+					        Replace ( Get(accountName) ; Position ( Get(accountName) ; "@" ; 0 ; 1 ) ; 1 ; "\@" );
+					        Get(accountName)
+					) ]
+	Go to Layout [ Layout: "TABLE User X Title" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	
+	
+	If [ Get(foundCount) =0 ]
+		Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+		Show Custom Dialog [ Title: "No access" ; Message: "Sorry. Your user does not seem to have access to this page item." ; Default Button: "OK" ]
+		Exit Application
+	End If
+End If
+# --------------- END SECURITY CHECKS ------------------------------------------
+
+Perform Script on Server [ From list ; ⚠️ PARAMETER "Parameter" NOT PARSED ⚠️ ; Wait for completion: OFF ]
+
+
+
+Set Variable [ $$currentPackage[1] ; FAT Package::JSON Friendly id ]
+
+Go to Related Record [ Table: FAT Title ; Layout: "TABLE FAT Title" ; Show related ]
+Set Variable [ $$lp_id[1] ; FAT Title::PrimaryKey ]
+Set Variable [ $$localisation_code[1] ; FAT Title::Original localisation code ]
+Go to Layout [ Layout: "FAT Package" ; Animation: None ]
+
+

@@ -1,0 +1,242 @@
+<Script>
+	<ScriptReference id="640" name="GoToRecordNumberReference"></ScriptReference>
+	<ObjectList membercount="22">
+		<Step hash="5677F6CC55EC7BFB95832D19D768D376" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Called from button in interface and when going back and show the last reviewed text"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4150C309F35264850F8DE1E7EC211602" id="79" name="Freeze Window" enable="True">
+		</Step>
+		<Step hash="C89E7907923C96A1702BAEC53FA9058A" id="86" name="Set Error Capture" enable="True">
+			<Options>196608</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Boolean">
+					<Boolean id="131072" value="True"></Boolean>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4986A31F4A29638EFD01078874A32969" id="89" name="# (comment)" enable="True">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Is a sort needed here?"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="4BF78B4568A9ABF0CEA89CCC368224AD" id="39" name="Sort Records" enable="False">
+			<Options>33587328</Options>
+			<ParameterValues membercount="3">
+				<Parameter type="Boolean">
+					<Boolean type="With dialog" id="128" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="Restore">
+					<Restore value="True"></Restore>
+				</Parameter>
+				<Parameter type="SortSpecification">
+					<SortSpecification value="True" maintain="True">
+						<SortList membercount="2">
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="23" name="SortIndex">
+										<TableOccurrenceReference id="1065430" name="FAT Package @ Translation"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+							<Sort type="Ascending">
+								<PrimaryField>
+									<FieldReference id="40" name="RecordNumberReference">
+										<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+									</FieldReference>
+								</PrimaryField>
+							</Sort>
+						</SortList>
+					</SortSpecification>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="CC999C13E08EED3A904965A79DB2AF83" id="141" name="Set Variable" enable="True">
+			<Options>16388</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Variable">
+					<value>
+						<Calculation datatype="1" position="1">
+							<Calculation>
+								<Text><![CDATA[GetAsNumber (Get(scriptParameter))]]></Text>
+							</Calculation>
+						</Calculation>
+					</value>
+					<Name value="$recordNumRef"></Name>
+					<repetition>
+						<Calculation datatype="1" position="2">
+							<Calculation>
+								<Text><![CDATA[1]]></Text>
+							</Calculation>
+						</Calculation>
+					</repetition>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="5D1AF9611D090159AE1147DF82B33A21" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>2</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="First" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="31A8E111999C8F91953094FFB0537069" id="89" name="# (comment)" enable="True">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="D21F0F46609FDE015B56E4D8914D6F06" id="71" name="Loop" enable="True">
+			<Options>256</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="List">
+					<List name="Always" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="34D4762A50CE8A01A978DD01FF9B2BE0" id="72" name="Exit Loop If" enable="True">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[FAT Text translated::RecordNumberReference = $recordNumRef]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="20A829944B27D2816C732B1B60CE1784" id="16" name="Go to Record/Request/Page" enable="True">
+			<Options>8194</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="Next" value="4">
+						<Boolean type="Exit after last" position="185" value="True"></Boolean>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="FBB631000A1989D318FC90C6822FEB22" id="73" name="End Loop" enable="True">
+		</Step>
+		<Step hash="957CA4A2EE8FB0926BC987A077A82542" id="89" name="# (comment)" enable="False">
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="7705D250F09A1197B38F7122F948BD5E" id="68" name="If" enable="False">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[$recordNumRef > 0 And $recordNumRef ≤ Get(foundCount)]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="542BA81E72FCC053E9BA06F43C89CD76" id="16" name="Go to Record/Request/Page" enable="False">
+			<Options>16514</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="By Calculation…" value="5">
+						<Boolean type="With dialog" position="157" value="False"></Boolean>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$recordNumRef]]></Text>
+							</Calculation>
+						</Calculation>
+					</List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="EB9D6A76A0A25CDCAE3BEB0C5803BCF9" id="89" name="# (comment)" enable="False">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Change 2022-02-21 after Hannah got the eternal scroll loop in WebDirect"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="8CAF8881CEE56E85AAAB39B345ADA6D6" id="89" name="# (comment)" enable="False">
+			<Options>4</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Comment">
+					<Comment value="Eternal scroll loop should be fixed due to a FileMaker Server update"></Comment>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="6DD59DDF87FC653E76C2330C03710A26" id="1" name="Perform Script" enable="False">
+			<Options>16448</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="List">
+					<List name="From list" value="1">
+						<ScriptReference id="642" name="UpdateLastEditedRecord"></ScriptReference>
+					</List>
+				</Parameter>
+				<Parameter type="Parameter">
+					<Parameter>
+						<Calculation datatype="1" position="0">
+							<Calculation>
+								<Text><![CDATA[$recordNumRef]]></Text>
+							</Calculation>
+						</Calculation>
+					</Parameter>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="C411620DCAB4D26872FA24BE8FA85AE7" id="125" name="Else If" enable="False">
+			<Options>16384</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Calculation">
+					<Calculation datatype="7" position="0">
+						<Calculation>
+							<Text><![CDATA[IsEmpty ( $recordNumRef )]]></Text>
+						</Calculation>
+					</Calculation>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="3912BA8B4FEB42EB7DA3632D0DC5484F" id="16" name="Go to Record/Request/Page" enable="False">
+			<Options>16386</Options>
+			<ParameterValues membercount="1">
+				<Parameter type="Records">
+					<List name="First" value="1"></List>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+		<Step hash="41445A053D627AFD2C974FA79E2CE651" id="70" name="End If" enable="False">
+		</Step>
+		<Step hash="829121866E9F0B935A089A4CD87EE560" id="17" name="Go to Field" enable="True">
+			<Options>1</Options>
+			<ParameterValues membercount="2">
+				<Parameter type="Boolean">
+					<Boolean type="Select/perform" id="4096" value="False"></Boolean>
+				</Parameter>
+				<Parameter type="FieldReference">
+					<FieldReference id="6" name="Text">
+						<repetition>
+							<Calculation datatype="1" position="10">
+								<Calculation>
+									<Text><![CDATA[1]]></Text>
+								</Calculation>
+							</Calculation>
+						</repetition>
+						<TableOccurrenceReference id="1065182" name="FAT Text translated"></TableOccurrenceReference>
+					</FieldReference>
+				</Parameter>
+			</ParameterValues>
+		</Step>
+	</ObjectList>
+</Script>

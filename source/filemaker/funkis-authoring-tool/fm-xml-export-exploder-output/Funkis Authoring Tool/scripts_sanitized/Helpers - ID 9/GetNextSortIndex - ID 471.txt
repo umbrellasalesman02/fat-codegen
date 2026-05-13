@@ -1,0 +1,32 @@
+# Called from CreatePageItem SRV if creating a page-item or a page+page-item in-between.
+
+Set Variable [ $sort_table[1] ; GetScriptProperty ( "sort_table" ) ]
+Set Variable [ $parent_id[1] ; GetScriptProperty ( "parent_id" ) ]
+Set Variable [ $sort_index[1] ; GetAsNumber (GetScriptProperty ( "sort_index" )) ]
+
+If [ $sort_table = "page_item" ]
+	Set Variable [ $sort_field[1] ; GetFieldName ( FAT Page item::SortIndex ) ]
+	Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+Else If [ $sort_table = "page" ]
+	Set Variable [ $sort_field[1] ; GetFieldName ( FAT Page::SortIndex ) ]
+	Go to Layout [ Layout: "TABLE FAT Page" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+End If
+
+Go to Record/Request/Page [ First ]
+
+Loop [ Flush: Always ]
+	Exit Loop If [ GetField ( $sort_field ) = $sort_index ]
+	Go to Record/Request/Page [ Next ; Exit after last: OFF ]
+End Loop
+
+Set Variable [ $sortIndex1[1] ; GetField ( $sort_field ) ]
+Go to Record/Request/Page [ Next ; Exit after last: OFF ]
+Set Variable [ $sortIndex2[1] ; GetField ( $sort_field ) ]
+Set Variable [ $newIndex[1] ; Round(Case ( $sortindex1 = $sortindex2 ; $sortindex1 + ,1; $sortindex1 + ($sortindex2 - $sortindex1)/2);5) ]
+
+Exit Script [ $newIndex ]
+

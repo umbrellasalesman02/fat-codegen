@@ -1,0 +1,64 @@
+# MAke sure the link field is present on the current layout
+Set Variable [ $web_instruction_text[1] ; "Copy this link to share or get direct access from the login page:" ]
+If [ Get(scriptParameter) = "Title" ]
+	Set Variable [ $link[1] ; "https://biz.funkismultimedia.se/utils/open-fmp-link.html#fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenTitle&param=" & FAT Title::PrimaryKey ]
+	If [ Platform = "WebDirect" ]
+		Show Custom Dialog [ Title: "Title link" ; Message: $web_instruction_text & "¶¶" & $link ; Default Button: "OK" ]
+	Else
+		# Just use an avaialble global field
+		Set Variable [ $tmp[1] ; FAT Title::gPackage id ]
+		Set Field [ FAT Title::gPackage id ; $link ]
+		Copy [ Select: ON ; FAT Title::gPackage id ]
+		Show Custom Dialog [ Title: "Title link copied to clipboard" ; Message: "Title link successfully copied to your clipboard!" ; Default Button: "OK" ]
+	End If
+	Set Field [ FAT Title::gPackage id ; $tmp ]
+Else If [ Get(scriptParameter) = "Package" ]
+	Set Variable [ $link[1] ; "https://biz.funkismultimedia.se/utils/open-fmp-link.html#fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenPackage&param=" & FAT Package::PrimaryKey ]
+	If [ Platform = "WebDirect" ]
+		Show Custom Dialog [ Title: "Package link" ; Message: $web_instruction_text & "¶¶" & $link ; Default Button: "OK" ]
+	Else
+		# Just use an avaialble global field
+		Set Variable [ $tmp[1] ; FAT Title::gPackage id ]
+		Set Field [ FAT Title::gPackage id ; $link ]
+		Copy [ Select: ON ; FAT Title::gPackage id ]
+		Show Custom Dialog [ Title: "Package link copied to clipboard" ; Message: "Package link successfully copied to your clipboard!" & "¶¶" & $link ; Default Button: "OK" ]
+	End If
+	Set Field [ FAT Title::gPackage id ; $tmp ]
+Else If [ Get(scriptParameter) = "Chapter" ]
+	Set Variable [ $link[1] ; "https://biz.funkismultimedia.se/utils/open-fmp-link.html#fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenChapter&param=" & FAT Chapter::PrimaryKey ]
+	If [ Platform = "WebDirect" ]
+		Show Custom Dialog [ Title: "Chapter link" ; Message: $web_instruction_text & "¶¶" & $link ; Default Button: "OK" ]
+	Else
+		# Just use an available global field
+		Set Variable [ $tmp[1] ; FAT Title::gPackage id ]
+		Set Field [ FAT Title::gPackage id ; $link ]
+		Copy [ Select: ON ; FAT Title::gPackage id ]
+		Show Custom Dialog [ Title: "Chapter link copied to clipboard" ; Message: "Chapter link successfully copied to your clipboard!" & "¶¶" & $link ; Default Button: "OK" ]
+		Set Field [ FAT Title::gPackage id ; $tmp ]
+	End If
+Else If [ Get(scriptParameter) = "Page" ]
+	Set Variable [ $link[1] ; "https://biz.funkismultimedia.se/utils/open-fmp-link.html#fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenPage&param=" & FAT Page::PrimaryKey ]
+	If [ Platform = "WebDirect" ]
+		Show Custom Dialog [ Title: "Page link" ; Message: $web_instruction_text & "¶¶" & $link ; Default Button: "OK" ]
+	Else
+		# Just use an avaialble global field
+		Set Variable [ $tmp[1] ; FAT Title::gPackage id ]
+		Set Field [ FAT Title::gPackage id ; $link ]
+		Copy [ Select: ON ; FAT Title::gPackage id ]
+		Show Custom Dialog [ Title: "Page link copied to clipboard" ; Message: "Page link successfully copied to your clipboard!"  & "¶¶" & $link ; Default Button: "OK" ]
+		Set Field [ FAT Title::gPackage id ; $tmp ]
+	End If
+Else
+	Set Variable [ $link[1] ; "https://biz.funkismultimedia.se/utils/open-fmp-link.html#fmp://biz.funkismultimedia.se/Funkis%20Authoring%20Tool?script=linkTriggeredOpenPageItem&param=" & FAT Page item::PrimaryKey ]
+	If [ Platform = "WebDirect" ]
+		Show Custom Dialog [ Title: "Page item link" ; Message: $web_instruction_text & "¶¶" & $link ; Default Button: "OK" ]
+	Else
+		# Just use an avaialble global field
+		Set Variable [ $tmp[1] ; FAT Page item::gBlock ]
+		Set Field [ FAT Title::gPackage id ; $link ]
+		Copy [ Select: ON ; FAT Title::gPackage id ]
+		Show Custom Dialog [ Title: "Page item link copied to clipboard" ; Message: "Page item link successfully copied to your clipboard!"  & "¶¶" & $link ; Default Button: "OK" ]
+		Set Field [ FAT Title::gPackage id ; $tmp ]
+	End If
+End If
+

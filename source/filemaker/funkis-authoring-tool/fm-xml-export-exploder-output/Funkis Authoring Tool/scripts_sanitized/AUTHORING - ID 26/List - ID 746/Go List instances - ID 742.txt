@@ -1,0 +1,69 @@
+# Called from a portal button in layout FAT Lists
+# Can be called from both Title Settings and FAT Page item
+Set Variable [ $context[1] ; Get(scriptParameter) ]
+Set Error Capture [ ON ]
+
+If [ $context = "Title" ]
+	Set Variable [ $list_id[1] ; FAT List::PrimaryKey ]
+Else If [ $context = "Page item" ]
+	Set Variable [ $list_id[1] ; FAT Page item::List id ]
+End If
+
+Set Variable [ $title_id[1] ; FAT Title::PrimaryKey ]
+
+If [ $context = "Title" ]
+	If [ FAT List::Number of List instances >0 ]
+		Set Variable [ $list_id[1] ; FAT List::PrimaryKey ]
+		
+		# Check number of page items
+		Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Set Variable [ $number_of_page_items[1] ; Get(foundCount) ]
+		# Check  number of IOs
+		Go to Layout [ Layout: "TABLE FAT IO" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		Set Variable [ $number_of_IOs[1] ; Get(foundCount) ]
+		# Check  number of IO Fields
+		Go to Layout [ Layout: "TABLE FAT IO Field" ; Animation: None ]
+		Perform Find [ ⚠️ RESTORE ⚠️ ]
+		Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		Set Variable [ $number_of_Fields[1] ; Get(foundCount) ]
+		Go to Layout [ Layout: <original layout> ; Animation: None ]
+		If [ $number_of_page_items > 0 And ($number_of_IOs+$number_of_Fields) = 0 ]
+			Set Variable [ $show_list[1] ; "page-items" ]
+		Else If [ $number_of_page_items = 0 And ($number_of_IOs+$number_of_Fields) > 0 ]
+			Set Variable [ $show_list[1] ; "ios" ]
+		Else If [ $number_of_page_items > 0 And ($number_of_IOs + $number_of_Fields) > 0 ]
+			Show Custom Dialog [ Title: "List used in both Page items and IOs" ; Message: "This list is used in both Page items and IOs.¶¶What do you want to view?" ; Default Button: "Page items" ; Button 2: "IOs" ; Button 3: "Cancel" ]
+			If [ Get(lastMessageChoice) = 1 ]
+				Set Variable [ $show_list[1] ; "page-items" ]
+			Else If [ Get(lastMessageChoice) = 2 ]
+				Set Variable [ $show_list[1] ; "ios" ]
+			Else
+				Exit Script []
+			End If
+		Else
+			Show Custom Dialog [ Title: "No page items or IOs found" ; Message: "No page items or IOs are currently using this list." ; Default Button: "OK" ]
+		End If
+		Perform Script [ From list ; "Close card Window" ]
+		Perform Script [ From list ; "Save Active Layout" ]
+		If [ $show_list = "page-items" ]
+			Go to Layout [ Layout: "TABLE FAT Page Item" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Go to Related Record [ Table: FAT Page item ; Layout: "FAT Block instances 2" ; Show related ; Match found set ]
+			Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+		Else If [ $show_list = "ios" ]
+			Go to Layout [ Layout: "FAT IO Found Set" ; Animation: None ]
+			Perform Find [ ⚠️ RESTORE ⚠️ ]
+			Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+			Extend Found Set [ ⚠️ RESTORE ⚠️ ]
+		End If
+	End If
+Else If [ $context = "Page item" ]
+	Set Variable [ $list_id[1] ; FAT Page item::List id ]
+	Go to Layout [ Layout: "FAT Block instances 2" ; Animation: None ]
+	Perform Find [ ⚠️ RESTORE ⚠️ ]
+	Sort Records [ With dialog: OFF ; ⚠️ PARAMETER "Restore" NOT PARSED ⚠️ ; ⚠️ PARAMETER "SortSpecification" NOT PARSED ⚠️ ]
+End If
+

@@ -1,0 +1,36 @@
+# This script duplicates styles from one theme to another
+
+# Theme id for theme = BaseProject One = ""F815E8A8-9312-40F9-A46E-86A8BB4A6243""
+Set Variable [ $from_theme_template[1] ; GetScriptProperty ( "from_theme_template" ) ]
+Set Variable [ $to_theme_template[1] ; GetScriptProperty ( "to_theme_template" ) ]
+Set Variable [ $to_theme[1] ; GetScriptProperty ( "to_theme" ) ]
+
+Freeze Window
+Set Error Capture [ ON ]
+
+Go to Layout [ Layout: "TABLE FAT Theme TextStyle Alt" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Set Variable [ $foundCount[1] ; Get(foundCount) ]
+	Set Variable [ $recordPosn[1] ; 1 ]
+	
+	Loop [ Flush: Always ]
+		Duplicate Record/Request
+		Set Variable [ $recordPosn[1] ; $recordPosn + 1 ]
+		
+		If [ $to_theme_template ]
+			# Copy from a tempate to another template
+			Set Field [ FAT Theme TextStyle Alt::Theme template id ; $to_theme_template ]
+		Else
+			# Copy from a tempate to a theme
+			Set Field [ FAT Theme TextStyle Alt::Theme id ; $to_theme ]
+		End If
+		
+		Exit Loop If [ $recordPosn > $foundCount ]
+		Go to Record/Request/Page [ With dialog: OFF ; $recordPosn ]
+	End Loop
+End If
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Go to Object [ "TextStyle" ; Repetition: 1 ]
+

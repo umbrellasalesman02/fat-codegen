@@ -1,0 +1,12 @@
+# Called from back window i Title Explorer
+Commit Records/Requests [ With dialog: OFF ]
+Set Variable [ $layoutIndex[1] ; ValueCount ( Variables::gTitleExplorerNavigation ) ]
+
+If [ $layoutIndex > 1 ]
+	Set Variable [ $layout[1] ; GetValue ( Variables::gTitleExplorerNavigation ; $layoutIndex ) ]
+	Set Field [ Variables::gTitleExplorerNavigation ; DeleteValue ( Variables::gTitleExplorerNavigation ; $layoutIndex ) ]
+	Go to Layout [ Layoutname: $layout ; Animation: None ]
+Else
+	Go to Layout [ Layout: "FAT TX Package" ; Animation: None ]
+End If
+

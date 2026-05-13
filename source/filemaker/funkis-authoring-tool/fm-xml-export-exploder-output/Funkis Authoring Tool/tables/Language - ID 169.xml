@@ -1,0 +1,143 @@
+<FieldCatalog>
+	<UUID modifications="31" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-01-03T10:45:24">4C18BEC5-607D-4961-9918-18CF064D11DA</UUID>
+	<BaseTableReference id="169" name="Language"></BaseTableReference>
+	<ObjectList membercount="13">
+		<Field id="1" name="Language Abbreviation code" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="4" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-08-28T18:31:08">E690C1DF-9113-46CD-8759-8F42EF16A700</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="2" name="Language" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="2" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">092786B5-87BA-4B56-9E40-60BD3B282276</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="3" name="gJSON" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="3" userName="Erik Wiberg" accountName="erik.wiberg@funkismultimedia.se" timestamp="2022-10-27T16:01:02">596422D8-1C61-4A15-A066-66898A19D5EB</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="True" maxRepetitions="1">
+				<LanguageReference name="English" id="21"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="4" name="Country" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="2" userName="Jens Thorsen" accountName="jensthorsen" timestamp="2020-12-14T18:24:37">9ABB5B73-251C-4C16-9E1E-A6FF9C22D1F5</UUID>
+			<AutoEnter type="Looked_up" prohibitModification="False">
+				<Looked_up dontCopyIfEmpty="True" noMatchCopyOption="DoNotCopy">
+					<FieldReference id="6" name="">
+						<TableOccurrenceReference id="-1" name="&lt;Table Missing&gt;"></TableOccurrenceReference>
+					</FieldReference>
+					<Context>
+						<TableOccurrenceReference id="1065158" name="Language @ Title"></TableOccurrenceReference>
+					</Context>
+				</Looked_up>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="5" name="Country Abbreviation code" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="5" userName="Jens Thorsen" accountName="Jensthorsen" timestamp="2021-08-28T18:31:15">ADC8CC6E-97E9-46C1-A2E6-616B2D31B33E</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="6" name="Localisation code" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="3" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-01-03T10:17:49">30B43AF0-3FAA-49E9-A9E9-DD88E01B1571</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="True" autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Unicode" id="2"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065158" name="Language @ Title"></TableOccurrenceReference>
+				<Text><![CDATA[Case(IsEmpty(Script Abbreviation code);     Language Abbreviation code & "-" & Country Abbreviation code ;    Language Abbreviation code & "-" & Script Abbreviation code & "-" & Country Abbreviation code)]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="7" name="Language Country" fieldtype="Calculated" datatype="Text" comment="">
+			<UUID modifications="11" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-01-03T10:45:20">8F293BB9-B763-4D2E-A5F4-4C83192A63B3</UUID>
+			<AutoEnter alwaysEvaluate="False"></AutoEnter>
+			<Storage storeCalculationResults="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+			<Calculation>
+				<TableOccurrenceReference id="1065158" name="Language @ Title"></TableOccurrenceReference>
+				<Text><![CDATA[Case ( IsEmpty ( Script Abbreviation code );    Language & " - " & Country & " (" & Language Abbreviation code & "-" & Country Abbreviation code & ")" ;    Language & " - " & Script Abbreviation Name & " - " & Country & " (" & Language Abbreviation code & "-" & Script Abbreviation code & "-" & Country Abbreviation code & ")" )]]></Text>
+			</Calculation>
+		</Field>
+		<Field id="8" name="Flag" fieldtype="Normal" datatype="Binary" comment="">
+			<UUID modifications="2" userName="Jens Thorsen" accountName="jensthorsen" timestamp="2020-12-14T18:25:32">D4D5DB3F-CA1C-401E-8962-5273CAC9B8C4</UUID>
+			<AutoEnter type="Looked_up" prohibitModification="False">
+				<Looked_up dontCopyIfEmpty="True" noMatchCopyOption="DoNotCopy">
+					<FieldReference id="9" name="">
+						<TableOccurrenceReference id="-1" name="&lt;Table Missing&gt;"></TableOccurrenceReference>
+					</FieldReference>
+					<Context>
+						<TableOccurrenceReference id="1065158" name="Language @ Title"></TableOccurrenceReference>
+					</Context>
+				</Looked_up>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage global="False" maxRepetitions="1"></Storage>
+		</Field>
+		<Field id="9" name="Original language name" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-09-08T13:52:13">8AB7C082-6B32-455A-9E89-A6041EE13EFD</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="10" name="Original country name" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="1" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-09-08T13:53:36">90DC7139-41F3-4187-8724-96324F346672</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="11" name="Language direction" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="3" userName="jensthorsen" accountName="jensthorsen" timestamp="2020-09-12T13:59:02">BF27A6E6-C125-4884-AAA6-2C76EC1230D6</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False">
+				<ValueListReference id="67" name="Language direction"></ValueListReference>
+			</Validation>
+			<Storage global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="14" name="Script Abbreviation code" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="2" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-01-03T10:27:44">9083567C-B39B-4E37-8037-704B27233F95</UUID>
+			<AutoEnter type="" prohibitModification="False"></AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+		<Field id="15" name="Script Abbreviation Name" fieldtype="Normal" datatype="Text" comment="">
+			<UUID modifications="4" userName="jensthorsen" accountName="jensthorsen" timestamp="2024-01-03T10:44:29">5B9F2B93-2CA7-4B01-9959-401FD6C9ADD9</UUID>
+			<AutoEnter type="Looked_up" prohibitModification="False">
+				<Looked_up dontCopyIfEmpty="True" noMatchCopyOption="DoNotCopy">
+					<FieldReference id="6" name="Script name">
+						<TableOccurrenceReference id="1065770" name="Language Script"></TableOccurrenceReference>
+					</FieldReference>
+					<Context>
+						<TableOccurrenceReference id="1065158" name="Language @ Title"></TableOccurrenceReference>
+					</Context>
+				</Looked_up>
+			</AutoEnter>
+			<Validation type="OnlyDuringDataEntry" allowOverride="True" notEmpty="False" unique="False" existing="False"></Validation>
+			<Storage autoIndex="True" global="False" maxRepetitions="1">
+				<LanguageReference name="Swedish" id="41"></LanguageReference>
+			</Storage>
+		</Field>
+	</ObjectList>
+</FieldCatalog>

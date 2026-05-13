@@ -1,0 +1,43 @@
+# Selected
+Set Variable [ $list_id[1] ; FAT List::gListSelectionForGroup ]
+Set Variable [ $parent_list_id[1] ; FAT List::PrimaryKey ]
+Set Variable [ $title_id[1] ; FAT List::Title id ]
+Set Variable [ $parent_list_template_id[1] ; Case( Count(FAT List of Lists @ List::PrimaryKey)=0; ""; FAT List::List template id) ]
+
+Freeze Window
+Set Error Capture [ ON ]
+
+# Check if lists have the same list type - get list template
+Go to Layout [ Layout: "TABLE FAT List Alt" ; Animation: None ]
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+
+If [ $parent_list_template_id ≠ FAT List Alt::List template id And $parent_list_template_id ≠ "" ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "Lists of different types" ; Message: "The list you selected is not the same type as the other lists in the group. " ; Default Button: "OK" ]
+	Exit Script []
+Else
+	Set Variable [ $list_template_id[1] ; FAT List Alt::List template id ]
+End If
+
+Go to Layout [ Layout: "TABLE FAT List of Lists" ; Animation: None ]
+
+# Check if list already in group
+Perform Find [ ⚠️ RESTORE ⚠️ ]
+If [ Get(foundCount)>0 ]
+	Go to Layout [ Layout: <original layout> ; Animation: None ]
+	Show Custom Dialog [ Title: "Lists already in group" ; Message: "This list is already added to the group." ; Default Button: "OK" ]
+	Exit Script []
+End If
+
+# Create and add list
+New Record/Request
+
+Set Field [ FAT List of Lists @ List::Title id ; $title_id ]
+Set Field [ FAT List of Lists @ List::Parent List ; $parent_list_id ]
+Set Field [ FAT List of Lists @ List::List id ; $list_id ]
+
+Go to Layout [ Layout: <original layout> ; Animation: None ]
+Set Field [ FAT List::List template id ; $list_template_id ]
+Set Field [ FAT List::gListSelectionForGroup ; "" ]
+
+
