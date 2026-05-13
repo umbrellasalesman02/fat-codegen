@@ -10,7 +10,9 @@ type FileMakerEnvConfig = {
 const readRequiredEnv = (name: string): string => {
   const value = process.env[name]?.trim();
   if (!value) {
-    throw new Error(`Missing required environment variable ${name}`);
+    throw new Error(
+      `Missing required environment variable ${name}. Load env before capture (for example via node --env-file=.env ...).`,
+    );
   }
   return value;
 };
@@ -38,7 +40,7 @@ export const fetchSourceRecordFromFileMaker = async (
   command: CaptureFixtureCommand,
 ): Promise<Record<string, unknown>> => {
   const config = readFileMakerConfig();
-  const { FMServerConnection } = await import('@proofkit/fmodata');
+  const { FMServerConnection, fmTableOccurrence, textField } = await import('@proofkit/fmodata');
   const connection = new FMServerConnection({
     serverUrl: config.serverUrl,
     auth: {
@@ -47,9 +49,27 @@ export const fetchSourceRecordFromFileMaker = async (
     },
   });
   const db = connection.database(config.databaseName);
+  const table =
+    command.tableName === 'FAT Title'
+      ? fmTableOccurrence(
+          command.tableName,
+          {
+            PrimaryKey: textField(),
+            'Header txt id': textField(),
+            ModificationTimestamp: textField(),
+          },
+          { defaultSelect: 'schema' },
+        )
+      : fmTableOccurrence(
+          command.tableName,
+          {
+            PrimaryKey: textField(),
+          },
+          { defaultSelect: 'schema' },
+        );
 
   const result = (await (db as any)
-    .from(command.tableName)
+    .from(table)
     .list()
     .where(`PrimaryKey eq ${quoteODataString(command.recordId)}`)
     .top(1)
