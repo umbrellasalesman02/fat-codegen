@@ -34,7 +34,10 @@ export const makeRpcLayer = (options?: ApiApplicationOptions) => {
   );
 };
 
-export const makeLayer = (config: { readonly host: string; readonly port: number }, options?: ApiApplicationOptions) => {
+export const makeLayer = (
+  config: { readonly host: string; readonly port: number },
+  options?: ApiApplicationOptions,
+) => {
   const todoRpcServer = RpcServer.layer(TodoRpcs).pipe(Layer.provide(makeRpcLayer(options)));
 
   const rpcProtocol = RpcServer.layerProtocolHttp({ path: '/rpc' }).pipe(

@@ -8,7 +8,7 @@ export default defineConfig({
     sortPackageJson: true,
   },
   lint: {
-    plugins: ['import'],
+    plugins: ['typescript', 'import'],
     ignorePatterns: [
       '.agents/**',
       'repos/**',
