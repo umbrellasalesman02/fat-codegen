@@ -1,4 +1,5 @@
 import { captureTitleSliceFixture, type CaptureFixtureCommand } from './fixture-capture.js';
+import { fetchSourceRecordFromFileMaker } from './filemaker-source-fetch.js';
 
 const usage =
   'Usage: node --import tsx src/features/titles/fixture-capture-cli.ts --table <tableName> --id <recordId> --out <outputFixturePath>';
@@ -28,11 +29,7 @@ const parseArgs = (args: ReadonlyArray<string>): CaptureFixtureCommand => {
 const main = async () => {
   const command = parseArgs(process.argv.slice(2));
   const result = await captureTitleSliceFixture(command, {
-    fetchSourceRecord: async () => {
-      throw new Error(
-        'Live FileMaker capture is not wired yet in ISSUE-002. Provide a committed fixture or wire a fetch adapter next.',
-      );
-    },
+    fetchSourceRecord: fetchSourceRecordFromFileMaker,
     projectRecord: (sourceRecord) => sourceRecord,
   });
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
