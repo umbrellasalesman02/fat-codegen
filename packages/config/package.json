@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
-    "lint": "echo \"No config lint targets yet\"",
-    "check": "npm run lint && echo \"TODO: add config validation\"",
-    "test": "echo \"TODO: add config tests\"",
+    "lint": "oxlint src test --deny-warnings",
+    "check": "npm run lint && tsc -p ../../tsconfig.json --noEmit",
+    "test": "ROOT=$(git rev-parse --show-toplevel) && vitest run \"$ROOT/packages/config/test\" --config \"$ROOT/vite.config.ts\"",
     "build": "echo \"TODO: add config build\""
   }
 }

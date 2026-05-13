@@ -1,14 +1,14 @@
 import { NodeHttpServer, NodeRuntime } from "@effect/platform-node"
 import { SqliteClient } from "@effect/sql-sqlite-node"
 import { Effect, Layer, Schema } from "effect"
-import { HttpRouter } from "effect/unstable/http"
+import { HttpRouter, HttpServerResponse } from "effect/unstable/http"
 import { Reactivity } from "effect/unstable/reactivity"
 import { RpcServer, RpcSerialization } from "effect/unstable/rpc"
 import { mkdirSync } from "node:fs"
 import { createServer } from "node:http"
+import { loadApiConfig } from "../../../packages/config/src/index.js"
 import { HealthResponse, Todo, TodoNotFound, TodoRpcs, UpdateTodoInput } from "@template/shared"
 
-const port = Number(process.env.API_PORT ?? 3737)
 const version = "0.1.0"
 
 type TodoRow = {
@@ -117,17 +117,25 @@ const TodoRpcServer = RpcServer.layer(TodoRpcs).pipe(
 const RpcProtocol = RpcServer.layerProtocolHttp({ path: "/rpc" }).pipe(
   Layer.provide(HttpRouter.layer)
 )
+const HealthRoute = HttpRouter.add(
+  "GET",
+  "/health",
+  Effect.succeed(HttpServerResponse.jsonUnsafe({ status: "ok", service: "api", version }))
+)
+const HttpRoutes = Layer.mergeAll(RpcProtocol, HealthRoute)
 
-const configuredDbPath = process.env.TODO_DB_PATH?.trim() || ".data/todos.sqlite"
+const config = await Effect.runPromise(loadApiConfig())
+const configuredDbPath = config.todoDbPath.trim()
 if (configuredDbPath !== ":memory:" && configuredDbPath.includes("/")) {
   mkdirSync(configuredDbPath.slice(0, configuredDbPath.lastIndexOf("/")), { recursive: true })
 }
 const sqliteLayer = SqliteClient.layer({ filename: configuredDbPath })
 
 const AppLayer = TodoRpcServer.pipe(
-  Layer.provideMerge(RpcProtocol),
-  Layer.provide(HttpRouter.serve(RpcProtocol)),
-  Layer.provide(NodeHttpServer.layer(createServer, { port })),
+  Layer.provideMerge(HttpRoutes),
+  Layer.provide(HttpRouter.serve(HttpRoutes)),
+  Layer.provide(HttpRouter.layer),
+  Layer.provide(NodeHttpServer.layer(createServer, { port: config.port, host: config.host })),
   Layer.provide(sqliteLayer),
   Layer.provide(Reactivity.layer),
   Layer.provide(RpcSerialization.layerNdjson)

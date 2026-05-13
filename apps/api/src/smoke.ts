@@ -1,8 +1,10 @@
 import { Effect } from "effect"
+import { loadApiConfig } from "../../../packages/config/src/index.js"
 import { ApiClient, makeApiClientLayer } from "@template/shared"
 
-const port = Number(process.env.API_PORT ?? 3737)
-const baseUrl = `http://127.0.0.1:${port}`
+const config = await Effect.runPromise(loadApiConfig())
+const baseHost = config.host === "0.0.0.0" ? "127.0.0.1" : config.host
+const baseUrl = `http://${baseHost}:${config.port}`
 
 const program = Effect.gen(function*() {
   const client = yield* ApiClient
