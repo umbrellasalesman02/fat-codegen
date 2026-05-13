@@ -10,7 +10,7 @@ Tracking board for the first Generated Application Slice (Title Read Summary).
 
 ## Issues
 
-- [ ] [ISSUE-001-title-slice-skeleton-with-typed-scope-error.md](/Users/erikwiberg/dev/work/filemaker-codegen/docs/issues/ISSUE-001-title-slice-skeleton-with-typed-scope-error.md)
+- [x] [ISSUE-001-title-slice-skeleton-with-typed-scope-error.md](/Users/erikwiberg/dev/work/filemaker-codegen/docs/issues/ISSUE-001-title-slice-skeleton-with-typed-scope-error.md)
 - [ ] [ISSUE-002-seed-fixture-capture-command.md](/Users/erikwiberg/dev/work/filemaker-codegen/docs/issues/ISSUE-002-seed-fixture-capture-command.md)
 - [ ] [ISSUE-003-projection-mapper-title-read-summary.md](/Users/erikwiberg/dev/work/filemaker-codegen/docs/issues/ISSUE-003-projection-mapper-title-read-summary.md)
 - [ ] [ISSUE-004-minimal-script-semantics-fail-fast-policy.md](/Users/erikwiberg/dev/work/filemaker-codegen/docs/issues/ISSUE-004-minimal-script-semantics-fail-fast-policy.md)

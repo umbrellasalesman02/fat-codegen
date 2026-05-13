@@ -4,11 +4,12 @@ import { Effect, Layer } from 'effect';
 import { HttpRouter } from 'effect/unstable/http';
 import { Reactivity } from 'effect/unstable/reactivity';
 import { RpcServer, RpcSerialization } from 'effect/unstable/rpc';
-import { mkdirSync } from 'node:fs';
 import { createServer } from 'node:http';
+import { mkdirSync } from 'node:fs';
 import { loadApiConfig } from '@template/config';
-import { TodoRpcs } from '@template/shared';
+import { TitleRpcs, TodoRpcs } from '@template/shared';
 import { makeHealthRoute, makeHealthRpcHandler } from './features/health/health.js';
+import { makeTitleRpcHandlers } from './features/titles/rpc.js';
 import { makeTodoRpcHandlers } from './features/todos/rpc.js';
 import { TodoRepository } from './features/todos/repository.js';
 
@@ -27,7 +28,8 @@ export type ApiApplicationOptions = {
 
 export const makeRpcLayer = (options?: ApiApplicationOptions) => {
   const todoRpcHandlers = makeTodoRpcHandlers(makeHealthRpcHandler(version));
-  return todoRpcHandlers.pipe(
+  const titleRpcHandlers = makeTitleRpcHandlers();
+  return Layer.mergeAll(todoRpcHandlers, titleRpcHandlers).pipe(
     Layer.provide(TodoRepository.layer),
     Layer.provide(options?.sqliteLayer ?? makeSqliteLayer('.data/todos.sqlite')),
     Layer.provide(Reactivity.layer),
@@ -38,7 +40,9 @@ export const makeLayer = (
   config: { readonly host: string; readonly port: number },
   options?: ApiApplicationOptions,
 ) => {
-  const todoRpcServer = RpcServer.layer(TodoRpcs).pipe(Layer.provide(makeRpcLayer(options)));
+  const rpcServer = Layer.mergeAll(RpcServer.layer(TodoRpcs), RpcServer.layer(TitleRpcs)).pipe(
+    Layer.provide(makeRpcLayer(options)),
+  );
 
   const rpcProtocol = RpcServer.layerProtocolHttp({ path: '/rpc' }).pipe(
     Layer.provide(HttpRouter.layer),
@@ -46,7 +50,7 @@ export const makeLayer = (
   const healthRoute = makeHealthRoute(version);
   const httpRoutes = Layer.mergeAll(rpcProtocol, healthRoute);
 
-  return todoRpcServer.pipe(
+  return rpcServer.pipe(
     Layer.provideMerge(httpRoutes),
     Layer.provide(HttpRouter.serve(httpRoutes)),
     Layer.provide(HttpRouter.layer),
