@@ -164,6 +164,10 @@ _Avoid_: table-specific capture scripts, hidden capture parameters
 Slice fixtures may store both captured source records and projected records, while runtime and generation consume projected records only.
 _Avoid_: projected-only fixtures with no traceability, runtime dependence on raw records
 
+**Projection DTO Boundary**:
+A schema-backed projection DTO maps raw source fields (for example `PrimaryKey`, `Header txt id`, `ModificationTimestamp`) into stable application-facing names (for example `titleId`, `titleNameLabel`, `modifiedAt`).
+_Avoid_: leaking legacy source field names into application contracts
+
 ## Relationships
 
 - A **Template Repository** contains multiple **Application**s
@@ -203,6 +207,7 @@ _Avoid_: projected-only fixtures with no traceability, runtime dependence on raw
 - **Slice Runtime Path** keeps slice behavior deterministic and environment-stable
 - **Fixture Capture Command Contract** standardizes agent-driven fixture acquisition
 - **Dual Fixture Record** preserves mapping traceability without expanding runtime coupling
+- **Projection DTO Boundary** preserves stable naming across evolving source-field curation
 
 ## Folder Boundaries
 
@@ -244,3 +249,4 @@ _Avoid_: projected-only fixtures with no traceability, runtime dependence on raw
 - "live data usage in slice-1" was ambiguous — resolved as **Fixture Capture Path** plus **Slice Runtime Path**.
 - "fixture capture interface" was ambiguous — resolved as **Fixture Capture Command Contract**.
 - "fixture storage shape" was ambiguous — resolved as **Dual Fixture Record**.
+- "field naming boundary" was ambiguous between raw source and application contracts — resolved as **Projection DTO Boundary**.
