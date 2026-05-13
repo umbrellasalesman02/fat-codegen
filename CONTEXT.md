@@ -37,8 +37,8 @@ _Avoid_: optional utility layer, framework-specific add-on
 _Avoid_: duplicating boundary types per app, trusting unchecked JSON
 
 **Quality Gate**:
-The required pre-merge validation sequence: `vp run check`, `vp run test`, API smoke checks, then `vp run test:e2e` (Chromium baseline).
-_Avoid_: ad hoc local-only checks, skipping smoke or E2E in done criteria
+The required pre-merge validation sequence: `vp run check`, `vp run test`, then `vp run test:e2e` (Chromium baseline).
+_Avoid_: ad hoc local-only checks, skipping E2E in done criteria
 
 **Agent Startup Sequence**:
 Read `CONTEXT.md`, then `AGENTS.md`; if the task touches Effect patterns, inspect `repos/effect-smol/LLMS.md` plus relevant `effect-smol` source and tests; apply the **Shared Contract Admission Rule** before editing `packages/shared`.

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('@smoke web loads and supports todo CRUD', async ({ page }) => {
+test('web loads and supports todo CRUD', async ({ page }) => {
   const todoTitle = `Ship TODO RPC ${Date.now()}`;
 
   await page.goto('/');

@@ -74,7 +74,6 @@ Run from repository root:
 - `vp run test`
 - `vp run build`
 - `vp run test:e2e`
-- `vp run test:e2e:smoke`
 - `vp run deps:check`
 
 Notes:
@@ -87,10 +86,5 @@ Notes:
 vp install
 vp run check
 vp run test
-API_PORT=3737 vp run --filter @template/api dev &
-API_PID=$!
-sleep 3
-API_PORT=3737 vp run --filter @template/api smoke
-kill $API_PID
 vp run test:e2e
 ```

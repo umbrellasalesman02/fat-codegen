@@ -10,10 +10,7 @@ Run from repository root unless a narrower scope is explicitly requested:
 
 1. `vp run check`
 2. `vp run test`
-3. If backend/API behavior changed, run API smoke check:
-   - Start API: `API_PORT=3737 vp run --filter @template/api dev`
-   - Smoke: `API_PORT=3737 vp run --filter @template/api smoke`
-4. If user-visible behavior changed, run: `vp run test:e2e` (or `vp run test:e2e:smoke` for fast validation)
+3. If backend/API behavior changed or user-visible behavior changed, run: `vp run test:e2e`
 
 When time is constrained, at minimum run `vp run check` and explain any skipped gates.
 

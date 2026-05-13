@@ -162,8 +162,7 @@ Primary CI job order:
 2. `vp install`
 3. `vp check`
 4. `vp test`
-5. API smoke check (`/health`)
-6. Playwright E2E (chromium)
+5. Playwright E2E (chromium)
 
 Fail fast behavior expected at each stage.
 
