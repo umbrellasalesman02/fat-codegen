@@ -55,10 +55,9 @@ export const fetchSourceRecordFromFileMaker = async (
           command.tableName,
           {
             PrimaryKey: textField(),
-            'Header txt id': textField(),
-            ModificationTimestamp: textField(),
           },
-          { defaultSelect: 'schema' },
+          // Intentionally capture broad raw source shape for traceability in fixture sourceRecord.
+          { defaultSelect: 'all' },
         )
       : fmTableOccurrence(
           command.tableName,
