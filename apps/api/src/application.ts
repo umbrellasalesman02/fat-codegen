@@ -40,7 +40,9 @@ export const makeLayer = (
   config: { readonly host: string; readonly port: number },
   options?: ApiApplicationOptions,
 ) => {
-  const rpcServer = Layer.mergeAll(RpcServer.layer(TodoRpcs), RpcServer.layer(TitleRpcs)).pipe(
+  const apiRpcs = TodoRpcs.merge(TitleRpcs);
+
+  const rpcServer = RpcServer.layer(apiRpcs).pipe(
     Layer.provide(makeRpcLayer(options)),
   );
 

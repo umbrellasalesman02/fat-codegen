@@ -20,3 +20,15 @@ test('web loads and supports todo CRUD', async ({ page }) => {
   await item.first().locator("xpath=../button[normalize-space()='Delete']").click();
   await expect(item.first()).not.toBeVisible();
 });
+
+test('title route renders seed summary and explicit scope messaging', async ({ page }) => {
+  await page.goto('/titles/9B433A0E-7EBC-435C-8A99-D966BC17BA30');
+  await expect(page.getByRole('heading', { name: 'Title Read Summary' })).toBeVisible();
+  await expect(page.getByText('17976250-18D1-4894-92D9-45198AB5C309')).toBeVisible();
+
+  await page.goto('/titles/not-in-slice');
+  await expect(page.getByRole('heading', { name: 'Title Slice Scope' })).toBeVisible();
+  await expect(page.locator('#title-scope-message')).toContainText(
+    'outside the current slice scope',
+  );
+});
