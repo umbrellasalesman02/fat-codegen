@@ -13,6 +13,7 @@ Run from repository root unless a narrower scope is explicitly requested:
 3. If backend/API behavior changed or user-visible behavior changed, run: `vp run test:e2e`
 
 When time is constrained, at minimum run `vp run check` and explain any skipped gates.
+Treat `vp run check` as passing only when it is clean from both errors and warnings.
 
 ## Vendored Repositories
 

@@ -37,7 +37,7 @@ _Avoid_: optional utility layer, framework-specific add-on
 _Avoid_: duplicating boundary types per app, trusting unchecked JSON
 
 **Quality Gate**:
-The required pre-merge validation sequence: `vp run check`, `vp run test`, then `vp run test:e2e` (Chromium baseline).
+The required pre-merge validation sequence: `vp run check`, `vp run test`, then `vp run test:e2e` (Chromium baseline), where `vp run check` is considered passing only when clean from both errors and warnings.
 _Avoid_: ad hoc local-only checks, skipping E2E in done criteria
 
 **Agent Startup Sequence**:
