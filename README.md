@@ -42,7 +42,7 @@ vp run dev
 ## Quality gates
 
 - `vp run check` is a required pre-merge gate.
-- Lint warnings fail by default (`oxlint --deny-warnings`).
+- Lint warnings fail by default through `vp lint` / `vp check` (Oxlint via Vite+).
 - `vp run test:e2e` runs Chromium-only Playwright by default.
 
 ## Tested versions matrix
