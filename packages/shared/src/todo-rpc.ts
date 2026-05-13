@@ -5,8 +5,8 @@ export class Todo extends Schema.Class<Todo>('Todo')({
   id: Schema.String,
   title: Schema.String,
   completed: Schema.Boolean,
-  createdAt: Schema.String,
-  updatedAt: Schema.String,
+  createdAt: Schema.DateFromString,
+  updatedAt: Schema.DateFromString,
 }) {}
 
 export class TodoNotFound extends Schema.ErrorClass<TodoNotFound>('TodoNotFound')({

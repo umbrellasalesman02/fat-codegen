@@ -36,14 +36,15 @@ export class TodoRepository extends Context.Service<
       const create = Effect.fn('TodoRepository.create')(function* (input: {
         readonly title: string;
       }) {
-        const now = new Date().toISOString();
+        const now = new Date();
+        const nowIso = now.toISOString();
         const id = crypto.randomUUID();
         yield* sql`INSERT INTO todos ${sql.insert({
           id,
           title: input.title,
           completed: 0,
-          created_at: now,
-          updated_at: now,
+          created_at: nowIso,
+          updated_at: nowIso,
         })}`.pipe(Effect.orDie);
         return new Todo({
           id,
@@ -70,17 +71,18 @@ export class TodoRepository extends Context.Service<
         const existing = yield* findById(input.id);
         const updatedTitle = input.title ?? existing.title;
         const updatedCompleted = input.completed ?? existing.completed === 1;
-        const updatedAt = new Date().toISOString();
+        const updatedAt = new Date();
+        const updatedAtIso = updatedAt.toISOString();
         yield* sql`UPDATE todos SET ${sql.update({
           title: updatedTitle,
           completed: updatedCompleted ? 1 : 0,
-          updated_at: updatedAt,
+          updated_at: updatedAtIso,
         })} WHERE id = ${input.id}`.pipe(Effect.orDie);
         return new Todo({
           id: input.id,
           title: updatedTitle,
           completed: updatedCompleted,
-          createdAt: existing.created_at,
+          createdAt: new Date(existing.created_at),
           updatedAt,
         });
       });

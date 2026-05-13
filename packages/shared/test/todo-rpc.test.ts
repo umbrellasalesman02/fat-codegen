@@ -13,6 +13,8 @@ describe('todo rpc schemas', () => {
       updatedAt: '2026-05-12T12:00:00.000Z',
     });
     assert.strictEqual(todo.title, 'Write docs');
+    assert.isTrue(todo.createdAt instanceof Date);
+    assert.isTrue(todo.updatedAt instanceof Date);
   });
 
   it('decodes health payload', () => {
