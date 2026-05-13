@@ -100,6 +100,14 @@ _Avoid_: mirror-all-fields integration, direct table passthrough
 Fields are added to slice projections only when required by a failing scenario, contract need, or script dependency, not preemptively.
 _Avoid_: upfront full-field mapping, speculative schema inclusion
 
+**Unsupported Script Step Policy**:
+If a required script step is not supported, generation fails fast and emits structured diagnostics instead of producing partial runnable behavior.
+_Avoid_: warn-and-stub, silent partial generation
+
+**Generated Contract Ownership**:
+Generator-owned boundary contract files live under `packages/shared/src/generated/*`, while hand-written shared files only compose or re-export those contracts for Application consumption.
+_Avoid_: app imports of generated internals, mixed manual and generated contract files
+
 ## Relationships
 
 - A **Template Repository** contains multiple **Application**s
@@ -123,6 +131,8 @@ _Avoid_: upfront full-field mapping, speculative schema inclusion
 - **Structural Source** provides generator inputs for shape and behavior, while **Projection Layer** governs selective runtime data retrieval
 - **Projection Layer** follows **Progressive Field Curation** to keep runtime scope intentional
 - **Source Provenance Path** standardizes naming of immutable structural inputs
+- **Unsupported Script Step Policy** preserves trust in generated outputs by preventing partial behavior emission
+- **Generated Contract Ownership** keeps app dependencies stable while allowing generator internals to evolve
 
 ## Folder Boundaries
 
@@ -149,3 +159,5 @@ _Avoid_: upfront full-field mapping, speculative schema inclusion
 - "source data" was ambiguous between metadata exports and runtime records — resolved via **Structural Source** plus **Projection Layer**.
 - "field coverage" was uncertain at kickoff — resolved via **Progressive Field Curation**.
 - "source folder naming" was ambiguous — resolved via **Source Provenance Path** with `source/filemaker/funkis-authoring-tool/fm-xml-export-exploder-output/`.
+- "unsupported script behavior" was ambiguous between stubbing and hard failure — resolved as **Unsupported Script Step Policy** with fail-fast diagnostics.
+- "shared contract ownership" was ambiguous between generated and hand-edited files — resolved via **Generated Contract Ownership**.

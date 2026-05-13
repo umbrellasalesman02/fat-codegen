@@ -1,6 +1,19 @@
-# TypeScript Effect Starter Template
+# FileMaker Codegen Port Workspace
 
-Vite+ (`vp`) fullstack TypeScript starter centered on Effect v4 beta conventions.
+Vite+ (`vp`) fullstack TypeScript workspace used to iteratively port a large FileMaker application into runnable and testable generated code.
+
+## Repository intent
+
+- Treat this repo as a code-generation workspace, not just a starter template.
+- Use immutable structural input from:
+  - `source/filemaker/funkis-authoring-tool/fm-xml-export-exploder-output/`
+- Generate vertical slices that become runnable through `apps/api` and `apps/web`.
+- Keep application boundaries stable through minimal contracts in `packages/shared`.
+
+For canonical domain language and architectural decisions, see:
+
+- [CONTEXT.md](/Users/erikwiberg/dev/work/filemaker-codegen/CONTEXT.md)
+- [ADR 0001](/Users/erikwiberg/dev/work/filemaker-codegen/docs/adr/0001-generated-port-architecture.md)
 
 ## Vite+ positioning
 
@@ -13,7 +26,7 @@ All documented flows are `vp`-first.
 ## Prerequisites
 
 - `vp` installed and available on PATH
-- Node version from [.nvmrc](/Users/erikwiberg/work/typescript-effect-template/.nvmrc)
+- Node version from [.nvmrc](/Users/erikwiberg/dev/work/filemaker-codegen/.nvmrc)
 
 ## Quick start
 
@@ -34,6 +47,8 @@ vp run dev
 │  └─ config/
 ├─ tests/
 │  └─ e2e/                 # Playwright Chromium tests
+├─ source/
+│  └─ filemaker/           # Immutable structural source inputs
 ├─ repos/
 │  └─ effect-smol/         # Vendored reference repo (read-only)
 └─ .github/workflows/ci.yml
@@ -61,9 +76,9 @@ vp run dev
 
 This template tracks Effect v4 beta. APIs may evolve. For implementation idioms, prioritize:
 
-- [repos/effect-smol](/Users/erikwiberg/work/typescript-effect-template/repos/effect-smol)
-- [docs/effect-devtools.md](/Users/erikwiberg/work/typescript-effect-template/docs/effect-devtools.md)
-- [docs/vendored-repositories.md](/Users/erikwiberg/work/typescript-effect-template/docs/vendored-repositories.md)
+- [repos/effect-smol](/Users/erikwiberg/dev/work/filemaker-codegen/repos/effect-smol)
+- [docs/effect-devtools.md](/Users/erikwiberg/dev/work/filemaker-codegen/docs/effect-devtools.md)
+- [docs/vendored-repositories.md](/Users/erikwiberg/dev/work/filemaker-codegen/docs/vendored-repositories.md)
 
 ## Command contract
 
