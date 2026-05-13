@@ -1,25 +1,25 @@
-import { defineConfig } from "vite";
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   preview: {
-    host: "127.0.0.1",
+    host: '127.0.0.1',
     port: 4173,
     proxy: {
-      "/api": {
-        target: "http://127.0.0.1:3737",
+      '/api': {
+        target: 'http://127.0.0.1:3737',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },
   server: {
-    host: "127.0.0.1",
+    host: '127.0.0.1',
     port: 4173,
     proxy: {
-      "/api": {
-        target: "http://127.0.0.1:3737",
+      '/api': {
+        target: 'http://127.0.0.1:3737',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

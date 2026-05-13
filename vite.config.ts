@@ -1,16 +1,19 @@
-import { defineConfig } from "vite-plus";
+import { defineConfig } from 'vite-plus';
 
 export default defineConfig({
   fmt: {
-    ignorePatterns: ["repos/**"],
+    ignorePatterns: ['repos/**', '**/dist/**'],
+    singleQuote: true,
+    semi: true,
+    sortPackageJson: true,
   },
   lint: {
     ignorePatterns: [
-      "repos/**",
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/coverage/**",
-      "test-results/**",
+      'repos/**',
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/coverage/**',
+      'test-results/**',
     ],
     options: {
       typeAware: true,
@@ -19,7 +22,7 @@ export default defineConfig({
   },
   test: {
     passWithNoTests: true,
-    setupFiles: ["./vitest.setup.ts"],
-    exclude: ["**/node_modules/**", "repos/**", "tests/e2e/**", "**/tests/e2e/**"],
+    setupFiles: ['./vitest.setup.ts'],
+    exclude: ['**/node_modules/**', 'repos/**', 'tests/e2e/**', '**/tests/e2e/**'],
   },
 });

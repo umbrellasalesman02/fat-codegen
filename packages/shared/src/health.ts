@@ -1,14 +1,14 @@
-import { Effect } from "effect";
+import { Effect } from 'effect';
 
 export type Health = {
-  readonly status: "ok";
-  readonly service: "api";
+  readonly status: 'ok';
+  readonly service: 'api';
   readonly version: string;
 };
 
 export const makeHealth = (version: string): Health => ({
-  status: "ok",
-  service: "api",
+  status: 'ok',
+  service: 'api',
   version,
 });
 

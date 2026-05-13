@@ -1,15 +1,15 @@
-import { NodeHttpServer, NodeRuntime } from "@effect/platform-node";
-import { SqliteClient } from "@effect/sql-sqlite-node";
-import { Effect, Layer, Schema } from "effect";
-import { HttpRouter, HttpServerResponse } from "effect/unstable/http";
-import { Reactivity } from "effect/unstable/reactivity";
-import { RpcServer, RpcSerialization } from "effect/unstable/rpc";
-import { mkdirSync } from "node:fs";
-import { createServer } from "node:http";
-import { loadApiConfig } from "../../../packages/config/src/index.js";
-import { HealthResponse, Todo, TodoNotFound, TodoRpcs, UpdateTodoInput } from "@template/shared";
+import { NodeHttpServer, NodeRuntime } from '@effect/platform-node';
+import { SqliteClient } from '@effect/sql-sqlite-node';
+import { Effect, Layer, Schema } from 'effect';
+import { HttpRouter, HttpServerResponse } from 'effect/unstable/http';
+import { Reactivity } from 'effect/unstable/reactivity';
+import { RpcServer, RpcSerialization } from 'effect/unstable/rpc';
+import { mkdirSync } from 'node:fs';
+import { createServer } from 'node:http';
+import { loadApiConfig } from '../../../packages/config/src/index.js';
+import { HealthResponse, Todo, TodoNotFound, TodoRpcs, UpdateTodoInput } from '@template/shared';
 
-const version = "0.1.0";
+const version = '0.1.0';
 
 type TodoRow = {
   readonly id: string;
@@ -30,7 +30,7 @@ const mapRowToTodo = (row: TodoRow) =>
     updatedAt: row.updated_at,
   });
 
-const ensureSchema = Effect.fn("ensureSchema")(function* () {
+const ensureSchema = Effect.fn('ensureSchema')(function* () {
   const sql = yield* SqliteClient.SqliteClient;
   yield* sql`CREATE TABLE IF NOT EXISTS todos (
     id TEXT PRIMARY KEY,
@@ -41,7 +41,7 @@ const ensureSchema = Effect.fn("ensureSchema")(function* () {
   )`.pipe(Effect.orDie);
 });
 
-const listTodos = Effect.fn("listTodos")(function* () {
+const listTodos = Effect.fn('listTodos')(function* () {
   const sql = yield* SqliteClient.SqliteClient;
   const rows =
     yield* sql<TodoRow>`SELECT id, title, completed, created_at, updated_at FROM todos ORDER BY created_at ASC`.pipe(
@@ -50,7 +50,7 @@ const listTodos = Effect.fn("listTodos")(function* () {
   return rows.map(mapRowToTodo);
 });
 
-const createTodo = Effect.fn("createTodo")(function* (payload: { readonly title: string }) {
+const createTodo = Effect.fn('createTodo')(function* (payload: { readonly title: string }) {
   const sql = yield* SqliteClient.SqliteClient;
   const now = new Date().toISOString();
   const id = crypto.randomUUID();
@@ -60,7 +60,7 @@ const createTodo = Effect.fn("createTodo")(function* (payload: { readonly title:
   return decodeTodo({ id, title: payload.title, completed: false, createdAt: now, updatedAt: now });
 });
 
-const findTodoById = Effect.fn("findTodoById")(function* (id: string) {
+const findTodoById = Effect.fn('findTodoById')(function* (id: string) {
   const sql = yield* SqliteClient.SqliteClient;
   const rows =
     yield* sql<TodoRow>`SELECT id, title, completed, created_at, updated_at FROM todos WHERE id = ${id}`.pipe(
@@ -73,7 +73,7 @@ const findTodoById = Effect.fn("findTodoById")(function* (id: string) {
   return row;
 });
 
-const updateTodo = Effect.fn("updateTodo")(function* (payload: UpdateTodoInput) {
+const updateTodo = Effect.fn('updateTodo')(function* (payload: UpdateTodoInput) {
   const sql = yield* SqliteClient.SqliteClient;
   const existing = yield* findTodoById(payload.id);
   const updated = {
@@ -95,7 +95,7 @@ const updateTodo = Effect.fn("updateTodo")(function* (payload: UpdateTodoInput) 
   });
 });
 
-const deleteTodo = Effect.fn("deleteTodo")(function* (payload: { readonly id: string }) {
+const deleteTodo = Effect.fn('deleteTodo')(function* (payload: { readonly id: string }) {
   const sql = yield* SqliteClient.SqliteClient;
   const existing = yield* findTodoById(payload.id);
   yield* sql`DELETE FROM todos WHERE id = ${payload.id}`.pipe(Effect.orDie);
@@ -106,7 +106,7 @@ const TodoRpcHandlers = TodoRpcs.toLayer(
   Effect.gen(function* () {
     yield* ensureSchema();
     return TodoRpcs.of({
-      health: () => Effect.succeed(new HealthResponse({ status: "ok", service: "api", version })),
+      health: () => Effect.succeed(new HealthResponse({ status: 'ok', service: 'api', version })),
       listTodos,
       createTodo,
       updateTodo,
@@ -117,20 +117,20 @@ const TodoRpcHandlers = TodoRpcs.toLayer(
 
 const TodoRpcServer = RpcServer.layer(TodoRpcs).pipe(Layer.provide(TodoRpcHandlers));
 
-const RpcProtocol = RpcServer.layerProtocolHttp({ path: "/rpc" }).pipe(
+const RpcProtocol = RpcServer.layerProtocolHttp({ path: '/rpc' }).pipe(
   Layer.provide(HttpRouter.layer),
 );
 const HealthRoute = HttpRouter.add(
-  "GET",
-  "/health",
-  Effect.succeed(HttpServerResponse.jsonUnsafe({ status: "ok", service: "api", version })),
+  'GET',
+  '/health',
+  Effect.succeed(HttpServerResponse.jsonUnsafe({ status: 'ok', service: 'api', version })),
 );
 const HttpRoutes = Layer.mergeAll(RpcProtocol, HealthRoute);
 
 const config = await Effect.runPromise(loadApiConfig());
 const configuredDbPath = config.todoDbPath.trim();
-if (configuredDbPath !== ":memory:" && configuredDbPath.includes("/")) {
-  mkdirSync(configuredDbPath.slice(0, configuredDbPath.lastIndexOf("/")), { recursive: true });
+if (configuredDbPath !== ':memory:' && configuredDbPath.includes('/')) {
+  mkdirSync(configuredDbPath.slice(0, configuredDbPath.lastIndexOf('/')), { recursive: true });
 }
 const sqliteLayer = SqliteClient.layer({ filename: configuredDbPath });
 
