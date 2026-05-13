@@ -1,41 +1,40 @@
-import { captureTitleSliceFixture, type CaptureFixtureCommand } from './fixture-capture.js';
+import { NodeRuntime, NodeServices } from '@effect/platform-node';
+import { Console, Effect } from 'effect';
+import { Command, Flag } from 'effect/unstable/cli';
+import { captureTitleSliceFixture } from './fixture-capture.js';
 import { fetchSourceRecordFromFileMaker } from './filemaker-source-fetch.js';
 
-const usage =
-  'Usage: node --import tsx src/features/titles/fixture-capture-cli.ts --table <tableName> --id <recordId> --out <outputFixturePath>';
+const cli = Command.make(
+  'capture-title-fixture',
+  {
+    tableName: Flag.string('table').pipe(Flag.withDescription('FileMaker table name')),
+    recordId: Flag.string('id').pipe(Flag.withDescription('FileMaker PrimaryKey value')),
+    outputFixturePath: Flag.string('out').pipe(
+      Flag.withDescription('Output path for fixture JSON file'),
+    ),
+  },
+  Effect.fn(function* ({ tableName, recordId, outputFixturePath }) {
+    const result = yield* Effect.promise(() =>
+      captureTitleSliceFixture(
+        {
+          tableName,
+          recordId,
+          outputFixturePath,
+        },
+        {
+          fetchSourceRecord: fetchSourceRecordFromFileMaker,
+          projectRecord: (sourceRecord) => sourceRecord,
+        },
+      ),
+    );
 
-const parseArgs = (args: ReadonlyArray<string>): CaptureFixtureCommand => {
-  const get = (flag: string) => {
-    const index = args.indexOf(flag);
-    const value = index >= 0 ? args[index + 1] : undefined;
-    return value?.trim();
-  };
+    yield* Console.log(result);
+  }),
+).pipe(
+  Command.withDescription('Capture a FileMaker record into a slice fixture with source+projection containers'),
+);
 
-  const tableName = get('--table');
-  const recordId = get('--id');
-  const outputFixturePath = get('--out');
-
-  if (!tableName || !recordId || !outputFixturePath) {
-    throw new Error(usage);
-  }
-
-  return {
-    tableName,
-    recordId,
-    outputFixturePath,
-  };
-};
-
-const main = async () => {
-  const command = parseArgs(process.argv.slice(2));
-  const result = await captureTitleSliceFixture(command, {
-    fetchSourceRecord: fetchSourceRecordFromFileMaker,
-    projectRecord: (sourceRecord) => sourceRecord,
-  });
-  process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-};
-
-main().catch((error) => {
-  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
-  process.exitCode = 1;
-});
+Command.run(cli, { version: '0.1.0' }).pipe(
+  Effect.provide(NodeServices.layer),
+  NodeRuntime.runMain,
+);

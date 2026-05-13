@@ -23,6 +23,16 @@ const readFileMakerConfig = (): FileMakerEnvConfig => ({
 });
 
 const quoteODataString = (value: string): string => `'${value.replace(/'/g, "''")}'`;
+const describeUnknownError = (value: unknown): string => {
+  if (value instanceof Error) {
+    return value.message;
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return 'unknown error';
+  }
+};
 
 export const fetchSourceRecordFromFileMaker = async (
   command: CaptureFixtureCommand,
@@ -51,7 +61,7 @@ export const fetchSourceRecordFromFileMaker = async (
 
   if (result.error) {
     throw new Error(
-      `FileMaker query failed for table ${command.tableName} and id ${command.recordId}: ${String(result.error)}`,
+      `FileMaker query failed for table ${command.tableName} and id ${command.recordId}: ${describeUnknownError(result.error)}`,
     );
   }
   if (!result.data) {
