@@ -1,5 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const reuseServer = process.env.PLAYWRIGHT_REUSE_SERVER === 'true';
+const apiHost = process.env.API_HOST ?? '127.0.0.1';
+const apiPort = process.env.API_PORT ?? '3747';
+const apiBaseUrl = `http://${apiHost}:${apiPort}`;
+const webPort = process.env.WEB_PORT ?? '4273';
+const webBaseUrl = `http://127.0.0.1:${webPort}`;
+
 export default defineConfig({
   testDir: './specs',
   reporter: 'list',
@@ -7,7 +14,7 @@ export default defineConfig({
   globalSetup: './global-setup.ts',
   globalTeardown: './global-teardown.ts',
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: webBaseUrl,
   },
   projects: [
     {
@@ -18,21 +25,25 @@ export default defineConfig({
   webServer: [
     {
       command: 'vp run --filter @template/api dev',
-      url: 'http://127.0.0.1:3737/health',
+      url: `${apiBaseUrl}/health`,
       env: {
         APP_PROFILE: process.env.APP_PROFILE ?? 'test',
-        API_HOST: process.env.API_HOST ?? '127.0.0.1',
-        API_PORT: process.env.API_PORT ?? '3737',
+        API_HOST: apiHost,
+        API_PORT: apiPort,
         TODO_DB_PATH: process.env.TODO_DB_PATH ?? '.data/todos.test.sqlite',
       },
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
+      reuseExistingServer: reuseServer,
+      timeout: 180_000,
     },
     {
       command: 'vp run --filter @template/web build && vp run --filter @template/web e2e:preview',
-      url: 'http://127.0.0.1:4173',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
+      url: webBaseUrl,
+      env: {
+        API_BASE_URL: apiBaseUrl,
+        WEB_PORT: webPort,
+      },
+      reuseExistingServer: reuseServer,
+      timeout: 180_000,
     },
   ],
 });

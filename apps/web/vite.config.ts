@@ -1,12 +1,15 @@
 import { defineConfig } from 'vite';
 
+const apiTarget = process.env.API_BASE_URL ?? 'http://127.0.0.1:3737';
+const webPort = Number(process.env.WEB_PORT ?? '4173');
+
 export default defineConfig({
   preview: {
     host: '127.0.0.1',
-    port: 4173,
+    port: webPort,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:3737',
+        target: apiTarget,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
@@ -14,10 +17,10 @@ export default defineConfig({
   },
   server: {
     host: '127.0.0.1',
-    port: 4173,
+    port: webPort,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:3737',
+        target: apiTarget,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
